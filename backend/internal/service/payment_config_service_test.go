@@ -199,6 +199,21 @@ func TestParsePaymentConfig(t *testing.T) {
 	})
 }
 
+func TestBuildPaymentSubjectUsesNeutralDefaultBrand(t *testing.T) {
+	t.Parallel()
+
+	svc := &PaymentService{}
+
+	if got := svc.buildPaymentSubject(nil, 12.5, &PaymentConfig{}); got != "ownapi 12.50 CNY" {
+		t.Fatalf("default recharge subject = %q, want %q", got, "ownapi 12.50 CNY")
+	}
+
+	plan := &dbent.SubscriptionPlan{Name: "Pro"}
+	if got := svc.buildPaymentSubject(plan, 0, &PaymentConfig{}); got != "ownapi Subscription Pro" {
+		t.Fatalf("default subscription subject = %q, want %q", got, "ownapi Subscription Pro")
+	}
+}
+
 func TestGetBasePaymentType(t *testing.T) {
 	t.Parallel()
 

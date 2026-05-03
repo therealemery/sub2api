@@ -1,5 +1,5 @@
 # =============================================================================
-# Sub2API Multi-Stage Dockerfile
+# ownapi Multi-Stage Dockerfile
 # =============================================================================
 # Stage 1: Build frontend
 # Stage 2: Build Go backend with embedded frontend
@@ -12,6 +12,7 @@ ARG ALPINE_IMAGE=alpine:3.21
 ARG POSTGRES_IMAGE=postgres:18-alpine
 ARG GOPROXY=https://goproxy.cn,direct
 ARG GOSUMDB=sum.golang.google.cn
+ARG ALPINE_REPOSITORY_URL=
 
 # -----------------------------------------------------------------------------
 # Stage 1: Frontend Builder
@@ -42,12 +43,16 @@ ARG COMMIT=docker
 ARG DATE
 ARG GOPROXY
 ARG GOSUMDB
+ARG ALPINE_REPOSITORY_URL
 
 ENV GOPROXY=${GOPROXY}
 ENV GOSUMDB=${GOSUMDB}
 
 # Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
+RUN if [ -n "${ALPINE_REPOSITORY_URL}" ]; then \
+        sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_REPOSITORY_URL}|g" /etc/apk/repositories; \
+    fi && \
+    apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /app/backend
 
@@ -84,12 +89,19 @@ FROM ${POSTGRES_IMAGE} AS pg-client
 FROM ${ALPINE_IMAGE}
 
 # Labels
-LABEL maintainer="Wei-Shaw <github.com/Wei-Shaw>"
-LABEL description="Sub2API - AI API Gateway Platform"
-LABEL org.opencontainers.image.source="https://github.com/Wei-Shaw/sub2api"
+ARG ALPINE_REPOSITORY_URL
+ARG APP_MAINTAINER="ownapi Maintainers"
+ARG APP_DESCRIPTION="ownapi"
+ARG APP_SOURCE_URL=""
+LABEL maintainer="${APP_MAINTAINER}"
+LABEL description="${APP_DESCRIPTION}"
+LABEL org.opencontainers.image.source="${APP_SOURCE_URL}"
 
 # Install runtime dependencies
-RUN apk add --no-cache \
+RUN if [ -n "${ALPINE_REPOSITORY_URL}" ]; then \
+        sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_REPOSITORY_URL}|g" /etc/apk/repositories; \
+    fi && \
+    apk add --no-cache \
     ca-certificates \
     tzdata \
     su-exec \

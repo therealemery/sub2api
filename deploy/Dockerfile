@@ -1,5 +1,5 @@
 # =============================================================================
-# Sub2API Multi-Stage Dockerfile
+# ownapi Multi-Stage Dockerfile
 # =============================================================================
 # Stage 1: Build frontend
 # Stage 2: Build Go backend with embedded frontend
@@ -73,9 +73,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
 FROM ${ALPINE_IMAGE}
 
 # Labels
-LABEL maintainer="Wei-Shaw <github.com/Wei-Shaw>"
-LABEL description="Sub2API - AI API Gateway Platform"
-LABEL org.opencontainers.image.source="https://github.com/Wei-Shaw/sub2api"
+ARG APP_MAINTAINER="ownapi Maintainers"
+ARG APP_DESCRIPTION="ownapi"
+ARG APP_SOURCE_URL=""
+LABEL maintainer="${APP_MAINTAINER}"
+LABEL description="${APP_DESCRIPTION}"
+LABEL org.opencontainers.image.source="${APP_SOURCE_URL}"
 
 # Install runtime dependencies
 RUN apk add --no-cache \

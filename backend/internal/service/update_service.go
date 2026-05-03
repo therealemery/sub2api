@@ -22,7 +22,6 @@ import (
 const (
 	updateCacheKey = "update_check_cache"
 	updateCacheTTL = 1200 // 20 minutes
-	githubRepo     = "Wei-Shaw/sub2api"
 
 	// Security: allowed download domains for updates
 	allowedDownloadHost = "github.com"
@@ -31,6 +30,10 @@ const (
 	// Security: max download size (500MB)
 	maxDownloadSize = 500 * 1024 * 1024
 )
+
+func configuredUpdateGitHubRepo() string {
+	return strings.TrimSpace(os.Getenv("UPDATE_GITHUB_REPO"))
+}
 
 // UpdateCache defines cache operations for update service
 type UpdateCache interface {
@@ -274,7 +277,18 @@ func (s *UpdateService) Rollback() error {
 }
 
 func (s *UpdateService) fetchLatestRelease(ctx context.Context) (*UpdateInfo, error) {
-	release, err := s.githubClient.FetchLatestRelease(ctx, githubRepo)
+	repo := configuredUpdateGitHubRepo()
+	if repo == "" {
+		return &UpdateInfo{
+			CurrentVersion: s.currentVersion,
+			LatestVersion:  s.currentVersion,
+			HasUpdate:      false,
+			Warning:        "Online updates are disabled. Set UPDATE_GITHUB_REPO to your release repository to enable them.",
+			BuildType:      s.buildType,
+		}, nil
+	}
+
+	release, err := s.githubClient.FetchLatestRelease(ctx, repo)
 	if err != nil {
 		return nil, err
 	}
