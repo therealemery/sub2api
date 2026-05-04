@@ -1,6 +1,6 @@
 package service
 
 const (
-	DefaultSiteName     = "ownapi"
-	DefaultSiteSubtitle = "ownapi"
+	DefaultSiteName     = "OwnAPI"
+	DefaultSiteSubtitle = "OwnAPI"
 )

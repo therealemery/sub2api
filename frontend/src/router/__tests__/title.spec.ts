@@ -23,8 +23,8 @@ describe('resolveDocumentTitle', () => {
   })
 
   it('站点名为空时，回退默认站点名', () => {
-    expect(resolveDocumentTitle('Dashboard', '')).toBe('Dashboard - ownapi')
-    expect(resolveDocumentTitle(undefined, '   ')).toBe('ownapi')
+    expect(resolveDocumentTitle('Dashboard', '')).toBe('Dashboard - OwnAPI')
+    expect(resolveDocumentTitle(undefined, '   ')).toBe('OwnAPI')
   })
 
   it('站点名变更时仅影响后续路由标题计算', () => {
