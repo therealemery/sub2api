@@ -1,0 +1,22 @@
+{
+  "name": "ownapi-docs",
+  "version": "1.0.0",
+  "description": "OwnAPI Developer Documentation",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "ownapi",
+    "api",
+    "documentation",
+    "ai"
+  ],
+  "author": "OwnAPI Team",
+  "license": "ISC",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

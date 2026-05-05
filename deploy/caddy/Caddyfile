@@ -1,0 +1,60 @@
+api.ownapi.dev {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+}
+
+ownapi.dev {
+	encode zstd gzip
+
+	handle /v1/models {
+		@options method OPTIONS
+		respond @options 204
+
+		header {
+			Access-Control-Allow-Origin https://docs.ownapi.dev
+			Access-Control-Allow-Methods GET, OPTIONS
+			Access-Control-Allow-Headers Authorization, Content-Type
+		}
+
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	reverse_proxy 127.0.0.1:3000
+}
+
+docs.ownapi.dev {
+	root * /var/www/docs.ownapi.dev
+	encode zstd gzip
+
+	# Redirect exact root to /zh/
+	@root path /
+	redir @root /zh/ 301
+
+	# Redirect /zh to /zh/ (add trailing slash for directory)
+	@zh path_regexp ^/zh$
+	redir @zh /zh/ 301
+
+	# Redirect /en to /en/ (add trailing slash for directory)
+	@en path_regexp ^/en$
+	redir @en /en/ 301
+
+	# Handle clean URLs: try path, then .html, then 404
+	try_files {path} {path}.html /404.html
+
+	file_server {
+		precompressed zstd br gzip
+	}
+
+	# Security headers
+	header {
+		X-Frame-Options SAMEORIGIN
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	# Static assets caching
+	@static path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+	header @static {
+		Cache-Control public, max-age=31536000, immutable
+	}
+}
