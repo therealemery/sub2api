@@ -22,7 +22,7 @@ API Key 是调用接口的唯一凭证，请妥善保管，不要在客户端代
 
 ## 第一个请求
 
-### cURL
+### GPT-5.4 (OpenAI 格式)
 
 ```bash
 curl https://ownapi.dev/v1/chat/completions \
@@ -37,7 +37,21 @@ curl https://ownapi.dev/v1/chat/completions \
   }'
 ```
 
-### Python (openai SDK)
+### Claude Opus 4.7 (Claude 格式)
+
+```bash
+curl https://ownapi.dev/v1/messages \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-4-7",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### Python
 
 ```python
 from openai import OpenAI
@@ -47,8 +61,9 @@ client = OpenAI(
     api_key="YOUR_API_KEY"
 )
 
+# GPT-5.5
 response = client.chat.completions.create(
-    model="gpt-5.4",
+    model="gpt-5.5",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Hello!"}
@@ -102,7 +117,7 @@ func main() {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: "gpt-5.4",
+			Model: "gpt-5.5",
 			Messages: []openai.ChatCompletionMessage{
 				{Role: openai.ChatMessageRoleSystem, Content: "You are a helpful assistant."},
 				{Role: openai.ChatMessageRoleUser, Content: "Hello!"},

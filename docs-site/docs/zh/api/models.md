@@ -1,43 +1,25 @@
 # 模型列表
 
-OwnAPI 支持多个上游平台的模型，具体可用模型取决于管理员配置的上游账号和分组策略。
+OwnAPI 支持以下模型，所有模型均通过统一的 API 接口访问。
 
-## 动态模型列表
+## 支持的模型
 
-以下模型列表通过 API 实时获取。**注意：此区域需要有效的 API Key 认证**。如果你当前未登录平台，下方会显示加载失败提示——这是正常的，因为浏览器中的静态文档无法携带你的私人 API Key。
+### OpenAI 系列
 
-在你的代码中使用自己的 API Key 调用 `/v1/models` 接口，即可获取完整的可用模型列表。下方「常见模型」表格列出了平台通常支持的模型作为参考。
+| 模型名称 | 模型 ID | 说明 |
+|---------|---------|------|
+| GPT-5.5 | `gpt-5.5` | 增强版旗舰模型，最强性能 |
+| GPT-5.4 | `gpt-5.4` | 最新多模态旗舰模型 |
+| GPT-5.3 Codex | `gpt-5.3-codex` | 代码生成专用模型 |
 
-<ModelList lang="zh" />
+### Claude 系列
 
-## 常见模型
-
-以下列出平台通常支持的模型（实际可用以管理员配置为准）：
-
-### OpenAI 模型
-
-| 模型 ID | 描述 |
-|---------|------|
-| `gpt-5.4` | 最新多模态旗舰模型 |
-| `gpt-5.5` | 增强版旗舰模型 |
-| `gpt-5.3-codex` | 代码生成专用模型 |
-
-### Claude 模型
-
-| 模型 ID | 描述 |
-|---------|------|
-| `claude-opus-4-7` | 最强 Opus 4.7 |
-| `claude-opus-4-6` | 最强 Opus 4.6 |
-| `claude-sonnet-4-6` | 平衡型 Sonnet 4.6 |
-| `claude-haiku-4-5` | 快速 Haiku 4.5 |
-
-### Gemini 模型
-
-| 模型 ID | 描述 |
-|---------|------|
-| `gemini-1.5-pro` | 多模态专业版 |
-| `gemini-1.5-flash` | 快速响应版 |
-| `gemini-1.0-pro` | 标准版 |
+| 模型名称 | 模型 ID | 说明 |
+|---------|---------|------|
+| Claude Opus 4.7 | `claude-opus-4-7` | 最强推理能力 |
+| Claude Opus 4.6 | `claude-opus-4-6` | 顶级性能 |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | 平衡型，性价比最佳 |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | 快速响应，低成本 |
 
 ## 通过 API 获取模型列表
 
@@ -46,20 +28,54 @@ curl https://ownapi.dev/v1/models \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-响应格式：
+响应示例：
 
 ```json
 {
   "object": "list",
   "data": [
     {
-      "id": "gpt-5.4",
+      "id": "gpt-5.5",
       "object": "model",
       "created": 1686935002,
       "owned_by": "openai"
+    },
+    {
+      "id": "claude-opus-4-7",
+      "object": "model",
+      "created": 1686935002,
+      "owned_by": "anthropic"
     }
   ]
 }
+```
+
+## 使用示例
+
+### GPT-5.5
+
+```bash
+curl https://ownapi.dev/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-5.5",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### Claude Opus 4.7
+
+```bash
+curl https://ownapi.dev/v1/messages \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-4-7",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
 ```
 
 ## 分组模型白名单

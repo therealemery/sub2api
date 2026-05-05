@@ -1,43 +1,25 @@
 # Model List
 
-OwnAPI supports models from multiple upstream platforms. The specific available models depend on the upstream accounts and group policies configured by the administrator.
+OwnAPI supports the following models, all accessible through a unified API interface.
 
-## Dynamic Model List
+## Supported Models
 
-The model list below is fetched from the API in real-time. **Note: This section requires a valid API Key for authentication**. If you are not currently logged into the platform, a loading failure message will be displayed below — this is expected, as the static documentation in your browser cannot carry your private API Key.
+### OpenAI Series
 
-Use your own API Key in your code to call the `/v1/models` endpoint and retrieve the full list of available models. The "Common Models" table below lists the models typically supported by the platform for reference.
+| Model Name | Model ID | Description |
+|-----------|----------|-------------|
+| GPT-5.5 | `gpt-5.5` | Enhanced flagship model, best performance |
+| GPT-5.4 | `gpt-5.4` | Latest multimodal flagship model |
+| GPT-5.3 Codex | `gpt-5.3-codex` | Code generation specialized model |
 
-<ModelList lang="en" />
+### Claude Series
 
-## Common Models
-
-The following models are typically supported by the platform (actual availability depends on administrator configuration):
-
-### OpenAI Models
-
-| Model ID | Description |
-|---------|------|
-| `gpt-5.4` | Latest multimodal flagship model |
-| `gpt-5.5` | Enhanced flagship model |
-| `gpt-5.3-codex` | Code generation specialized model |
-
-### Claude Models
-
-| Model ID | Description |
-|---------|------|
-| `claude-opus-4-7` | Most capable Opus 4.7 |
-| `claude-opus-4-6` | Most capable Opus 4.6 |
-| `claude-sonnet-4-6` | Balanced Sonnet 4.6 |
-| `claude-haiku-4-5` | Fast Haiku 4.5 |
-
-### Gemini Models
-
-| Model ID | Description |
-|---------|------|
-| `gemini-1.5-pro` | Multimodal professional version |
-| `gemini-1.5-flash` | Fast response version |
-| `gemini-1.0-pro` | Standard version |
+| Model Name | Model ID | Description |
+|-----------|----------|-------------|
+| Claude Opus 4.7 | `claude-opus-4-7` | Strongest reasoning capability |
+| Claude Opus 4.6 | `claude-opus-4-6` | Top-tier performance |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | Balanced, best value |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | Fast response, low cost |
 
 ## Get Model List via API
 
@@ -46,20 +28,54 @@ curl https://ownapi.dev/v1/models \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-Response format:
+Response example:
 
 ```json
 {
   "object": "list",
   "data": [
     {
-      "id": "gpt-5.4",
+      "id": "gpt-5.5",
       "object": "model",
       "created": 1686935002,
       "owned_by": "openai"
+    },
+    {
+      "id": "claude-opus-4-7",
+      "object": "model",
+      "created": 1686935002,
+      "owned_by": "anthropic"
     }
   ]
 }
+```
+
+## Usage Examples
+
+### GPT-5.5
+
+```bash
+curl https://ownapi.dev/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-5.5",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### Claude Opus 4.7
+
+```bash
+curl https://ownapi.dev/v1/messages \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-opus-4-7",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
 ```
 
 ## Group Model Allowlist
