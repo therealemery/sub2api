@@ -22,7 +22,7 @@ Authorization: Bearer YOUR_API_KEY
 curl https://ownapi.dev/v1/chat/completions \
   -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
-  -d '{"model": "gpt-4o", "messages": [{"role": "user", "content": "Hi"}]}'
+  -d '{"model": "gpt-5.4", "messages": [{"role": "user", "content": "Hi"}]}'
 ```
 
 ## 错误响应

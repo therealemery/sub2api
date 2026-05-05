@@ -18,20 +18,18 @@ The following models are typically supported by the platform (actual availabilit
 
 | Model ID | Description |
 |---------|------|
-| `gpt-4o` | Latest multimodal flagship model |
-| `gpt-4o-mini` | Fast, cost-effective version |
-| `gpt-4-turbo` | 128K context window |
-| `gpt-4` | Standard GPT-4 |
-| `gpt-3.5-turbo` | Fast, low-cost |
-| `dall-e-3` | Image generation |
+| `gpt-5.4` | Latest multimodal flagship model |
+| `gpt-5.5` | Enhanced flagship model |
+| `gpt-5.3-codex` | Code generation specialized model |
 
 ### Claude Models
 
 | Model ID | Description |
 |---------|------|
-| `claude-3-5-sonnet-20241022` | Latest Sonnet |
-| `claude-3-5-haiku-20241022` | Fast Haiku |
-| `claude-3-opus-20240229` | Most capable Opus |
+| `claude-opus-4-7` | Most capable Opus 4.7 |
+| `claude-opus-4-6` | Most capable Opus 4.6 |
+| `claude-sonnet-4-6` | Balanced Sonnet 4.6 |
+| `claude-haiku-4-5` | Fast Haiku 4.5 |
 
 ### Gemini Models
 
@@ -55,7 +53,7 @@ Response format:
   "object": "list",
   "data": [
     {
-      "id": "gpt-4o",
+      "id": "gpt-5.4",
       "object": "model",
       "created": 1686935002,
       "owned_by": "openai"

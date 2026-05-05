@@ -19,7 +19,7 @@ curl https://ownapi.dev/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-5.4",
     "messages": [
       {"role": "system", "content": "You are a helpful assistant."},
       {"role": "user", "content": "Hello!"}
@@ -34,7 +34,7 @@ curl https://ownapi.dev/v1/chat/completions \
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `model` | string | 是 | 模型 ID，如 `gpt-4o`、`gpt-4o-mini` |
+| `model` | string | 是 | 模型 ID，如 `gpt-5.4`、`gpt-5.5` |
 | `messages` | array | 是 | 消息列表，包含 `role` 和 `content` |
 | `temperature` | float | 否 | 采样温度，0-2，默认 1 |
 | `max_tokens` | integer | 否 | 最大生成 token 数 |
@@ -50,7 +50,7 @@ curl https://ownapi.dev/v1/chat/completions \
   "id": "chatcmpl-xxx",
   "object": "chat.completion",
   "created": 1699000000,
-  "model": "gpt-4o",
+  "model": "gpt-5.4",
   "choices": [
     {
       "index": 0,
@@ -78,7 +78,7 @@ curl https://ownapi.dev/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-5.4",
     "messages": [{"role": "user", "content": "Hello"}],
     "stream": true
   }'
@@ -88,7 +88,7 @@ Python 流式示例：
 
 ```python
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.4",
     messages=[{"role": "user", "content": "Hello"}],
     stream=True
 )
@@ -109,7 +109,7 @@ curl https://ownapi.dev/v1/responses \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-5.4",
     "input": "What is the weather like?"
   }'
 ```
@@ -131,7 +131,7 @@ curl https://ownapi.dev/v1/responses \
   "id": "resp_xxx",
   "object": "response",
   "created_at": 1699000000,
-  "model": "gpt-4o",
+  "model": "gpt-5.4",
   "output": [
     {
       "type": "message",
@@ -173,7 +173,7 @@ curl https://ownapi.dev/v1/images/generations \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "dall-e-3",
+    "model": "gpt-5.4",
     "prompt": "A cute cat wearing a hat",
     "n": 1,
     "size": "1024x1024"
@@ -184,7 +184,7 @@ curl https://ownapi.dev/v1/images/generations \
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `model` | string | 是 | 图像模型，如 `dall-e-3` |
+| `model` | string | 是 | 图像模型，如 `gpt-5.4` |
 | `prompt` | string | 是 | 图像描述 |
 | `n` | integer | 否 | 生成数量，默认 1 |
 | `size` | string | 否 | 尺寸，如 `1024x1024` |
@@ -235,7 +235,7 @@ curl https://ownapi.dev/v1/models \
   "object": "list",
   "data": [
     {
-      "id": "gpt-4o",
+      "id": "gpt-5.4",
       "object": "model",
       "created": 1686935002,
       "owned_by": "openai"
