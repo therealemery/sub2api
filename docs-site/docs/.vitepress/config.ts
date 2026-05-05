@@ -102,7 +102,7 @@ export default defineConfig({
     
     // 社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/your-org/ownapi-docs' },
+      { icon: 'github', link: 'https://github.com/therealemery/sub2api-ownapi' },
     ],
     
     // 页脚
@@ -113,7 +113,7 @@ export default defineConfig({
     
     // 编辑链接
     editLink: {
-      pattern: 'https://github.com/your-org/ownapi-docs/edit/main/docs/:path',
+      pattern: 'https://github.com/therealemery/sub2api-ownapi/edit/main/docs-site/docs/:path',
       text: '在 GitHub 上编辑此页',
     },
   },
