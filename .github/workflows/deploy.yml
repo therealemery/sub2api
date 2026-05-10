@@ -1,0 +1,77 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build and deploy'
+        required: false
+        default: 'main'
+        type: string
+
+env:
+  IMAGE_NAME: ownapi
+  IMAGE_TAG: latest
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            --build-arg GOPROXY=https://goproxy.cn,direct \
+            --build-arg GOSUMDB=sum.golang.google.cn \
+            --build-arg ALPINE_REPOSITORY_URL=https://mirrors.aliyun.com/alpine \
+            -f Dockerfile \
+            --load .
+
+      - name: Save Docker image
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          ls -lh /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+
+      - name: Copy image to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          target: /opt/ownapi/deploy/
+          strip_components: 2
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/ownapi/deploy
+            echo "Loading Docker image..."
+            docker load < ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+            echo "Stopping old containers..."
+            docker compose down
+            echo "Starting new containers..."
+            docker compose up -d
+            echo "Cleaning up..."
+            rm -f ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+            echo "Deployment complete!"
+            docker compose ps
+            echo ""
+            echo "Recent logs:"
+            docker compose logs --tail=20 ownapi
