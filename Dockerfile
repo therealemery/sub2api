@@ -21,11 +21,8 @@ FROM ${NODE_IMAGE} AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Allow build scripts (esbuild, vue-demi need postinstall)
-RUN pnpm config set ignore-build-scripts false
+# Install pnpm (lock to v9, matching CI config)
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Install dependencies first (better caching)
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
