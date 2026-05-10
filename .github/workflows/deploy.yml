@@ -10,7 +10,7 @@ on:
         type: string
 
 env:
-  IMAGE_NAME: ghcr.io/therealemery/ownapi
+  IMAGE_NAME: ownapi
   IMAGE_TAG: main
 
 jobs:
