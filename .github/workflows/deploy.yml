@@ -51,6 +51,8 @@ jobs:
         run: |
           docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip | ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             cd /opt/ownapi/deploy
+            echo "Pulling latest deploy configs..."
+            git pull --rebase origin main || echo "Warning: git pull failed, using existing configs"
             echo "Loading Docker image..."
             gunzip | docker load
             echo "Restarting ownapi service..."
