@@ -52,7 +52,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
           target: /opt/ownapi/deploy/
-          strip_components: 2
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
