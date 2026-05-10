@@ -41,8 +41,8 @@ jobs:
 
       - name: Save Docker image
         run: |
-          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
-          ls -lh /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          ls -lh ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
 
       - name: Copy image to server
         uses: appleboy/scp-action@v0.1.7
@@ -50,7 +50,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: /tmp/${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          source: ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
           target: /opt/ownapi/deploy/
 
       - name: Deploy on server
