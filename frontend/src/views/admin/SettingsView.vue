@@ -4631,7 +4631,7 @@
                       v-model="form.payment_product_name_suffix"
                       type="text"
                       class="input"
-                      placeholder="CNY"
+                      placeholder="USD"
                     />
                   </div>
                   <div>
@@ -4644,7 +4644,7 @@
                       {{
                         (form.payment_product_name_prefix || DEFAULT_PAYMENT_PRODUCT_PREFIX) +
                         " 100 " +
-                        (form.payment_product_name_suffix || "CNY")
+                        (form.payment_product_name_suffix || "USD")
                       }}
                     </div>
                   </div>

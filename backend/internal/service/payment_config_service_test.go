@@ -204,8 +204,8 @@ func TestBuildPaymentSubjectUsesNeutralDefaultBrand(t *testing.T) {
 
 	svc := &PaymentService{}
 
-	if got := svc.buildPaymentSubject(nil, 12.5, &PaymentConfig{}); got != "OwnAPI 12.50 CNY" {
-		t.Fatalf("default recharge subject = %q, want %q", got, "OwnAPI 12.50 CNY")
+	if got := svc.buildPaymentSubject(nil, 12.5, &PaymentConfig{}); got != "OwnAPI 12.50 USD" {
+		t.Fatalf("default recharge subject = %q, want %q", got, "OwnAPI 12.50 USD")
 	}
 
 	plan := &dbent.SubscriptionPlan{Name: "Pro"}
