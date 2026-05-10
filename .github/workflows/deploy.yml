@@ -10,8 +10,8 @@ on:
         type: string
 
 env:
-  IMAGE_NAME: ownapi
-  IMAGE_TAG: latest
+  IMAGE_NAME: ghcr.io/therealemery/ownapi
+  IMAGE_TAG: main
 
 jobs:
   build-and-deploy:
