@@ -24,6 +24,9 @@ WORKDIR /app/frontend
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
+# Allow build scripts (esbuild, vue-demi need postinstall)
+RUN pnpm config set ignore-build-scripts false
+
 # Install dependencies first (better caching)
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
