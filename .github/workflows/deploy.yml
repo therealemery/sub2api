@@ -39,38 +39,25 @@ jobs:
             -f Dockerfile \
             --load .
 
-      - name: Save Docker image
+      - name: Setup SSH key
         run: |
-          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
-          ls -lh ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
 
-      - name: Copy image to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
-          target: /opt/ownapi/deploy/
-
-      - name: Deploy on server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
+      - name: Save and deploy image
+        run: |
+          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip | ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             cd /opt/ownapi/deploy
             echo "Loading Docker image..."
-            docker load < ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
-            echo "Restarting ownapi service only (postgres/redis unchanged)..."
+            gunzip | docker load
+            echo "Restarting ownapi service..."
             docker compose stop ownapi
             docker compose rm -f ownapi
             docker compose up -d ownapi
-            echo "Cleaning up..."
-            rm -f ${{ env.IMAGE_NAME }}-${{ env.IMAGE_TAG }}.tar.gz
             echo "Deployment complete!"
             docker compose ps
-            echo ""
-            echo "Recent logs:"
             docker compose logs --tail=20 ownapi
+          '
