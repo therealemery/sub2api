@@ -14,7 +14,7 @@ import (
 
 // Stripe constants.
 const (
-	stripeCurrency            = "cny"
+	stripeCurrency            = "usd"
 	stripeEventPaymentSuccess = "payment_intent.succeeded"
 	stripeEventPaymentFailed  = "payment_intent.payment_failed"
 )
@@ -72,7 +72,7 @@ var stripePaymentMethodTypes = map[string][]string{
 func (s *Stripe) CreatePayment(ctx context.Context, req payment.CreatePaymentRequest) (*payment.CreatePaymentResponse, error) {
 	s.ensureInit()
 
-	amountInCents, err := payment.YuanToFen(req.Amount)
+	amountInMinorUnits, err := payment.MajorToMinor(req.Amount)
 	if err != nil {
 		return nil, fmt.Errorf("stripe create payment: %w", err)
 	}
@@ -86,7 +86,7 @@ func (s *Stripe) CreatePayment(ctx context.Context, req payment.CreatePaymentReq
 	}
 
 	params := &stripe.PaymentIntentCreateParams{
-		Amount:             stripe.Int64(amountInCents),
+		Amount:             stripe.Int64(amountInMinorUnits),
 		Currency:           stripe.String(stripeCurrency),
 		PaymentMethodTypes: pmTypes,
 		Description:        stripe.String(req.Subject),
@@ -136,7 +136,7 @@ func (s *Stripe) QueryOrder(ctx context.Context, tradeNo string) (*payment.Query
 	return &payment.QueryOrderResponse{
 		TradeNo: pi.ID,
 		Status:  status,
-		Amount:  payment.FenToYuan(pi.Amount),
+		Amount:  payment.MinorToMajor(pi.Amount),
 	}, nil
 }
 
@@ -177,7 +177,7 @@ func parseStripePaymentIntent(event *stripe.Event, status string, rawBody string
 	return &payment.PaymentNotification{
 		TradeNo: pi.ID,
 		OrderID: pi.Metadata["orderId"],
-		Amount:  payment.FenToYuan(pi.Amount),
+		Amount:  payment.MinorToMajor(pi.Amount),
 		Status:  status,
 		RawData: rawBody,
 	}, nil
@@ -187,14 +187,14 @@ func parseStripePaymentIntent(event *stripe.Event, status string, rawBody string
 func (s *Stripe) Refund(ctx context.Context, req payment.RefundRequest) (*payment.RefundResponse, error) {
 	s.ensureInit()
 
-	amountInCents, err := payment.YuanToFen(req.Amount)
+	amountInMinorUnits, err := payment.MajorToMinor(req.Amount)
 	if err != nil {
 		return nil, fmt.Errorf("stripe refund: %w", err)
 	}
 
 	params := &stripe.RefundCreateParams{
 		PaymentIntent: stripe.String(req.TradeNo),
-		Amount:        stripe.Int64(amountInCents),
+		Amount:        stripe.Int64(amountInMinorUnits),
 		Reason:        stripe.String(string(stripe.RefundReasonRequestedByCustomer)),
 	}
 	params.Context = ctx

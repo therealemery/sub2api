@@ -5,6 +5,19 @@
 import { config } from '@vue/test-utils'
 import { vi } from 'vitest'
 
+if (typeof globalThis.localStorage === 'undefined' || typeof globalThis.localStorage.getItem !== 'function') {
+  const store = new Map<string, string>()
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: vi.fn((key: string) => store.get(key) ?? null),
+      setItem: vi.fn((key: string, value: string) => { store.set(key, value) }),
+      removeItem: vi.fn((key: string) => { store.delete(key) }),
+      clear: vi.fn(() => { store.clear() }),
+    },
+  })
+}
+
 // Mock requestIdleCallback (Safari < 15 不支持)
 if (typeof globalThis.requestIdleCallback === 'undefined') {
   globalThis.requestIdleCallback = ((callback: IdleRequestCallback) => {

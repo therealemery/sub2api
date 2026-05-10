@@ -96,7 +96,7 @@ func GetBasePaymentType(t string) string {
 // CreatePaymentRequest holds the parameters for creating a new payment.
 type CreatePaymentRequest struct {
 	OrderID            string // Internal order ID
-	Amount             string // Pay amount in CNY (formatted to 2 decimal places)
+	Amount             string // Pay amount in the provider currency (formatted to 2 decimal places)
 	PaymentType        string // e.g. "alipay", "wxpay", "stripe"
 	Subject            string // Product description
 	NotifyURL          string // Webhook callback URL
@@ -151,7 +151,7 @@ type CreatePaymentResponse struct {
 type QueryOrderResponse struct {
 	TradeNo  string
 	Status   string  // "pending", "paid", "failed", "refunded"
-	Amount   float64 // Amount in CNY
+	Amount   float64 // Amount in the provider currency
 	PaidAt   string  // RFC3339 timestamp or empty
 	Metadata map[string]string
 }

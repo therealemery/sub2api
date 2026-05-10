@@ -130,10 +130,11 @@ func (h *PaymentHandler) GetCheckoutInfo(c *gin.Context) {
 		})
 	}
 
+	stripeLimits := stripeOnlyMethodLimits(limitsResp)
 	response.Success(c, checkoutInfoResponse{
-		Methods:                   limitsResp.Methods,
-		GlobalMin:                 limitsResp.GlobalMin,
-		GlobalMax:                 limitsResp.GlobalMax,
+		Methods:                   stripeLimits.Methods,
+		GlobalMin:                 stripeLimits.GlobalMin,
+		GlobalMax:                 stripeLimits.GlobalMax,
 		Plans:                     planList,
 		BalanceDisabled:           cfg.BalanceDisabled,
 		BalanceRechargeMultiplier: cfg.BalanceRechargeMultiplier,
@@ -142,6 +143,18 @@ func (h *PaymentHandler) GetCheckoutInfo(c *gin.Context) {
 		HelpImageURL:              cfg.HelpImageURL,
 		StripePublishableKey:      cfg.StripePublishableKey,
 	})
+}
+
+func stripeOnlyMethodLimits(resp *service.MethodLimitsResponse) service.MethodLimitsResponse {
+	if resp == nil {
+		return service.MethodLimitsResponse{Methods: map[string]service.MethodLimits{}}
+	}
+	methods := map[string]service.MethodLimits{}
+	if limit, ok := resp.Methods[payment.TypeStripe]; ok {
+		methods[payment.TypeStripe] = limit
+		return service.MethodLimitsResponse{Methods: methods, GlobalMin: limit.SingleMin, GlobalMax: limit.SingleMax}
+	}
+	return service.MethodLimitsResponse{Methods: methods}
 }
 
 type checkoutInfoResponse struct {
