@@ -15,13 +15,6 @@ func normalizeBalanceRechargeMultiplier(multiplier float64) float64 {
 	return multiplier
 }
 
-func calculateCreditedBalance(paymentAmount, multiplier float64) float64 {
-	return decimal.NewFromFloat(paymentAmount).
-		Mul(decimal.NewFromFloat(normalizeBalanceRechargeMultiplier(multiplier))).
-		Round(2).
-		InexactFloat64()
-}
-
 func calculateGatewayRefundAmount(orderAmount, payAmount, refundAmount float64) float64 {
 	if orderAmount <= 0 || payAmount <= 0 || refundAmount <= 0 {
 		return 0
