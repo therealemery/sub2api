@@ -11,7 +11,6 @@ on:
 
 env:
   IMAGE_NAME: ownapi
-  IMAGE_TAG: main
 
 jobs:
   build-and-deploy:
@@ -21,6 +20,23 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.branch || github.ref }}
+
+      - name: Compute build metadata
+        id: meta
+        run: |
+          FULL_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="$(git rev-parse --short=12 HEAD)"
+          BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          IMAGE_REF="${{ env.IMAGE_NAME }}:${SHORT_SHA}"
+
+          {
+            echo "full_sha=${FULL_SHA}"
+            echo "short_sha=${SHORT_SHA}"
+            echo "built_at=${BUILT_AT}"
+            echo "image_ref=${IMAGE_REF}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Building ${IMAGE_REF} from ${FULL_SHA} at ${BUILT_AT}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -32,10 +48,13 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64 \
-            -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            -t ${{ steps.meta.outputs.image_ref }} \
             --build-arg GOPROXY=https://goproxy.cn,direct \
             --build-arg GOSUMDB=sum.golang.google.cn \
             --build-arg ALPINE_REPOSITORY_URL=https://mirrors.aliyun.com/alpine \
+            --build-arg COMMIT=${{ steps.meta.outputs.full_sha }} \
+            --build-arg DATE=${{ steps.meta.outputs.built_at }} \
+            --build-arg APP_SOURCE_URL=https://github.com/${{ github.repository }} \
             -f Dockerfile \
             --load .
 
@@ -49,15 +68,36 @@ jobs:
 
       - name: Save and deploy image
         run: |
-          docker save ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip | ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+          docker save ${{ steps.meta.outputs.image_ref }} | gzip | ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            set -eu
             cd /opt/ownapi/deploy
+            IMAGE_REF="${{ steps.meta.outputs.image_ref }}"
+            FULL_SHA="${{ steps.meta.outputs.full_sha }}"
+            SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
+
             echo "Loading Docker image..."
             gunzip | docker load
-            echo "Restarting ownapi service..."
-            docker compose stop ownapi
-            docker compose rm -f ownapi
-            docker compose up -d ownapi
+
+            echo "Deploying ${IMAGE_REF} (${FULL_SHA})..."
+            if [ -f .env ]; then
+              cp .env ".env.backup.${SHORT_SHA}"
+              if grep -q "^APP_IMAGE=" .env; then
+                sed -i "s|^APP_IMAGE=.*|APP_IMAGE=${IMAGE_REF}|" .env
+              else
+                printf "\nAPP_IMAGE=%s\n" "${IMAGE_REF}" >> .env
+              fi
+            else
+              echo "Warning: .env not found; using APP_IMAGE only for this compose invocation"
+            fi
+
+            APP_IMAGE="${IMAGE_REF}" docker compose up -d --force-recreate ownapi
+            printf "%s %s\n" "${IMAGE_REF}" "${FULL_SHA}" > .deployed-version
+
             echo "Deployment complete!"
             docker compose ps
+            docker inspect ownapi --format "Running image: {{.Config.Image}}"
+            docker exec ownapi /app/sub2api -version || true
+            wget -q -T 10 -O - http://127.0.0.1:${SERVER_PORT:-8080}/health
+            echo
             docker compose logs --tail=20 ownapi
           '
