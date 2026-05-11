@@ -30,6 +30,7 @@ test-backend:
 	@$(MAKE) -C backend test
 
 test-frontend:
+	@pnpm --dir frontend run ui:audit
 	@pnpm --dir frontend run lint:check
 	@pnpm --dir frontend run typecheck
 	@$(MAKE) test-frontend-critical

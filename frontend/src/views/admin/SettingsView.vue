@@ -5551,9 +5551,18 @@ function localText(zh: string, en: string): string {
   return locale.value.startsWith("zh") ? zh : en;
 }
 
-const paymentGuideHref = computed(() => appStore.docUrl || "");
+const DEFAULT_PAYMENT_GUIDE_HREF =
+  "https://github.com/Wei-Shaw/sub2api/blob/main/docs/PAYMENT_CN.md";
+const DEFAULT_PAYMENT_METHODS_HREF =
+  "https://github.com/Wei-Shaw/sub2api/blob/main/docs/PAYMENT_CN.md#支持的支付方式";
 
-const paymentMethodsHref = computed(() => appStore.docUrl || "");
+const paymentGuideHref = computed(
+  () => appStore.docUrl || DEFAULT_PAYMENT_GUIDE_HREF,
+);
+
+const paymentMethodsHref = computed(
+  () => appStore.docUrl || DEFAULT_PAYMENT_METHODS_HREF,
+);
 
 type SettingsTab =
   | "general"
