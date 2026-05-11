@@ -75,6 +75,8 @@ jobs:
             FULL_SHA="${{ steps.meta.outputs.full_sha }}"
             SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
 
+            echo "Pulling latest deploy configs..."
+            git pull --rebase origin main || echo "Warning: git pull failed, using existing configs"
             echo "Loading Docker image..."
             gunzip | docker load
 
