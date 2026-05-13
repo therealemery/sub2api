@@ -13,7 +13,7 @@
     </div>
     <div v-else class="overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="border-b border-gray-200 dark:border-dark-700">
+        <thead class="border-b border-gray-200 border-[var(--border-default)]">
           <tr class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.model') }}</th>
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.latestStatus') }}</th>
@@ -28,9 +28,16 @@
           <tr
             v-for="m in detail.models"
             :key="m.model"
-            class="border-b border-gray-100 dark:border-dark-800"
+            class="border-b border-gray-100 border-[var(--border-default)]"
           >
-            <td class="py-2 pr-3 font-medium text-gray-900 dark:text-gray-100">{{ m.model }}</td>
+            <td class="py-2 pr-3 font-medium text-gray-900 dark:text-gray-100">
+              <span class="monitor-detail-model">
+                <span class="monitor-detail-logo">
+                  <img v-if="getModelLogo(m.model)" :src="getModelLogo(m.model)" :alt="getModelDisplayName(m.model)" />
+                </span>
+                <span>{{ m.model }}</span>
+              </span>
+            </td>
             <td class="py-2 pr-3">
               <span
                 class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px]"
@@ -70,6 +77,7 @@ import {
 } from '@/api/channelMonitor'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
+import { getModelDisplayName, getModelLogo } from '@/constants/modelLogos'
 
 const props = defineProps<{
   show: boolean
@@ -112,3 +120,44 @@ watch(
   { immediate: true },
 )
 </script>
+
+<style scoped>
+.monitor-detail-model {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.monitor-detail-logo {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.monitor-detail-logo img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+.monitor-detail-model > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(.dark) .monitor-detail-logo {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark) .monitor-detail-logo img {
+  filter: none;
+}
+</style>

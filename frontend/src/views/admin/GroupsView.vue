@@ -1,6 +1,11 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
+    <div class="table-page-with-intro">
+      <PageIntro
+        :title="'\u5206\u7ec4\u7ba1\u7406'"
+        :description="'\u521b\u5efa\u548c\u7ef4\u62a4\u5206\u7ec4\uff0c\u51b3\u5b9a\u7528\u6237\u6216 API Key \u53ef\u7528\u7684\u6e20\u9053\u3001\u6a21\u578b\u8303\u56f4\u3001\u8d39\u7387\u548c\u5bb9\u91cf\u9650\u5236\u3002'"
+      />
+      <TablePageLayout>
       <template #filters>
         <div
           class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start"
@@ -91,7 +96,7 @@
           @sort="handleSort"
         >
           <template #cell-name="{ value }">
-            <span class="font-medium text-gray-900 dark:text-white">{{
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
               value
             }}</span>
           </template>
@@ -99,17 +104,24 @@
           <template #cell-platform="{ value }">
             <span
               :class="[
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
+                'inline-flex items-center gap-1.5 rounded-md px-2.5 py-0.5 text-xs font-medium',
                 value === 'anthropic'
                   ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                   : value === 'openai'
                     ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                     : value === 'antigravity'
                       ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                      : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                      : 'bg-gray-100 text-gray-700 dark:bg-[var(--bg-surface)]/10 dark:text-gray-300',
               ]"
             >
-              <PlatformIcon :platform="value" size="xs" />
+              <span class="admin-platform-logo">
+                <img
+                  v-if="platformLogo(value)"
+                  :src="platformLogo(value)"
+                  :alt="platformLogoLabel(value)"
+                />
+                <PlatformIcon v-else :platform="asGroupPlatform(value)" size="xs" />
+              </span>
               {{ t("admin.groups.platforms." + value) }}
             </span>
           </template>
@@ -119,7 +131,7 @@
               <!-- Type Badge -->
               <span
                 :class="[
-                  'inline-block rounded-full px-2 py-0.5 text-xs font-medium',
+                  'inline-block rounded-md px-2 py-0.5 text-xs font-medium',
                   row.subscription_type === 'subscription'
                     ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
                     : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
@@ -154,7 +166,7 @@
                       (row.weekly_limit_usd || row.monthly_limit_usd)
                     "
                     class="mx-1 text-gray-300 dark:text-gray-600"
-                    >·</span
+                    >閻</span>
                   >
                   <span v-if="row.weekly_limit_usd"
                     >${{ row.weekly_limit_usd }}/{{
@@ -164,7 +176,7 @@
                   <span
                     v-if="row.weekly_limit_usd && row.monthly_limit_usd"
                     class="mx-1 text-gray-300 dark:text-gray-600"
-                    >·</span
+                    >閻</span>
                   >
                   <span v-if="row.monthly_limit_usd"
                     >${{ row.monthly_limit_usd }}/{{
@@ -207,7 +219,7 @@
                   }}</span
                 >
                 <span
-                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                   >{{ t("admin.groups.accountsUnit") }}</span
                 >
               </div>
@@ -220,7 +232,7 @@
                   >{{ row.rate_limited_account_count }}</span
                 >
                 <span
-                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                   >{{ t("admin.groups.accountsUnit") }}</span
                 >
               </div>
@@ -233,7 +245,7 @@
                   >{{ row.account_count || 0 }}</span
                 >
                 <span
-                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+                  class="ml-1 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                   >{{ t("admin.groups.accountsUnit") }}</span
                 >
               </div>
@@ -250,11 +262,11 @@
               :rpm-used="capacityMap.get(row.id)!.rpmUsed"
               :rpm-max="capacityMap.get(row.id)!.rpmMax"
             />
-            <span v-else class="text-xs text-gray-400">—</span>
+            <span v-else class="text-xs text-gray-400">-</span>
           </template>
 
           <template #cell-usage="{ row }">
-            <div v-if="usageLoading" class="text-xs text-gray-400">—</div>
+            <div v-if="usageLoading" class="text-xs text-gray-400">&#x52A0;&#x8F7D;&#x4E2D;</div>
             <div v-else class="space-y-0.5 text-xs">
               <div class="text-gray-500 dark:text-gray-400">
                 <span class="text-gray-400 dark:text-gray-500">{{
@@ -294,7 +306,7 @@
             <div class="flex items-center gap-1">
               <button
                 @click="handleEdit(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t("common.edit") }}</span>
@@ -330,7 +342,7 @@
           <template #empty>
             <EmptyState
               :title="t('admin.groups.noGroupsYet')"
-              :description="t('admin.groups.createFirstGroup')"
+              :description="'\u8fd8\u6ca1\u6709\u521b\u5efa\u5206\u7ec4\u3002\u8bf7\u5148\u914d\u7f6e\u6e20\u9053\uff0c\u518d\u521b\u5efa\u5206\u7ec4\u6765\u5206\u914d\u7528\u6237\u6216 API Key \u53ef\u7528\u8303\u56f4\u4e0e\u8d39\u7387\u3002'"
               :action-text="t('admin.groups.createGroup')"
               @action="showCreateModal = true"
             />
@@ -338,30 +350,39 @@
         </DataTable>
       </template>
 
-      <template #pagination>
-        <Pagination
-          v-if="pagination.total > 0"
-          :page="pagination.page"
-          :total="pagination.total"
-          :page-size="pagination.page_size"
-          @update:page="handlePageChange"
-          @update:pageSize="handlePageSizeChange"
-        />
-      </template>
-    </TablePageLayout>
+      </TablePageLayout>
+
+      <Pagination
+        v-if="paginationState.total > 0"
+        class="mt-4"
+        :page="paginationState.page"
+        :total="paginationState.total"
+        :page-size="paginationState.page_size"
+        @update:page="handlePageChange"
+        @update:pageSize="handlePageSizeChange"
+      />
+    </div>
 
     <!-- Create Group Modal -->
     <BaseDialog
       :show="showCreateModal"
       :title="t('admin.groups.createGroup')"
-      width="normal"
+      width="wide"
       @close="closeCreateModal"
     >
       <form
         id="create-group-form"
         @submit.prevent="handleCreateGroup"
-        class="space-y-5"
+        class="admin-config-form space-y-5"
       >
+        <div class="admin-config-impact-note">
+          <strong>&#x4FDD;&#x5B58;&#x5F71;&#x54CD;</strong>
+          &#x8FD9;&#x91CC;&#x53EA;&#x4FDD;&#x5B58;&#x5206;&#x7EC4;&#x914D;&#x7F6E;&#xFF0C;&#x4E0D;&#x4F1A;&#x81EA;&#x52A8;&#x521B;&#x5EFA;&#x6E20;&#x9053;&#x3001;&#x8D26;&#x53F7;&#x6216; API Key&#x3002;&#x4FDD;&#x5B58;&#x540E;&#x4F1A;&#x5F71;&#x54CD;&#x4F7F;&#x7528;&#x8BE5;&#x5206;&#x7EC4;&#x7684;&#x7528;&#x6237;&#x548C;&#x5BC6;&#x94A5;&#x3002;        </div>
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x57FA;&#x7840;&#x4FE1;&#x606F;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x5206;&#x7EC4;&#x540D;&#x79F0;&#x3001;&#x8BF4;&#x660E;&#x548C;&#x5E73;&#x53F0;&#xFF0C;&#x4FBF;&#x4E8E;&#x540E;&#x7EED;&#x5206;&#x914D;&#x6E20;&#x9053;&#x4E0E;&#x5BC6;&#x94A5;&#x3002;</p>
+          </div>
         <div>
           <label class="input-label">{{ t("admin.groups.form.name") }}</label>
           <input
@@ -393,10 +414,43 @@
             :options="platformOptions"
             data-tour="group-form-platform"
             @change="createForm.copy_accounts_from_group_ids = []"
-          />
+          >
+            <template #selected="{ option }">
+              <span v-if="option" class="admin-platform-select-item">
+                <span class="admin-platform-logo">
+                  <img
+                    v-if="platformLogo(option.value)"
+                    :src="platformLogo(option.value)"
+                    :alt="platformLogoLabel(option.value)"
+                  />
+                  <PlatformIcon v-else :platform="asGroupPlatform(option.value)" size="xs" />
+                </span>
+                <span>{{ option.label }}</span>
+              </span>
+            </template>
+            <template #option="{ option }">
+              <span class="admin-platform-select-item">
+                <span class="admin-platform-logo">
+                  <img
+                    v-if="platformLogo(option.value)"
+                    :src="platformLogo(option.value)"
+                    :alt="platformLogoLabel(option.value)"
+                  />
+                  <PlatformIcon v-else :platform="asGroupPlatform(option.value)" size="xs" />
+                </span>
+                <span class="select-option-label">{{ option.label }}</span>
+              </span>
+            </template>
+          </Select>
           <p class="input-hint">{{ t("admin.groups.platformHint") }}</p>
         </div>
-        <!-- 从分组复制账号 -->
+        </section>
+
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x5206;&#x914D;&#x89C4;&#x5219;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x8D39;&#x7387;&#x3001;RPM&#x3001;&#x516C;&#x5F00;&#x8303;&#x56F4;&#x548C;&#x8D26;&#x53F7;&#x590D;&#x5236;&#x65B9;&#x5F0F;&#x3002;</p>
+          </div>
         <div v-if="copyAccountsGroupOptions.length > 0">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -407,13 +461,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.copyAccounts.tooltip") }}
@@ -425,7 +479,7 @@
               </div>
             </div>
           </div>
-          <!-- 已选分组标签 -->
+          <!-- 閻庣懓鎲￠悡锟犲焵椤掆偓椤︻垶宕规惔锝囩＜闁告洦鍓涢崹鑲╃磼?-->
           <div
             v-if="createForm.copy_accounts_from_group_ids.length > 0"
             class="flex flex-wrap gap-1.5 mb-2"
@@ -433,7 +487,7 @@
             <span
               v-for="groupId in createForm.copy_accounts_from_group_ids"
               :key="groupId"
-              class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+              class="inline-flex items-center gap-1 rounded-md bg-[var(--bg-surface-alt)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
             >
               {{
                 copyAccountsGroupOptions.find((o) => o.value === groupId)
@@ -447,13 +501,12 @@
                       (id) => id !== groupId,
                     )
                 "
-                class="ml-0.5 text-primary-500 hover:text-primary-700 dark:hover:text-primary-200"
+                class="ml-0.5 text-[var(--accent)] hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
               >
                 <Icon name="x" size="xs" />
               </button>
             </span>
           </div>
-          <!-- 分组选择下拉 -->
           <select
             class="input"
             @change="
@@ -526,14 +579,14 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <!-- Tooltip Popover -->
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="mb-2 text-xs font-medium">
                     {{ t("admin.groups.exclusiveTooltip.title") }}
@@ -544,7 +597,7 @@
                   <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
                     <p class="text-xs leading-relaxed text-gray-300">
                       <span
-                        class="inline-flex items-center gap-1 text-primary-400"
+                        class="inline-flex items-center gap-1 text-[var(--accent)]"
                         ><Icon name="lightbulb" size="xs" />
                         {{ t("admin.groups.exclusiveTooltip.example") }}</span
                       >
@@ -564,15 +617,15 @@
               type="button"
               @click="createForm.is_exclusive = !createForm.is_exclusive"
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 createForm.is_exclusive
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   createForm.is_exclusive ? 'translate-x-6' : 'translate-x-1',
                 ]"
               />
@@ -586,9 +639,15 @@
             </span>
           </div>
         </div>
+        </section>
 
         <!-- Subscription Configuration -->
-        <div class="mt-4 border-t pt-4">
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x8BA2;&#x9605;&#x9650;&#x5236;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x8BA2;&#x9605;&#x7C7B;&#x578B;&#x4EE5;&#x53CA;&#x65E5;&#x3001;&#x5468;&#x3001;&#x6708;&#x989D;&#x5EA6;&#x9650;&#x5236;&#x3002;</p>
+          </div>
+        <div>
           <div>
             <label class="input-label">{{
               t("admin.groups.subscription.type")
@@ -605,7 +664,7 @@
           <!-- Subscription limits (only show when subscription type is selected) -->
           <div
             v-if="createForm.subscription_type === 'subscription'"
-            class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
+            class="space-y-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4"
           >
             <div>
               <label class="input-label">{{
@@ -648,30 +707,26 @@
             </div>
           </div>
         </div>
+        </section>
 
-        <!-- 图片生成计费配置 -->
-        <div
+        <section
           v-if="
             createForm.platform === 'antigravity' ||
             createForm.platform === 'gemini' ||
             createForm.platform === 'openai'
           "
-          class="border-t pt-4"
+          class="admin-config-section"
         >
-          <label
-            class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-          >
-            {{ t("admin.groups.imagePricing.title") }}
-          </label>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-            {{ t("admin.groups.imagePricing.description") }}
-          </p>
+          <div class="admin-config-section-header">
+            <h4>{{ t("admin.groups.imagePricing.title") }}</h4>
+            <p>{{ t("admin.groups.imagePricing.description") }}</p>
+          </div>
           <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
             <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input
                 v-model="createForm.allow_image_generation"
                 type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               {{ t("admin.groups.imagePricing.allowImageGeneration") }}
             </label>
@@ -679,7 +734,7 @@
               <input
                 v-model="createForm.image_rate_independent"
                 type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               {{ t("admin.groups.imagePricing.independentMultiplier") }}
             </label>
@@ -751,9 +806,14 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- 支持的模型系列（仅 antigravity 平台） -->
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x5E73;&#x53F0;&#x4E13;&#x5C5E;&#x8BBE;&#x7F6E;</h4>
+            <p>&#x4FDD;&#x7559; Claude&#x3001;OpenAI&#x3001;Gemini &#x4E0E; Antigravity &#x7684;&#x5E73;&#x53F0;&#x5B57;&#x6BB5;&#xFF0C;&#x4EC5;&#x8C03;&#x6574;&#x5C55;&#x793A;&#x5C42;&#x7EA7;&#x3002;</p>
+          </div>
+
         <div v-if="createForm.platform === 'antigravity'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -765,13 +825,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.supportedScopes.tooltip") }}
@@ -789,7 +849,7 @@
                 type="checkbox"
                 :checked="createForm.supported_model_scopes.includes('claude')"
                 @change="toggleCreateScope('claude')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.claude")
@@ -802,7 +862,7 @@
                   createForm.supported_model_scopes.includes('gemini_text')
                 "
                 @change="toggleCreateScope('gemini_text')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.geminiText")
@@ -815,7 +875,7 @@
                   createForm.supported_model_scopes.includes('gemini_image')
                 "
                 @change="toggleCreateScope('gemini_image')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.geminiImage")
@@ -827,7 +887,6 @@
           </p>
         </div>
 
-        <!-- MCP XML 协议注入（仅 antigravity 平台） -->
         <div v-if="createForm.platform === 'antigravity'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -838,13 +897,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.mcpXml.tooltip") }}
@@ -861,15 +920,15 @@
               type="button"
               @click="createForm.mcp_xml_inject = !createForm.mcp_xml_inject"
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 createForm.mcp_xml_inject
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   createForm.mcp_xml_inject ? 'translate-x-6' : 'translate-x-1',
                 ]"
               />
@@ -884,7 +943,6 @@
           </div>
         </div>
 
-        <!-- Claude Code 客户端限制（仅 anthropic 平台） -->
         <div v-if="createForm.platform === 'anthropic'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -896,13 +954,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.claudeCode.tooltip") }}
@@ -921,15 +979,15 @@
                 createForm.claude_code_only = !createForm.claude_code_only
               "
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 createForm.claude_code_only
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   createForm.claude_code_only
                     ? 'translate-x-6'
                     : 'translate-x-1',
@@ -944,7 +1002,6 @@
               }}
             </span>
           </div>
-          <!-- 降级分组选择（仅当启用 claude_code_only 时显示） -->
           <div v-if="createForm.claude_code_only" class="mt-3">
             <label class="input-label">{{
               t("admin.groups.claudeCode.fallbackGroup")
@@ -960,16 +1017,14 @@
           </div>
         </div>
 
-        <!-- OpenAI Messages 调度配置（仅 openai 平台） -->
         <div
           v-if="createForm.platform === 'openai'"
-          class="border-t border-gray-200 dark:border-dark-400 pt-4 mt-4"
+          class="border-t border-gray-200 border-[var(--border-default)] pt-4 mt-4"
         >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             {{ t("admin.groups.openaiMessages.title") }}
           </h4>
 
-          <!-- 允许 Messages 调度开关 -->
           <div class="flex items-center justify-between">
             <label class="text-sm text-gray-600 dark:text-gray-400">{{
               t("admin.groups.openaiMessages.allowDispatch")
@@ -980,15 +1035,15 @@
                 createForm.allow_messages_dispatch =
                   !createForm.allow_messages_dispatch
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 createForm.allow_messages_dispatch
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   createForm.allow_messages_dispatch
                     ? 'translate-x-6'
@@ -1003,15 +1058,15 @@
 
           <div v-if="createForm.allow_messages_dispatch" class="mt-3">
             <div
-              class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-dark-600 dark:bg-dark-800"
+              class="relative overflow-hidden rounded-lg border border-gray-200 bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <div
-                class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-dark-700 dark:bg-dark-700/50"
+                class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               >
                 <div class="flex items-center gap-2">
-                  <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <div class="h-2 w-2 rounded-md bg-gray-500 dark:bg-gray-300"></div>
                   <label
-                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                     >{{
                       t("admin.groups.openaiMessages.familyMappingTitle")
                     }}</label
@@ -1067,24 +1122,24 @@
             </div>
 
             <div
-              class="mt-5 relative overflow-hidden rounded-xl border border-primary-200 bg-white shadow-sm dark:border-primary-900/50 dark:bg-dark-800"
+              class="mt-5 relative overflow-hidden rounded-lg border border-[var(--border-focus)] bg-[var(--bg-surface)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
             >
               <div
-                class="border-b border-primary-100 bg-primary-50/80 px-4 py-3 dark:border-primary-900/40 dark:bg-primary-900/20"
+                class="border-b border-[var(--border-focus)] bg-[var(--bg-surface-alt)] px-4 py-3 border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <div class="flex items-center gap-2">
-                      <div class="h-2 w-2 rounded-full bg-primary-500"></div>
+                      <div class="h-2 w-2 rounded-md bg-[var(--accent)]"></div>
                       <label
-                        class="text-sm font-medium text-primary-900 dark:text-primary-100"
+                        class="text-sm font-medium text-[var(--accent)] text-[var(--accent)]"
                         >{{
                           t("admin.groups.openaiMessages.exactMappingTitle")
                         }}</label
                       >
                     </div>
                     <p
-                      class="mt-1 text-xs text-primary-600/90 dark:text-primary-400/90"
+                      class="mt-1 text-xs text-[var(--accent)] text-[var(--accent)]"
                     >
                       {{ t("admin.groups.openaiMessages.exactMappingHint") }}
                     </p>
@@ -1092,10 +1147,10 @@
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50/30 dark:bg-dark-800/30">
+              <div class="p-4 bg-gray-50/30 bg-[var(--bg-surface-alt)]">
                 <div
                   v-if="createForm.exact_model_mappings.length === 0"
-                  class="flex items-center justify-between gap-3 rounded-xl border-2 border-dashed border-primary-200 bg-white px-5 py-4 text-sm text-primary-700 transition-colors hover:border-primary-300 dark:border-primary-900/40 dark:bg-dark-800 dark:text-primary-300 dark:hover:border-primary-800"
+                  class="flex items-center justify-between gap-3 rounded-lg border-2 border-dashed border-[var(--border-focus)] bg-[var(--bg-surface)] px-5 py-4 text-sm text-[var(--accent)] transition-colors hover:border-[var(--border-focus)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:border-[var(--border-focus)]"
                 >
                   <span>{{
                     t("admin.groups.openaiMessages.noExactMappings")
@@ -1103,7 +1158,7 @@
                   <button
                     type="button"
                     @click="addCreateMessagesDispatchMapping"
-                    class="flex items-center gap-1.5 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                    class="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                   >
                     <Icon name="plus" size="sm" />
                     {{ t("admin.groups.openaiMessages.addExactMapping") }}
@@ -1114,7 +1169,7 @@
                   <div
                     v-for="row in createForm.exact_model_mappings"
                     :key="getCreateMessagesDispatchRowKey(row)"
-                    class="group relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-dark-600 dark:bg-dark-700 dark:hover:border-primary-700"
+                    class="group relative rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-4 transition-colors hover:border-[var(--border-focus)]  border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-[var(--border-focus)]"
                   >
                     <div class="flex items-center gap-4">
                       <div
@@ -1132,11 +1187,11 @@
                                 'admin.groups.openaiMessages.claudeModelPlaceholder',
                               )
                             "
-                            class="input bg-gray-50 focus:bg-white dark:bg-dark-800 dark:focus:bg-dark-900"
+                            class="input bg-gray-50 focus:bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] dark:focus:bg-dark-900"
                           />
                         </div>
                         <div
-                          class="hidden md:flex md:justify-center md:pt-7 text-primary-300 dark:text-primary-700"
+                          class="hidden md:flex md:justify-center md:pt-7 text-[var(--accent)] text-[var(--accent)]"
                         >
                           <Icon
                             name="arrowRight"
@@ -1156,7 +1211,7 @@
                                 'admin.groups.openaiMessages.targetModelPlaceholder',
                               )
                             "
-                            class="input bg-gray-50 focus:bg-white dark:bg-dark-800 dark:focus:bg-dark-900"
+                            class="input bg-gray-50 focus:bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] dark:focus:bg-dark-900"
                           />
                         </div>
                       </div>
@@ -1176,7 +1231,7 @@
                   <button
                     type="button"
                     @click="addCreateMessagesDispatchMapping"
-                    class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-white py-3 text-sm font-medium text-gray-500 transition-all hover:border-primary-300 hover:bg-primary-50/50 hover:text-primary-600 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-primary-800 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-[var(--bg-surface)] py-3 text-sm font-medium text-gray-500 transition-colors hover:border-[var(--border-focus)] hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
                   >
                     <Icon name="plus" size="sm" />
                     {{ t("admin.groups.openaiMessages.addExactMapping") }}
@@ -1187,30 +1242,29 @@
           </div>
         </div>
 
-        <!-- 账号过滤控制 (OpenAI/Antigravity/Anthropic/Gemini) -->
         <div
           v-if="
             ['openai', 'antigravity', 'anthropic', 'gemini'].includes(
               createForm.platform,
             )
           "
-          class="border-t border-gray-200 dark:border-dark-400 pt-4 mt-4 space-y-4"
+          class="border-t border-gray-200 border-[var(--border-default)] pt-4 mt-4 space-y-4"
         >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            账号过滤控制
+            平台专属设置
           </h4>
 
           <!-- require_oauth_only toggle -->
           <div class="flex items-center justify-between">
             <div>
-              <label class="text-sm text-gray-600 dark:text-gray-400"
-                >仅允许 OAuth 账号</label
-              >
+              <label class="text-sm text-gray-600 dark:text-gray-400">
+                仅允许 OAuth 账号
+              </label>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{
                   createForm.require_oauth_only
-                    ? "已启用 — 排除 API Key 类型账号"
-                    : "未启用"
+                    ? "启用后，此分组只会使用 OAuth 授权账号。"
+                    : "关闭后，此分组可使用当前平台的所有可用账号。"
                 }}
               </p>
             </div>
@@ -1219,15 +1273,15 @@
               @click="
                 createForm.require_oauth_only = !createForm.require_oauth_only
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 createForm.require_oauth_only
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   createForm.require_oauth_only
                     ? 'translate-x-6'
@@ -1240,14 +1294,14 @@
           <!-- require_privacy_set toggle -->
           <div class="flex items-center justify-between">
             <div>
-              <label class="text-sm text-gray-600 dark:text-gray-400"
-                >仅允许隐私保护已设置的账号</label
-              >
+              <label class="text-sm text-gray-600 dark:text-gray-400">
+                要求账号完成隐私设置
+              </label>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{
                   createForm.require_privacy_set
-                    ? "已启用 — Privacy 未设置的账号将被排除"
-                    : "未启用"
+                    ? "启用后，仅使用已经完成 Privacy 设置的账号。"
+                    : "关闭后，不限制账号的 Privacy 设置状态。"
                 }}
               </p>
             </div>
@@ -1256,15 +1310,15 @@
               @click="
                 createForm.require_privacy_set = !createForm.require_privacy_set
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 createForm.require_privacy_set
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   createForm.require_privacy_set
                     ? 'translate-x-6'
@@ -1275,7 +1329,6 @@
           </div>
         </div>
 
-        <!-- 无效请求兜底（仅 anthropic/antigravity 平台，且非订阅分组） -->
         <div
           v-if="
             ['anthropic', 'antigravity'].includes(createForm.platform) &&
@@ -1296,7 +1349,6 @@
           </p>
         </div>
 
-        <!-- 模型路由配置（仅 anthropic 平台） -->
         <div v-if="createForm.platform === 'anthropic'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1308,13 +1360,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.modelRouting.tooltip") }}
@@ -1326,7 +1378,6 @@
               </div>
             </div>
           </div>
-          <!-- 启用开关 -->
           <div class="flex items-center gap-3 mb-3">
             <button
               type="button"
@@ -1335,15 +1386,15 @@
                   !createForm.model_routing_enabled
               "
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 createForm.model_routing_enabled
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   createForm.model_routing_enabled
                     ? 'translate-x-6'
                     : 'translate-x-1',
@@ -1367,12 +1418,11 @@
           <p v-else class="text-xs text-gray-500 dark:text-gray-400 mb-3">
             {{ t("admin.groups.modelRouting.noRulesHint") }}
           </p>
-          <!-- 路由规则列表（仅在启用时显示） -->
           <div v-if="createForm.model_routing_enabled" class="space-y-3">
             <div
               v-for="rule in createModelRoutingRules"
               :key="getCreateRuleRenderKey(rule)"
-              class="rounded-lg border border-gray-200 p-3 dark:border-dark-600"
+              class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
             >
               <div class="flex items-start gap-3">
                 <div class="flex-1 space-y-2">
@@ -1393,7 +1443,6 @@
                     <label class="input-label text-xs">{{
                       t("admin.groups.modelRouting.accounts")
                     }}</label>
-                    <!-- 已选账号标签 -->
                     <div
                       v-if="rule.accounts.length > 0"
                       class="flex flex-wrap gap-1.5 mb-2"
@@ -1401,19 +1450,18 @@
                       <span
                         v-for="account in rule.accounts"
                         :key="account.id"
-                        class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                        class="inline-flex items-center gap-1 rounded-md bg-[var(--bg-surface-alt)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
                       >
                         {{ account.name }}
                         <button
                           type="button"
                           @click="removeSelectedAccount(rule, account.id)"
-                          class="ml-0.5 text-primary-500 hover:text-primary-700 dark:hover:text-primary-200"
+                          class="ml-0.5 text-[var(--accent)] hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
                         >
                           <Icon name="x" size="xs" />
                         </button>
                       </span>
                     </div>
-                    <!-- 账号搜索输入框 -->
                     <div class="relative account-search-container">
                       <input
                         v-model="
@@ -1429,14 +1477,13 @@
                         @input="searchAccountsByRule(rule)"
                         @focus="onAccountSearchFocus(rule)"
                       />
-                      <!-- 搜索结果下拉框 -->
                       <div
                         v-if="
                           showAccountDropdown[getCreateRuleSearchKey(rule)] &&
                           accountSearchResults[getCreateRuleSearchKey(rule)]
                             ?.length > 0
                         "
-                        class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-white shadow-lg dark:border-dark-600 dark:bg-dark-800"
+                        class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                       >
                         <button
                           v-for="account in accountSearchResults[
@@ -1478,21 +1525,24 @@
               </div>
             </div>
           </div>
-          <!-- 添加规则按钮（仅在启用时显示） -->
           <button
             v-if="createForm.model_routing_enabled"
             type="button"
             @click="addCreateRoutingRule"
-            class="mt-3 flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            class="mt-3 flex items-center gap-1.5 text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
           >
             <Icon name="plus" size="sm" />
             {{ t("admin.groups.modelRouting.addRule") }}
           </button>
         </div>
+        </section>
       </form>
 
       <template #footer>
         <div class="flex justify-end gap-3 pt-4">
+          <div class="config-save-note mr-auto hidden max-w-lg text-left lg:block">
+            <strong>&#x4FDD;&#x5B58;&#x533A;</strong>
+            &#x4FDD;&#x5B58;&#x540E;&#x4F1A;&#x5F71;&#x54CD;&#x5DF2;&#x4F7F;&#x7528;&#x8BE5;&#x5206;&#x7EC4;&#x7684;&#x7528;&#x6237;&#x548C; API Key&#xFF0C;&#x4E0D;&#x4F1A;&#x6539;&#x53D8;&#x6E20;&#x9053;&#x6216;&#x8D26;&#x53F7;&#x914D;&#x7F6E;&#x3002;          </div>
           <button
             @click="closeCreateModal"
             type="button"
@@ -1537,15 +1587,23 @@
     <BaseDialog
       :show="showEditModal"
       :title="t('admin.groups.editGroup')"
-      width="normal"
+      width="wide"
       @close="closeEditModal"
     >
       <form
         v-if="editingGroup"
         id="edit-group-form"
         @submit.prevent="handleUpdateGroup"
-        class="space-y-5"
+        class="admin-config-form space-y-5"
       >
+        <div class="admin-config-impact-note">
+          <strong>&#x4FDD;&#x5B58;&#x5F71;&#x54CD;</strong>
+          &#x8FD9;&#x91CC;&#x53EA;&#x4FDD;&#x5B58;&#x5206;&#x7EC4;&#x914D;&#x7F6E;&#xFF0C;&#x4E0D;&#x4F1A;&#x81EA;&#x52A8;&#x521B;&#x5EFA;&#x6E20;&#x9053;&#x3001;&#x8D26;&#x53F7;&#x6216; API Key&#x3002;&#x4FDD;&#x5B58;&#x540E;&#x4F1A;&#x5F71;&#x54CD;&#x4F7F;&#x7528;&#x8BE5;&#x5206;&#x7EC4;&#x7684;&#x7528;&#x6237;&#x548C;&#x5BC6;&#x94A5;&#x3002;        </div>
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x57FA;&#x7840;&#x4FE1;&#x606F;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x5206;&#x7EC4;&#x540D;&#x79F0;&#x3001;&#x8BF4;&#x660E;&#x548C;&#x5E73;&#x53F0;&#xFF0C;&#x4FBF;&#x4E8E;&#x540E;&#x7EED;&#x5206;&#x914D;&#x6E20;&#x9053;&#x4E0E;&#x5BC6;&#x94A5;&#x3002;</p>
+          </div>
         <div>
           <label class="input-label">{{ t("admin.groups.form.name") }}</label>
           <input
@@ -1575,10 +1633,43 @@
             :options="platformOptions"
             :disabled="true"
             data-tour="group-form-platform"
-          />
+          >
+            <template #selected="{ option }">
+              <span v-if="option" class="admin-platform-select-item">
+                <span class="admin-platform-logo">
+                  <img
+                    v-if="platformLogo(option.value)"
+                    :src="platformLogo(option.value)"
+                    :alt="platformLogoLabel(option.value)"
+                  />
+                  <PlatformIcon v-else :platform="asGroupPlatform(option.value)" size="xs" />
+                </span>
+                <span>{{ option.label }}</span>
+              </span>
+            </template>
+            <template #option="{ option }">
+              <span class="admin-platform-select-item">
+                <span class="admin-platform-logo">
+                  <img
+                    v-if="platformLogo(option.value)"
+                    :src="platformLogo(option.value)"
+                    :alt="platformLogoLabel(option.value)"
+                  />
+                  <PlatformIcon v-else :platform="asGroupPlatform(option.value)" size="xs" />
+                </span>
+                <span class="select-option-label">{{ option.label }}</span>
+              </span>
+            </template>
+          </Select>
           <p class="input-hint">{{ t("admin.groups.platformNotEditable") }}</p>
         </div>
-        <!-- 从分组复制账号（编辑时） -->
+        </section>
+
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x5206;&#x914D;&#x89C4;&#x5219;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x8D39;&#x7387;&#x3001;RPM&#x3001;&#x516C;&#x5F00;&#x8303;&#x56F4;&#x548C;&#x8D26;&#x53F7;&#x590D;&#x5236;&#x65B9;&#x5F0F;&#x3002;</p>
+          </div>
         <div v-if="copyAccountsGroupOptionsForEdit.length > 0">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1589,13 +1680,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.copyAccounts.tooltipEdit") }}
@@ -1607,7 +1698,7 @@
               </div>
             </div>
           </div>
-          <!-- 已选分组标签 -->
+          <!-- 閻庣懓鎲￠悡锟犲焵椤掆偓椤︻垶宕规惔锝囩＜闁告洦鍓涢崹鑲╃磼?-->
           <div
             v-if="editForm.copy_accounts_from_group_ids.length > 0"
             class="flex flex-wrap gap-1.5 mb-2"
@@ -1615,7 +1706,7 @@
             <span
               v-for="groupId in editForm.copy_accounts_from_group_ids"
               :key="groupId"
-              class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+              class="inline-flex items-center gap-1 rounded-md bg-[var(--bg-surface-alt)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
             >
               {{
                 copyAccountsGroupOptionsForEdit.find((o) => o.value === groupId)
@@ -1629,13 +1720,12 @@
                       (id) => id !== groupId,
                     )
                 "
-                class="ml-0.5 text-primary-500 hover:text-primary-700 dark:hover:text-primary-200"
+                class="ml-0.5 text-[var(--accent)] hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
               >
                 <Icon name="x" size="xs" />
               </button>
             </span>
           </div>
-          <!-- 分组选择下拉 -->
           <select
             class="input"
             @change="
@@ -1706,14 +1796,14 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <!-- Tooltip Popover -->
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="mb-2 text-xs font-medium">
                     {{ t("admin.groups.exclusiveTooltip.title") }}
@@ -1724,7 +1814,7 @@
                   <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
                     <p class="text-xs leading-relaxed text-gray-300">
                       <span
-                        class="inline-flex items-center gap-1 text-primary-400"
+                        class="inline-flex items-center gap-1 text-[var(--accent)]"
                         ><Icon name="lightbulb" size="xs" />
                         {{ t("admin.groups.exclusiveTooltip.example") }}</span
                       >
@@ -1744,15 +1834,15 @@
               type="button"
               @click="editForm.is_exclusive = !editForm.is_exclusive"
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 editForm.is_exclusive
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   editForm.is_exclusive ? 'translate-x-6' : 'translate-x-1',
                 ]"
               />
@@ -1770,9 +1860,15 @@
           <label class="input-label">{{ t("admin.groups.form.status") }}</label>
           <Select v-model="editForm.status" :options="editStatusOptions" />
         </div>
+        </section>
 
         <!-- Subscription Configuration -->
-        <div class="mt-4 border-t pt-4">
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x8BA2;&#x9605;&#x9650;&#x5236;</h4>
+            <p>&#x8BBE;&#x7F6E;&#x8BA2;&#x9605;&#x7C7B;&#x578B;&#x4EE5;&#x53CA;&#x65E5;&#x3001;&#x5468;&#x3001;&#x6708;&#x989D;&#x5EA6;&#x9650;&#x5236;&#x3002;</p>
+          </div>
+        <div>
           <div>
             <label class="input-label">{{
               t("admin.groups.subscription.type")
@@ -1790,7 +1886,7 @@
           <!-- Subscription limits (only show when subscription type is selected) -->
           <div
             v-if="editForm.subscription_type === 'subscription'"
-            class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
+            class="space-y-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4"
           >
             <div>
               <label class="input-label">{{
@@ -1833,30 +1929,26 @@
             </div>
           </div>
         </div>
+        </section>
 
-        <!-- 图片生成计费配置 -->
-        <div
+        <section
           v-if="
             editForm.platform === 'antigravity' ||
             editForm.platform === 'gemini' ||
             editForm.platform === 'openai'
           "
-          class="border-t pt-4"
+          class="admin-config-section"
         >
-          <label
-            class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-          >
-            {{ t("admin.groups.imagePricing.title") }}
-          </label>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-            {{ t("admin.groups.imagePricing.description") }}
-          </p>
+          <div class="admin-config-section-header">
+            <h4>{{ t("admin.groups.imagePricing.title") }}</h4>
+            <p>{{ t("admin.groups.imagePricing.description") }}</p>
+          </div>
           <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
             <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input
                 v-model="editForm.allow_image_generation"
                 type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               {{ t("admin.groups.imagePricing.allowImageGeneration") }}
             </label>
@@ -1864,7 +1956,7 @@
               <input
                 v-model="editForm.image_rate_independent"
                 type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               {{ t("admin.groups.imagePricing.independentMultiplier") }}
             </label>
@@ -1936,9 +2028,14 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- 支持的模型系列（仅 antigravity 平台） -->
+        <section class="admin-config-section">
+          <div class="admin-config-section-header">
+            <h4>&#x5E73;&#x53F0;&#x4E13;&#x5C5E;&#x8BBE;&#x7F6E;</h4>
+            <p>&#x4FDD;&#x7559; Claude&#x3001;OpenAI&#x3001;Gemini &#x4E0E; Antigravity &#x7684;&#x5E73;&#x53F0;&#x5B57;&#x6BB5;&#xFF0C;&#x4EC5;&#x8C03;&#x6574;&#x5C55;&#x793A;&#x5C42;&#x7EA7;&#x3002;</p>
+          </div>
+
         <div v-if="editForm.platform === 'antigravity'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1950,13 +2047,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.supportedScopes.tooltip") }}
@@ -1974,7 +2071,7 @@
                 type="checkbox"
                 :checked="editForm.supported_model_scopes.includes('claude')"
                 @change="toggleEditScope('claude')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.claude")
@@ -1987,7 +2084,7 @@
                   editForm.supported_model_scopes.includes('gemini_text')
                 "
                 @change="toggleEditScope('gemini_text')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.geminiText")
@@ -2000,7 +2097,7 @@
                   editForm.supported_model_scopes.includes('gemini_image')
                 "
                 @change="toggleEditScope('gemini_image')"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{
                 t("admin.groups.supportedScopes.geminiImage")
@@ -2012,7 +2109,6 @@
           </p>
         </div>
 
-        <!-- MCP XML 协议注入（仅 antigravity 平台） -->
         <div v-if="editForm.platform === 'antigravity'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -2023,13 +2119,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.mcpXml.tooltip") }}
@@ -2046,15 +2142,15 @@
               type="button"
               @click="editForm.mcp_xml_inject = !editForm.mcp_xml_inject"
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 editForm.mcp_xml_inject
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   editForm.mcp_xml_inject ? 'translate-x-6' : 'translate-x-1',
                 ]"
               />
@@ -2069,7 +2165,6 @@
           </div>
         </div>
 
-        <!-- Claude Code 客户端限制（仅 anthropic 平台） -->
         <div v-if="editForm.platform === 'anthropic'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -2081,13 +2176,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.claudeCode.tooltip") }}
@@ -2104,15 +2199,15 @@
               type="button"
               @click="editForm.claude_code_only = !editForm.claude_code_only"
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 editForm.claude_code_only
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   editForm.claude_code_only ? 'translate-x-6' : 'translate-x-1',
                 ]"
               />
@@ -2125,7 +2220,6 @@
               }}
             </span>
           </div>
-          <!-- 降级分组选择（仅当启用 claude_code_only 时显示） -->
           <div v-if="editForm.claude_code_only" class="mt-3">
             <label class="input-label">{{
               t("admin.groups.claudeCode.fallbackGroup")
@@ -2141,16 +2235,14 @@
           </div>
         </div>
 
-        <!-- OpenAI Messages 调度配置（仅 openai 平台） -->
         <div
           v-if="editForm.platform === 'openai'"
-          class="border-t border-gray-200 dark:border-dark-400 pt-4 mt-4"
+          class="border-t border-gray-200 border-[var(--border-default)] pt-4 mt-4"
         >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             {{ t("admin.groups.openaiMessages.title") }}
           </h4>
 
-          <!-- 允许 Messages 调度开关 -->
           <div class="flex items-center justify-between">
             <label class="text-sm text-gray-600 dark:text-gray-400">{{
               t("admin.groups.openaiMessages.allowDispatch")
@@ -2161,15 +2253,15 @@
                 editForm.allow_messages_dispatch =
                   !editForm.allow_messages_dispatch
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 editForm.allow_messages_dispatch
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   editForm.allow_messages_dispatch
                     ? 'translate-x-6'
@@ -2184,15 +2276,15 @@
 
           <div v-if="editForm.allow_messages_dispatch" class="mt-3">
             <div
-              class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-dark-600 dark:bg-dark-800"
+              class="relative overflow-hidden rounded-lg border border-gray-200 bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <div
-                class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 dark:border-dark-700 dark:bg-dark-700/50"
+                class="border-b border-gray-100 bg-gray-50/80 px-4 py-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               >
                 <div class="flex items-center gap-2">
-                  <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <div class="h-2 w-2 rounded-md bg-gray-500 dark:bg-gray-300"></div>
                   <label
-                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                     >{{
                       t("admin.groups.openaiMessages.familyMappingTitle")
                     }}</label
@@ -2248,24 +2340,24 @@
             </div>
 
             <div
-              class="mt-5 relative overflow-hidden rounded-xl border border-primary-200 bg-white shadow-sm dark:border-primary-900/50 dark:bg-dark-800"
+              class="mt-5 relative overflow-hidden rounded-lg border border-[var(--border-focus)] bg-[var(--bg-surface)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
             >
               <div
-                class="border-b border-primary-100 bg-primary-50/80 px-4 py-3 dark:border-primary-900/40 dark:bg-primary-900/20"
+                class="border-b border-[var(--border-focus)] bg-[var(--bg-surface-alt)] px-4 py-3 border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div>
                     <div class="flex items-center gap-2">
-                      <div class="h-2 w-2 rounded-full bg-primary-500"></div>
+                      <div class="h-2 w-2 rounded-md bg-[var(--accent)]"></div>
                       <label
-                        class="text-sm font-medium text-primary-900 dark:text-primary-100"
+                        class="text-sm font-medium text-[var(--accent)] text-[var(--accent)]"
                         >{{
                           t("admin.groups.openaiMessages.exactMappingTitle")
                         }}</label
                       >
                     </div>
                     <p
-                      class="mt-1 text-xs text-primary-600/90 dark:text-primary-400/90"
+                      class="mt-1 text-xs text-[var(--accent)] text-[var(--accent)]"
                     >
                       {{ t("admin.groups.openaiMessages.exactMappingHint") }}
                     </p>
@@ -2273,10 +2365,10 @@
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50/30 dark:bg-dark-800/30">
+              <div class="p-4 bg-gray-50/30 bg-[var(--bg-surface-alt)]">
                 <div
                   v-if="editForm.exact_model_mappings.length === 0"
-                  class="flex items-center justify-between gap-3 rounded-xl border-2 border-dashed border-primary-200 bg-white px-5 py-4 text-sm text-primary-700 transition-colors hover:border-primary-300 dark:border-primary-900/40 dark:bg-dark-800 dark:text-primary-300 dark:hover:border-primary-800"
+                  class="flex items-center justify-between gap-3 rounded-lg border-2 border-dashed border-[var(--border-focus)] bg-[var(--bg-surface)] px-5 py-4 text-sm text-[var(--accent)] transition-colors hover:border-[var(--border-focus)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:border-[var(--border-focus)]"
                 >
                   <span>{{
                     t("admin.groups.openaiMessages.noExactMappings")
@@ -2284,7 +2376,7 @@
                   <button
                     type="button"
                     @click="addEditMessagesDispatchMapping"
-                    class="flex items-center gap-1.5 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                    class="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                   >
                     <Icon name="plus" size="sm" />
                     {{ t("admin.groups.openaiMessages.addExactMapping") }}
@@ -2295,7 +2387,7 @@
                   <div
                     v-for="row in editForm.exact_model_mappings"
                     :key="getEditMessagesDispatchRowKey(row)"
-                    class="group relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-primary-300 hover:shadow-md dark:border-dark-600 dark:bg-dark-700 dark:hover:border-primary-700"
+                    class="group relative rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-4 transition-colors hover:border-[var(--border-focus)]  border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-[var(--border-focus)]"
                   >
                     <div class="flex items-center gap-4">
                       <div
@@ -2313,11 +2405,11 @@
                                 'admin.groups.openaiMessages.claudeModelPlaceholder',
                               )
                             "
-                            class="input bg-gray-50 focus:bg-white dark:bg-dark-800 dark:focus:bg-dark-900"
+                            class="input bg-gray-50 focus:bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] dark:focus:bg-dark-900"
                           />
                         </div>
                         <div
-                          class="hidden md:flex md:justify-center md:pt-7 text-primary-300 dark:text-primary-700"
+                          class="hidden md:flex md:justify-center md:pt-7 text-[var(--accent)] text-[var(--accent)]"
                         >
                           <Icon
                             name="arrowRight"
@@ -2337,7 +2429,7 @@
                                 'admin.groups.openaiMessages.targetModelPlaceholder',
                               )
                             "
-                            class="input bg-gray-50 focus:bg-white dark:bg-dark-800 dark:focus:bg-dark-900"
+                            class="input bg-gray-50 focus:bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] dark:focus:bg-dark-900"
                           />
                         </div>
                       </div>
@@ -2357,7 +2449,7 @@
                   <button
                     type="button"
                     @click="addEditMessagesDispatchMapping"
-                    class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-white py-3 text-sm font-medium text-gray-500 transition-all hover:border-primary-300 hover:bg-primary-50/50 hover:text-primary-600 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-primary-800 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-[var(--bg-surface)] py-3 text-sm font-medium text-gray-500 transition-colors hover:border-[var(--border-focus)] hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
                   >
                     <Icon name="plus" size="sm" />
                     {{ t("admin.groups.openaiMessages.addExactMapping") }}
@@ -2368,30 +2460,29 @@
           </div>
         </div>
 
-        <!-- 账号过滤控制 (OpenAI/Antigravity/Anthropic/Gemini) -->
         <div
           v-if="
             ['openai', 'antigravity', 'anthropic', 'gemini'].includes(
               editForm.platform,
             )
           "
-          class="border-t border-gray-200 dark:border-dark-400 pt-4 mt-4 space-y-4"
+          class="border-t border-gray-200 border-[var(--border-default)] pt-4 mt-4 space-y-4"
         >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            账号过滤控制
+            平台专属设置
           </h4>
 
           <!-- require_oauth_only toggle -->
           <div class="flex items-center justify-between">
             <div>
-              <label class="text-sm text-gray-600 dark:text-gray-400"
-                >仅允许 OAuth 账号</label
-              >
+              <label class="text-sm text-gray-600 dark:text-gray-400">
+                仅允许 OAuth 账号
+              </label>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{
                   editForm.require_oauth_only
-                    ? "已启用 — 排除 API Key 类型账号"
-                    : "未启用"
+                    ? "启用后，此分组只会使用 OAuth 授权账号。"
+                    : "关闭后，此分组可使用当前平台的所有可用账号。"
                 }}
               </p>
             </div>
@@ -2400,15 +2491,15 @@
               @click="
                 editForm.require_oauth_only = !editForm.require_oauth_only
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 editForm.require_oauth_only
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   editForm.require_oauth_only
                     ? 'translate-x-6'
@@ -2421,14 +2512,14 @@
           <!-- require_privacy_set toggle -->
           <div class="flex items-center justify-between">
             <div>
-              <label class="text-sm text-gray-600 dark:text-gray-400"
-                >仅允许隐私保护已设置的账号</label
-              >
+              <label class="text-sm text-gray-600 dark:text-gray-400">
+                要求账号完成隐私设置
+              </label>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {{
                   editForm.require_privacy_set
-                    ? "已启用 — Privacy 未设置的账号将被排除"
-                    : "未启用"
+                    ? "启用后，仅使用已经完成 Privacy 设置的账号。"
+                    : "关闭后，不限制账号的 Privacy 设置状态。"
                 }}
               </p>
             </div>
@@ -2437,15 +2528,15 @@
               @click="
                 editForm.require_privacy_set = !editForm.require_privacy_set
               "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
               :class="
                 editForm.require_privacy_set
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
               "
             >
               <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
                 :class="
                   editForm.require_privacy_set
                     ? 'translate-x-6'
@@ -2456,7 +2547,6 @@
           </div>
         </div>
 
-        <!-- 无效请求兜底（仅 anthropic/antigravity 平台，且非订阅分组） -->
         <div
           v-if="
             ['anthropic', 'antigravity'].includes(editForm.platform) &&
@@ -2477,7 +2567,6 @@
           </p>
         </div>
 
-        <!-- 模型路由配置（仅 anthropic 平台） -->
         <div v-if="editForm.platform === 'anthropic'" class="border-t pt-4">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -2489,13 +2578,13 @@
                 name="questionCircle"
                 size="sm"
                 :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
+                class="cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
               />
               <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
+                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-colors duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
               >
                 <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
+                  class="rounded-lg bg-gray-900 p-3 text-[var(--text-inverse)] dark:bg-gray-800"
                 >
                   <p class="text-xs leading-relaxed text-gray-300">
                     {{ t("admin.groups.modelRouting.tooltip") }}
@@ -2507,7 +2596,6 @@
               </div>
             </div>
           </div>
-          <!-- 启用开关 -->
           <div class="flex items-center gap-3 mb-3">
             <button
               type="button"
@@ -2515,15 +2603,15 @@
                 editForm.model_routing_enabled = !editForm.model_routing_enabled
               "
               :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 items-center rounded-md transition-colors',
                 editForm.model_routing_enabled
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
+                  ? 'bg-[var(--accent)]'
+                  : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
               ]"
             >
               <span
                 :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-4 w-4 transform rounded-md bg-[var(--bg-surface)] shadow-none transition-transform',
                   editForm.model_routing_enabled
                     ? 'translate-x-6'
                     : 'translate-x-1',
@@ -2547,12 +2635,11 @@
           <p v-else class="text-xs text-gray-500 dark:text-gray-400 mb-3">
             {{ t("admin.groups.modelRouting.noRulesHint") }}
           </p>
-          <!-- 路由规则列表（仅在启用时显示） -->
           <div v-if="editForm.model_routing_enabled" class="space-y-3">
             <div
               v-for="rule in editModelRoutingRules"
               :key="getEditRuleRenderKey(rule)"
-              class="rounded-lg border border-gray-200 p-3 dark:border-dark-600"
+              class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
             >
               <div class="flex items-start gap-3">
                 <div class="flex-1 space-y-2">
@@ -2573,7 +2660,6 @@
                     <label class="input-label text-xs">{{
                       t("admin.groups.modelRouting.accounts")
                     }}</label>
-                    <!-- 已选账号标签 -->
                     <div
                       v-if="rule.accounts.length > 0"
                       class="flex flex-wrap gap-1.5 mb-2"
@@ -2581,19 +2667,18 @@
                       <span
                         v-for="account in rule.accounts"
                         :key="account.id"
-                        class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                        class="inline-flex items-center gap-1 rounded-md bg-[var(--bg-surface-alt)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
                       >
                         {{ account.name }}
                         <button
                           type="button"
                           @click="removeSelectedAccount(rule, account.id, true)"
-                          class="ml-0.5 text-primary-500 hover:text-primary-700 dark:hover:text-primary-200"
+                          class="ml-0.5 text-[var(--accent)] hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
                         >
                           <Icon name="x" size="xs" />
                         </button>
                       </span>
                     </div>
-                    <!-- 账号搜索输入框 -->
                     <div class="relative account-search-container">
                       <input
                         v-model="
@@ -2609,14 +2694,13 @@
                         @input="searchAccountsByRule(rule, true)"
                         @focus="onAccountSearchFocus(rule, true)"
                       />
-                      <!-- 搜索结果下拉框 -->
                       <div
                         v-if="
                           showAccountDropdown[getEditRuleSearchKey(rule)] &&
                           accountSearchResults[getEditRuleSearchKey(rule)]
                             ?.length > 0
                         "
-                        class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-white shadow-lg dark:border-dark-600 dark:bg-dark-800"
+                        class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                       >
                         <button
                           v-for="account in accountSearchResults[
@@ -2658,21 +2742,24 @@
               </div>
             </div>
           </div>
-          <!-- 添加规则按钮（仅在启用时显示） -->
           <button
             v-if="editForm.model_routing_enabled"
             type="button"
             @click="addEditRoutingRule"
-            class="mt-3 flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            class="mt-3 flex items-center gap-1.5 text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
           >
             <Icon name="plus" size="sm" />
             {{ t("admin.groups.modelRouting.addRule") }}
           </button>
         </div>
+        </section>
       </form>
 
       <template #footer>
         <div class="flex justify-end gap-3 pt-4">
+          <div class="config-save-note mr-auto hidden max-w-lg text-left lg:block">
+            <strong>&#x4FDD;&#x5B58;&#x533A;</strong>
+            &#x4FDD;&#x5B58;&#x540E;&#x4F1A;&#x5F71;&#x54CD;&#x5DF2;&#x4F7F;&#x7528;&#x8BE5;&#x5206;&#x7EC4;&#x7684;&#x7528;&#x6237;&#x548C; API Key&#xFF0C;&#x4E0D;&#x4F1A;&#x6539;&#x53D8;&#x6E20;&#x9053;&#x6216;&#x8D26;&#x53F7;&#x914D;&#x7F6E;&#x3002;          </div>
           <button
             @click="closeEditModal"
             type="button"
@@ -2744,26 +2831,26 @@
           <div
             v-for="group in sortableGroups"
             :key="group.id"
-            class="flex cursor-grab items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-md active:cursor-grabbing dark:border-dark-600 dark:bg-dark-700"
+            class="flex cursor-grab items-center gap-3 rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-3 transition-colors  active:cursor-grabbing border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           >
             <div class="text-gray-400">
               <Icon name="menu" size="md" />
             </div>
             <div class="flex-1">
-              <div class="font-medium text-gray-900 dark:text-white">
+              <div class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ group.name }}
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">
                 <span
                   :class="[
-                    'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
+                    'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium',
                     group.platform === 'anthropic'
                       ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                       : group.platform === 'openai'
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                         : group.platform === 'antigravity'
                           ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                          : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                          : 'bg-gray-100 text-gray-700 dark:bg-[var(--bg-surface)]/10 dark:text-gray-300',
                   ]"
                 >
                   {{ t("admin.groups.platforms." + group.platform) }}
@@ -2848,9 +2935,11 @@ import Pagination from "@/components/common/Pagination.vue";
 import BaseDialog from "@/components/common/BaseDialog.vue";
 import ConfirmDialog from "@/components/common/ConfirmDialog.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
+import PageIntro from "@/components/common/PageIntro.vue";
 import Select from "@/components/common/Select.vue";
 import PlatformIcon from "@/components/common/PlatformIcon.vue";
 import Icon from "@/components/icons/Icon.vue";
+import { getPlatformDisplayName, getPlatformLogo } from "@/constants/modelLogos";
 import GroupRateMultipliersModal from "@/components/admin/group/GroupRateMultipliersModal.vue";
 import GroupRPMOverridesModal from "@/components/admin/group/GroupRPMOverridesModal.vue";
 import GroupCapacityBadge from "@/components/common/GroupCapacityBadge.vue";
@@ -2869,6 +2958,10 @@ import {
 const { t } = useI18n();
 const appStore = useAppStore();
 const onboardingStore = useOnboardingStore();
+
+const platformLogo = (platform: unknown) => getPlatformLogo(String(platform ?? ""));
+const platformLogoLabel = (platform: unknown) => getPlatformDisplayName(String(platform ?? ""));
+const asGroupPlatform = (platform: unknown) => String(platform ?? "") as GroupPlatform;
 
 const columns = computed<Column[]>(() => [
   { key: "name", label: t("admin.groups.columns.name"), sortable: true },
@@ -2945,7 +3038,6 @@ const subscriptionTypeOptions = computed(() => [
   { value: "subscription", label: t("admin.groups.subscription.subscription") },
 ]);
 
-// 降级分组选项（创建时）- 仅包含 anthropic 平台且未启用 claude_code_only 的分组
 const fallbackGroupOptions = computed(() => {
   const options: { value: number | null; label: string }[] = [
     { value: null, label: t("admin.groups.claudeCode.noFallback") },
@@ -2962,7 +3054,6 @@ const fallbackGroupOptions = computed(() => {
   return options;
 });
 
-// 降级分组选项（编辑时）- 排除自身
 const fallbackGroupOptionsForEdit = computed(() => {
   const options: { value: number | null; label: string }[] = [
     { value: null, label: t("admin.groups.claudeCode.noFallback") },
@@ -2981,7 +3072,6 @@ const fallbackGroupOptionsForEdit = computed(() => {
   return options;
 });
 
-// 无效请求兜底分组选项（创建时）- 仅包含 anthropic 平台、非订阅且未配置兜底的分组
 const invalidRequestFallbackOptions = computed(() => {
   const options: { value: number | null; label: string }[] = [
     { value: null, label: t("admin.groups.invalidRequestFallback.noFallback") },
@@ -2999,7 +3089,6 @@ const invalidRequestFallbackOptions = computed(() => {
   return options;
 });
 
-// 无效请求兜底分组选项（编辑时）- 排除自身
 const invalidRequestFallbackOptionsForEdit = computed(() => {
   const options: { value: number | null; label: string }[] = [
     { value: null, label: t("admin.groups.invalidRequestFallback.noFallback") },
@@ -3019,18 +3108,16 @@ const invalidRequestFallbackOptionsForEdit = computed(() => {
   return options;
 });
 
-// 复制账号的源分组选项（创建时）- 仅包含相同平台且有账号的分组
 const copyAccountsGroupOptions = computed(() => {
   const eligibleGroups = groups.value.filter(
     (g) => g.platform === createForm.platform && (g.account_count || 0) > 0,
   );
   return eligibleGroups.map((g) => ({
     value: g.id,
-    label: `${g.name} (${g.account_count || 0} 个账号)`,
+    label: `${g.name} (${g.account_count || 0} \u4e2a\u8d26\u53f7)`, 
   }));
 });
 
-// 复制账号的源分组选项（编辑时）- 仅包含相同平台且有账号的分组，排除自身
 const copyAccountsGroupOptionsForEdit = computed(() => {
   const currentId = editingGroup.value?.id;
   const eligibleGroups = groups.value.filter(
@@ -3041,7 +3128,7 @@ const copyAccountsGroupOptionsForEdit = computed(() => {
   );
   return eligibleGroups.map((g) => ({
     value: g.id,
-    label: `${g.name} (${g.account_count || 0} 个账号)`,
+    label: `${g.name} (${g.account_count || 0} \u4e2a\u8d26\u53f7)`, 
   }));
 });
 
@@ -3070,7 +3157,7 @@ const filters = reactive({
   status: "",
   is_exclusive: "",
 });
-const pagination = reactive({
+const paginationState = reactive({
   page: 1,
   page_size: getPersistedPageSize(),
   total: 0,
@@ -3109,57 +3196,43 @@ const createForm = reactive({
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
-  // 图片生成计费配置
   allow_image_generation: false,
   image_rate_independent: false,
   image_rate_multiplier: 1,
   image_price_1k: null as number | null,
   image_price_2k: null as number | null,
   image_price_4k: null as number | null,
-  // Claude Code 客户端限制（仅 anthropic 平台使用）
   claude_code_only: false,
   fallback_group_id: null as number | null,
   fallback_group_id_on_invalid_request: null as number | null,
-  // OpenAI Messages 调度配置（仅 openai 平台使用）
   allow_messages_dispatch: false,
   opus_mapped_model: createMessagesDispatchDefaults.opus_mapped_model,
   sonnet_mapped_model: createMessagesDispatchDefaults.sonnet_mapped_model,
   haiku_mapped_model: createMessagesDispatchDefaults.haiku_mapped_model,
   exact_model_mappings: [] as MessagesDispatchMappingRow[],
-  // 账号过滤控制（OpenAI/Antigravity 平台）
   require_oauth_only: false,
   require_privacy_set: false,
-  // 模型路由开关
   model_routing_enabled: false,
-  // 支持的模型系列（仅 antigravity 平台）
   supported_model_scopes: ["claude", "gemini_text", "gemini_image"] as string[],
-  // MCP XML 协议注入开关（仅 antigravity 平台）
   mcp_xml_inject: true,
-  // 从分组复制账号
   copy_accounts_from_group_ids: [] as number[],
-  // 分组级 RPM 限制（每用户每分钟最大请求数；0 = 不限制）
   rpm_limit: 0 as number,
 });
 
-// 简单账号类型（用于模型路由选择）
 interface SimpleAccount {
   id: number;
   name: string;
 }
 
-// 模型路由规则类型
 interface ModelRoutingRule {
   pattern: string;
-  accounts: SimpleAccount[]; // 选中的账号对象数组
+  accounts: SimpleAccount[];
 }
 
-// 创建表单的模型路由规则
 const createModelRoutingRules = ref<ModelRoutingRule[]>([]);
 
-// 编辑表单的模型路由规则
 const editModelRoutingRules = ref<ModelRoutingRule[]>([]);
 
-// 规则对象稳定 key（避免使用 index 导致状态错位）
 const resolveCreateRuleKey =
   createStableObjectKeyResolver<ModelRoutingRule>("create-rule");
 const resolveEditRuleKey =
@@ -3191,7 +3264,6 @@ const getRuleSearchKey = (rule: ModelRoutingRule, isEdit: boolean = false) => {
   return isEdit ? getEditRuleSearchKey(rule) : getCreateRuleSearchKey(rule);
 };
 
-// 账号搜索相关状态
 const accountSearchKeyword = ref<Record<string, string>>({});
 const accountSearchResults = ref<Record<string, SimpleAccount[]>>({});
 const showAccountDropdown = ref<Record<string, boolean>>({});
@@ -3230,7 +3302,6 @@ const accountSearchRunner = useKeyedDebouncedSearch<SimpleAccount[]>({
   },
 });
 
-// 搜索账号（仅限 anthropic 平台）
 const searchAccounts = (key: string) => {
   accountSearchRunner.trigger(key, accountSearchKeyword.value[key] || "");
 };
@@ -3242,7 +3313,6 @@ const searchAccountsByRule = (
   searchAccounts(getRuleSearchKey(rule, isEdit));
 };
 
-// 选择账号
 const selectAccount = (
   rule: ModelRoutingRule,
   account: SimpleAccount,
@@ -3250,18 +3320,15 @@ const selectAccount = (
 ) => {
   if (!rule) return;
 
-  // 检查是否已选择
   if (!rule.accounts.some((a) => a.id === account.id)) {
     rule.accounts.push(account);
   }
 
-  // 清空搜索
   const key = getRuleSearchKey(rule, isEdit);
   accountSearchKeyword.value[key] = "";
   showAccountDropdown.value[key] = false;
 };
 
-// 移除已选账号
 const removeSelectedAccount = (
   rule: ModelRoutingRule,
   accountId: number,
@@ -3272,7 +3339,6 @@ const removeSelectedAccount = (
   rule.accounts = rule.accounts.filter((a) => a.id !== accountId);
 };
 
-// 切换创建表单的模型系列选择
 const toggleCreateScope = (scope: string) => {
   const idx = createForm.supported_model_scopes.indexOf(scope);
   if (idx === -1) {
@@ -3282,7 +3348,6 @@ const toggleCreateScope = (scope: string) => {
   }
 };
 
-// 切换编辑表单的模型系列选择
 const toggleEditScope = (scope: string) => {
   const idx = editForm.supported_model_scopes.indexOf(scope);
   if (idx === -1) {
@@ -3292,25 +3357,21 @@ const toggleEditScope = (scope: string) => {
   }
 };
 
-// 处理账号搜索输入框聚焦
 const onAccountSearchFocus = (
   rule: ModelRoutingRule,
   isEdit: boolean = false,
 ) => {
   const key = getRuleSearchKey(rule, isEdit);
   showAccountDropdown.value[key] = true;
-  // 如果没有搜索结果，触发一次搜索
   if (!accountSearchResults.value[key]?.length) {
     searchAccounts(key);
   }
 };
 
-// 添加创建表单的路由规则
 const addCreateRoutingRule = () => {
   createModelRoutingRules.value.push({ pattern: "", accounts: [] });
 };
 
-// 删除创建表单的路由规则
 const removeCreateRoutingRule = (rule: ModelRoutingRule) => {
   const index = createModelRoutingRules.value.indexOf(rule);
   if (index === -1) return;
@@ -3321,12 +3382,10 @@ const removeCreateRoutingRule = (rule: ModelRoutingRule) => {
   createModelRoutingRules.value.splice(index, 1);
 };
 
-// 添加编辑表单的路由规则
 const addEditRoutingRule = () => {
   editModelRoutingRules.value.push({ pattern: "", accounts: [] });
 };
 
-// 删除编辑表单的路由规则
 const removeEditRoutingRule = (rule: ModelRoutingRule) => {
   const index = editModelRoutingRules.value.indexOf(rule);
   if (index === -1) return;
@@ -3337,7 +3396,6 @@ const removeEditRoutingRule = (rule: ModelRoutingRule) => {
   editModelRoutingRules.value.splice(index, 1);
 };
 
-// 将 UI 格式的路由规则转换为 API 格式
 const convertRoutingRulesToApiFormat = (
   rules: ModelRoutingRule[],
 ): Record<string, number[]> | null => {
@@ -3359,7 +3417,6 @@ const convertRoutingRulesToApiFormat = (
   return hasValidRules ? result : null;
 };
 
-// 将 API 格式的路由规则转换为 UI 格式（需要加载账号名称）
 const convertApiFormatToRoutingRules = async (
   apiFormat: Record<string, number[]> | null,
 ): Promise<ModelRoutingRule[]> => {
@@ -3367,14 +3424,12 @@ const convertApiFormatToRoutingRules = async (
 
   const rules: ModelRoutingRule[] = [];
   for (const [pattern, accountIds] of Object.entries(apiFormat)) {
-    // 加载账号信息
     const accounts: SimpleAccount[] = [];
     for (const id of accountIds) {
       try {
         const account = await adminAPI.accounts.getById(id);
         accounts.push({ id: account.id, name: account.name });
       } catch {
-        // 如果账号不存在，仍然显示 ID
         accounts.push({ id, name: `#${id}` });
       }
     }
@@ -3394,36 +3449,27 @@ const editForm = reactive({
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
-  // 图片生成计费配置
   allow_image_generation: false,
   image_rate_independent: false,
   image_rate_multiplier: 1,
   image_price_1k: null as number | null,
   image_price_2k: null as number | null,
   image_price_4k: null as number | null,
-  // Claude Code 客户端限制（仅 anthropic 平台使用）
   claude_code_only: false,
   fallback_group_id: null as number | null,
   fallback_group_id_on_invalid_request: null as number | null,
-  // OpenAI Messages 调度配置（仅 openai 平台使用）
   allow_messages_dispatch: false,
   default_mapped_model: '',
   opus_mapped_model: editMessagesDispatchDefaults.opus_mapped_model,
   sonnet_mapped_model: editMessagesDispatchDefaults.sonnet_mapped_model,
   haiku_mapped_model: editMessagesDispatchDefaults.haiku_mapped_model,
   exact_model_mappings: [] as MessagesDispatchMappingRow[],
-  // 账号过滤控制（OpenAI/Antigravity 平台）
   require_oauth_only: false,
   require_privacy_set: false,
-  // 模型路由开关
   model_routing_enabled: false,
-  // 支持的模型系列（仅 antigravity 平台）
   supported_model_scopes: ["claude", "gemini_text", "gemini_image"] as string[],
-  // MCP XML 协议注入开关（仅 antigravity 平台）
   mcp_xml_inject: true,
-  // 从分组复制账号
   copy_accounts_from_group_ids: [] as number[],
-  // 分组级 RPM 限制（每用户每分钟最大请求数；0 = 不限制）
   rpm_limit: 0 as number,
 });
 
@@ -3483,7 +3529,6 @@ const editImageFinalPricePreview = computed(() =>
   buildImageFinalPricePreview(editForm),
 );
 
-// 根据分组类型返回不同的删除确认消息
 const deleteConfirmMessage = computed(() => {
   if (!deletingGroup.value) {
     return "";
@@ -3506,8 +3551,8 @@ const loadGroups = async () => {
   loading.value = true;
   try {
     const response = await adminAPI.groups.list(
-      pagination.page,
-      pagination.page_size,
+      paginationState.page,
+      paginationState.page_size,
       {
         platform: (filters.platform as GroupPlatform) || undefined,
         status: filters.status as any,
@@ -3522,8 +3567,8 @@ const loadGroups = async () => {
     );
     if (signal.aborted) return;
     groups.value = response.items;
-    pagination.total = response.total;
-    pagination.pages = response.pages;
+    paginationState.total = response.total;
+    paginationState.pages = response.pages;
     loadUsageSummary();
     loadCapacitySummary();
   } catch (error: any) {
@@ -3603,26 +3648,26 @@ let searchTimeout: ReturnType<typeof setTimeout>;
 const handleSearch = () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    pagination.page = 1;
+    paginationState.page = 1;
     loadGroups();
   }, 300);
 };
 
 const handlePageChange = (page: number) => {
-  pagination.page = page;
+  paginationState.page = page;
   loadGroups();
 };
 
 const handlePageSizeChange = (pageSize: number) => {
-  pagination.page_size = pageSize;
-  pagination.page = 1;
+  paginationState.page_size = pageSize;
+  paginationState.page = 1;
   loadGroups();
 };
 
 const handleSort = (key: string, order: 'asc' | 'desc') => {
   sortState.sort_by = key;
   sortState.sort_order = order;
-  pagination.page = 1;
+  paginationState.page = 1;
   loadGroups();
 };
 
@@ -3695,7 +3740,6 @@ const handleCreateGroup = async () => {
   }
   submitting.value = true;
   try {
-    // 构建请求数据，包含模型路由配置
     const requestData = {
       ...createForm,
       daily_limit_usd: normalizeOptionalLimit(
@@ -3721,7 +3765,6 @@ const handleCreateGroup = async () => {
             })
           : undefined,
     };
-    // v-model.number 清空输入框时产生 ""，转为 null 让后端设为无限制
     const emptyToNull = (v: any) => (v === "" ? null : v);
     requestData.daily_limit_usd = emptyToNull(requestData.daily_limit_usd);
     requestData.weekly_limit_usd = emptyToNull(requestData.weekly_limit_usd);
@@ -3790,9 +3833,8 @@ const handleEdit = async (group: AdminGroup) => {
     "gemini_image",
   ];
   editForm.mcp_xml_inject = group.mcp_xml_inject ?? true;
-  editForm.copy_accounts_from_group_ids = []; // 复制账号字段每次编辑时重置为空
+  editForm.copy_accounts_from_group_ids = [];
   editForm.rpm_limit = group.rpm_limit ?? 0;
-  // 加载模型路由规则（异步加载账号名称）
   editModelRoutingRules.value = await convertApiFormatToRoutingRules(
     group.model_routing,
   );
@@ -3808,6 +3850,7 @@ const closeEditModal = () => {
   editingGroup.value = null;
   editModelRoutingRules.value = [];
   editForm.copy_accounts_from_group_ids = [];
+  editForm.rpm_limit = 0;
   resetMessagesDispatchFormState(editForm);
 };
 
@@ -3820,7 +3863,6 @@ const handleUpdateGroup = async () => {
 
   submitting.value = true;
   try {
-    // 转换 fallback_group_id: null -> 0 (后端使用 0 表示清除)
     const payload = {
       ...editForm,
       daily_limit_usd: normalizeOptionalLimit(
@@ -3852,7 +3894,6 @@ const handleUpdateGroup = async () => {
             })
           : undefined,
     };
-    // v-model.number 清空输入框时产生 ""，转为 null 让后端设为无限制
     const emptyToNull = (v: any) => (v === "" ? null : v);
     payload.daily_limit_usd = emptyToNull(payload.daily_limit_usd);
     payload.weekly_limit_usd = emptyToNull(payload.weekly_limit_usd);
@@ -3930,7 +3971,6 @@ const confirmDelete = async () => {
   }
 };
 
-// 监听 subscription_type 变化，订阅模式时 is_exclusive 默认为 true
 watch(
   () => createForm.subscription_type,
   (newVal) => {
@@ -3986,10 +4026,8 @@ watch(
   }
 )
 
-// 点击外部关闭账号搜索下拉框
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
-  // 检查是否点击在下拉框或输入框内
   if (!target.closest(".account-search-container")) {
     Object.keys(showAccountDropdown.value).forEach((key) => {
       showAccountDropdown.value[key] = false;
@@ -3997,12 +4035,9 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
-// 打开排序弹窗
 const openSortModal = async () => {
   try {
-    // 获取所有分组（不分页）
     const allGroups = await adminAPI.groups.getAll();
-    // 按 sort_order 排序
     sortableGroups.value = [...allGroups].sort(
       (a, b) => a.sort_order - b.sort_order,
     );
@@ -4013,13 +4048,11 @@ const openSortModal = async () => {
   }
 };
 
-// 关闭排序弹窗
 const closeSortModal = () => {
   showSortModal.value = false;
   sortableGroups.value = [];
 };
 
-// 保存排序
 const saveSortOrder = async () => {
   sortSubmitting.value = true;
   try {
@@ -4052,3 +4085,46 @@ onUnmounted(() => {
   clearAllAccountSearchState();
 });
 </script>
+
+<style scoped>
+.admin-platform-logo {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.admin-platform-logo img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.admin-platform-select-item {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-platform-select-item > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(.dark) .admin-platform-logo {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark) .admin-platform-logo img {
+  filter: none;
+}
+</style>

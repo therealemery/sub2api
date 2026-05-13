@@ -23,10 +23,10 @@
       </div>
 
       <div v-else-if="rules.length === 0" class="py-8 text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-dark-700">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 bg-[var(--bg-surface-alt)]">
           <Icon name="shield" size="lg" class="text-gray-400" />
         </div>
-        <h4 class="mb-1 text-sm font-medium text-gray-900 dark:text-white">
+        <h4 class="mb-1 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.errorPassthrough.noRules') }}
         </h4>
         <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -34,9 +34,9 @@
         </p>
       </div>
 
-      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 dark:border-dark-600">
+      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-700">
-          <thead class="sticky top-0 bg-gray-50 dark:bg-dark-700">
+          <thead class="sticky top-0 bg-gray-50 bg-[var(--bg-surface-alt)]">
             <tr>
               <th class="px-3 py-2 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                 {{ t('admin.errorPassthrough.columns.priority') }}
@@ -61,15 +61,15 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-800">
+          <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
             <tr v-for="rule in rules" :key="rule.id" class="hover:bg-gray-50 dark:hover:bg-dark-700">
               <td class="whitespace-nowrap px-3 py-2">
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-xs font-medium text-gray-700 dark:bg-dark-600 dark:text-gray-300">
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded bg-gray-100 text-xs font-medium text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300">
                   {{ rule.priority }}
                 </span>
               </td>
               <td class="px-3 py-2">
-                <div class="font-medium text-gray-900 dark:text-white text-sm">{{ rule.name }}</div>
+                <div class="font-medium text-gray-900 dark:text-[var(--text-inverse)] text-sm">{{ rule.name }}</div>
                 <div v-if="rule.description" class="mt-0.5 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">
                   {{ rule.description }}
                 </div>
@@ -164,13 +164,13 @@
                 <button
                   @click="toggleEnabled(rule)"
                   :class="[
-                    'relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                    rule.enabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                    'relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                    rule.enabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
                   ]"
                 >
                   <span
                     :class="[
-                      'pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                      'pointer-events-none inline-block h-3 w-3 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                       rule.enabled ? 'translate-x-3' : 'translate-x-0'
                     ]"
                   />
@@ -180,7 +180,7 @@
                 <div class="flex items-center gap-1">
                   <button
                     @click="handleEdit(rule)"
-                    class="p-1 text-gray-500 hover:text-primary-600 dark:hover:text-primary-400"
+                    class="p-1 text-gray-500 hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
                     :title="t('common.edit')"
                   >
                     <Icon name="edit" size="sm" />
@@ -251,8 +251,8 @@
         </div>
 
         <!-- Match Conditions -->
-        <div class="rounded-lg border border-gray-200 p-3 dark:border-dark-600">
-          <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <div class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]">
+          <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('admin.errorPassthrough.form.matchConditions') }}
           </h4>
 
@@ -291,7 +291,7 @@
                   type="radio"
                   :value="option.value"
                   v-model="form.match_mode"
-                  class="mt-0.5 h-3.5 w-3.5 border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="mt-0.5 h-3.5 w-3.5 border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                 />
                 <div class="flex-1">
                   <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ option.label }}</span>
@@ -313,7 +313,7 @@
                   type="checkbox"
                   :value="platform.value"
                   v-model="form.platforms"
-                  class="h-3.5 w-3.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="h-3.5 w-3.5 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                 />
                 <span class="text-xs text-gray-700 dark:text-gray-300">{{ platform.label }}</span>
               </label>
@@ -323,8 +323,8 @@
         </div>
 
         <!-- Response Behavior -->
-        <div class="rounded-lg border border-gray-200 p-3 dark:border-dark-600">
-          <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <div class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]">
+          <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('admin.errorPassthrough.form.responseBehavior') }}
           </h4>
 
@@ -334,7 +334,7 @@
                 <input
                   type="checkbox"
                   v-model="form.passthrough_code"
-                  class="h-3.5 w-3.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="h-3.5 w-3.5 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                 />
                 <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.errorPassthrough.form.passthroughCode') }}
@@ -357,7 +357,7 @@
                 <input
                   type="checkbox"
                   v-model="form.passthrough_body"
-                  class="h-3.5 w-3.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="h-3.5 w-3.5 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                 />
                 <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.errorPassthrough.form.passthroughBody') }}
@@ -394,7 +394,7 @@
           <input
             type="checkbox"
             v-model="form.enabled"
-            class="h-3.5 w-3.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="h-3.5 w-3.5 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
           <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
             {{ t('admin.errorPassthrough.form.enabled') }}

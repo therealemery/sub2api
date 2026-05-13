@@ -216,8 +216,8 @@ async function saveAllSettings() {
       </div>
 
       <!-- 数据采集频率 -->
-      <div class="rounded-2xl bg-gray-50 p-4 dark:bg-dark-700/50">
-        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.dataCollection') }}</h4>
+      <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
+        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.dataCollection') }}</h4>
         <div>
           <label class="input-label">{{ t('admin.ops.settings.evaluationInterval') }}</label>
           <input
@@ -232,13 +232,13 @@ async function saveAllSettings() {
       </div>
 
       <!-- 预警配置 -->
-      <div class="rounded-2xl bg-gray-50 p-4 dark:bg-dark-700/50">
-        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.alertConfig') }}</h4>
+      <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
+        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.alertConfig') }}</h4>
 
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div>
-              <label class="font-medium text-gray-900 dark:text-white">{{ t('admin.ops.settings.enableAlert') }}</label>
+              <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.enableAlert') }}</label>
             </div>
             <Toggle v-model="emailConfig.alert.enabled" />
           </div>
@@ -261,10 +261,10 @@ async function saveAllSettings() {
               <span
                 v-for="email in emailConfig.alert.recipients"
                 :key="email"
-                class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-[var(--bg-surface)]/10 dark:text-gray-300"
               >
                 {{ email }}
-                <button type="button" class="text-blue-700/80 hover:text-blue-900" @click="removeRecipient('alert', email)">×</button>
+                <button type="button" class="text-gray-600 hover:text-gray-950 dark:text-gray-300 dark:hover:text-[var(--text-inverse)]" @click="removeRecipient('alert', email)">×</button>
               </span>
             </div>
             <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -280,13 +280,13 @@ async function saveAllSettings() {
       </div>
 
       <!-- 评估报告配置 -->
-      <div class="rounded-2xl bg-gray-50 p-4 dark:bg-dark-700/50">
-        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.reportConfig') }}</h4>
+      <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
+        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.reportConfig') }}</h4>
 
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div>
-              <label class="font-medium text-gray-900 dark:text-white">{{ t('admin.ops.settings.enableReport') }}</label>
+              <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.enableReport') }}</label>
             </div>
             <Toggle v-model="emailConfig.report.enabled" />
           </div>
@@ -309,10 +309,10 @@ async function saveAllSettings() {
               <span
                 v-for="email in emailConfig.report.recipients"
                 :key="email"
-                class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-[var(--bg-surface)]/10 dark:text-gray-300"
               >
                 {{ email }}
-                <button type="button" class="text-blue-700/80 hover:text-blue-900" @click="removeRecipient('report', email)">×</button>
+                <button type="button" class="text-gray-600 hover:text-gray-950 dark:text-gray-300 dark:hover:text-[var(--text-inverse)]" @click="removeRecipient('report', email)">×</button>
               </span>
             </div>
             <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -340,8 +340,8 @@ async function saveAllSettings() {
       </div>
 
       <!-- 指标阈值配置 -->
-      <div class="rounded-2xl bg-gray-50 p-4 dark:bg-dark-700/50">
-        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.metricThresholds') }}</h4>
+      <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
+        <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.ops.settings.metricThresholds') }}</h4>
         <p class="mb-4 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.ops.settings.metricThresholdsHint') }}</p>
 
         <div class="space-y-4">
@@ -400,8 +400,8 @@ async function saveAllSettings() {
       </div>
 
       <!-- 高级设置 -->
-      <details class="rounded-2xl bg-gray-50 dark:bg-dark-700/50">
-        <summary class="cursor-pointer p-4 text-sm font-semibold text-gray-900 dark:text-white">
+      <details class="rounded-lg bg-gray-50 bg-[var(--bg-surface-alt)]">
+        <summary class="cursor-pointer p-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.ops.settings.advancedSettings') }}
         </summary>
         <div class="space-y-4 px-4 pb-4">

@@ -11,6 +11,49 @@ import type {
   PaginatedResponse
 } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewHost(): boolean {
+  return ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)
+}
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || isLocalPreviewHost()) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function previewRedeemCodes(): RedeemCode[] {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: 1,
+      code: 'WELCOME-OWNAPI',
+      type: 'balance',
+      value: 20,
+      status: 'active',
+      used_by: null,
+      used_at: null,
+      created_at: now,
+      updated_at: now
+    },
+    {
+      id: 2,
+      code: 'CLAUDE-PREVIEW',
+      type: 'subscription',
+      value: 1,
+      status: 'unused',
+      used_by: null,
+      used_at: null,
+      created_at: now,
+      updated_at: now,
+      group_id: 2,
+      validity_days: 30
+    }
+  ]
+}
+
 /**
  * List all redeem codes with pagination
  * @param page - Page number (default: 1)
@@ -32,6 +75,17 @@ export async function list(
     signal?: AbortSignal
   }
 ): Promise<PaginatedResponse<RedeemCode>> {
+  if (isLocalPreviewSession()) {
+    const items = previewRedeemCodes()
+    return {
+      items,
+      total: items.length,
+      page,
+      page_size: pageSize,
+      pages: 1
+    }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<RedeemCode>>('/admin/redeem-codes', {
     params: {
       page,
@@ -49,6 +103,10 @@ export async function list(
  * @returns Redeem code details
  */
 export async function getById(id: number): Promise<RedeemCode> {
+  if (isLocalPreviewSession()) {
+    return previewRedeemCodes().find((item) => item.id === id) ?? previewRedeemCodes()[0]
+  }
+
   const { data } = await apiClient.get<RedeemCode>(`/admin/redeem-codes/${id}`)
   return data
 }
@@ -69,6 +127,23 @@ export async function generate(
   groupId?: number | null,
   validityDays?: number
 ): Promise<RedeemCode[]> {
+  if (isLocalPreviewSession()) {
+    const now = new Date().toISOString()
+    return Array.from({ length: count }, (_, index) => ({
+      id: 100 + index,
+      code: `PREVIEW-${String(index + 1).padStart(4, '0')}`,
+      type,
+      value,
+      status: 'active',
+      used_by: null,
+      used_at: null,
+      created_at: now,
+      updated_at: now,
+      group_id: type === 'subscription' ? groupId ?? null : undefined,
+      validity_days: type === 'subscription' ? validityDays ?? 30 : undefined
+    }))
+  }
+
   const payload: GenerateRedeemCodesRequest = {
     count,
     type,
@@ -135,6 +210,22 @@ export async function getStats(): Promise<{
   total_value_distributed: number
   by_type: Record<RedeemCodeType, number>
 }> {
+  if (isLocalPreviewSession()) {
+    return {
+      total_codes: 2,
+      active_codes: 2,
+      used_codes: 0,
+      expired_codes: 0,
+      total_value_distributed: 0,
+      by_type: {
+        balance: 1,
+        concurrency: 0,
+        subscription: 1,
+        invitation: 0
+      } as Record<RedeemCodeType, number>
+    }
+  }
+
   const { data } = await apiClient.get<{
     total_codes: number
     active_codes: number

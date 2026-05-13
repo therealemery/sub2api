@@ -1,15 +1,19 @@
 <template>
   <AppLayout>
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="admin-settings-shell mx-auto max-w-4xl space-y-6">
+      <PageIntro
+        title="系统设置"
+        description="调整站点品牌、功能开关、安全、用户默认值、网关、支付和邮件等配置。每个分区独立说明影响范围，保存动作仍使用原来的提交逻辑。"
+      />
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <div
-          class="h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600"
+          class="h-8 w-8 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
         ></div>
       </div>
 
       <!-- Settings Form -->
-      <form v-else @submit.prevent="saveSettings" class="space-y-6" novalidate>
+      <form v-else @submit.prevent="saveSettings" class="admin-settings-form space-y-6" novalidate>
         <!-- Tab Navigation -->
         <div class="sticky top-0 z-10 overflow-x-auto settings-tabs-scroll">
           <nav class="settings-tabs">
@@ -31,14 +35,20 @@
           </nav>
         </div>
 
+        <section class="settings-tab-summary">
+          <span class="settings-tab-kicker">当前配置区</span>
+          <h2>{{ activeTabSummary.title }}</h2>
+          <p>{{ activeTabSummary.description }}</p>
+        </section>
+
         <!-- Tab: Security — Admin API Key -->
         <div v-show="activeTab === 'security'" class="space-y-6">
           <!-- Admin API Key Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.adminApiKey.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -68,7 +78,7 @@
                 class="flex items-center gap-2 text-gray-500"
               >
                 <div
-                  class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"
+                  class="h-4 w-4 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
                 ></div>
                 {{ t("common.loading") }}
               </div>
@@ -125,7 +135,7 @@
                       {{ t("admin.settings.adminApiKey.currentKey") }}
                     </label>
                     <code
-                      class="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-900 dark:bg-dark-700 dark:text-gray-100"
+                      class="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-900 bg-[var(--bg-surface-alt)] dark:text-gray-100"
                     >
                       {{ adminApiKeyMasked }}
                     </code>
@@ -166,7 +176,7 @@
                   </p>
                   <div class="flex items-center gap-2">
                     <code
-                      class="flex-1 select-all break-all rounded border border-green-300 bg-white px-3 py-2 font-mono text-sm dark:border-green-700 dark:bg-dark-800"
+                      class="flex-1 select-all break-all rounded border border-green-300 bg-[var(--bg-surface)] px-3 py-2 font-mono text-sm dark:border-green-700 bg-[var(--bg-surface-alt)]"
                     >
                       {{ newAdminApiKey }}
                     </code>
@@ -193,9 +203,9 @@
           <!-- Overload Cooldown (529) Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.overloadCooldown.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -208,7 +218,7 @@
                 class="flex items-center gap-2 text-gray-500"
               >
                 <div
-                  class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"
+                  class="h-4 w-4 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
                 ></div>
                 {{ t("common.loading") }}
               </div>
@@ -216,7 +226,7 @@
               <template v-else>
                 <div class="flex items-center justify-between">
                   <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
+                    <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                       t("admin.settings.overloadCooldown.enabled")
                     }}</label>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -228,7 +238,7 @@
 
                 <div
                   v-if="overloadCooldownForm.enabled"
-                  class="space-y-4 border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="space-y-4 border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <div>
                     <label
@@ -252,7 +262,7 @@
                 </div>
 
                 <div
-                  class="flex justify-end border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="flex justify-end border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <button
                     type="button"
@@ -294,9 +304,9 @@
           <!-- Stream Timeout Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.streamTimeout.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -310,7 +320,7 @@
                 class="flex items-center gap-2 text-gray-500"
               >
                 <div
-                  class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"
+                  class="h-4 w-4 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
                 ></div>
                 {{ t("common.loading") }}
               </div>
@@ -319,7 +329,7 @@
                 <!-- Enable Stream Timeout -->
                 <div class="flex items-center justify-between">
                   <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
+                    <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                       t("admin.settings.streamTimeout.enabled")
                     }}</label>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -332,7 +342,7 @@
                 <!-- Settings - Only show when enabled -->
                 <div
                   v-if="streamTimeoutForm.enabled"
-                  class="space-y-4 border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="space-y-4 border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <!-- Action -->
                   <div>
@@ -432,7 +442,7 @@
 
                 <!-- Save Button -->
                 <div
-                  class="flex justify-end border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="flex justify-end border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <button
                     type="button"
@@ -474,9 +484,9 @@
           <!-- Request Rectifier Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.rectifier.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -490,7 +500,7 @@
                 class="flex items-center gap-2 text-gray-500"
               >
                 <div
-                  class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"
+                  class="h-4 w-4 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
                 ></div>
                 {{ t("common.loading") }}
               </div>
@@ -499,7 +509,7 @@
                 <!-- Master Toggle -->
                 <div class="flex items-center justify-between">
                   <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
+                    <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                       t("admin.settings.rectifier.enabled")
                     }}</label>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -512,7 +522,7 @@
                 <!-- Sub-toggles (only show when master is enabled) -->
                 <div
                   v-if="rectifierForm.enabled"
-                  class="space-y-4 border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="space-y-4 border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <!-- Thinking Signature Rectifier -->
                   <div class="flex items-center justify-between">
@@ -569,7 +579,7 @@
                   <!-- Custom Patterns (only when apikey_signature_enabled) -->
                   <div
                     v-if="rectifierForm.apikey_signature_enabled"
-                    class="ml-4 space-y-3 border-l-2 border-gray-200 pl-4 dark:border-dark-600"
+                    class="space-y-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4"
                   >
                     <div>
                       <label
@@ -625,7 +635,7 @@
                     <button
                       type="button"
                       @click="rectifierForm.apikey_signature_patterns.push('')"
-                      class="btn btn-ghost btn-xs text-primary-600 dark:text-primary-400"
+                      class="btn btn-ghost btn-xs text-[var(--accent)] text-[var(--accent)]"
                     >
                       + {{ t("admin.settings.rectifier.addPattern") }}
                     </button>
@@ -634,7 +644,7 @@
 
                 <!-- Save Button -->
                 <div
-                  class="flex justify-end border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="flex justify-end border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <button
                     type="button"
@@ -673,9 +683,9 @@
           <!-- Beta Policy Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.betaPolicy.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -689,7 +699,7 @@
                 class="flex items-center gap-2 text-gray-500"
               >
                 <div
-                  class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary-600"
+                  class="h-4 w-4 animate-spin rounded-md border-b-2 border-[var(--border-focus)]"
                 ></div>
                 {{ t("common.loading") }}
               </div>
@@ -699,16 +709,16 @@
                 <div
                   v-for="rule in betaPolicyForm.rules"
                   :key="rule.beta_token"
-                  class="rounded-lg border border-gray-200 p-4 dark:border-dark-600"
+                  class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                 >
                   <div class="mb-3 flex items-center gap-2">
                     <span
-                      class="text-sm font-medium text-gray-900 dark:text-white"
+                      class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                     >
                       {{ getBetaDisplayName(rule.beta_token) }}
                     </span>
                     <span
-                      class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-dark-700 dark:text-gray-400"
+                      class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400"
                     >
                       {{ rule.beta_token }}
                     </span>
@@ -776,7 +786,7 @@
                         v-for="preset in betaPresets[rule.beta_token]"
                         :key="preset.label"
                         type="button"
-                        class="inline-flex items-center gap-1 rounded-md border border-primary-200 bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-900/50"
+                        class="inline-flex items-center gap-1 rounded-md border border-[var(--border-focus)] bg-[var(--bg-surface-alt)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] transition-colors hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
                         @click="applyBetaPreset(rule, preset)"
                         :title="preset.description"
                       >
@@ -836,7 +846,7 @@
                         if (!rule.model_whitelist) rule.model_whitelist = [];
                         rule.model_whitelist.push('');
                       "
-                      class="mb-2 inline-flex items-center gap-1 text-xs text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                      class="mb-2 inline-flex items-center gap-1 text-xs text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                     >
                       <svg
                         class="h-3.5 w-3.5"
@@ -864,7 +874,7 @@
                         v-for="pattern in commonModelPatterns"
                         :key="pattern"
                         type="button"
-                        class="rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:border-dark-600 dark:text-gray-400 dark:hover:border-primary-700 dark:hover:bg-primary-900/30 dark:hover:text-primary-300"
+                        class="rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-600 transition-colors hover:border-[var(--border-focus)] hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] border-[var(--border-default)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
                         @click="addQuickPattern(rule, pattern)"
                       >
                         {{ pattern }}
@@ -913,7 +923,7 @@
 
                 <!-- Save Button -->
                 <div
-                  class="flex justify-end border-t border-gray-100 pt-4 dark:border-dark-700"
+                  class="flex justify-end border-t border-gray-100 pt-4 border-[var(--border-default)]"
                 >
                   <button
                     type="button"
@@ -952,9 +962,9 @@
           <!-- OpenAI Fast/Flex Policy Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.openaiFastPolicy.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -965,7 +975,7 @@
               <!-- Empty state -->
               <div
                 v-if="openaiFastPolicyForm.rules.length === 0"
-                class="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500 dark:border-dark-600 dark:text-gray-400"
+                class="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500 border-[var(--border-default)] dark:text-gray-400"
               >
                 {{ t("admin.settings.openaiFastPolicy.empty") }}
               </div>
@@ -974,11 +984,11 @@
               <div
                 v-for="(rule, ruleIndex) in openaiFastPolicyForm.rules"
                 :key="ruleIndex"
-                class="rounded-lg border border-gray-200 p-4 dark:border-dark-600"
+                class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
               >
                 <div class="mb-3 flex items-center justify-between">
                   <span
-                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                   >
                     {{
                       t("admin.settings.openaiFastPolicy.ruleHeader", {
@@ -1139,7 +1149,7 @@
                   <button
                     type="button"
                     @click="addOpenAIFastPolicyModelPattern(rule)"
-                    class="mb-2 inline-flex items-center gap-1 text-xs text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                    class="mb-2 inline-flex items-center gap-1 text-xs text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                   >
                     <svg
                       class="h-3.5 w-3.5"
@@ -1236,9 +1246,9 @@
           <!-- Registration Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.registration.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1249,7 +1259,7 @@
               <!-- Enable Registration -->
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.enableRegistration")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1263,10 +1273,10 @@
 
               <!-- Email Verification -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.emailVerification")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1277,8 +1287,8 @@
               </div>
 
               <!-- Email Suffix Whitelist -->
-              <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
-                <label class="font-medium text-gray-900 dark:text-white">{{
+              <div class="border-t border-gray-100 pt-4 border-[var(--border-default)]">
+                <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                   t("admin.settings.registration.emailSuffixWhitelist")
                 }}</label>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1287,19 +1297,19 @@
                   }}
                 </p>
                 <div
-                  class="mt-3 rounded-lg border border-gray-300 bg-white p-2 dark:border-dark-500 dark:bg-dark-700"
+                  class="mt-3 rounded-lg border border-gray-300 bg-[var(--bg-surface)] p-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                 >
                   <div class="flex flex-wrap items-center gap-2">
                     <span
                       v-for="suffix in registrationEmailSuffixWhitelistTags"
                       :key="suffix"
-                      class="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs font-mono text-gray-700 dark:bg-dark-600 dark:text-gray-200"
+                      class="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs font-mono text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200"
                     >
                       <span class="text-gray-400 dark:text-gray-500">@</span>
                       <span>{{ suffix }}</span>
                       <button
                         type="button"
-                        class="rounded-full text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-dark-500 dark:hover:text-white"
+                        class="rounded-md text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-dark-500 dark:hover:text-[var(--text-inverse)]"
                         @click="
                           removeRegistrationEmailSuffixWhitelistTag(suffix)
                         "
@@ -1314,7 +1324,7 @@
                     </span>
 
                     <div
-                      class="flex min-w-[220px] flex-1 items-center gap-1 rounded border border-transparent px-2 py-1 focus-within:border-primary-300 dark:focus-within:border-primary-700"
+                      class="flex min-w-[220px] flex-1 items-center gap-1 rounded border border-transparent px-2 py-1 focus-within:border-[var(--border-focus)] dark:focus-within:border-[var(--border-focus)]"
                     >
                       <span
                         class="font-mono text-sm text-gray-400 dark:text-gray-500"
@@ -1323,7 +1333,7 @@
                       <input
                         v-model="registrationEmailSuffixWhitelistDraft"
                         type="text"
-                        class="w-full bg-transparent text-sm font-mono text-gray-900 outline-none placeholder:text-gray-400 dark:text-white dark:placeholder:text-gray-500"
+                        class="w-full bg-transparent text-sm font-mono text-gray-900 outline-none placeholder:text-gray-400 dark:text-[var(--text-inverse)] dark:placeholder:text-gray-500"
                         :placeholder="
                           t(
                             'admin.settings.registration.emailSuffixWhitelistPlaceholder',
@@ -1352,10 +1362,10 @@
 
               <!-- Promo Code -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.promoCode")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1367,10 +1377,10 @@
 
               <!-- Invitation Code -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.invitationCode")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1382,10 +1392,10 @@
               <!-- Password Reset - Only show when email verification is enabled -->
               <div
                 v-if="form.email_verify_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.passwordReset")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1397,7 +1407,7 @@
               <!-- Frontend URL - Only show when password reset is enabled -->
               <div
                 v-if="form.email_verify_enabled && form.password_reset_enabled"
-                class="border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <label
                   class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -1419,10 +1429,10 @@
 
               <!-- TOTP 2FA -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.registration.totp")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1447,9 +1457,9 @@
           <!-- Cloudflare Turnstile Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.turnstile.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1460,7 +1470,7 @@
               <!-- Enable Turnstile -->
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.turnstile.enableTurnstile")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1473,7 +1483,7 @@
               <!-- Turnstile Keys - Only show when enabled -->
               <div
                 v-if="form.turnstile_enabled"
-                class="border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div class="grid grid-cols-1 gap-6">
                   <div>
@@ -1493,7 +1503,7 @@
                       <a
                         href="https://dash.cloudflare.com/"
                         target="_blank"
-                        class="text-primary-600 hover:text-primary-500"
+                        class="text-[var(--accent)] hover:text-[var(--accent-hover)]"
                         >{{
                           t("admin.settings.turnstile.cloudflareDashboard")
                         }}</a
@@ -1530,9 +1540,9 @@
           <!-- LinuxDo Connect OAuth 登录 -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.linuxdo.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1542,7 +1552,7 @@
             <div class="space-y-5 p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.linuxdo.enable")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1554,7 +1564,7 @@
 
               <div
                 v-if="form.linuxdo_connect_enabled"
-                class="border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div class="grid grid-cols-1 gap-6">
                   <div>
@@ -1631,7 +1641,7 @@
                       </button>
                       <code
                         v-if="linuxdoRedirectUrlSuggestion"
-                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-dark-800 dark:text-gray-300"
+                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                       >
                         {{ linuxdoRedirectUrlSuggestion }}
                       </code>
@@ -1648,9 +1658,9 @@
           <!-- WeChat Connect OAuth 登录 -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.wechatConnect.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1660,7 +1670,7 @@
             <div class="space-y-5 p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.wechatConnect.enabledLabel")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -1675,15 +1685,15 @@
 
               <div
                 v-if="form.wechat_connect_enabled"
-                class="space-y-6 border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="space-y-6 border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div class="space-y-4">
                   <div
-                    class="rounded-lg border border-gray-200 p-4 dark:border-dark-700"
+                    class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                   >
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <h3 class="font-medium text-gray-900 dark:text-white">
+                        <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                           {{ localText("PC 应用", "PC App") }}
                         </h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1752,11 +1762,11 @@
                   </div>
 
                   <div
-                    class="rounded-lg border border-gray-200 p-4 dark:border-dark-700"
+                    class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                   >
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <h3 class="font-medium text-gray-900 dark:text-white">
+                        <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                           {{ localText("公众号", "Official Account") }}
                         </h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1830,11 +1840,11 @@
                   </div>
 
                   <div
-                    class="rounded-lg border border-gray-200 p-4 dark:border-dark-700"
+                    class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                   >
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <h3 class="font-medium text-gray-900 dark:text-white">
+                        <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                           {{ localText("移动应用", "Mobile App") }}
                         </h3>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -1958,7 +1968,7 @@
                       </button>
                       <code
                         v-if="wechatRedirectUrlSuggestion"
-                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-dark-800 dark:text-gray-300"
+                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                       >
                         {{ wechatRedirectUrlSuggestion }}
                       </code>
@@ -1990,9 +2000,9 @@
           <!-- Generic OIDC OAuth 登录 -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.oidc.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2002,7 +2012,7 @@
             <div class="space-y-5 p-6">
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.oidc.enable")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -2014,7 +2024,7 @@
 
               <div
                 v-if="form.oidc_connect_enabled"
-                class="space-y-6 border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="space-y-6 border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                   <div>
@@ -2217,7 +2227,7 @@
                       </button>
                       <code
                         v-if="oidcRedirectUrlSuggestion"
-                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 dark:bg-dark-800 dark:text-gray-300"
+                        class="select-all break-all rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                       >
                         {{ oidcRedirectUrlSuggestion }}
                       </code>
@@ -2302,10 +2312,10 @@
 
                 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                   <div
-                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 border-[var(--border-default)]"
                   >
                     <div>
-                      <label class="font-medium text-gray-900 dark:text-white">
+                      <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                         {{ t("admin.settings.oidc.usePkce") }}
                       </label>
                     </div>
@@ -2316,10 +2326,10 @@
                   </div>
 
                   <div
-                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 border-[var(--border-default)]"
                   >
                     <div>
-                      <label class="font-medium text-gray-900 dark:text-white">
+                      <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                         {{ t("admin.settings.oidc.validateIdToken") }}
                       </label>
                     </div>
@@ -2330,10 +2340,10 @@
                   </div>
 
                   <div
-                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                    class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 border-[var(--border-default)]"
                   >
                     <div>
-                      <label class="font-medium text-gray-900 dark:text-white">
+                      <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                         {{ t("admin.settings.oidc.requireEmailVerified") }}
                       </label>
                     </div>
@@ -2403,9 +2413,9 @@
           <!-- Default Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.defaults.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2469,10 +2479,10 @@
                 </div>
               </div>
 
-              <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
+              <div class="border-t border-gray-100 pt-4 border-[var(--border-default)]">
                 <div class="mb-3 flex items-center justify-between">
                   <div>
-                    <label class="font-medium text-gray-900 dark:text-white">
+                    <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                       {{ t("admin.settings.defaults.defaultSubscriptions") }}
                     </label>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -2493,7 +2503,7 @@
 
                 <div
                   v-if="form.default_subscriptions.length === 0"
-                  class="rounded border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 dark:border-dark-600 dark:text-gray-400"
+                  class="rounded border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 border-[var(--border-default)] dark:text-gray-400"
                 >
                   {{ t("admin.settings.defaults.defaultSubscriptionsEmpty") }}
                 </div>
@@ -2502,7 +2512,7 @@
                   <div
                     v-for="(item, index) in form.default_subscriptions"
                     :key="`default-sub-${index}`"
-                    class="grid grid-cols-1 gap-3 rounded border border-gray-200 p-3 md:grid-cols-[1fr_160px_auto] dark:border-dark-600"
+                    class="grid grid-cols-1 gap-3 rounded border border-gray-200 p-3 md:grid-cols-[1fr_160px_auto] border-[var(--border-default)]"
                   >
                     <div>
                       <label
@@ -2611,9 +2621,9 @@
 
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.authSourceDefaults.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2622,10 +2632,10 @@
             </div>
             <div class="space-y-6 p-6">
               <div
-                class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t("admin.settings.authSourceDefaults.requireEmailLabel") }}
                   </label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -2639,11 +2649,11 @@
                 <div
                   v-for="authSource in authSourceDefaultsMeta"
                   :key="authSource.source"
-                  class="rounded-xl border border-gray-200 p-4 dark:border-dark-700"
+                  class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                 >
                   <div class="flex items-center justify-between gap-4">
                     <div>
-                      <div class="font-medium text-gray-900 dark:text-white">
+                      <div class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                         {{ authSource.title }}
                       </div>
                       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2661,7 +2671,7 @@
                   <div
                     v-if="authSourceDefaults[authSource.source].grant_on_signup"
                     :data-testid="`auth-source-${authSource.source}-panel`"
-                    class="mt-4 space-y-4 border-t border-gray-100 pt-4 dark:border-dark-700"
+                    class="mt-4 space-y-4 border-t border-gray-100 pt-4 border-[var(--border-default)]"
                   >
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                       {{ t("admin.settings.authSourceDefaults.enabledHint") }}
@@ -2704,11 +2714,11 @@
                     </div>
 
                     <div
-                      class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
+                      class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 border-[var(--border-default)]"
                     >
                       <div>
                         <label
-                          class="font-medium text-gray-900 dark:text-white"
+                          class="font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                         >
                           {{ t("admin.settings.authSourceDefaults.grantOnFirstBindLabel") }}
                         </label>
@@ -2729,7 +2739,7 @@
                     <div class="mb-3 flex items-center justify-between">
                       <div>
                         <label
-                          class="font-medium text-gray-900 dark:text-white"
+                          class="font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                         >
                           {{ t("admin.settings.authSourceDefaults.defaultSubscriptionsLabel") }}
                         </label>
@@ -2756,7 +2766,7 @@
                         authSourceDefaults[authSource.source].subscriptions
                           .length === 0
                       "
-                      class="rounded border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 dark:border-dark-600 dark:text-gray-400"
+                      class="rounded border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 border-[var(--border-default)] dark:text-gray-400"
                     >
                       {{ t("admin.settings.authSourceDefaults.noSourceSubscriptions") }}
                     </div>
@@ -2767,7 +2777,7 @@
                           authSource.source
                         ].subscriptions"
                         :key="`${authSource.source}-sub-${index}`"
-                        class="grid grid-cols-1 gap-3 rounded border border-gray-200 p-3 md:grid-cols-[1fr_160px_auto] dark:border-dark-600"
+                        class="grid grid-cols-1 gap-3 rounded border border-gray-200 p-3 md:grid-cols-[1fr_160px_auto] border-[var(--border-default)]"
                       >
                         <div>
                           <label
@@ -2892,9 +2902,9 @@
           <!-- Claude Code Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.claudeCode.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2944,9 +2954,9 @@
           <!-- Gateway Scheduling Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.scheduling.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -2989,9 +2999,9 @@
           <!-- Gateway Forwarding Behavior -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.gatewayForwarding.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -3087,9 +3097,9 @@
           <!-- Web Search Emulation -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.webSearchEmulation.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -3131,7 +3141,7 @@
 
                 <div
                   v-if="webSearchConfig.providers.length === 0"
-                  class="rounded-lg border border-dashed border-gray-300 p-4 text-center text-sm text-gray-400 dark:border-dark-600"
+                  class="rounded-lg border border-dashed border-gray-300 p-4 text-center text-sm text-gray-400 border-[var(--border-default)]"
                 >
                   {{ t("admin.settings.webSearchEmulation.noProviders") }}
                 </div>
@@ -3139,7 +3149,7 @@
                 <div
                   v-for="(provider, pIdx) in webSearchConfig.providers"
                   :key="pIdx"
-                  class="rounded-lg border border-gray-200 dark:border-dark-600"
+                  class="rounded-lg border border-gray-200 border-[var(--border-default)]"
                 >
                   <!-- Collapsible header -->
                   <div
@@ -3208,7 +3218,7 @@
                   <!-- Expanded content -->
                   <div
                     v-if="expandedProviders[pIdx]"
-                    class="space-y-3 border-t border-gray-100 px-4 pb-4 pt-3 dark:border-dark-700"
+                    class="space-y-3 border-t border-gray-100 px-4 pb-4 pt-3 border-[var(--border-default)]"
                   >
                     <!-- API Key with inline show/copy -->
                     <div>
@@ -3374,11 +3384,11 @@
                           provider.quota_limit != null &&
                           provider.quota_limit > 0
                         "
-                        class="flex-1 rounded-full bg-gray-200 dark:bg-dark-600"
+                        class="flex-1 rounded-md bg-gray-200 bg-[var(--bg-surface-alt)]"
                         style="height: 6px"
                       >
                         <div
-                          class="h-full rounded-full transition-all"
+                          class="h-full rounded-md transition-colors"
                           :class="
                             quotaPercentage(provider) > 90
                               ? 'bg-red-500'
@@ -3405,7 +3415,7 @@
                       <button
                         v-if="(provider.quota_used ?? 0) > 0"
                         type="button"
-                        class="text-xs text-primary-600 hover:text-primary-700"
+                        class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]"
                         @click="resetWebSearchUsage(pIdx)"
                       >
                         {{ t("admin.settings.webSearchEmulation.resetUsage") }}
@@ -3444,10 +3454,10 @@
             @click.self="wsTestDialogOpen = false"
           >
             <div
-              class="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-dark-800"
+              class="mx-4 w-full max-w-lg rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]"
             >
               <h3
-                class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+                class="mb-4 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
               >
                 {{ t("admin.settings.webSearchEmulation.testResultTitle") }}
               </h3>
@@ -3477,7 +3487,7 @@
               <!-- Test results -->
               <div
                 v-if="wsTestResult"
-                class="mt-4 max-h-80 overflow-y-auto rounded-lg bg-gray-50 p-4 dark:bg-dark-700"
+                class="mt-4 max-h-80 overflow-y-auto rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]"
               >
                 <p
                   class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -3495,12 +3505,12 @@
                 <div
                   v-for="(r, rIdx) in wsTestResult.results"
                   :key="rIdx"
-                  class="mt-2 border-t border-gray-200 pt-2 first:mt-0 first:border-0 first:pt-0 dark:border-dark-600"
+                  class="mt-2 border-t border-gray-200 pt-2 first:mt-0 first:border-0 first:pt-0 border-[var(--border-default)]"
                 >
                   <a
                     :href="r.url"
                     target="_blank"
-                    class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                    class="text-sm font-medium text-[var(--accent)] hover:underline text-[var(--accent)]"
                     >{{ r.title }}</a
                   >
                   <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -3527,9 +3537,9 @@
           <!-- Site Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.site.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -3542,7 +3552,7 @@
                 class="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
               >
                 <div>
-                  <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t("admin.settings.site.backendMode") }}
                   </h3>
                   <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -3608,8 +3618,8 @@
               </div>
 
               <!-- Global Table Preferences -->
-              <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
-                <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+              <div class="border-t border-gray-100 pt-4 border-[var(--border-default)]">
+                <h3 class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t("admin.settings.site.tablePreferencesTitle") }}
                 </h3>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -3670,7 +3680,7 @@
                   <div
                     v-for="(ep, index) in form.custom_endpoints"
                     :key="index"
-                    class="rounded-lg border border-gray-200 p-4 dark:border-dark-600"
+                    class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
                   >
                     <div class="mb-3 flex items-center justify-between">
                       <span
@@ -3766,7 +3776,7 @@
 
                 <button
                   type="button"
-                  class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-2.5 text-sm text-gray-500 transition-colors hover:border-primary-400 hover:text-primary-600 dark:border-dark-600 dark:text-gray-400 dark:hover:border-primary-500 dark:hover:text-primary-400"
+                  class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 px-4 py-2.5 text-sm text-gray-500 transition-colors hover:border-[var(--border-focus)] hover:text-[var(--accent-hover)] border-[var(--border-default)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:text-[var(--accent-hover)]"
                   @click="addEndpoint"
                 >
                   <svg
@@ -3863,10 +3873,10 @@
 
               <!-- Hide CCS Import Button -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.site.hideCcsImportButton")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -3881,9 +3891,9 @@
           <!-- Custom Menu Items -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.customMenu.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -3895,7 +3905,7 @@
               <div
                 v-for="(item, index) in form.custom_menu_items"
                 :key="item.id || index"
-                class="rounded-lg border border-gray-200 p-4 dark:border-dark-600"
+                class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
               >
                 <div class="mb-3 flex items-center justify-between">
                   <span
@@ -4048,7 +4058,7 @@
               <!-- Add button -->
               <button
                 type="button"
-                class="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-3 text-sm text-gray-500 transition-colors hover:border-primary-400 hover:text-primary-600 dark:border-dark-600 dark:text-gray-400 dark:hover:border-primary-500 dark:hover:text-primary-400"
+                class="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-3 text-sm text-gray-500 transition-colors hover:border-[var(--border-focus)] hover:text-[var(--accent-hover)] border-[var(--border-default)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:text-[var(--accent-hover)]"
                 @click="addMenuItem"
               >
                 <svg
@@ -4075,8 +4085,8 @@
         <div v-show="activeTab === 'features'" class="space-y-6">
 
         <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.settings.features.channelMonitor.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -4085,7 +4095,7 @@
             <p class="mt-1.5 text-xs">
               <router-link
                 to="/admin/channels/monitor"
-                class="inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
+                class="inline-flex items-center gap-1 text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 {{ t('admin.settings.features.channelMonitor.configureLink') }}
                 <span aria-hidden="true">→</span>
@@ -4125,8 +4135,8 @@
         </div>
 
         <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.settings.features.availableChannels.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -4135,7 +4145,7 @@
             <p class="mt-1.5 text-xs">
               <router-link
                 to="/admin/channels/pricing"
-                class="inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
+                class="inline-flex items-center gap-1 text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 {{ t('admin.settings.features.availableChannels.configureLink') }}
                 <span aria-hidden="true">→</span>
@@ -4159,8 +4169,8 @@
 
         <!-- Affiliate (邀请返利) feature card -->
         <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.settings.features.affiliate.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -4253,10 +4263,10 @@
               </div>
 
               <!-- 专属用户管理 -->
-              <div class="border-t border-gray-100 pt-6 dark:border-dark-700">
+              <div class="border-t border-gray-100 pt-6 border-[var(--border-default)]">
                 <div class="mb-3 flex items-center justify-between">
                   <div>
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                       {{ t('admin.settings.features.affiliate.customUsers.title') }}
                     </h3>
                     <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
@@ -4290,9 +4300,9 @@
                   </button>
                 </div>
 
-                <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-dark-700">
+                <div class="overflow-hidden rounded-lg border border-gray-200 border-[var(--border-default)]">
                   <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-700">
-                    <thead class="bg-gray-50 dark:bg-dark-800">
+                    <thead class="bg-gray-50 bg-[var(--bg-surface-alt)]">
                       <tr>
                         <th class="px-3 py-2 text-left">
                           <input
@@ -4308,7 +4318,7 @@
                         <th class="px-3 py-2 text-left text-xs font-medium uppercase text-gray-500">{{ t('admin.settings.features.affiliate.customUsers.col.actions') }}</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-900">
+                    <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
                       <tr v-if="affiliateState.loading">
                         <td colspan="6" class="px-3 py-6 text-center text-sm text-gray-500">
                           {{ t('common.loading') }}
@@ -4327,13 +4337,13 @@
                             @change="toggleAffiliateSelect(entry.user_id)"
                           />
                         </td>
-                        <td class="px-3 py-2 text-sm text-gray-900 dark:text-white">{{ entry.email }}</td>
+                        <td class="px-3 py-2 text-sm text-gray-900 dark:text-[var(--text-inverse)]">{{ entry.email }}</td>
                         <td class="px-3 py-2 text-sm text-gray-600 dark:text-gray-300">{{ entry.username }}</td>
                         <td class="px-3 py-2 text-sm font-mono">
                           {{ entry.aff_code }}
                           <span
                             v-if="entry.aff_code_custom"
-                            class="ml-1 inline-block rounded bg-primary-100 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                            class="ml-1 inline-block rounded bg-[var(--bg-surface-alt)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
                           >{{ t('admin.settings.features.affiliate.customUsers.customBadge') }}</span>
                         </td>
                         <td class="px-3 py-2 text-sm">
@@ -4342,7 +4352,7 @@
                         </td>
                         <td class="px-3 py-2 text-sm">
                           <div class="flex items-center gap-2">
-                            <button type="button" class="text-primary-600 hover:underline" @click="openAffiliateModal(entry)">
+                            <button type="button" class="text-[var(--accent)] hover:underline" @click="openAffiliateModal(entry)">
                               {{ t('common.edit') }}
                             </button>
                             <button
@@ -4394,7 +4404,7 @@
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           @click.self="closeAffiliateModal"
         >
-          <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-dark-900">
+          <div class="w-full max-w-md rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]">
             <h3 class="mb-4 text-lg font-semibold">
               {{ affiliateModal.mode === 'add' ? t('admin.settings.features.affiliate.modal.addTitle') : t('admin.settings.features.affiliate.modal.editTitle') }}
             </h3>
@@ -4404,10 +4414,10 @@
                 <!-- Chip showing the picked user; clicking it re-opens the search -->
                 <div
                   v-if="affiliateModal.selectedUser"
-                  class="flex items-center justify-between rounded-md border border-primary-200 bg-primary-50 px-3 py-2 dark:border-primary-700/50 dark:bg-primary-900/20"
+                  class="flex items-center justify-between rounded-md border border-[var(--border-focus)] bg-[var(--bg-surface-alt)] px-3 py-2 border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
                 >
                   <div class="text-sm">
-                    <span class="font-medium text-gray-900 dark:text-white">{{ affiliateModal.selectedUser.email }}</span>
+                    <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ affiliateModal.selectedUser.email }}</span>
                     <span class="ml-1 text-xs text-gray-500">({{ affiliateModal.selectedUser.username }})</span>
                   </div>
                   <button
@@ -4430,7 +4440,7 @@
                   />
                   <div
                     v-if="affiliateModal.userResults.length > 0"
-                    class="mt-1 max-h-40 overflow-y-auto rounded border border-gray-200 dark:border-dark-700"
+                    class="mt-1 max-h-40 overflow-y-auto rounded border border-gray-200 border-[var(--border-default)]"
                   >
                     <button
                       v-for="u in affiliateModal.userResults"
@@ -4519,7 +4529,7 @@
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           @click.self="affiliateBatchModal.open = false"
         >
-          <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-dark-900">
+          <div class="w-full max-w-md rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]">
             <h3 class="mb-4 text-lg font-semibold">
               {{ t('admin.settings.features.affiliate.batchModal.title', { count: affiliateState.selected.length }) }}
             </h3>
@@ -4565,9 +4575,9 @@
           <!-- Payment System Settings -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.payment.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -4577,7 +4587,7 @@
                   :href="paymentGuideHref"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="ml-2 inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                  class="ml-2 inline-flex items-center text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                 >
                   <svg
                     class="mr-0.5 h-3.5 w-3.5"
@@ -4600,7 +4610,7 @@
               <!-- Enable toggle -->
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.payment.enabled")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -4639,7 +4649,7 @@
                       t("admin.settings.payment.preview")
                     }}</label>
                     <div
-                      class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-300"
+                      class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300"
                     >
                       {{
                         (form.payment_product_name_prefix || DEFAULT_PAYMENT_PRODUCT_PREFIX) +
@@ -4733,7 +4743,7 @@
                       }}
                     </p>
                     <p
-                      class="mt-1 text-xs font-medium text-primary-600 dark:text-primary-400"
+                      class="mt-1 text-xs font-medium text-[var(--accent)] text-[var(--accent)]"
                     >
                       {{
                         t("admin.settings.payment.balanceRechargePreview", {
@@ -4782,7 +4792,7 @@
                     </p>
                     <p
                       v-if="(Number(form.payment_recharge_fee_rate) || 0) > 0"
-                      class="mt-1 text-xs font-medium text-primary-600 dark:text-primary-400"
+                      class="mt-1 text-xs font-medium text-[var(--accent)] text-[var(--accent)]"
                     >
                       {{
                         t("admin.settings.payment.rechargeFeePreview", {
@@ -4840,10 +4850,10 @@
                       <button
                         type="button"
                         :class="[
-                          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+                          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
                           form.payment_cancel_rate_limit_enabled
-                            ? 'bg-primary-500'
-                            : 'bg-gray-300 dark:bg-dark-600',
+                            ? 'bg-[var(--accent)]'
+                            : 'bg-gray-300 bg-[var(--bg-surface-alt)]',
                         ]"
                         @click="
                           form.payment_cancel_rate_limit_enabled =
@@ -4852,7 +4862,7 @@
                       >
                         <span
                           :class="[
-                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                            'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                             form.payment_cancel_rate_limit_enabled
                               ? 'translate-x-5'
                               : 'translate-x-0',
@@ -4935,10 +4945,10 @@
                       type="button"
                       @click="togglePaymentType(pt.value)"
                       :class="[
-                        'rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
+                        'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
                         isPaymentTypeEnabled(pt.value)
-                          ? 'border-primary-500 bg-primary-500 text-white shadow-sm'
-                          : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50 dark:border-dark-600 dark:bg-dark-800 dark:text-gray-300 dark:hover:border-dark-500',
+                          ? 'border-[var(--border-focus)] bg-[var(--accent)] text-[var(--text-inverse)]'
+                          : 'border-gray-300 bg-[var(--bg-surface)] text-gray-600 hover:border-gray-400 hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:border-dark-500',
                       ]"
                     >
                       {{ pt.label }}
@@ -4951,7 +4961,7 @@
                       :href="paymentMethodsHref"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="ml-1 text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300"
+                      class="ml-1 text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                     >
                       {{ t("admin.settings.payment.findProvider") }}
                       <svg
@@ -5033,7 +5043,7 @@
                   class="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500"
                 />
                 <div>
-                  <h3 class="font-medium text-gray-900 dark:text-white">
+                  <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t("admin.settings.emailTabDisabledTitle") }}
                   </h3>
                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -5047,10 +5057,10 @@
           <!-- SMTP Settings - Only show when email verification is enabled -->
           <div v-if="form.email_verify_enabled" class="card">
             <div
-              class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="flex items-center justify-between border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t("admin.settings.smtp.title") }}
                 </h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -5192,10 +5202,10 @@
 
               <!-- Use TLS Toggle -->
               <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 border-[var(--border-default)]"
               >
                 <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
+                  <label class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                     t("admin.settings.smtp.useTls")
                   }}</label>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -5210,9 +5220,9 @@
           <!-- Send Test Email - Only show when email verification is enabled -->
           <div v-if="form.email_verify_enabled" class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.testEmail.title") }}
               </h2>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -5276,9 +5286,9 @@
           <!-- Balance Low Notification -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h3 class="text-base font-medium text-gray-900 dark:text-white">
+              <h3 class="text-base font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.balanceNotify.title") }}
               </h3>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -5336,9 +5346,9 @@
           <!-- Account Quota Notification -->
           <div class="card">
             <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+              class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
             >
-              <h3 class="text-base font-medium text-gray-900 dark:text-white">
+              <h3 class="text-base font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t("admin.settings.quotaNotify.title") }}
               </h3>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -5375,7 +5385,7 @@
                         class="sr-only peer"
                       />
                       <div
-                        class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:after:border-gray-500 peer-checked:bg-primary-600"
+                        class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-md peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[var(--bg-surface)] after:border-gray-300 after:border after:rounded-md after:h-4 after:w-4 after:transition-colors dark:after:border-gray-500 peer-checked:bg-[var(--accent)]"
                       ></div>
                     </label>
                     <input
@@ -5417,7 +5427,11 @@
         </div>
 
         <!-- Save Button -->
-        <div v-show="activeTab !== 'backup'" class="flex justify-end">
+        <div v-show="activeTab !== 'backup'" class="settings-save-bar flex justify-end gap-3">
+          <div class="config-save-note mr-auto hidden max-w-lg text-left lg:block">
+            <strong>保存区：</strong>
+            这里保存的是系统全局设置，不会替你创建渠道、分组、账号或 API 密钥。
+          </div>
           <button
             type="submit"
             :disabled="saving || loadFailed"
@@ -5517,6 +5531,7 @@ import AppLayout from "@/components/layout/AppLayout.vue";
 import Icon from "@/components/icons/Icon.vue";
 import Select from "@/components/common/Select.vue";
 import ConfirmDialog from "@/components/common/ConfirmDialog.vue";
+import PageIntro from "@/components/common/PageIntro.vue";
 import PaymentProviderList from "@/components/payment/PaymentProviderList.vue";
 import PaymentProviderDialog from "@/components/payment/PaymentProviderDialog.vue";
 import GroupBadge from "@/components/common/GroupBadge.vue";
@@ -5539,8 +5554,10 @@ import {
 } from "@/utils/registrationEmailPolicy";
 import {
   DEFAULT_PAYMENT_PRODUCT_PREFIX,
+  DEFAULT_SITE_LOGO,
   DEFAULT_SITE_NAME,
   DEFAULT_SITE_SUBTITLE,
+  resolveSiteLogoPath,
 } from "@/constants/branding";
 
 const { t, locale } = useI18n();
@@ -5551,9 +5568,11 @@ function localText(zh: string, en: string): string {
   return locale.value.startsWith("zh") ? zh : en;
 }
 
-const paymentGuideHref = computed(() => appStore.docUrl || "");
+const DEFAULT_PAYMENT_GUIDE_HREF = "https://docs.ownapi.dev/zh/guide/getting-started";
 
-const paymentMethodsHref = computed(() => appStore.docUrl || "");
+const paymentGuideHref = computed(() => appStore.docUrl || DEFAULT_PAYMENT_GUIDE_HREF);
+
+const paymentMethodsHref = computed(() => appStore.docUrl || DEFAULT_PAYMENT_GUIDE_HREF);
 
 type SettingsTab =
   | "general"
@@ -5575,6 +5594,41 @@ const settingsTabs = [
   { key: "email" as SettingsTab, icon: "mail" as const },
   { key: "backup" as SettingsTab, icon: "database" as const },
 ];
+const settingsTabSummaries: Record<SettingsTab, { title: string; description: string }> = {
+  general: {
+    title: "基础品牌与访问入口",
+    description: "影响站点名称、Logo、文档链接、首页和用户可见的公共信息。",
+  },
+  features: {
+    title: "功能开关",
+    description: "控制监控、支付、渠道展示、推广等功能入口是否对用户开放。",
+  },
+  security: {
+    title: "安全与注册",
+    description: "管理管理员 API Key、注册策略、验证方式和登录相关安全规则。",
+  },
+  users: {
+    title: "用户默认值",
+    description: "影响新用户默认额度、并发、分组、余额提醒和用户侧限制。",
+  },
+  gateway: {
+    title: "网关与模型调用",
+    description: "影响上游请求、冷却、Claude Code、OpenAI 兼容模式等调用行为。",
+  },
+  payment: {
+    title: "支付与订阅",
+    description: "管理支付方式、套餐、订单行为和充值订阅展示。",
+  },
+  email: {
+    title: "邮件通知",
+    description: "配置 SMTP、验证邮件、余额提醒和测试发送。",
+  },
+  backup: {
+    title: "备份与恢复",
+    description: "管理数据备份相关操作，保存按钮由备份模块自身处理。",
+  },
+};
+const activeTabSummary = computed(() => settingsTabSummaries[activeTab.value]);
 const { copyToClipboard } = useClipboard();
 
 const loading = ref(true);
@@ -5703,7 +5757,7 @@ const form = reactive<SettingsForm>({
   force_email_on_third_party_signup: false,
   default_user_rpm_limit: 0,
   site_name: DEFAULT_SITE_NAME,
-  site_logo: "",
+  site_logo: DEFAULT_SITE_LOGO,
   site_subtitle: DEFAULT_SITE_SUBTITLE,
   api_base_url: "",
   contact_info: "",
@@ -6353,6 +6407,7 @@ async function loadSettings() {
         (form as Record<string, unknown>)[key] = value;
       }
     }
+    form.site_logo = resolveSiteLogoPath(form.site_logo || DEFAULT_SITE_LOGO);
     Object.assign(authSourceDefaults, buildAuthSourceDefaultsState(settings));
     form.backend_mode_enabled = settings.backend_mode_enabled;
     form.default_subscriptions = normalizeDefaultSubscriptionSettings(
@@ -6829,6 +6884,7 @@ async function saveSettings() {
         (form as Record<string, unknown>)[key] = value;
       }
     }
+    form.site_logo = resolveSiteLogoPath(form.site_logo || DEFAULT_SITE_LOGO);
     Object.assign(authSourceDefaults, buildAuthSourceDefaultsState(updated));
     registrationEmailSuffixWhitelistTags.value =
       normalizeRegistrationEmailSuffixDomains(
@@ -8043,7 +8099,7 @@ watch(
 .settings-tabs-scroll:hover {
   scrollbar-color: rgb(0 0 0 / 0.15) transparent;
 }
-:root.dark .settings-tabs-scroll:hover {
+:global(.dark) .settings-tabs-scroll:hover {
   scrollbar-color: rgb(255 255 255 / 0.2) transparent;
 }
 .settings-tabs-scroll::-webkit-scrollbar {
@@ -8059,17 +8115,18 @@ watch(
 .settings-tabs-scroll:hover::-webkit-scrollbar-thumb {
   background: rgb(0 0 0 / 0.15);
 }
-:root.dark .settings-tabs-scroll:hover::-webkit-scrollbar-thumb {
+:global(.dark) .settings-tabs-scroll:hover::-webkit-scrollbar-thumb {
   background: rgb(255 255 255 / 0.2);
 }
 
 .settings-tabs {
-  @apply inline-flex min-w-full gap-0.5 rounded-2xl
-         border border-gray-100 bg-white/80 p-1 backdrop-blur-sm
-         dark:border-dark-700/50 dark:bg-dark-800/80;
-  box-shadow:
-    0 1px 3px rgb(0 0 0 / 0.04),
-    0 1px 2px rgb(0 0 0 / 0.02);
+  display: inline-flex;
+  min-width: 100%;
+  gap: 2px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-alt);
+  padding: 4px;
 }
 
 @media (min-width: 640px) {
@@ -8079,48 +8136,617 @@ watch(
 }
 
 .settings-tab {
-  @apply relative flex flex-1 items-center justify-center gap-1.5
-         whitespace-nowrap rounded-xl px-2.5 py-2
-         text-sm font-medium
-         text-gray-500 dark:text-dark-400
-         transition-all duration-200 ease-out;
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  color: var(--text-mutedd);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
 }
 
 .settings-tab:hover:not(.settings-tab-active) {
-  @apply text-gray-700 dark:text-gray-300;
-  background: rgb(0 0 0 / 0.03);
+  color: var(--text-primary);
+  background: var(--state-hover);
 }
 
-:root.dark .settings-tab:hover:not(.settings-tab-active) {
-  background: rgb(255 255 255 / 0.04);
+:global(.dark) .settings-tab:hover:not(.settings-tab-active) {
+  background: var(--state-hover);
 }
 
 .settings-tab-active {
-  @apply text-primary-600 dark:text-primary-400;
-  background: linear-gradient(
-    135deg,
-    rgba(20, 184, 166, 0.08),
-    rgba(20, 184, 166, 0.03)
-  );
-  box-shadow: 0 1px 2px rgba(20, 184, 166, 0.1);
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
-:root.dark .settings-tab-active {
-  background: linear-gradient(
-    135deg,
-    rgba(45, 212, 191, 0.12),
-    rgba(45, 212, 191, 0.05)
-  );
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+:global(.dark) .settings-tab-active {
+  background: var(--accent-soft);
 }
 
 .settings-tab-icon {
   @apply flex h-6 w-6 items-center justify-center rounded-lg
-         transition-all duration-200;
+         transition-colors duration-200;
 }
 
 .settings-tab-active .settings-tab-icon {
-  @apply bg-primary-500/15 text-primary-600
-         dark:bg-primary-400/15 dark:text-primary-400;
+  background: var(--bg-surface-alt);
+  color: var(--accent);
+}
+
+.admin-settings-shell {
+  max-width: min(100%, 1120px);
+}
+
+.admin-settings-form {
+  position: relative;
+}
+
+.settings-tabs-scroll {
+  top: 4.25rem;
+  z-index: 20;
+  margin-inline: -0.125rem;
+  padding: 0.125rem 0.125rem 0.625rem;
+}
+
+.settings-tabs {
+  border-color: var(--border-default) !important;
+  border-radius: 16px !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.settings-tab {
+  min-height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: 12px !important;
+  font-weight: 700;
+}
+
+.settings-tab-active {
+  border-color: var(--border-focus);
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  box-shadow: none;
+}
+
+:global(.dark) .settings-tab-active {
+  color: var(--accent) !important;
+  box-shadow: none;
+}
+
+.admin-settings-form .card {
+  overflow: hidden;
+}
+
+:global(.dark) .admin-settings-form .card {
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card > div:first-child {
+  border-bottom-color: var(--border-default) !important;
+  background: var(--bg-surface-alt);
+}
+
+:global(.dark) .admin-settings-form .card > div:first-child {
+  background: var(--bg-surface-alt);
+}
+
+.admin-settings-form .card h2 {
+  color: var(--text-primary) !important;
+  font-weight: 800;
+}
+
+.admin-settings-form .card > div:last-child {
+  background: var(--bg-surface-alt);
+}
+
+:global(.dark) .admin-settings-form .card > div:last-child {
+  background: var(--bg-surface);
+}
+
+.admin-settings-form .card .rounded-lg {
+  border-radius: 14px !important;
+}
+
+.admin-settings-form .card .border-t {
+  border-color: var(--border-default) !important;
+}
+
+.admin-settings-form .card .bg-amber-50,
+.admin-settings-form .card .bg-green-50,
+.admin-settings-form .card .bg-red-50 {
+  border-width: 1px;
+}
+
+.settings-save-bar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 18;
+  margin-top: 1.5rem;
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--bg-surface);
+  padding: 0.75rem;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+:global(.dark) .settings-save-bar {
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .settings-tabs-scroll {
+    top: 4rem;
+  }
+
+  .settings-tab {
+    flex: 0 0 auto;
+    padding-inline: 0.875rem;
+  }
+
+  .settings-save-bar {
+    bottom: 0.75rem;
+  }
+}
+
+.settings-tabs {
+  border-color: var(--border-default) !important;
+  border-radius: 16px !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+  backdrop-filter: none !important;
+}
+
+.settings-tab {
+  min-height: 36px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.settings-tab:hover:not(.settings-tab-active),
+.settings-tab-active {
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none;
+}
+
+.settings-tab-active .settings-tab-icon {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+.admin-settings-form .card {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+}
+
+.admin-settings-form .card > div:first-child,
+:global(.dark) .admin-settings-form .card > div:first-child {
+  border-bottom-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card h2 {
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.admin-settings-form .card > div:last-child,
+:global(.dark) .admin-settings-form .card > div:last-child {
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card .rounded-lg {
+  border-radius: 8px !important;
+}
+
+.admin-settings-form .card .bg-amber-50,
+.admin-settings-form .card .bg-green-50,
+.admin-settings-form .card .bg-red-50 {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.settings-save-bar,
+:global(.dark) .settings-save-bar {
+  border-color: var(--border-default) !important;
+  border-radius: 16px !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+  backdrop-filter: none !important;
+}
+
+.settings-tab-summary {
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--bg-surface);
+  padding: 16px 18px;
+}
+
+.settings-tab-summary h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.settings-tab-summary p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.settings-save-bar {
+  position: sticky;
+  z-index: 8;
+  bottom: 1rem;
+  align-items: center;
+  padding: 12px;
+}
+
+/* OwnAPI final desktop UI lock: keep this at the end of the scoped block. */
+.settings-tabs-scroll {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 8px !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+  scrollbar-color: transparent transparent !important;
+}
+
+.settings-tabs-scroll:hover {
+  scrollbar-color: transparent transparent !important;
+}
+
+.settings-tabs {
+  border: 0 !important;
+  border-radius: var(--radius-md) !important;
+  gap: 6px !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+.settings-tab {
+  min-height: 38px !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-md) !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  transition: none !important;
+}
+
+.settings-tab:hover:not(.settings-tab-active) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.settings-tab-active,
+:global(.dark) .settings-tab-active,
+.settings-tab-active:hover {
+  border-color: var(--accent-soft) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  box-shadow: none;
+}
+
+.settings-tab-icon,
+.settings-tab-active .settings-tab-icon {
+  border-radius: var(--radius-md) !important;
+  background: transparent !important;
+  color: currentColor !important;
+  transition: none !important;
+}
+
+.settings-tab-summary {
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  transition: none !important;
+}
+
+.admin-settings-form .card {
+  overflow: hidden !important;
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+  transition: none !important;
+}
+
+.admin-settings-form .card:hover {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  transform: none !important;
+  box-shadow: none;
+}
+
+.admin-settings-form .card > div:first-child,
+:global(.dark) .admin-settings-form .card > div:first-child {
+  border-bottom-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.admin-settings-form .card > div:last-child,
+:global(.dark) .admin-settings-form .card > div:last-child {
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card .rounded,
+.admin-settings-form .card .rounded-md,
+.admin-settings-form .card .rounded-lg,
+.admin-settings-form .card .rounded-lg {
+  border-radius: var(--radius-md) !important;
+}
+
+.admin-settings-form .card .rounded-lg,
+.admin-settings-form .card .rounded-lg {
+  border-radius: var(--radius-lg) !important;
+}
+
+.admin-settings-form .card button.rounded,
+.admin-settings-form .card button.rounded-md,
+.admin-settings-form .card button.rounded-lg,
+.admin-settings-form .card .btn {
+  border-radius: var(--radius-md) !important;
+}
+
+.admin-settings-form .transition,
+.admin-settings-form .transition-colors,
+.admin-settings-form .transition-colors {
+  transition-property: none !important;
+  transition-duration: 0s !important;
+}
+
+.admin-settings-form button:not(.btn-primary):not([role='switch']):hover {
+  border-color: var(--border-strong) !important;
+  background: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  transform: none !important;
+  box-shadow: none;
+}
+
+.admin-settings-form .btn-primary:hover {
+  border-color: #056b6b !important;
+  background: #056b6b !important;
+  color: var(--bg-surface) !important;
+  transform: none !important;
+  box-shadow: none;
+}
+
+/* System settings readability pass. Keep this block last in this scoped file. */
+.admin-settings-shell {
+  width: min(100%, 1180px) !important;
+  max-width: min(100%, 1180px) !important;
+}
+
+.admin-settings-shell :deep(.page-intro) {
+  padding: 28px 32px !important;
+}
+
+.admin-settings-shell :deep(.page-intro h2) {
+  font-size: 26px !important;
+  line-height: 1.2 !important;
+}
+
+.admin-settings-shell :deep(.page-intro p) {
+  max-width: 860px !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+
+.settings-tabs-scroll {
+  position: sticky !important;
+  top: 72px !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  padding: 10px !important;
+}
+
+.settings-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 8px !important;
+}
+
+.settings-tab {
+  min-height: 44px !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.settings-tab:hover:not(.settings-tab-active) {
+  border-color: var(--border-strong) !important;
+  background: var(--bg-subtle) !important;
+}
+
+.settings-tab-active,
+:global(.dark) .settings-tab-active,
+.settings-tab-active:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.settings-tab-icon {
+  width: 24px !important;
+  height: 24px !important;
+  color: currentColor !important;
+}
+
+.settings-tab-summary {
+  display: grid !important;
+  gap: 8px !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface-alt) !important;
+  padding: 22px 24px !important;
+}
+
+.settings-tab-kicker {
+  color: var(--accent) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.settings-tab-summary h2 {
+  color: var(--text-primary) !important;
+  font-size: 20px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+}
+
+.settings-tab-summary p {
+  max-width: 920px !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+}
+
+.admin-settings-form > .space-y-6 {
+  gap: 24px !important;
+}
+
+.admin-settings-form .card {
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card > div:first-child,
+:global(.dark) .admin-settings-form .card > div:first-child {
+  display: grid !important;
+  gap: 6px !important;
+  padding: 22px 26px !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.admin-settings-form .card > div:first-child h2 {
+  margin: 0 !important;
+  color: var(--text-primary) !important;
+  font-size: 19px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+}
+
+.admin-settings-form .card > div:first-child p {
+  margin: 0 !important;
+  max-width: 860px !important;
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+}
+
+.admin-settings-form .card > div:last-child,
+:global(.dark) .admin-settings-form .card > div:last-child {
+  padding: 26px !important;
+  background: var(--bg-surface) !important;
+}
+
+.admin-settings-form .card h3 {
+  color: var(--text-primary) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.45 !important;
+}
+
+.admin-settings-form .card label {
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  line-height: 1.45 !important;
+}
+
+.admin-settings-form .card p,
+.admin-settings-form .card .text-xs {
+  line-height: 1.65 !important;
+}
+
+.admin-settings-form .card .text-xs:not(.font-mono),
+.admin-settings-form .card .text-sm.text-gray-500,
+.admin-settings-form .card .text-xs.text-gray-500,
+.admin-settings-form .card .text-xs.text-gray-400 {
+  color: var(--text-secondary) !important;
+}
+
+.admin-settings-form .card .border-t {
+  margin-top: 4px !important;
+  padding-top: 18px !important;
+}
+
+.admin-settings-form .card .rounded-lg.border,
+.admin-settings-form .card .rounded-md.border,
+.admin-settings-form .card [class*='border-gray-200'] {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.admin-settings-form .input,
+.admin-settings-form :deep(.select-trigger) {
+  min-height: 42px !important;
+  background: var(--bg-surface) !important;
+}
+
+.settings-save-bar {
+  min-height: 64px !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 14px 16px !important;
+}
+
+.config-save-note {
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+.config-save-note strong {
+  color: var(--text-primary) !important;
+}
+
+@media (max-width: 1024px) {
+  .settings-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-settings-shell :deep(.page-intro),
+  .admin-settings-form .card > div:first-child,
+  .admin-settings-form .card > div:last-child,
+  .settings-tab-summary {
+    padding: 18px !important;
+  }
 }
 </style>

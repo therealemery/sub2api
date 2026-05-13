@@ -17,7 +17,7 @@
         v-if="hiddenCount > 0"
         ref="moreButtonRef"
         @click.stop="showPopover = !showPopover"
-        class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-300 dark:hover:bg-dark-500 transition-colors cursor-pointer whitespace-nowrap"
+        class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500 transition-colors cursor-pointer whitespace-nowrap"
       >
         <span>+{{ hiddenCount }}</span>
       </button>
@@ -36,7 +36,7 @@
         <div
           v-if="showPopover"
           ref="popoverRef"
-          class="fixed z-50 min-w-48 max-w-96 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-dark-600 dark:bg-dark-800"
+          class="fixed z-50 min-w-48 max-w-96 rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           :style="popoverStyle"
         >
           <div class="mb-2 flex items-center justify-between">
@@ -74,7 +74,7 @@
       @click="showPopover = false"
     />
   </div>
-  <span v-else class="text-sm text-gray-400 dark:text-dark-500">-</span>
+  <span v-else class="text-sm text-gray-400 text-[var(--text-muted)]">-</span>
 </template>
 
 <script setup lang="ts">

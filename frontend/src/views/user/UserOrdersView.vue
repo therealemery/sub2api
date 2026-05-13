@@ -1,44 +1,51 @@
 <template>
   <AppLayout>
-    <div class="space-y-4">
-      <!-- Filters -->
-      <div class="card p-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <Select v-model="currentFilter" :options="statusFilters" class="w-36" @change="fetchOrders" />
-          <div class="flex flex-1 items-center justify-end gap-2">
-            <button @click="fetchOrders" :disabled="loading" class="btn btn-secondary" :title="t('common.refresh')">
-              <Icon name="refresh" size="md" :class="loading ? 'animate-spin' : ''" />
-            </button>
-            <button class="btn btn-primary" @click="router.push('/purchase')">{{ t('payment.result.backToRecharge') }}</button>
+    <div class="table-page-with-intro">
+      <PageIntro
+        title="我的订单"
+        description="查看充值、订阅、退款和待支付订单，确认每一笔金额和处理状态。"
+      />
+
+      <div class="space-y-4">
+        <!-- Filters -->
+        <div class="card p-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <Select v-model="currentFilter" :options="statusFilters" class="w-36" @change="fetchOrders" />
+            <div class="flex flex-1 items-center justify-end gap-2">
+              <button @click="fetchOrders" :disabled="loading" class="btn btn-secondary" :title="t('common.refresh')">
+                <Icon name="refresh" size="md" :class="loading ? 'animate-spin' : ''" />
+              </button>
+              <button class="btn btn-primary" @click="router.push('/purchase')">{{ t('payment.result.backToRecharge') }}</button>
+            </div>
           </div>
         </div>
+
+        <!-- Table -->
+        <OrderTable :orders="orders" :loading="loading">
+          <template #actions="{ row }">
+            <div class="flex items-center gap-2">
+              <button v-if="row.status === 'PENDING'" @click="handleCancel(row.id)" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-yellow-600 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20">
+                <Icon name="x" size="sm" />
+                <span>{{ t('payment.orders.cancel') }}</span>
+              </button>
+              <button v-if="canRequestRefund(row)" @click="openRefundDialog(row)" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20">
+                <Icon name="dollar" size="sm" />
+                <span>{{ t('payment.orders.requestRefund') }}</span>
+              </button>
+            </div>
+          </template>
+        </OrderTable>
+
+        <!-- Pagination -->
+        <Pagination
+          v-if="pagination.total > 0"
+          :page="pagination.page"
+          :total="pagination.total"
+          :page-size="pagination.page_size"
+          @update:page="handlePageChange"
+          @update:pageSize="handlePageSizeChange"
+        />
       </div>
-
-      <!-- Table -->
-      <OrderTable :orders="orders" :loading="loading">
-        <template #actions="{ row }">
-          <div class="flex items-center gap-2">
-            <button v-if="row.status === 'PENDING'" @click="handleCancel(row.id)" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-yellow-600 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20">
-              <Icon name="x" size="sm" />
-              <span>{{ t('payment.orders.cancel') }}</span>
-            </button>
-            <button v-if="canRequestRefund(row)" @click="openRefundDialog(row)" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20">
-              <Icon name="dollar" size="sm" />
-              <span>{{ t('payment.orders.requestRefund') }}</span>
-            </button>
-          </div>
-        </template>
-      </OrderTable>
-
-      <!-- Pagination -->
-      <Pagination
-        v-if="pagination.total > 0"
-        :page="pagination.page"
-        :total="pagination.total"
-        :page-size="pagination.page_size"
-        @update:page="handlePageChange"
-        @update:pageSize="handlePageSizeChange"
-      />
     </div>
 
     <!-- Cancel Confirm Dialog -->
@@ -55,14 +62,14 @@
     <!-- Refund Dialog -->
     <BaseDialog :show="!!refundTarget" :title="t('payment.orders.requestRefund')" @close="refundTarget = null">
       <div v-if="refundTarget" class="space-y-4">
-        <div class="rounded-xl bg-gray-50 p-4 dark:bg-dark-800">
+        <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
           <div class="flex justify-between text-sm">
             <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.orderId') }}</span>
-            <span class="font-mono text-gray-900 dark:text-white">#{{ refundTarget.id }}</span>
+            <span class="font-mono text-gray-900 dark:text-[var(--text-inverse)]">#{{ refundTarget.id }}</span>
           </div>
           <div class="mt-2 flex justify-between text-sm">
             <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.amount') }}</span>
-            <span class="text-gray-900 dark:text-white">${{ refundTarget.amount.toFixed(2) }}</span>
+            <span class="text-gray-900 dark:text-[var(--text-inverse)]">${{ refundTarget.amount.toFixed(2) }}</span>
           </div>
         </div>
         <div>
@@ -89,6 +96,7 @@ import { paymentAPI } from '@/api/payment'
 import { extractI18nErrorMessage } from '@/utils/apiError'
 import type { PaymentOrder } from '@/types/payment'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import Select from '@/components/common/Select.vue'

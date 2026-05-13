@@ -1,7 +1,7 @@
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-slate-950">
+  <div class="stripe-popup-page flex min-h-screen items-center justify-center p-4">
     <div
-      class="w-full max-w-md space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+      class="stripe-popup-panel w-full max-w-md space-y-4 rounded-lg border p-6"
     >
       <!-- Amount + Order ID -->
       <div v-if="amount" class="text-center">
@@ -19,7 +19,7 @@
           {{ error }}
         </div>
         <button
-          class="w-full text-sm underline dark:text-blue-400 dark:hover:text-blue-300"
+          class="w-full text-sm underline"
           :style="{ color: methodColor }"
           @click="closeWindow"
         >
@@ -32,7 +32,7 @@
         <div class="text-5xl text-green-600 dark:text-green-400">✓</div>
         <p class="text-sm text-gray-500 dark:text-slate-400">{{ t('payment.result.success') }}</p>
         <button
-          class="text-sm underline dark:text-blue-400 dark:hover:text-blue-300"
+          class="text-sm underline"
           :style="{ color: methodColor }"
           @click="closeWindow"
         >
@@ -64,16 +64,16 @@ interface StripeWithWechatPay {
 }
 
 const METHOD_COLORS: Record<string, string> = {
-  alipay: '#00AEEF',
-  wechat_pay: '#07C160',
+  alipay: '#111827',
+  wechat_pay: '#111827',
 }
-const DEFAULT_METHOD_COLOR = '#635bff'
+const DEFAULT_METHOD_COLOR = '#111827'
 
 const { t } = useI18n()
 const route = useRoute()
 
 const orderId = String(route.query.order_id || '')
-const method = String(route.query.method || 'alipay')
+const method = String(route.query.method || 'card')
 const amount = String(route.query.amount || '')
 
 const methodColor = computed(() => METHOD_COLORS[method] || DEFAULT_METHOD_COLOR)
@@ -168,3 +168,14 @@ function startPolling() {
   }, 3000)
 }
 </script>
+
+<style scoped>
+.stripe-popup-page {
+  background: var(--ownapi-page-bg, #eef2f6);
+}
+
+.stripe-popup-panel {
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+}
+</style>

@@ -3,10 +3,10 @@
     <div class="flex min-h-full items-center justify-center p-4">
       <div class="fixed inset-0 bg-black/50 transition-opacity" @click="$emit('close')"></div>
 
-      <div class="relative w-full max-w-md transform rounded-xl bg-white p-6 shadow-xl transition-all dark:bg-dark-800">
+      <div class="totp-modal-panel relative w-full max-w-md transform rounded-lg p-6 transition-colors">
         <!-- Header -->
         <div class="mb-6 text-center">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('profile.totp.setupTitle') }}
           </h3>
           <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -18,7 +18,7 @@
         <div v-if="step === 0" class="space-y-6">
           <!-- Loading verification method -->
           <div v-if="methodLoading" class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700 dark:border-gray-200"></div>
           </div>
 
           <template v-else>
@@ -82,7 +82,7 @@
           <!-- QR Code and Secret -->
           <template v-if="setupData">
             <div class="flex justify-center">
-              <div class="rounded-lg border border-gray-200 p-4 bg-white dark:border-dark-600 dark:bg-white">
+              <div class="rounded-lg border border-gray-200 p-4 bg-[var(--bg-surface)] border-[var(--border-default)] dark:bg-[var(--bg-surface)]">
                 <img :src="qrCodeDataUrl" alt="QR Code" class="h-48 w-48" />
               </div>
             </div>
@@ -92,7 +92,7 @@
                 {{ t('profile.totp.manualEntry') }}
               </p>
               <div class="flex items-center justify-center gap-2">
-                <code class="rounded bg-gray-100 px-3 py-2 font-mono text-sm dark:bg-dark-700">
+                <code class="rounded bg-gray-100 px-3 py-2 font-mono text-sm bg-[var(--bg-surface-alt)]">
                   {{ setupData.secret }}
                 </code>
                 <button
@@ -139,7 +139,7 @@
                   maxlength="1"
                   inputmode="numeric"
                   pattern="[0-9]"
-                  class="h-12 w-10 rounded-lg border border-gray-300 text-center text-lg font-semibold focus:border-primary-500 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-700"
+                  class="h-12 w-10 rounded-lg border border-gray-300 text-center text-lg font-semibold focus:border-[var(--border-focus)] focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                   @input="handleCodeInput($event, index)"
                   @keydown="handleKeydown($event, index)"
                   @paste="handlePaste"
@@ -401,3 +401,10 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.totp-modal-panel {
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+</style>

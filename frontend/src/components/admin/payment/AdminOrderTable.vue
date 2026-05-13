@@ -53,7 +53,7 @@
 
       <template #cell-pay_amount="{ value, row }">
         <div class="text-sm">
-          <span class="font-medium text-gray-900 dark:text-white">¥{{ value.toFixed(2) }}</span>
+          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ value.toFixed(2) }}</span>
           <span v-if="row.fee_rate > 0" class="ml-1 text-xs text-gray-400" :title="t('payment.orders.fee') + ': ' + row.fee_rate + '%'">
             ({{ row.fee_rate }}%)
           </span>
@@ -105,7 +105,7 @@
           <button
             v-if="row.status === 'FAILED'"
             @click="emit('retry', row)"
-            class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+            class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
           >
             <Icon name="refresh" size="sm" />
             <span class="text-xs">{{ t('payment.admin.retry') }}</span>

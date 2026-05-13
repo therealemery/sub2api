@@ -28,9 +28,9 @@
       <div v-else-if="filteredKeys.length === 0" class="py-6 text-center text-sm text-gray-500">
         {{ t('admin.channelMonitor.form.noActiveKey') }}
       </div>
-      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 dark:border-dark-600">
+      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-dark-800 sticky top-0 z-10">
+          <thead class="bg-gray-50 bg-[var(--bg-surface-alt)] sticky top-0 z-10">
             <tr class="text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               <th class="px-3 py-2">{{ t('common.name') }}</th>
               <th class="px-3 py-2">{{ t('keys.apiKey') }}</th>
@@ -44,7 +44,7 @@
               class="cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700"
               @click="$emit('pick', k)"
             >
-              <td class="px-3 py-2 font-medium text-gray-900 dark:text-white">{{ k.name }}</td>
+              <td class="px-3 py-2 font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ k.name }}</td>
               <td class="px-3 py-2 font-mono text-xs text-gray-500 dark:text-gray-400">{{ maskApiKey(k.key) }}</td>
               <td class="px-3 py-2">
                 <GroupBadge

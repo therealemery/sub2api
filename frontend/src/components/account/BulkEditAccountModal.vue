@@ -7,8 +7,8 @@
   >
     <form id="bulk-edit-account-form" class="space-y-5" @submit.prevent="() => handleSubmit()">
       <!-- Info -->
-      <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-        <p class="text-sm text-blue-700 dark:text-blue-400">
+      <div class="rounded-lg bg-[var(--bg-surface-alt)] p-4 bg-[var(--bg-surface-alt)]">
+        <p class="text-sm text-[var(--accent)] text-[var(--accent)]">
           <svg class="mr-1.5 inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
@@ -34,7 +34,7 @@
       <!-- OpenAI passthrough -->
       <div
         v-if="allOpenAIPassthroughCapable"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="mb-3 flex items-center justify-between">
           <div class="flex-1 pr-4">
@@ -54,7 +54,7 @@
             id="bulk-edit-openai-passthrough-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-passthrough-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -67,14 +67,14 @@
             id="bulk-edit-openai-passthrough-toggle"
             type="button"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              openaiPassthroughEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              openaiPassthroughEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
             @click="openaiPassthroughEnabled = !openaiPassthroughEnabled"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 openaiPassthroughEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -83,7 +83,7 @@
       </div>
 
       <!-- Base URL (API Key only) -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-base-url-label"
@@ -97,7 +97,7 @@
             id="bulk-edit-base-url-enabled"
             type="checkbox"
             aria-controls="bulk-edit-base-url"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <input
@@ -116,7 +116,7 @@
       </div>
 
       <!-- Model restriction -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-model-restriction-label"
@@ -130,7 +130,7 @@
             id="bulk-edit-model-restriction-enabled"
             type="checkbox"
             aria-controls="bulk-edit-model-restriction-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
 
@@ -155,10 +155,10 @@
               <button
                 type="button"
                 :class="[
-                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'whitelist'
-                    ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                    ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                 ]"
                 @click="modelRestrictionMode = 'whitelist'"
               >
@@ -180,10 +180,10 @@
               <button
                 type="button"
                 :class="[
-                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'mapping'
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                 ]"
                 @click="modelRestrictionMode = 'mapping'"
               >
@@ -206,8 +206,8 @@
 
             <!-- Whitelist Mode -->
             <div v-if="modelRestrictionMode === 'whitelist'">
-              <div class="mb-3 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-                <p class="text-xs text-blue-700 dark:text-blue-400">
+              <div class="mb-3 rounded-lg bg-[var(--bg-surface-alt)] p-3 bg-[var(--bg-surface-alt)]">
+                <p class="text-xs text-[var(--accent)] text-[var(--accent)]">
                   <svg
                     class="mr-1 inline h-4 w-4"
                     fill="none"
@@ -310,7 +310,7 @@
 
               <button
                 type="button"
-                class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+                class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
                 @click="addModelMapping"
               >
                 <svg
@@ -347,7 +347,7 @@
       </div>
 
       <!-- Custom error codes -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <div>
             <label
@@ -366,7 +366,7 @@
             id="bulk-edit-custom-error-codes-enabled"
             type="checkbox"
             aria-controls="bulk-edit-custom-error-codes-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
 
@@ -388,7 +388,7 @@
                 'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                 selectedErrorCodes.includes(code.value)
                   ? 'bg-red-100 text-red-700 ring-1 ring-red-500 dark:bg-red-900/30 dark:text-red-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
               ]"
               @click="toggleErrorCode(code.value)"
             >
@@ -426,7 +426,7 @@
             <span
               v-for="code in selectedErrorCodes.sort((a, b) => a - b)"
               :key="code"
-              class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
+              class="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
             >
               {{ code }}
               <button
@@ -445,7 +445,7 @@
       </div>
 
       <!-- Intercept warmup requests (Anthropic only) -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="flex items-center justify-between">
           <div class="flex-1 pr-4">
             <label
@@ -464,21 +464,21 @@
             id="bulk-edit-intercept-warmup-enabled"
             type="checkbox"
             aria-controls="bulk-edit-intercept-warmup-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div v-if="enableInterceptWarmup" id="bulk-edit-intercept-warmup-body" class="mt-3">
           <button
             type="button"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              interceptWarmupRequests ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              interceptWarmupRequests ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
             @click="interceptWarmupRequests = !interceptWarmupRequests"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 interceptWarmupRequests ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -487,7 +487,7 @@
       </div>
 
       <!-- Proxy -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-proxy-label"
@@ -501,7 +501,7 @@
             id="bulk-edit-proxy-enabled"
             type="checkbox"
             aria-controls="bulk-edit-proxy-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div id="bulk-edit-proxy-body" :class="!enableProxy && 'pointer-events-none opacity-50'">
@@ -514,7 +514,7 @@
       </div>
 
       <!-- Concurrency & Priority -->
-      <div class="grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 dark:border-dark-600 lg:grid-cols-4">
+      <div class="grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 border-[var(--border-default)] lg:grid-cols-4">
         <div>
           <div class="mb-3 flex items-center justify-between">
             <label
@@ -529,7 +529,7 @@
               id="bulk-edit-concurrency-enabled"
               type="checkbox"
               aria-controls="bulk-edit-concurrency"
-              class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
           </div>
           <input
@@ -558,7 +558,7 @@
               id="bulk-edit-load-factor-enabled"
               type="checkbox"
               aria-controls="bulk-edit-load-factor"
-              class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
           </div>
           <input
@@ -588,7 +588,7 @@
               id="bulk-edit-priority-enabled"
               type="checkbox"
               aria-controls="bulk-edit-priority"
-              class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
           </div>
           <input
@@ -616,7 +616,7 @@
               id="bulk-edit-rate-multiplier-enabled"
               type="checkbox"
               aria-controls="bulk-edit-rate-multiplier"
-              class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
           </div>
           <input
@@ -635,7 +635,7 @@
       </div>
 
       <!-- Status -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-status-label"
@@ -649,7 +649,7 @@
             id="bulk-edit-status-enabled"
             type="checkbox"
             aria-controls="bulk-edit-status"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div id="bulk-edit-status" :class="!enableStatus && 'pointer-events-none opacity-50'">
@@ -662,7 +662,7 @@
       </div>
 
       <!-- OpenAI OAuth WS mode -->
-      <div v-if="allOpenAIOAuth" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allOpenAIOAuth" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-openai-ws-mode-label"
@@ -676,7 +676,7 @@
             id="bulk-edit-openai-ws-mode-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-ws-mode"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -699,7 +699,7 @@
       </div>
 
       <!-- OpenAI OAuth Codex CLI only -->
-      <div v-if="allOpenAIOAuth" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allOpenAIOAuth" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-openai-codex-cli-only-label"
@@ -713,7 +713,7 @@
             id="bulk-edit-openai-codex-cli-only-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-codex-cli-only"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -727,14 +727,14 @@
             id="bulk-edit-openai-codex-cli-only-toggle"
             type="button"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              codexCLIOnlyEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              codexCLIOnlyEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
             @click="codexCLIOnlyEnabled = !codexCLIOnlyEnabled"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 codexCLIOnlyEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -743,7 +743,7 @@
       </div>
 
       <!-- OpenAI API Key WS mode -->
-      <div v-if="allOpenAIAPIKey" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allOpenAIAPIKey" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-openai-apikey-ws-mode-label"
@@ -757,7 +757,7 @@
             id="bulk-edit-openai-apikey-ws-mode-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-apikey-ws-mode"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -780,7 +780,7 @@
       </div>
 
       <!-- OpenAI Compact mode -->
-      <div v-if="allOpenAIPassthroughCapable" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allOpenAIPassthroughCapable" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <div class="flex-1 pr-4">
             <label
@@ -799,7 +799,7 @@
             id="bulk-edit-openai-compact-mode-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-compact-mode"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -816,7 +816,7 @@
       </div>
 
       <!-- OpenAI Compact model mapping -->
-      <div v-if="allOpenAIPassthroughCapable" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allOpenAIPassthroughCapable" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <div class="flex-1 pr-4">
             <label
@@ -835,7 +835,7 @@
             id="bulk-edit-openai-compact-model-mapping-enabled"
             type="checkbox"
             aria-controls="bulk-edit-openai-compact-model-mapping"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div
@@ -874,7 +874,7 @@
           </div>
           <button
             type="button"
-            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
             data-testid="bulk-edit-openai-compact-model-mapping-add"
             @click="addOpenAICompactModelMapping"
           >
@@ -884,7 +884,7 @@
       </div>
 
       <!-- RPM Limit (仅全部为 Anthropic OAuth/SetupToken 时显示) -->
-      <div v-if="allAnthropicOAuthOrSetupToken" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="allAnthropicOAuthOrSetupToken" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-rpm-limit-label"
@@ -898,7 +898,7 @@
             id="bulk-edit-rpm-limit-enabled"
             type="checkbox"
             aria-controls="bulk-edit-rpm-limit-body"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
 
@@ -914,13 +914,13 @@
               type="button"
               @click="rpmLimitEnabled = !rpmLimitEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                rpmLimitEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                rpmLimitEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   rpmLimitEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -949,10 +949,10 @@
                   type="button"
                   @click="bulkRpmStrategy = 'tiered'"
                   :class="[
-                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     bulkRpmStrategy === 'tiered'
-                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                      ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                   ]"
                 >
                   {{ t('admin.accounts.quotaControl.rpmLimit.strategyTiered') }}
@@ -961,10 +961,10 @@
                   type="button"
                   @click="bulkRpmStrategy = 'sticky_exempt'"
                   :class="[
-                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     bulkRpmStrategy === 'sticky_exempt'
-                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                      ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                   ]"
                 >
                   {{ t('admin.accounts.quotaControl.rpmLimit.strategyStickyExempt') }}
@@ -1000,8 +1000,8 @@
               :class="[
                 'px-3 py-1.5 text-sm rounded-md border transition-colors',
                 userMsgQueueMode === opt.value
-                  ? 'bg-primary-600 text-white border-primary-600'
-                  : 'bg-white dark:bg-dark-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-dark-500 hover:bg-gray-50 dark:hover:bg-dark-600'
+                  ? 'bg-[var(--accent)] text-[var(--text-inverse)] border-[var(--border-focus)]'
+                  : 'bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] text-gray-700 dark:text-gray-300 border-gray-300 border-[var(--border-default)] hover:bg-gray-50 dark:hover:bg-dark-600'
               ]">
               {{ opt.label }}
             </button>
@@ -1010,7 +1010,7 @@
       </div>
 
       <!-- Groups -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <div class="mb-3 flex items-center justify-between">
           <label
             id="bulk-edit-groups-label"
@@ -1024,7 +1024,7 @@
             id="bulk-edit-groups-enabled"
             type="checkbox"
             aria-controls="bulk-edit-groups"
-            class="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
         </div>
         <div id="bulk-edit-groups" :class="!enableGroups && 'pointer-events-none opacity-50'">

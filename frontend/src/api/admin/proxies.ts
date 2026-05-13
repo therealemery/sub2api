@@ -15,6 +15,15 @@ import type {
   AdminDataImportResult
 } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
 /**
  * List all proxies with pagination
  * @param page - Page number (default: 1)
@@ -36,6 +45,16 @@ export async function list(
     signal?: AbortSignal
   }
 ): Promise<PaginatedResponse<Proxy>> {
+  if (isLocalPreviewSession()) {
+    return {
+      items: [],
+      total: 0,
+      page,
+      page_size: pageSize,
+      pages: 0
+    }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<Proxy>>('/admin/proxies', {
     params: {
       page,
@@ -52,6 +71,10 @@ export async function list(
  * @returns List of all active proxies
  */
 export async function getAll(): Promise<Proxy[]> {
+  if (isLocalPreviewSession()) {
+    return []
+  }
+
   const { data } = await apiClient.get<Proxy[]>('/admin/proxies/all')
   return data
 }
@@ -61,6 +84,10 @@ export async function getAll(): Promise<Proxy[]> {
  * @returns List of all active proxies with account count
  */
 export async function getAllWithCount(): Promise<Proxy[]> {
+  if (isLocalPreviewSession()) {
+    return []
+  }
+
   const { data } = await apiClient.get<Proxy[]>('/admin/proxies/all', {
     params: { with_count: 'true' }
   })

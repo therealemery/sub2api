@@ -4,6 +4,11 @@
       data-testid="profile-shell"
       class="mx-auto max-w-[950px] space-y-6"
     >
+      <PageIntro
+        title="个人资料"
+        description="管理账户资料、登录绑定、安全验证和余额提醒。这里的设置只影响当前账户，不会改变 API 密钥或管理员配置。"
+      />
+
       <ProfileInfoCard
         :user="user"
         :linuxdo-enabled="linuxdoOAuthEnabled"
@@ -16,14 +21,14 @@
 
       <div
         v-if="contactInfo"
-        class="card border-primary-200 bg-primary-50 p-6 dark:bg-primary-900/20"
+        class="card p-6"
       >
         <div class="flex items-center gap-4">
-          <div class="rounded-xl bg-primary-100 p-3 text-primary-600">
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200">
             <Icon name="chat" size="lg" />
           </div>
           <div>
-            <h3 class="font-semibold text-primary-800 dark:text-primary-200">
+            <h3 class="font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('common.contactSupport') }}
             </h3>
             <p class="text-sm font-medium">{{ contactInfo }}</p>
@@ -52,6 +57,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Icon } from '@/components/icons'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import ProfileBalanceNotifyCard from '@/components/user/profile/ProfileBalanceNotifyCard.vue'
 import ProfileInfoCard from '@/components/user/profile/ProfileInfoCard.vue'
 import ProfilePasswordForm from '@/components/user/profile/ProfilePasswordForm.vue'

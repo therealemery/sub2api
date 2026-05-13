@@ -7,6 +7,15 @@
 import { apiClient } from '../client'
 import type { PaginatedResponse } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
 export interface AffiliateAdminEntry {
   user_id: number
   email: string
@@ -112,6 +121,16 @@ export interface SimpleUser {
 export async function listUsers(
   params: ListAffiliateUsersParams = {},
 ): Promise<PaginatedResponse<AffiliateAdminEntry>> {
+  if (isLocalPreviewSession()) {
+    return {
+      items: [],
+      total: 0,
+      page: params.page ?? 1,
+      page_size: params.page_size ?? 20,
+      pages: 0,
+    }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<AffiliateAdminEntry>>(
     '/admin/affiliates/users',
     {
@@ -126,6 +145,10 @@ export async function listUsers(
 }
 
 export async function lookupUsers(q: string): Promise<SimpleUser[]> {
+  if (isLocalPreviewSession()) {
+    return []
+  }
+
   const { data } = await apiClient.get<SimpleUser[]>(
     '/admin/affiliates/users/lookup',
     { params: { q } },
@@ -179,6 +202,10 @@ function recordParams(params: ListAffiliateRecordsParams = {}) {
 export async function listInviteRecords(
   params: ListAffiliateRecordsParams = {},
 ): Promise<PaginatedResponse<AffiliateInviteRecord>> {
+  if (isLocalPreviewSession()) {
+    return { items: [], total: 0, page: params.page ?? 1, page_size: params.page_size ?? 20, pages: 0 }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<AffiliateInviteRecord>>(
     '/admin/affiliates/invites',
     { params: recordParams(params) },
@@ -189,6 +216,10 @@ export async function listInviteRecords(
 export async function listRebateRecords(
   params: ListAffiliateRecordsParams = {},
 ): Promise<PaginatedResponse<AffiliateRebateRecord>> {
+  if (isLocalPreviewSession()) {
+    return { items: [], total: 0, page: params.page ?? 1, page_size: params.page_size ?? 20, pages: 0 }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<AffiliateRebateRecord>>(
     '/admin/affiliates/rebates',
     { params: recordParams(params) },
@@ -199,6 +230,10 @@ export async function listRebateRecords(
 export async function listTransferRecords(
   params: ListAffiliateRecordsParams = {},
 ): Promise<PaginatedResponse<AffiliateTransferRecord>> {
+  if (isLocalPreviewSession()) {
+    return { items: [], total: 0, page: params.page ?? 1, page_size: params.page_size ?? 20, pages: 0 }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<AffiliateTransferRecord>>(
     '/admin/affiliates/transfers',
     { params: recordParams(params) },

@@ -101,7 +101,7 @@
           <template #header-select>
             <input
               type="checkbox"
-              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               :checked="allVisibleSelected"
               @click.stop
               @change="toggleSelectAllVisible($event)"
@@ -111,7 +111,7 @@
           <template #cell-select="{ row }">
             <input
               type="checkbox"
-              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               :checked="selectedProxyIds.has(row.id)"
               @click.stop
               @change="toggleSelectRow(row.id, $event)"
@@ -119,7 +119,7 @@
           </template>
 
           <template #cell-name="{ value }">
-            <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
           </template>
 
           <template #cell-protocol="{ value }">
@@ -138,7 +138,7 @@
               <div class="relative">
                 <button
                   type="button"
-                  class="rounded p-0.5 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  class="rounded p-0.5 text-gray-400 hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
                   :title="t('admin.proxies.copyProxyUrl')"
                   @click.stop="copyProxyUrl(row)"
                   @contextmenu.prevent="toggleCopyMenu(row.id)"
@@ -148,7 +148,7 @@
                 <!-- 右键展开格式选择菜单 -->
                 <div
                   v-if="copyMenuProxyId === row.id"
-                  class="absolute left-0 top-full z-50 mt-1 w-auto min-w-[180px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-dark-500 dark:bg-dark-700"
+                  class="absolute left-0 top-full z-50 mt-1 w-auto min-w-[180px] rounded-lg border border-gray-200 bg-[var(--bg-surface)] py-1 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                 >
                   <button
                     v-for="fmt in getCopyFormats(row)"
@@ -202,14 +202,14 @@
             <button
               v-if="(value || 0) > 0"
               type="button"
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-primary-700 hover:bg-gray-200 dark:bg-dark-600 dark:text-primary-300 dark:hover:bg-dark-500"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-[var(--accent)] hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:bg-dark-500"
               @click="openAccountsModal(row)"
             >
               {{ t('admin.groups.accountsCount', { count: value || 0 }) }}
             </button>
             <span
               v-else
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
             >
               {{ t('admin.groups.accountsCount', { count: 0 }) }}
             </span>
@@ -283,7 +283,7 @@
               <button
                 @click="handleQualityCheck(row)"
                 :disabled="qualityCheckingProxyIds.has(row.id)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
               >
                 <svg
                   v-if="qualityCheckingProxyIds.has(row.id)"
@@ -310,7 +310,7 @@
               </button>
               <button
                 @click="handleEdit(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t('common.edit') }}</span>
@@ -357,14 +357,14 @@
       @close="closeCreateModal"
     >
       <!-- Tab Switch -->
-      <div class="mb-6 flex border-b border-gray-200 dark:border-dark-600">
+      <div class="mb-6 flex border-b border-gray-200 border-[var(--border-default)]">
         <button
           type="button"
           @click="createMode = 'standard'"
           :class="[
             '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
             createMode === 'standard'
-              ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+              ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
               : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           ]"
         >
@@ -377,7 +377,7 @@
           :class="[
             '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
             createMode === 'batch'
-              ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+              ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
               : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           ]"
         >
@@ -490,10 +490,10 @@
         </div>
 
         <!-- Parse Result -->
-        <div v-if="batchParseResult.total > 0" class="rounded-lg bg-gray-50 p-4 dark:bg-dark-700">
+        <div v-if="batchParseResult.total > 0" class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
             <div class="flex items-center gap-4 text-sm">
               <div class="flex items-center gap-1.5">
-              <Icon name="checkCircle" size="sm" :stroke-width="2" class="text-primary-500" />
+              <Icon name="checkCircle" size="sm" :stroke-width="2" class="text-[var(--accent)]" />
               <span class="text-gray-700 dark:text-gray-300">
                 {{ t('admin.proxies.parsedCount', { count: batchParseResult.valid }) }}
               </span>
@@ -755,7 +755,7 @@
       @close="closeQualityReportDialog"
     >
       <div v-if="qualityReport" class="space-y-4">
-        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-dark-600 dark:bg-dark-700">
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
           <div class="flex items-center justify-between gap-4">
             <div>
               <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -766,7 +766,7 @@
               </div>
             </div>
             <div class="text-right">
-              <div class="text-2xl font-semibold text-gray-900 dark:text-white">
+              <div class="text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ qualityReport.score }}
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -785,9 +785,9 @@
           </div>
         </div>
 
-        <div class="max-h-80 overflow-auto rounded-lg border border-gray-200 dark:border-dark-600">
+        <div class="max-h-80 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
           <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-dark-700">
-            <thead class="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-dark-800 dark:text-dark-400">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]">
               <tr>
                 <th class="px-3 py-2 text-left">{{ t('admin.proxies.qualityTableTarget') }}</th>
                 <th class="px-3 py-2 text-left">{{ t('admin.proxies.qualityTableStatus') }}</th>
@@ -796,9 +796,9 @@
                 <th class="px-3 py-2 text-left">{{ t('admin.proxies.qualityTableMessage') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-900">
+            <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
               <tr v-for="item in qualityReport.items" :key="item.target">
-                <td class="px-3 py-2 text-gray-900 dark:text-white">{{ qualityTargetLabel(item.target) }}</td>
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">{{ qualityTargetLabel(item.target) }}</td>
                 <td class="px-3 py-2">
                   <span class="badge" :class="qualityStatusClass(item.status)">{{ qualityStatusLabel(item.status) }}</span>
                 </td>
@@ -840,16 +840,16 @@
       </div>
       <div v-else class="max-h-80 overflow-auto">
         <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-dark-700">
-          <thead class="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-dark-800 dark:text-dark-400">
+          <thead class="bg-gray-50 text-xs uppercase text-gray-500 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]">
             <tr>
               <th class="px-4 py-2 text-left">{{ t('admin.proxies.accountName') }}</th>
               <th class="px-4 py-2 text-left">{{ t('admin.accounts.columns.platformType') }}</th>
               <th class="px-4 py-2 text-left">{{ t('admin.proxies.accountNotes') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-900">
+          <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
             <tr v-for="account in proxyAccounts" :key="account.id">
-              <td class="px-4 py-2 font-medium text-gray-900 dark:text-white">{{ account.name }}</td>
+              <td class="px-4 py-2 font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ account.name }}</td>
               <td class="px-4 py-2">
                 <PlatformTypeBadge :platform="account.platform" :type="account.type" />
               </td>

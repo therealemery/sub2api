@@ -4,7 +4,7 @@ import 'driver.js/dist/driver.css'
 import { useAuthStore as useUserStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { useI18n } from 'vue-i18n'
-import { getAdminSteps, getUserSteps } from '@/components/Guide/steps'
+import { getUserSteps } from '@/components/Guide/steps'
 
 export interface OnboardingOptions {
   storageKey?: string
@@ -15,7 +15,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
   const { t } = useI18n()
   const userStore = useUserStore()
   const onboardingStore = useOnboardingStore()
-  const storageVersion = 'v4_interactive' // Bump version for new tour type
+  const storageVersion = 'v6_mandatory_user_guide'
 
   // Timing constants for better maintainability
   const TIMING = {
@@ -28,6 +28,27 @@ export function useOnboardingTour(options: OnboardingOptions) {
   const isInteractiveStep = (step: DriveStep): boolean => {
     return step.popover?.showButtons?.length === 1 &&
            step.popover.showButtons[0] === 'close'
+  }
+
+  const TOUR_EMOJI_PATTERN = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?/gu
+
+  const stripTourEmoji = (value: string): string =>
+    value.replace(TOUR_EMOJI_PATTERN, '').replace(/\s{2,}/g, ' ')
+
+  const sanitizeTourButtonText = (value: string): string =>
+    stripTourEmoji(value).trim()
+
+  const sanitizeTourNode = (node: ParentNode | null) => {
+    if (!node) return
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+    let textNode = walker.nextNode()
+    while (textNode) {
+      const cleaned = stripTourEmoji(textNode.textContent || '')
+      if (cleaned !== textNode.textContent) {
+        textNode.textContent = cleaned
+      }
+      textNode = walker.nextNode()
+    }
   }
 
   // Helper: Clean up click listener
@@ -76,6 +97,12 @@ export function useOnboardingTour(options: OnboardingOptions) {
     localStorage.removeItem(getStorageKey())
   }
 
+  const finishTour = () => {
+    markAsSeen()
+    driverInstance?.destroy()
+    onboardingStore.setDriverInstance(null)
+  }
+
   /**
    * 检查元素是否存在，如果不存在则重试
    */
@@ -93,9 +120,12 @@ export function useOnboardingTour(options: OnboardingOptions) {
 
   const startTour = async (startIndex = 0) => {
     // 动态获取当前用户角色和步骤
-    const isAdmin = userStore.user?.role === 'admin'
-    const isSimpleMode = userStore.isSimpleMode
-    const steps = isAdmin ? getAdminSteps(t, isSimpleMode) : getUserSteps(t)
+    if (userStore.user?.role === 'admin') {
+      markAsSeen()
+      return
+    }
+
+    const steps = getUserSteps(t)
 
     // 确保 DOM 就绪
     await nextTick()
@@ -116,6 +146,10 @@ export function useOnboardingTour(options: OnboardingOptions) {
       steps,
       animate: true,
       allowClose: false, // 禁止点击遮罩关闭
+      allowKeyboardControl: false,
+      overlayClickBehavior: () => {
+        driverInstance?.refresh()
+      },
       stagePadding: 4,
       popoverClass: 'theme-tour-popover',
       nextBtnText: t('common.next'),
@@ -126,9 +160,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
       onNextClick: async (_el, _step, { config, state }) => {
         // 如果是最后一步，点击则是"完成"
         if (state.activeIndex === (config.steps?.length ?? 0) - 1) {
-          markAsSeen()
-          driverInstance?.destroy()
-          onboardingStore.setDriverInstance(null)
+          finishTour()
         } else {
           // 注意：交互式步骤通常隐藏 Next 按钮，此处逻辑为防御性编程
           const currentIndex = state.activeIndex ?? 0
@@ -154,9 +186,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
         driverInstance?.movePrevious()
       },
       onCloseClick: () => {
-        markAsSeen()
-        driverInstance?.destroy()
-        onboardingStore.setDriverInstance(null)
+        finishTour()
       },
 
       // 渲染时重组 Footer 布局
@@ -177,6 +207,15 @@ export function useOnboardingTour(options: OnboardingOptions) {
           if (!titleEl || !footerEl) {
             console.warn('Onboarding: Missing popover elements')
             return
+          }
+
+          sanitizeTourNode(titleEl)
+          sanitizeTourNode(popover.description)
+          if (nextButton?.textContent) {
+            nextButton.textContent = sanitizeTourButtonText(nextButton.textContent)
+          }
+          if (previousButton?.textContent) {
+            previousButton.textContent = sanitizeTourButtonText(previousButton.textContent)
           }
 
           // 1.5 交互式步骤提示
@@ -217,6 +256,16 @@ export function useOnboardingTour(options: OnboardingOptions) {
 
             if (progressEl) leftContainer.appendChild(progressEl)
 
+            const skipBtn = document.createElement('button')
+            skipBtn.type = 'button'
+            skipBtn.className = 'driver-popover-skip-btn'
+            skipBtn.textContent = t('common.skip', '跳过')
+            skipBtn.addEventListener('click', (event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              finishTour()
+            })
+
             const shortcutsEl = document.createElement('div')
             shortcutsEl.className = 'footer-shortcuts'
 
@@ -232,19 +281,10 @@ export function useOnboardingTour(options: OnboardingOptions) {
               document.createTextNode(` ${t('onboarding.navigation.flipPage')}`),
             )
 
-            const shortcut2 = document.createElement('span')
-            shortcut2.className = 'shortcut-item'
-            const kbd3 = document.createElement('kbd')
-            kbd3.textContent = 'ESC'
-            shortcut2.appendChild(kbd3)
-            shortcut2.appendChild(
-              document.createTextNode(` ${t('onboarding.navigation.exit')}`),
-            )
-
             shortcutsEl.appendChild(shortcut1)
-            shortcutsEl.appendChild(shortcut2)
             leftContainer.appendChild(shortcutsEl)
 
+            rightContainer.appendChild(skipBtn)
             if (prevBtnEl) rightContainer.appendChild(prevBtnEl)
             if (nextBtnEl) rightContainer.appendChild(nextBtnEl)
 
@@ -256,6 +296,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
           // 3. 状态更新
           const isLastStep = state.activeIndex === (config.steps?.length ?? 0) - 1
           const activeNextBtn = nextButton || footerEl.querySelector(`.${CLASS_NEXT_BTN}`)
+          const activeSkipBtn = footerEl.querySelector('.driver-popover-skip-btn') as HTMLButtonElement | null
 
           if (activeNextBtn) {
              if (isLastStep) {
@@ -263,6 +304,10 @@ export function useOnboardingTour(options: OnboardingOptions) {
              } else {
                activeNextBtn.classList.remove(CLASS_DONE_BTN)
              }
+          }
+
+          if (activeSkipBtn) {
+            activeSkipBtn.hidden = isLastStep
           }
         } catch (e) {
           console.error('Onboarding Tour Render Error:', e)
@@ -417,9 +462,6 @@ export function useOnboardingTour(options: OnboardingOptions) {
       if (e.key === 'Escape') {
         e.preventDefault()
         e.stopPropagation()
-        markAsSeen()
-        driverInstance.destroy()
-        onboardingStore.setDriverInstance(null)
         return
       }
 
@@ -532,13 +574,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
     }
 
     // 简易模式下禁用新手引导
-    if (userStore.isSimpleMode) {
-      return
-    }
-
-    // 只在管理员+标准模式下自动启动
-    const isAdmin = userStore.user?.role === 'admin'
-    if (!isAdmin) {
+    if (userStore.isSimpleMode || !userStore.user || userStore.user.role === 'admin') {
       return
     }
 

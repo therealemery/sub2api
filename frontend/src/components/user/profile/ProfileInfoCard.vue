@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <section
       data-testid="profile-overview-hero"
-      class="card overflow-hidden border border-primary-100/80 bg-gradient-to-br from-primary-50 via-white to-amber-50/70 dark:border-primary-900/40 dark:from-primary-950/40 dark:via-dark-900 dark:to-dark-950"
+      class="card overflow-hidden"
     >
       <div class="px-6 py-6 md:px-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
           <div
-            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary-500 to-primary-600 text-2xl font-bold text-white shadow-lg shadow-primary-500/20"
+            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gray-900 text-2xl font-bold text-[var(--text-inverse)] shadow-none dark:bg-gray-100 dark:text-gray-900"
           >
             <img
               v-if="avatarUrl"
@@ -21,7 +21,7 @@
           <div class="min-w-0 flex-1 space-y-5">
             <div class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-white">
+                <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ displayName }}
                 </h2>
                 <span :class="['badge', user?.role === 'admin' ? 'badge-primary' : 'badge-gray']">
@@ -49,7 +49,7 @@
                   <span
                     v-for="hint in sourceHints"
                     :key="hint.key"
-                    class="inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 ring-1 ring-primary-100 dark:bg-dark-900/70 dark:ring-primary-900/40"
+                    class="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                   >
                     <Icon name="link" size="sm" />
                     {{ hint.text }}
@@ -61,34 +61,34 @@
             <div class="grid gap-3 sm:grid-cols-3">
               <div
                 data-testid="profile-overview-metric-balance"
-                class="rounded-2xl bg-white/85 px-4 py-3 shadow-sm ring-1 ring-white/70 dark:bg-dark-900/60 dark:ring-dark-700"
+                class="rounded-lg px-4 py-3"
               >
                 <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
                   {{ t('profile.accountBalance') }}
                 </p>
-                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                <p class="money-value mt-1 text-lg font-semibold">
                   {{ formatCurrency(user?.balance || 0) }}
                 </p>
               </div>
               <div
                 data-testid="profile-overview-metric-concurrency"
-                class="rounded-2xl bg-white/85 px-4 py-3 shadow-sm ring-1 ring-white/70 dark:bg-dark-900/60 dark:ring-dark-700"
+                class="rounded-lg px-4 py-3"
               >
                 <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
                   {{ t('profile.concurrencyLimit') }}
                 </p>
-                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ user?.concurrency || 0 }}
                 </p>
               </div>
               <div
                 data-testid="profile-overview-metric-member-since"
-                class="rounded-2xl bg-white/85 px-4 py-3 shadow-sm ring-1 ring-white/70 dark:bg-dark-900/60 dark:ring-dark-700"
+                class="rounded-lg px-4 py-3"
               >
                 <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
                   {{ t('profile.memberSince') }}
                 </p>
-                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ memberSinceLabel }}
                 </p>
               </div>
@@ -102,11 +102,11 @@
       <div data-testid="profile-main-column" class="space-y-6">
         <section
           data-testid="profile-basics-panel"
-          class="card border border-gray-100 bg-white/90 p-6 dark:border-dark-700 dark:bg-dark-900/50"
+          class="card p-6"
         >
           <div class="mb-5 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t('profile.basicsTitle') }}
               </h3>
               <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -116,14 +116,14 @@
           </div>
 
           <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
-            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
+            <div class="rounded-lg border border-gray-100 bg-gray-50/80 p-5 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
               <ProfileAvatarCard
                 :user="user"
                 embedded
               />
             </div>
 
-            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-5 dark:border-dark-700 dark:bg-dark-900/30">
+            <div class="rounded-lg border border-gray-100 bg-gray-50/80 p-5 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
               <ProfileEditForm
                 :initial-username="user?.username || ''"
                 embedded
@@ -134,7 +134,7 @@
 
         <section
           data-testid="profile-auth-bindings-panel"
-          class="card border border-gray-100 bg-white/90 p-6 dark:border-dark-700 dark:bg-dark-900/50"
+          class="card p-6"
         >
           <ProfileIdentityBindingsSection
             :user="user"
@@ -153,9 +153,9 @@
       <div data-testid="profile-side-column" class="space-y-6">
         <section
           v-if="sourceHints.length"
-          class="card border border-gray-100 bg-white/90 p-6 dark:border-dark-700 dark:bg-dark-900/50"
+          class="card p-6"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('profile.linkedProfileSources') }}
           </h3>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -166,7 +166,7 @@
             <div
               v-for="hint in sourceHints"
               :key="hint.key"
-              class="flex items-start gap-3 rounded-2xl border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm text-gray-600 dark:border-dark-700 dark:bg-dark-900/30 dark:text-gray-300"
+              class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm text-gray-600 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300"
             >
               <Icon name="link" size="sm" class="mt-0.5 text-gray-400 dark:text-gray-500" />
               <span>{{ hint.text }}</span>
@@ -367,3 +367,44 @@ const sourceHints = computed(() => {
   return hints
 })
 </script>
+
+<style scoped>
+[data-testid='profile-overview-hero'] {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+}
+
+[data-testid='profile-overview-hero'] > div {
+  padding: 24px !important;
+}
+
+[data-testid='profile-overview-metric-balance'],
+[data-testid='profile-overview-metric-concurrency'],
+[data-testid='profile-overview-metric-member-since'] {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface-alt) !important;
+  box-shadow: none;
+}
+
+[data-testid='profile-basics-panel'],
+[data-testid='profile-auth-bindings-panel'],
+[data-testid='profile-side-column'] :deep(.card) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+}
+
+[data-testid='profile-basics-panel'] :deep(.rounded-lg),
+[data-testid='profile-auth-bindings-panel'] :deep(.rounded-lg) {
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+@media (max-width: 768px) {
+  [data-testid='profile-overview-hero'] > div {
+    padding: 18px !important;
+  }
+}
+</style>

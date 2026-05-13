@@ -13,7 +13,16 @@ import {
   type ReleaseInfo
 } from '@/api/admin/system'
 import { getPublicSettings as fetchPublicSettingsAPI } from '@/api/auth'
-import { DEFAULT_SITE_NAME } from '@/constants/branding'
+import { DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath } from '@/constants/branding'
+
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
 
 export const useAppStore = defineStore('app', () => {
   // ==================== State ====================
@@ -27,7 +36,7 @@ export const useAppStore = defineStore('app', () => {
   const publicSettingsLoaded = ref<boolean>(false)
   const publicSettingsLoading = ref<boolean>(false)
   const siteName = ref<string>(DEFAULT_SITE_NAME)
-  const siteLogo = ref<string>('')
+  const siteLogo = ref<string>(DEFAULT_SITE_LOGO)
   const siteVersion = ref<string>('')
   const contactInfo = ref<string>('')
   const apiBaseUrl = ref<string>('')
@@ -106,6 +115,11 @@ export const useAppStore = defineStore('app', () => {
    * @returns Toast ID for manual dismissal
    */
   function showToast(type: ToastType, message: string, duration?: number): string {
+    const existingToast = toasts.value.find((toast) => toast.type === type && toast.message === message)
+    if (existingToast) {
+      return existingToast.id
+    }
+
     const id = `toast-${++toastIdCounter}`
     const toast: Toast = {
       id,
@@ -240,6 +254,23 @@ export const useAppStore = defineStore('app', () => {
    * @param force - Force refresh from API
    */
   async function fetchVersion(force = false): Promise<VersionInfo | null> {
+    if (isLocalPreviewSession()) {
+      const data: VersionInfo = {
+        current_version: 'local-preview',
+        latest_version: 'local-preview',
+        has_update: false,
+        build_type: 'source',
+        cached: true
+      }
+      currentVersion.value = data.current_version
+      latestVersion.value = data.latest_version
+      hasUpdate.value = data.has_update
+      buildType.value = data.build_type
+      releaseInfo.value = null
+      versionLoaded.value = true
+      return data
+    }
+
     // Return cached data if available and not forcing refresh
     if (versionLoaded.value && !force) {
       return {
@@ -289,12 +320,17 @@ export const useAppStore = defineStore('app', () => {
    * Apply settings to store state (internal helper to avoid code duplication)
    */
   function applySettings(config: PublicSettings): void {
-    if (typeof window !== 'undefined') {
-      window.__APP_CONFIG__ = { ...config }
+    const resolvedSiteLogo = resolveSiteLogoPath(config.site_logo)
+    const normalizedConfig = {
+      ...config,
+      site_logo: resolvedSiteLogo
     }
-    cachedPublicSettings.value = config
+    if (typeof window !== 'undefined') {
+      window.__APP_CONFIG__ = { ...normalizedConfig }
+    }
+    cachedPublicSettings.value = normalizedConfig
     siteName.value = config.site_name || DEFAULT_SITE_NAME
-    siteLogo.value = config.site_logo || ''
+    siteLogo.value = resolvedSiteLogo
     siteVersion.value = config.version || ''
     contactInfo.value = config.contact_info || ''
     apiBaseUrl.value = config.api_base_url || ''

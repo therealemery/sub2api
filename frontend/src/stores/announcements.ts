@@ -4,6 +4,15 @@ import { announcementsAPI } from '@/api'
 import type { UserAnnouncement } from '@/types'
 
 const THROTTLE_MS = 20 * 60 * 1000 // 20 minutes
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  if (
+    typeof localStorage === 'undefined' ||
+    (!import.meta.env.DEV && !['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname))
+  ) return false
+  return !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+}
 
 export const useAnnouncementStore = defineStore('announcements', () => {
   // State
@@ -24,6 +33,16 @@ export const useAnnouncementStore = defineStore('announcements', () => {
   // Actions
   async function fetchAnnouncements(force = false) {
     const now = Date.now()
+
+    if (isLocalPreviewSession()) {
+      announcements.value = []
+      popupQueue.value = []
+      currentPopup.value = null
+      loading.value = false
+      lastFetchTime.value = now
+      return
+    }
+
     if (!force && lastFetchTime.value > 0 && now - lastFetchTime.value < THROTTLE_MS) {
       return
     }
@@ -86,6 +105,7 @@ export const useAnnouncementStore = defineStore('announcements', () => {
   }
 
   async function markAsRead(id: number) {
+    if (isLocalPreviewSession()) return
     try {
       await announcementsAPI.markRead(id)
       const ann = announcements.value.find((a) => a.id === id)
@@ -98,6 +118,15 @@ export const useAnnouncementStore = defineStore('announcements', () => {
   }
 
   async function markAllAsRead() {
+    if (isLocalPreviewSession()) {
+      announcements.value.forEach((a) => {
+        if (!a.read_at) {
+          a.read_at = new Date().toISOString()
+        }
+      })
+      return
+    }
+
     const unread = announcements.value.filter((a) => !a.read_at)
     if (unread.length === 0) return
 

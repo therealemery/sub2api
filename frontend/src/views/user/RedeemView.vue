@@ -1,22 +1,26 @@
 <template>
   <AppLayout>
     <div class="mx-auto max-w-2xl space-y-6">
+      <PageIntro
+        title="兑换"
+        description="使用兑换码为账户增加余额、并发或套餐权益，兑换结果和历史记录会保留在本页。"
+        compact
+      />
+
       <!-- Current Balance Card -->
-      <div class="card overflow-hidden">
-        <div class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center">
+      <div class="card p-6 text-center">
           <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm"
+            class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           >
-            <Icon name="creditCard" size="xl" class="text-white" />
+            <Icon name="creditCard" size="xl" class="text-gray-700 dark:text-gray-200" />
           </div>
-          <p class="text-sm font-medium text-primary-100">{{ t('redeem.currentBalance') }}</p>
-          <p class="mt-2 text-4xl font-bold text-white">
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ t('redeem.currentBalance') }}</p>
+          <p class="money-value mt-2 text-4xl font-bold">
             ${{ user?.balance?.toFixed(2) || '0.00' }}
           </p>
-          <p class="mt-2 text-sm text-primary-100">
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             {{ t('redeem.concurrency') }}: {{ user?.concurrency || 0 }} {{ t('redeem.requests') }}
           </p>
-        </div>
       </div>
 
       <!-- Redeem Form -->
@@ -29,7 +33,7 @@
               </label>
               <div class="relative mt-1">
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <Icon name="gift" size="md" class="text-gray-400 dark:text-dark-500" />
+                  <Icon name="gift" size="md" class="text-gray-400 text-[var(--text-muted)]" />
                 </div>
                 <input
                   id="code"
@@ -87,7 +91,7 @@
           <div class="p-6">
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30"
+                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30"
               >
                 <Icon name="checkCircle" size="md" class="text-emerald-600 dark:text-emerald-400" />
               </div>
@@ -141,7 +145,7 @@
           <div class="p-6">
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30"
+                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30"
               >
                 <Icon
                   name="exclamationCircle"
@@ -163,22 +167,20 @@
       </transition>
 
       <!-- Information Card -->
-      <div
-        class="card border-primary-200 bg-primary-50 dark:border-primary-800/50 dark:bg-primary-900/20"
-      >
+      <div class="card">
         <div class="p-6">
           <div class="flex items-start gap-4">
             <div
-              class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 dark:bg-primary-900/30"
+              class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
-              <Icon name="infoCircle" size="md" class="text-primary-600 dark:text-primary-400" />
+              <Icon name="infoCircle" size="md" class="text-gray-600 dark:text-gray-300" />
             </div>
             <div class="flex-1">
-              <h3 class="text-sm font-semibold text-primary-800 dark:text-primary-300">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t('redeem.aboutCodes') }}
               </h3>
               <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-primary-700 dark:text-primary-400"
+                class="mt-2 list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-gray-300"
               >
                 <li>{{ t('redeem.codeRule1') }}</li>
                 <li>{{ t('redeem.codeRule2') }}</li>
@@ -186,7 +188,7 @@
                   {{ t('redeem.codeRule3') }}
                   <span
                     v-if="contactInfo"
-                    class="ml-1.5 inline-flex items-center rounded-md bg-primary-200/50 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-800/40 dark:text-primary-200"
+                    class="ml-1.5 inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200"
                   >
                     {{ contactInfo }}
                   </span>
@@ -200,15 +202,15 @@
 
       <!-- Recent Activity -->
       <div class="card">
-        <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('redeem.recentActivity') }}
           </h2>
         </div>
         <div class="p-6">
           <!-- Loading State -->
           <div v-if="loadingHistory" class="flex items-center justify-center py-8">
-            <svg class="h-6 w-6 animate-spin text-primary-500" fill="none" viewBox="0 0 24 24">
+            <svg class="h-6 w-6 animate-spin text-gray-700 dark:text-gray-200" fill="none" viewBox="0 0 24 24">
               <circle
                 class="opacity-25"
                 cx="12"
@@ -230,12 +232,12 @@
             <div
               v-for="item in history"
               :key="item.id"
-              class="flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-dark-800"
+              class="flex items-center justify-between rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]"
             >
               <div class="flex items-center gap-4">
                 <div
                   :class="[
-                    'flex h-10 w-10 items-center justify-center rounded-xl',
+                    'flex h-10 w-10 items-center justify-center rounded-lg',
                     isBalanceType(item.type)
                       ? item.value >= 0
                         ? 'bg-emerald-100 dark:bg-emerald-900/30'
@@ -243,7 +245,7 @@
                       : isSubscriptionType(item.type)
                         ? 'bg-purple-100 dark:bg-purple-900/30'
                         : item.value >= 0
-                          ? 'bg-blue-100 dark:bg-blue-900/30'
+                          ? 'bg-gray-100 bg-[var(--bg-surface-alt)]'
                           : 'bg-orange-100 dark:bg-orange-900/30'
                   ]"
                 >
@@ -272,16 +274,16 @@
                     size="md"
                     :class="
                       item.value >= 0
-                        ? 'text-blue-600 dark:text-blue-400'
+                        ? 'text-gray-600 dark:text-gray-300'
                         : 'text-orange-600 dark:text-orange-400'
                     "
                   />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ getHistoryItemTitle(item) }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-dark-400">
+                  <p class="text-xs text-gray-500 text-[var(--text-muted)]">
                     {{ formatDateTime(item.used_at) }}
                   </p>
                 </div>
@@ -297,7 +299,7 @@
                       : isSubscriptionType(item.type)
                         ? 'text-purple-600 dark:text-purple-400'
                         : item.value >= 0
-                          ? 'text-blue-600 dark:text-blue-400'
+                          ? 'text-gray-600 dark:text-gray-300'
                           : 'text-orange-600 dark:text-orange-400'
                   ]"
                 >
@@ -305,17 +307,17 @@
                 </p>
                 <p
                   v-if="!isAdminAdjustment(item.type)"
-                  class="font-mono text-xs text-gray-400 dark:text-dark-500"
+                  class="font-mono text-xs text-gray-400 text-[var(--text-muted)]"
                 >
                   {{ item.code.slice(0, 8) }}...
                 </p>
-                <p v-else class="text-xs text-gray-400 dark:text-dark-500">
+                <p v-else class="text-xs text-gray-400 text-[var(--text-muted)]">
                   {{ t('redeem.adminAdjustment') }}
                 </p>
                 <!-- Display notes for admin adjustments -->
                 <p
                   v-if="item.notes"
-                  class="mt-1 text-xs text-gray-500 dark:text-dark-400 italic max-w-[200px] truncate"
+                  class="mt-1 text-xs text-gray-500 text-[var(--text-muted)] italic max-w-[200px] truncate"
                   :title="item.notes"
                 >
                   {{ item.notes }}
@@ -327,11 +329,11 @@
           <!-- Empty State -->
           <div v-else class="empty-state py-8">
             <div
-              class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-dark-800"
+              class="mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-gray-100 bg-[var(--bg-surface-alt)]"
             >
-              <Icon name="clock" size="xl" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="clock" size="xl" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
-            <p class="text-sm text-gray-500 dark:text-dark-400">
+            <p class="text-sm text-gray-500 text-[var(--text-muted)]">
               {{ t('redeem.historyWillAppear') }}
             </p>
           </div>
@@ -349,6 +351,7 @@ import { useAppStore } from '@/stores/app'
 import { useSubscriptionStore } from '@/stores/subscriptions'
 import { redeemAPI, authAPI, type RedeemHistoryItem } from '@/api'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { formatDateTime } from '@/utils/format'
 
@@ -490,7 +493,7 @@ onMounted(async () => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,

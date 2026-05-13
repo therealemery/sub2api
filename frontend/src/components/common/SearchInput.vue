@@ -41,3 +41,24 @@ const handleInput = (event: Event) => {
   debouncedEmitSearch(value)
 }
 </script>
+
+<style scoped>
+:deep(.input) {
+  min-height: 40px !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+  font-size: var(--text-body, 16px) !important;
+  font-weight: 400 !important;
+  box-shadow: none;
+}
+
+:deep(.input::placeholder) {
+  color: var(--text-secondary) !important;
+}
+
+.relative :deep(svg) {
+  color: var(--text-secondary) !important;
+}
+</style>

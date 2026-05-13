@@ -1,6 +1,6 @@
 <template>
   <div class="card p-4">
-    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
       {{ t('payment.admin.dailyRevenue') }}
     </h3>
     <div class="h-64">
@@ -51,8 +51,8 @@ const chartData = computed(() => {
       {
         label: t('payment.admin.revenue'),
         data: props.data.map(d => d.amount),
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#c4471a',
+        backgroundColor: 'rgba(196, 71, 26, 0.12)',
         fill: true,
         tension: 0.3,
         pointRadius: 3,
@@ -62,7 +62,7 @@ const chartData = computed(() => {
         label: t('payment.admin.orderCount'),
         data: props.data.map(d => d.count),
         borderColor: 'rgb(16, 185, 129)',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        backgroundColor: 'rgba(40, 122, 75, 0.12)',
         fill: false,
         tension: 0.3,
         pointRadius: 3,

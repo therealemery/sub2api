@@ -13,6 +13,19 @@ import type {
 } from '@/types/payment'
 import type { BasePaginationResponse } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function previewResponse<T>(data: T) {
+  return Promise.resolve({ data })
+}
+
 /** Admin-facing payment config returned by GET /admin/payment/config */
 export interface AdminPaymentConfig {
   enabled: boolean
@@ -54,6 +67,25 @@ export const adminPaymentAPI = {
 
   /** Get payment configuration (admin view) */
   getConfig() {
+    if (isLocalPreviewSession()) {
+      return previewResponse<AdminPaymentConfig>({
+        enabled: true,
+        min_amount: 1,
+        max_amount: 500,
+        daily_limit: 1000,
+        order_timeout_minutes: 15,
+        max_pending_orders: 3,
+        enabled_payment_types: ['stripe'],
+        balance_disabled: false,
+        balance_recharge_multiplier: 1,
+        load_balance_strategy: 'round_robin',
+        product_name_prefix: 'OwnAPI',
+        product_name_suffix: '',
+        help_image_url: '',
+        help_text: ''
+      })
+    }
+
     return apiClient.get<AdminPaymentConfig>('/admin/payment/config')
   },
 
@@ -156,6 +188,10 @@ export const adminPaymentAPI = {
 
   /** Get all provider instances */
   getProviders() {
+    if (isLocalPreviewSession()) {
+      return previewResponse<ProviderInstance[]>([])
+    }
+
     return apiClient.get<ProviderInstance[]>('/admin/payment/providers')
   },
 

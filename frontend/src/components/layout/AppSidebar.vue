@@ -9,11 +9,12 @@
     <!-- Logo/Brand -->
     <div class="sidebar-header" :class="{ 'sidebar-header-collapsed': sidebarCollapsed }">
       <!-- Custom Logo or Default Logo -->
-      <div class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl shadow-glow">
-        <img v-if="settingsLoaded" :src="siteLogo || '/logo.png'" alt="Logo" class="h-full w-full object-contain" />
+      <div class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg">
+        <img :src="siteLogoPaths.light" alt="Logo" class="theme-logo-light" />
+        <img :src="siteLogoPaths.dark" alt="Logo" class="theme-logo-dark" />
       </div>
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
-        <span class="sidebar-brand-title text-lg font-bold text-gray-900 dark:text-white">
+        <span class="sidebar-brand-title text-lg font-bold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ siteName }}
         </span>
         <!-- Version Badge -->
@@ -54,7 +55,7 @@
                 </span>
               </button>
               <!-- Children -->
-              <div v-if="!sidebarCollapsed && isGroupExpanded(item)" class="mb-1 ml-4 border-l border-gray-200 pl-2 dark:border-dark-600">
+              <div v-if="!sidebarCollapsed && isGroupExpanded(item)" class="mb-1 ml-4 pl-2">
                 <router-link
                   v-for="child in item.children"
                   :key="child.path"
@@ -84,6 +85,7 @@
                       ? 'sidebar-wallet'
                       : undefined
               "
+              :data-tour="getSidebarTourId(item.path)"
               @click="handleMenuItemClick(item.path)"
             >
               <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
@@ -108,7 +110,7 @@
             class="sidebar-link mb-1"
             :class="{ 'sidebar-link-active': isActive(item.path), 'sidebar-link-collapsed': sidebarCollapsed }"
             :title="sidebarCollapsed ? item.label : undefined"
-            :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
+            :data-tour="getSidebarTourId(item.path)"
             @click="handleMenuItemClick(item.path)"
           >
             <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
@@ -128,7 +130,7 @@
             class="sidebar-link mb-1"
             :class="{ 'sidebar-link-active': isActive(item.path), 'sidebar-link-collapsed': sidebarCollapsed }"
             :title="sidebarCollapsed ? item.label : undefined"
-            :data-tour="item.path === '/keys' ? 'sidebar-my-keys' : undefined"
+            :data-tour="getSidebarTourId(item.path)"
             @click="handleMenuItemClick(item.path)"
           >
             <span v-if="item.iconSvg" class="h-5 w-5 flex-shrink-0 sidebar-svg-icon" v-html="sanitizeSvg(item.iconSvg)"></span>
@@ -140,7 +142,7 @@
     </nav>
 
     <!-- Bottom Section -->
-    <div class="mt-auto border-t border-gray-100 p-3 dark:border-dark-800">
+    <div class="sidebar-footer mt-auto border-t border-gray-100 p-3 border-[var(--border-default)]">
       <!-- Theme Toggle -->
       <button
         @click="toggleTheme"
@@ -187,6 +189,7 @@ import { useAdminSettingsStore, useAppStore, useAuthStore, useOnboardingStore } 
 import VersionBadge from '@/components/common/VersionBadge.vue'
 import { sanitizeSvg } from '@/utils/sanitize'
 import { FeatureFlags, makeSidebarFlag } from '@/utils/featureFlags'
+import { resolveThemedSiteLogoPaths } from '@/constants/branding'
 
 interface NavItem {
   path: string
@@ -243,251 +246,152 @@ const expandedGroups = ref<Set<string>>(new Set())
 
 // Site settings from appStore (cached, no flicker)
 const siteName = computed(() => appStore.siteName)
-const siteLogo = computed(() => appStore.siteLogo)
+const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(appStore.siteLogo))
 const siteVersion = computed(() => appStore.siteVersion)
-const settingsLoaded = computed(() => appStore.publicSettingsLoaded)
 
-// SVG Icon Components
-const DashboardIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z'
-        })
-      ]
-    )
+const SIDEBAR_ICON_MAIN = 'var(--sidebar-icon-main)'
+const SIDEBAR_ICON_ACCENT = 'var(--sidebar-icon-accent)'
+
+interface SidebarIconPath {
+  d: string
+  accent?: boolean
 }
 
-const KeyIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z'
-        })
-      ]
-    )
+function makeSidebarIcon(paths: SidebarIconPath[]) {
+  return {
+    render: () =>
+      h(
+        'svg',
+        {
+          fill: 'none',
+          viewBox: '0 0 24 24',
+          'aria-hidden': 'true',
+        },
+        paths.map((path) =>
+          h('path', {
+            d: path.d,
+            stroke: path.accent ? SIDEBAR_ICON_ACCENT : SIDEBAR_ICON_MAIN,
+            'stroke-width': '2',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            fill: 'none',
+          })
+        )
+      ),
+  }
 }
 
-const ChartIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'
-        })
-      ]
-    )
-}
+const SidebarDashboardIcon = makeSidebarIcon([
+  { d: 'M5 4.5h4.4c.35 0 .6.25.6.6v4.3c0 .35-.25.6-.6.6H5.1c-.35 0-.6-.25-.6-.6V5.1c0-.35.25-.6.5-.6zM14.6 4.5H19c.35 0 .6.25.6.6v4.3c0 .35-.25.6-.6.6h-4.3c-.35 0-.6-.25-.6-.6V5.1c0-.35.25-.6.5-.6zM5 14h4.4c.35 0 .6.25.6.6V19c0 .35-.25.6-.6.6H5.1c-.35 0-.6-.25-.6-.6v-4.3c0-.45.25-.7.5-.7z' },
+  { d: 'M14.6 14H19c.35 0 .6.25.6.6V19c0 .35-.25.6-.6.6h-4.3c-.35 0-.6-.25-.6-.6v-4.3c0-.45.25-.7.5-.7z', accent: true },
+])
 
-const GiftIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z'
-        })
-      ]
-    )
-}
+const SidebarOpsIcon = makeSidebarIcon([
+  { d: 'M3.5 12h3.2l2.2-5.1 4.2 10.2 2.5-5.1h2.3' },
+  { d: 'M20 12h.1', accent: true },
+])
 
-const UserIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z'
-        })
-      ]
-    )
-}
+const SidebarUsersIcon = makeSidebarIcon([
+  { d: 'M8.4 11.2a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2zM3.4 19.2c.2-3.2 2.2-5.2 5-5.2 1.7 0 3 .65 3.85 1.85' },
+  { d: 'M16.5 11.2a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4zM14.3 14.5c2.9.15 4.75 1.9 5 4.7', accent: true },
+])
 
-const UsersIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z'
-        })
-      ]
-    )
-}
+const SidebarGroupIcon = makeSidebarIcon([
+  { d: 'M3.8 8.2h6.45l1.55 1.7h8.4c.55 0 1 .45 1 1v7.3c0 .55-.45 1-1 1H3.8c-.55 0-1-.45-1-1v-9c0-.55.45-1 1-1zM3 12.2h18' },
+  { d: 'M6.2 12.2h4.5', accent: true },
+])
 
-const FolderIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z'
-        })
-      ]
-    )
-}
+const SidebarChannelIcon = makeSidebarIcon([
+  { d: 'M7.2 12H13M15.8 7.2l-2.8 2.2M15.8 16.8 13 14.6M18.5 5.6a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2zM18.5 14.2a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2z' },
+  { d: 'M5.1 9.9a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2z', accent: true },
+])
 
-const ChannelIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0l4.179 2.25L12 17.25 2.25 12m15.321-2.25l4.179 2.25L12 17.25l-9.75-5.25'
-        })
-      ]
-    )
-}
+const SidebarModelIcon = makeSidebarIcon([
+  { d: 'm12 3.8 7.1 4.1v8.2L12 20.2l-7.1-4.1V7.9L12 3.8z' },
+  { d: 'm12 8.3 3.2 1.85v3.7L12 15.7l-3.2-1.85v-3.7L12 8.3z', accent: true },
+])
 
-const CreditCardIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z'
-        })
-      ]
-    )
-}
+const SidebarSubscriptionIcon = makeSidebarIcon([
+  { d: 'M4.6 6.4h14.8c.55 0 1 .45 1 1v9.2c0 .55-.45 1-1 1H4.6c-.55 0-1-.45-1-1V7.4c0-.55.45-1 1-1zM3.8 9.7h16.4' },
+  { d: 'M6.3 14.2h3.1', accent: true },
+])
 
-const RechargeSubscriptionIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'currentColor', viewBox: '0 0 1024 1024' },
-      [
-        h('path', {
-          d: 'M512 992C247.3 992 32 776.7 32 512S247.3 32 512 32s480 215.3 480 480c0 84.4-22.2 167.4-64.2 240-8.9 15.3-28.4 20.6-43.7 11.7-15.3-8.8-20.5-28.4-11.7-43.7 36.4-62.9 55.6-134.8 55.6-208 0-229.4-186.6-416-416-416S96 282.6 96 512s186.6 416 416 416c17.7 0 32 14.3 32 32s-14.3 32-32 32z'
-        }),
-        h('path', {
-          d: 'M640 512H384c-17.7 0-32-14.3-32-32s14.3-32 32-32h256c17.7 0 32 14.3 32 32s-14.3 32-32 32zM640 640H384c-17.7 0-32-14.3-32-32s14.3-32 32-32h256c17.7 0 32 14.3 32 32s-14.3 32-32 32z'
-        }),
-        h('path', {
-          d: 'M512 480c-8.2 0-16.4-3.1-22.6-9.4l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3-6.3 6.3-14.5 9.4-22.7 9.4z'
-        }),
-        h('path', {
-          d: 'M512 480c-8.2 0-16.4-3.1-22.6-9.4-12.5-12.5-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-128 128c-6.3 6.3-14.5 9.4-22.7 9.4z'
-        }),
-        h('path', {
-          d: 'M512 736c-17.7 0-32-14.3-32-32V448c0-17.7 14.3-32 32-32s32 14.3 32 32v256c0 17.7-14.3 32-32 32zM896 992H512c-17.7 0-32-14.3-32-32s14.3-32 32-32h306.8l-73.4-73.4c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l128 128c9.2 9.2 11.9 22.9 6.9 34.9S908.9 992 896 992z'
-        })
-      ]
-    )
-}
+const SidebarAccountIcon = makeSidebarIcon([
+  { d: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17zM3.9 12h16.2M12 3.5c2.15 2.25 3.2 5.1 3.2 8.5s-1.05 6.25-3.2 8.5M12 3.5C9.85 5.75 8.8 8.6 8.8 12s1.05 6.25 3.2 8.5' },
+  { d: 'M18.2 7.2c1.2 1.35 1.9 3 1.9 4.8', accent: true },
+])
 
-const GlobeIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418'
-        })
-      ]
-    )
-}
+const SidebarBellIcon = makeSidebarIcon([
+  { d: 'M6.2 16.6h11.6l-1.3-1.8V10a4.5 4.5 0 0 0-9 0v4.8l-1.3 1.8zM10 19.1c.45.55 1.15.9 2 .9s1.55-.35 2-.9M12 4.3V3.4' },
+  { d: 'M12 17.8v1.3', accent: true },
+])
 
-const ServerIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z'
-        })
-      ]
-    )
-}
+const SidebarProxyIcon = makeSidebarIcon([
+  { d: 'M12 3.8 18.8 6v5.5c0 4.1-2.45 7-6.8 8.7-4.35-1.7-6.8-4.6-6.8-8.7V6L12 3.8z' },
+  { d: 'M8.9 12h6.2M9.1 9.2v5.6M14.9 9.2v5.6', accent: true },
+])
 
-const BellIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9a6 6 0 10-12 0v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0'
-        })
-      ]
-    )
-}
+const SidebarTicketIcon = makeSidebarIcon([
+  { d: 'M4.2 7.4h15.6c.55 0 1 .45 1 1v2.2a2.2 2.2 0 0 0 0 2.8v2.2c0 .55-.45 1-1 1H4.2c-.55 0-1-.45-1-1v-2.2a2.2 2.2 0 0 0 0-2.8V8.4c0-.55.45-1 1-1zM14.8 9.2h2.2M14.8 14.8h2.2' },
+  { d: 'M9.4 8.7v6.6', accent: true },
+])
 
-const TicketIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z'
-        })
-      ]
-    )
-}
+const SidebarPromoIcon = makeSidebarIcon([
+  { d: 'M4.4 10h15.2v8.4c0 .55-.45 1-1 1H5.4c-.55 0-1-.45-1-1V10zM3.8 7.2h16.4c.45 0 .8.35.8.8v2H3V8c0-.45.35-.8.8-.8z' },
+  { d: 'M12 7.2v12.2M9.2 7.2c-.9-1-.9-2.2-.15-2.8.9-.7 2.25.15 2.95 2.8M14.8 7.2c.9-1 .9-2.2.15-2.8-.9-.7-2.25.15-2.95 2.8M9.2 15.8l5.6-4.6M9.8 11.3h.1M14.1 15.7h.1', accent: true },
+])
 
-const CogIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z'
-        }),
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-        })
-      ]
-    )
-}
+const SidebarGiftIcon = makeSidebarIcon([
+  { d: 'M4.4 10h15.2v8.4c0 .55-.45 1-1 1H5.4c-.55 0-1-.45-1-1V10zM3.8 7.2h16.4c.45 0 .8.35.8.8v2H3V8c0-.45.35-.8.8-.8z' },
+  { d: 'M12 7.2v12.2M9.2 7.2c-.9-1-.9-2.2-.15-2.8.9-.7 2.25.15 2.95 2.8M14.8 7.2c.9-1 .9-2.2.15-2.8-.9-.7-2.25.15-2.95 2.8', accent: true },
+])
 
+const SidebarOrderIcon = makeSidebarIcon([
+  { d: 'M7 3.8h10l1.2 1.4L19.4 4v16.2l-1.2-1.2-1.2 1.2-1.2-1.2-1.2 1.2-1.2-1.2-1.2 1.2-1.2-1.2-1.2 1.2-1.2-1.2-1.2 1.2V4l1.2 1.2L7 3.8zM8.5 10h7M8.5 15h4.5' },
+  { d: 'M8.5 12.5h5.2', accent: true },
+])
+
+const SidebarUsageIcon = makeSidebarIcon([
+  { d: 'M5.1 13.4h2.8c.35 0 .6.25.6.6v4.4c0 .35-.25.6-.6.6H5.1c-.35 0-.6-.25-.6-.6V14c0-.35.25-.6.6-.6zM10.6 9.6h2.8c.35 0 .6.25.6.6v8.2c0 .35-.25.6-.6.6h-2.8c-.35 0-.6-.25-.6-.6v-8.2c0-.35.25-.6.6-.6z' },
+  { d: 'M16.1 5h2.8c.35 0 .6.25.6.6v12.8c0 .35-.25.6-.6.6h-2.8c-.35 0-.6-.25-.6-.6V5.6c0-.35.25-.6.6-.6z', accent: true },
+])
+
+const SidebarSettingsIcon = makeSidebarIcon([
+  { d: 'M12 3.7 13.2 6c.45.15.85.35 1.25.55L17 5.8l1.5 2.6-1.8 1.7c.05.3.1.6.1.9s-.05.6-.1.9l1.8 1.7-1.5 2.6-2.55-.75c-.4.25-.8.4-1.25.55L12 20.3 10.8 18c-.45-.15-.85-.35-1.25-.55L7 18.2l-1.5-2.6 1.8-1.7c-.05-.3-.1-.6-.1-.9s.05-.6.1-.9L5.5 8.4 7 5.8l2.55.75c.4-.25.8-.4 1.25-.55L12 3.7z' },
+  { d: 'M12 9.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2z', accent: true },
+])
+
+const SidebarKeyIcon = makeSidebarIcon([
+  { d: 'M14.8 8.2a3.9 3.9 0 1 1-2.1 3.45L5.2 19.2H3.5v-2.1h2.1V15h2.1l3.55-3.55' },
+  { d: 'M16.3 7.1h.1', accent: true },
+])
+
+const SidebarSignalIcon = makeSidebarIcon([
+  { d: 'M7.5 16.8a6.8 6.8 0 0 1 0-9.6M16.5 7.2a6.8 6.8 0 0 1 0 9.6M5 19.2a10.3 10.3 0 0 1 0-14.4M19 4.8a10.3 10.3 0 0 1 0 14.4' },
+  { d: 'M12 12h.1', accent: true },
+])
+
+const SidebarRechargeIcon = makeSidebarIcon([
+  { d: 'M5 6.3h14c.55 0 1 .45 1 1v9.4c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V7.3c0-.55.45-1 1-1zM4.2 9.4h15.6M8.4 14.7h4.8' },
+  { d: 'm15.5 12.6 2 2-2 2M17.5 14.6h-3.8', accent: true },
+])
+
+const SidebarProfileIcon = makeSidebarIcon([
+  { d: 'M12 11.1a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2zM4.7 20.1c.3-4.2 3.1-6.4 7.3-6.4 2.55 0 4.6.8 5.85 2.35' },
+  { d: 'M19.3 20.1c-.15-1.75-.65-3.05-1.45-4.05', accent: true },
+])
+
+const SidebarAffiliateIcon = makeSidebarIcon([
+  { d: 'M8.2 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM4 19.4c.25-3.1 1.9-4.9 4.2-4.9M15.8 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+  { d: 'M19.9 19.4c-.25-3.1-1.9-4.9-4.1-4.9M8.2 14.5c2 0 3.25 1.1 3.8 3.2', accent: true },
+])
+
+const SidebarPriceTagIcon = makeSidebarIcon([
+  { d: 'M4.2 5.3h6.1c.45 0 .85.18 1.15.48l8.05 8.05c.4.4.4 1.05 0 1.45l-4.2 4.2c-.4.4-1.05.4-1.45 0L5.8 11.45a1.6 1.6 0 0 1-.48-1.15V4.2' },
+  { d: 'M8.2 8.2h.1', accent: true },
+])
+
+// Footer and group-control SVG icons
 const SunIcon = {
   render: () =>
     h(
@@ -533,36 +437,6 @@ const ChevronDoubleLeftIcon = {
     )
 }
 
-const OrderIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z'
-        })
-      ]
-    )
-}
-
-const OrderListIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z'
-        })
-      ]
-    )
-}
-
 const ChevronDoubleRightIcon = {
   render: () =>
     h(
@@ -573,41 +447,6 @@ const ChevronDoubleRightIcon = {
           'stroke-linecap': 'round',
           'stroke-linejoin': 'round',
           d: 'm5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5'
-        })
-      ]
-    )
-}
-
-const SignalIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788M12 12h.008v.008H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z'
-        })
-      ]
-    )
-}
-
-const PriceTagIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z'
-        }),
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M6 6h.008v.008H6V6z'
         })
       ]
     )
@@ -646,19 +485,20 @@ const flagAdminPayment = () => adminSettingsStore.paymentEnabled
 function buildSelfNavItems(withDashboard: boolean): NavItem[] {
   const items: NavItem[] = []
   if (withDashboard) {
-    items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: DashboardIcon })
+    items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: SidebarDashboardIcon })
   }
   items.push(
-    { path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon },
-    { path: '/usage', label: t('nav.usage'), icon: ChartIcon, hideInSimpleMode: true },
-    { path: '/available-channels', label: t('nav.availableChannels'), icon: ChannelIcon, hideInSimpleMode: true, featureFlag: flagAvailableChannels },
-    { path: '/monitor', label: t('nav.channelStatus'), icon: SignalIcon, featureFlag: flagChannelMonitor },
-    { path: '/subscriptions', label: t('nav.mySubscriptions'), icon: CreditCardIcon, hideInSimpleMode: true },
-    { path: '/purchase', label: t('nav.buySubscription'), icon: RechargeSubscriptionIcon, hideInSimpleMode: true, featureFlag: flagPayment },
-    { path: '/orders', label: t('nav.myOrders'), icon: OrderListIcon, hideInSimpleMode: true, featureFlag: flagPayment },
-    { path: '/redeem', label: t('nav.redeem'), icon: GiftIcon, hideInSimpleMode: true },
-    { path: '/affiliate', label: t('nav.affiliate'), icon: UsersIcon, hideInSimpleMode: true, featureFlag: flagAffiliate },
-    { path: '/profile', label: t('nav.profile'), icon: UserIcon },
+    { path: '/models', label: '模型中心', icon: SidebarModelIcon, hideInSimpleMode: true },
+    { path: '/keys', label: t('nav.apiKeys'), icon: SidebarKeyIcon },
+    { path: '/usage', label: t('nav.usage'), icon: SidebarUsageIcon, hideInSimpleMode: true },
+    { path: '/available-channels', label: t('nav.availableChannels'), icon: SidebarChannelIcon, hideInSimpleMode: true, featureFlag: flagAvailableChannels },
+    { path: '/monitor', label: t('nav.channelStatus'), icon: SidebarSignalIcon, featureFlag: flagChannelMonitor },
+    { path: '/subscriptions', label: t('nav.mySubscriptions'), icon: SidebarSubscriptionIcon, hideInSimpleMode: true },
+    { path: '/purchase', label: t('nav.buySubscription'), icon: SidebarRechargeIcon, hideInSimpleMode: true, featureFlag: flagPayment },
+    { path: '/orders', label: t('nav.myOrders'), icon: SidebarOrderIcon, hideInSimpleMode: true, featureFlag: flagPayment },
+    { path: '/redeem', label: t('nav.redeem'), icon: SidebarGiftIcon, hideInSimpleMode: true },
+    { path: '/affiliate', label: t('nav.affiliate'), icon: SidebarAffiliateIcon, hideInSimpleMode: true, featureFlag: flagAffiliate },
+    { path: '/profile', label: t('nav.profile'), icon: SidebarProfileIcon },
     ...customMenuItemsForUser.value.map((item): NavItem => ({
       path: `/custom/${item.id}`,
       label: item.label,
@@ -700,54 +540,55 @@ const customMenuItemsForAdmin = computed(() => {
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
   const baseItems: NavItem[] = [
-    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: DashboardIcon },
-    { path: '/admin/ops', label: t('nav.ops'), icon: ChartIcon, featureFlag: flagOpsMonitoring },
-    { path: '/admin/users', label: t('nav.users'), icon: UsersIcon, hideInSimpleMode: true },
-    { path: '/admin/groups', label: t('nav.groups'), icon: FolderIcon, hideInSimpleMode: true },
+    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: SidebarDashboardIcon },
+    { path: '/admin/ops', label: t('nav.ops'), icon: SidebarOpsIcon, featureFlag: flagOpsMonitoring },
+    { path: '/admin/users', label: t('nav.users'), icon: SidebarUsersIcon, hideInSimpleMode: true },
+    { path: '/admin/groups', label: t('nav.groups'), icon: SidebarGroupIcon, hideInSimpleMode: true },
     {
       path: '/admin/channels',
       label: t('nav.channelManagement'),
-      icon: ChannelIcon,
+      icon: SidebarChannelIcon,
       hideInSimpleMode: true,
       expandOnly: true,
       children: [
-        { path: '/admin/channels/pricing', label: t('nav.channelPricing'), icon: PriceTagIcon },
-        { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SignalIcon, featureFlag: flagChannelMonitor },
+        { path: '/admin/channels/pricing', label: t('nav.channelPricing'), icon: SidebarPriceTagIcon },
+        { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SidebarSignalIcon, featureFlag: flagChannelMonitor },
       ],
     },
-    { path: '/admin/subscriptions', label: t('nav.subscriptions'), icon: CreditCardIcon, hideInSimpleMode: true },
-    { path: '/admin/accounts', label: t('nav.accounts'), icon: GlobeIcon },
-    { path: '/admin/announcements', label: t('nav.announcements'), icon: BellIcon },
-    { path: '/admin/proxies', label: t('nav.proxies'), icon: ServerIcon },
-    { path: '/admin/redeem', label: t('nav.redeemCodes'), icon: TicketIcon, hideInSimpleMode: true },
-    { path: '/admin/promo-codes', label: t('nav.promoCodes'), icon: GiftIcon, hideInSimpleMode: true },
+    { path: '/admin/models', label: '模型中心', icon: SidebarModelIcon, hideInSimpleMode: true },
+    { path: '/admin/subscriptions', label: t('nav.subscriptions'), icon: SidebarSubscriptionIcon, hideInSimpleMode: true },
+    { path: '/admin/accounts', label: t('nav.accounts'), icon: SidebarAccountIcon },
+    { path: '/admin/announcements', label: t('nav.announcements'), icon: SidebarBellIcon },
+    { path: '/admin/proxies', label: t('nav.proxies'), icon: SidebarProxyIcon },
+    { path: '/admin/redeem', label: t('nav.redeemCodes'), icon: SidebarTicketIcon, hideInSimpleMode: true },
+    { path: '/admin/promo-codes', label: t('nav.promoCodes'), icon: SidebarPromoIcon, hideInSimpleMode: true },
     {
       path: '/admin/affiliates',
       label: t('nav.affiliateManagement'),
-      icon: UsersIcon,
+      icon: SidebarAffiliateIcon,
       hideInSimpleMode: true,
       expandOnly: true,
       featureFlag: flagAffiliate,
       children: [
-        { path: '/admin/affiliates/invites', label: t('nav.affiliateInviteRecords'), icon: UsersIcon },
-        { path: '/admin/affiliates/rebates', label: t('nav.affiliateRebateRecords'), icon: OrderIcon },
-        { path: '/admin/affiliates/transfers', label: t('nav.affiliateTransferRecords'), icon: CreditCardIcon },
+        { path: '/admin/affiliates/invites', label: t('nav.affiliateInviteRecords'), icon: SidebarAffiliateIcon },
+        { path: '/admin/affiliates/rebates', label: t('nav.affiliateRebateRecords'), icon: SidebarOrderIcon },
+        { path: '/admin/affiliates/transfers', label: t('nav.affiliateTransferRecords'), icon: SidebarSubscriptionIcon },
       ],
     },
     {
       path: '/admin/orders',
       label: t('nav.orderManagement'),
-      icon: OrderIcon,
+      icon: SidebarOrderIcon,
       hideInSimpleMode: true,
       expandOnly: true,
       featureFlag: flagAdminPayment,
       children: [
-        { path: '/admin/orders/dashboard', label: t('nav.paymentDashboard'), icon: ChartIcon },
-        { path: '/admin/orders', label: t('nav.orderManagement'), icon: OrderIcon },
-        { path: '/admin/orders/plans', label: t('nav.paymentPlans'), icon: CreditCardIcon },
+        { path: '/admin/orders/dashboard', label: t('nav.paymentDashboard'), icon: SidebarDashboardIcon },
+        { path: '/admin/orders', label: t('nav.orderManagement'), icon: SidebarOrderIcon },
+        { path: '/admin/orders/plans', label: t('nav.paymentPlans'), icon: SidebarSubscriptionIcon },
       ],
     },
-    { path: '/admin/usage', label: t('nav.usage'), icon: ChartIcon }
+    { path: '/admin/usage', label: t('nav.usage'), icon: SidebarUsageIcon }
   ]
 
   const visible = applyFeatureFlags(baseItems)
@@ -755,20 +596,31 @@ const adminNavItems = computed((): NavItem[] => {
   // 简单模式下，在系统设置前插入 API密钥
   if (authStore.isSimpleMode) {
     const filtered = visible.filter(item => !item.hideInSimpleMode)
-    filtered.push({ path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon })
-    filtered.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
+    filtered.push({ path: '/keys', label: t('nav.apiKeys'), icon: SidebarKeyIcon })
+    filtered.push({ path: '/admin/settings', label: t('nav.settings'), icon: SidebarSettingsIcon })
     for (const cm of customMenuItemsForAdmin.value) {
       filtered.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
     }
     return filtered
   }
 
-  visible.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
+  visible.push({ path: '/admin/settings', label: t('nav.settings'), icon: SidebarSettingsIcon })
   for (const cm of customMenuItemsForAdmin.value) {
     visible.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
   }
   return visible
 })
+
+const sidebarTourIds: Record<string, string> = {
+  '/models': 'sidebar-models',
+  '/keys': 'sidebar-my-keys',
+  '/usage': 'sidebar-usage',
+  '/subscriptions': 'sidebar-subscriptions',
+}
+
+function getSidebarTourId(path: string): string | undefined {
+  return sidebarTourIds[path]
+}
 
 function toggleSidebar() {
   appStore.toggleSidebar()
@@ -776,8 +628,10 @@ function toggleSidebar() {
 
 function toggleTheme() {
   isDark.value = !isDark.value
+  const nextTheme = isDark.value ? 'dark' : 'light'
   document.documentElement.classList.toggle('dark', isDark.value)
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  document.documentElement.dataset.theme = nextTheme
+  localStorage.setItem('theme', nextTheme)
 }
 
 function closeMobile() {
@@ -791,12 +645,9 @@ function handleMenuItemClick(itemPath: string) {
     }, 150)
   }
 
-  // Map paths to tour selectors
-  const pathToSelector: Record<string, string> = {
-    '/admin/groups': '#sidebar-group-manage',
-    '/admin/accounts': '#sidebar-channel-manage',
-    '/keys': '[data-tour="sidebar-my-keys"]'
-  }
+  const pathToSelector = Object.fromEntries(
+    Object.entries(sidebarTourIds).map(([path, tourId]) => [path, `[data-tour="${tourId}"]`])
+  )
 
   const selector = pathToSelector[itemPath]
   if (selector && onboardingStore.isCurrentStep(selector)) {
@@ -945,14 +796,14 @@ onMounted(() => {
   right: 0.75rem;
   top: 50%;
   height: 1px;
-  background: rgb(229 231 235);
+  background: var(--bg-surface-alt);
   opacity: 0;
   transform: translateY(-50%);
   transition: opacity 0.18s ease;
 }
 
 .dark .sidebar-section-title::after {
-  background: rgb(55 65 81);
+  background: var(--bg-surface-alt);
 }
 
 .sidebar-section-title-text-collapsed {
@@ -992,6 +843,10 @@ onMounted(() => {
   pointer-events: none;
 }
 
+.sidebar-link {
+  border-radius: var(--radius-lg) !important;
+}
+
 /* Custom SVG icon in sidebar: constrain size without overriding uploaded SVG colors */
 .sidebar-svg-icon {
   color: currentColor;
@@ -1001,5 +856,202 @@ onMounted(() => {
   display: block;
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.sidebar-header {
+  min-height: 4.5rem;
+}
+
+.sidebar-logo {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 14px;
+}
+
+.sidebar-brand-title {
+  background: none;
+  background-clip: text;
+  color: var(--accent) !important;
+  font-weight: 900;
+}
+
+.sidebar-section {
+  margin-bottom: 1rem;
+  border-radius: 16px;
+}
+
+.sidebar-section + .sidebar-section {
+  border-top: 1px solid var(--border-default);
+  padding-top: 0.875rem;
+}
+
+.sidebar-link {
+  min-height: 2.5rem;
+  border: 1px solid transparent;
+}
+
+.sidebar-link-active {
+  border-color: var(--border-focus);
+}
+
+.sidebar-link-active svg,
+.sidebar-link-active .sidebar-svg-icon {
+  filter: none;
+}
+
+.sidebar-footer {
+  background: var(--bg-surface);
+}
+
+.dark .sidebar-footer {
+  background: var(--bg-surface);
+}
+
+.sidebar {
+  --sidebar-icon-main: #5A5148;
+  --sidebar-icon-accent: #BB4D1B;
+  border-right-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none;
+}
+
+.dark .sidebar {
+  --sidebar-icon-main: #F3E9DD;
+  --sidebar-icon-accent: #BB4D1B;
+}
+
+.sidebar-header {
+  min-height: 72px !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  padding: 16px 24px !important;
+}
+
+.sidebar-logo {
+  position: relative !important;
+  flex: 0 0 36px !important;
+  min-width: 36px !important;
+  width: 36px !important;
+  height: 36px !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+.sidebar-logo img {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: scale(1.58) !important;
+  transform-origin: center center !important;
+}
+
+.sidebar-brand-title {
+  background: none !important;
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.sidebar-section {
+  margin-bottom: 36px !important;
+  border-radius: 0 !important;
+}
+
+.sidebar-section + .sidebar-section {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.sidebar-section-title {
+  margin-bottom: 10px !important;
+  padding: 0 12px !important;
+  color: var(--text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+.sidebar-section-title::after {
+  background: var(--border-default) !important;
+}
+
+.sidebar-link {
+  position: relative !important;
+  min-height: 46px !important;
+  border: 0 !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 10px 12px 10px 16px !important;
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  gap: 10px !important;
+  box-shadow: none;
+}
+
+.sidebar-link::before {
+  content: none;
+  display: none;
+}
+
+.sidebar-link:hover {
+  border: 0 !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.sidebar-link-active {
+  border: 0 !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  font-weight: 650 !important;
+}
+
+.sidebar-link-active::before {
+  content: none;
+  display: none;
+}
+
+.sidebar-link-active svg,
+.sidebar-link-active .sidebar-svg-icon {
+  filter: none !important;
+}
+
+.sidebar-footer,
+.dark .sidebar-footer {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+}
+
+.sidebar .sidebar-link-active,
+.sidebar .sidebar-link-active.router-link-active,
+.sidebar .sidebar-link-active.router-link-exact-active {
+  border: 0 !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  font-weight: 500 !important;
+}
+
+.dark .sidebar .sidebar-link-active,
+.dark .sidebar .sidebar-link-active.router-link-active,
+.dark .sidebar .sidebar-link-active.router-link-exact-active {
+  border: 0 !important;
+  background: var(--accent) !important;
+  color: var(--accent-soft) !important;
+}
+
+.sidebar .sidebar-link-active::before,
+.sidebar .sidebar-link-active.router-link-active::before,
+.sidebar .sidebar-link-active.router-link-exact-active::before {
+  content: none !important;
+  display: none !important;
 }
 </style>

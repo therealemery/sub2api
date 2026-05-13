@@ -1,24 +1,30 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
-      <template #filters>
-        <MonitorFiltersBar
-          v-model:search="searchQuery"
-          v-model:provider="providerFilter"
-          v-model:enabled="enabledFilter"
-          :loading="loading"
-          @reload="reload"
-          @create="openCreateDialog"
-          @manage-templates="showTemplateManager = true"
-          @search-input="handleSearch"
-        />
-      </template>
+    <div class="table-page-with-intro">
+      <PageIntro
+        title="渠道监控"
+        description="检查 OpenAI、Claude、Gemini 等渠道的可用性、延迟和最近状态，避免管理员在渠道、分组和密钥之间来回排查。"
+      />
 
-      <template #table>
-        <DataTable :columns="columns" :data="monitors" :loading="loading">
+      <TablePageLayout>
+        <template #filters>
+          <MonitorFiltersBar
+            v-model:search="searchQuery"
+            v-model:provider="providerFilter"
+            v-model:enabled="enabledFilter"
+            :loading="loading"
+            @reload="reload"
+            @create="openCreateDialog"
+            @manage-templates="showTemplateManager = true"
+            @search-input="handleSearch"
+          />
+        </template>
+
+        <template #table>
+          <DataTable :columns="columns" :data="monitors" :loading="loading">
           <template #cell-name="{ row, value }">
             <div class="flex items-center gap-1.5">
-              <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
               <HelpTooltip v-if="row.api_key_decrypt_failed" :content="t('admin.channelMonitor.apiKeyDecryptFailed')">
                 <Icon name="exclamationTriangle" size="sm" class="text-red-500" />
               </HelpTooltip>
@@ -65,20 +71,21 @@
               @action="openCreateDialog"
             />
           </template>
-        </DataTable>
-      </template>
+          </DataTable>
+        </template>
 
-      <template #pagination>
-        <Pagination
-          v-if="pagination.total > 0"
-          :page="pagination.page"
-          :total="pagination.total"
-          :page-size="pagination.page_size"
-          @update:page="onPageChange"
-          @update:pageSize="onPageSizeChange"
-        />
-      </template>
-    </TablePageLayout>
+        <template #pagination>
+          <Pagination
+            v-if="pagination.total > 0"
+            :page="pagination.page"
+            :total="pagination.total"
+            :page-size="pagination.page_size"
+            @update:page="onPageChange"
+            @update:pageSize="onPageSizeChange"
+          />
+        </template>
+      </TablePageLayout>
+    </div>
 
     <MonitorFormDialog
       :show="showDialog"
@@ -127,6 +134,7 @@ import type {
 import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'

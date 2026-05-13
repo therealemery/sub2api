@@ -98,7 +98,7 @@
           </template>
 
           <template #cell-value="{ value, row }">
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
+            <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
               <template v-if="row.type === 'balance'">${{ value.toFixed(2) }}</template>
               <template v-else-if="row.type === 'subscription'">
                 {{ row.validity_days || 30 }} {{ t('admin.redeem.days') }}
@@ -126,13 +126,13 @@
           </template>
 
           <template #cell-used_by="{ value, row }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">
               {{ row.user?.email || (value ? t('admin.redeem.userPrefix', { id: value }) : '-') }}
             </span>
           </template>
 
           <template #cell-used_at="{ value }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">{{
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">{{
               value ? formatDateTime(value) : '-'
             }}</span>
           </template>
@@ -154,7 +154,7 @@
                 </svg>
                 <span class="text-xs">{{ t('common.delete') }}</span>
               </button>
-              <span v-else class="text-gray-400 dark:text-dark-500">-</span>
+              <span v-else class="text-gray-400 text-[var(--text-muted)]">-</span>
             </div>
           </template>
         </DataTable>
@@ -208,9 +208,9 @@
       <div v-if="showGenerateDialog" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="fixed inset-0 bg-black/50" @click="showGenerateDialog = false"></div>
         <div
-          class="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-dark-800"
+          class="relative z-10 w-full max-w-md rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]"
         >
-          <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('admin.redeem.generateCodesTitle') }}
           </h2>
           <form @submit.prevent="handleGenerateCodes" class="space-y-4">
@@ -237,8 +237,8 @@
               />
             </div>
             <!-- 邀请码类型：显示提示信息 -->
-            <div v-if="generateForm.type === 'invitation'" class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-              <p class="text-sm text-blue-700 dark:text-blue-300">
+            <div v-if="generateForm.type === 'invitation'" class="rounded-lg bg-[var(--bg-surface-alt)] p-3 bg-[var(--bg-surface-alt)]">
+              <p class="text-sm text-[var(--accent)] text-[var(--accent)]">
                 {{ t('admin.redeem.invitationHint') }}
               </p>
             </div>
@@ -315,10 +315,10 @@
     <Teleport to="body">
       <div v-if="showResultDialog" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-black/50" @click="closeResultDialog"></div>
-        <div class="relative z-10 w-full max-w-lg rounded-xl bg-white shadow-xl dark:bg-dark-800">
+        <div class="relative z-10 w-full max-w-lg rounded-lg bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)]">
           <!-- Header -->
           <div
-            class="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-dark-600"
+            class="flex items-center justify-between border-b border-gray-200 px-5 py-4 border-[var(--border-default)]"
           >
             <div class="flex items-center gap-3">
               <div
@@ -339,7 +339,7 @@
                 </svg>
               </div>
               <div>
-                <h2 class="text-base font-semibold text-gray-900 dark:text-white">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('admin.redeem.generatedSuccessfully') }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -349,9 +349,10 @@
             </div>
             <button
               @click="closeResultDialog"
-              class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-dark-700 dark:hover:text-gray-300"
+              class="modal-close-button text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              aria-label="关闭弹窗"
             >
-              <Icon name="x" size="md" :stroke-width="2" />
+              <Icon name="x" size="xl" :stroke-width="2.8" />
             </button>
           </div>
           <!-- Content -->
@@ -361,18 +362,18 @@
                 readonly
                 :value="generatedCodesText"
                 :style="{ height: textareaHeight }"
-                class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 font-mono text-sm text-gray-800 focus:outline-none dark:border-dark-600 dark:bg-dark-700 dark:text-gray-200"
+                class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 font-mono text-sm text-gray-800 focus:outline-none border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200"
               ></textarea>
             </div>
           </div>
           <!-- Footer -->
           <div
-            class="flex justify-end gap-2 rounded-b-xl border-t border-gray-200 bg-gray-50 px-5 py-4 dark:border-dark-600 dark:bg-dark-700/50"
+            class="flex justify-end gap-2 rounded-b-xl border-t border-gray-200 bg-gray-50 px-5 py-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           >
             <button
               @click="copyGeneratedCodes"
               :class="[
-                'btn flex items-center gap-2 transition-all',
+                'btn flex items-center gap-2 transition-colors',
                 copiedAll ? 'btn-success' : 'btn-secondary'
               ]"
             >

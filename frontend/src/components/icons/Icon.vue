@@ -5,6 +5,7 @@
     viewBox="0 0 24 24"
     stroke="currentColor"
     :stroke-width="strokeWidth"
+    :data-icon="name"
   >
     <path stroke-linecap="round" stroke-linejoin="round" :d="iconPath" />
   </svg>

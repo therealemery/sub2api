@@ -140,11 +140,10 @@ export function useSwipeSelect(
   function createMarquee() {
     removeMarquee() // defensive: remove any stale marquee
     marqueeEl = document.createElement('div')
-    const isDark = document.documentElement.classList.contains('dark')
     Object.assign(marqueeEl.style, {
       position: 'fixed',
-      background: isDark ? 'rgba(96, 165, 250, 0.15)' : 'rgba(59, 130, 246, 0.12)',
-      border: isDark ? '1.5px solid rgba(96, 165, 250, 0.5)' : '1.5px solid rgba(59, 130, 246, 0.4)',
+      background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+      border: '1.5px solid color-mix(in srgb, var(--accent) 42%, transparent)',
       borderRadius: '4px',
       pointerEvents: 'none',
       zIndex: '9999',

@@ -3,15 +3,15 @@
     <SearchInput
       :model-value="searchQuery"
       :placeholder="t('admin.accounts.searchAccounts')"
-      class="w-full sm:w-64"
+      class="account-filter-search w-full sm:w-64"
       @update:model-value="$emit('update:searchQuery', $event)"
       @search="$emit('change')"
     />
-    <Select :model-value="filters.platform" class="w-40" :options="pOpts" @update:model-value="updatePlatform" @change="$emit('change')" />
-    <Select :model-value="filters.type" class="w-40" :options="tOpts" @update:model-value="updateType" @change="$emit('change')" />
-    <Select :model-value="filters.status" class="w-40" :options="sOpts" @update:model-value="updateStatus" @change="$emit('change')" />
-    <Select :model-value="filters.privacy_mode" class="w-40" :options="privacyOpts" @update:model-value="updatePrivacyMode" @change="$emit('change')" />
-    <Select :model-value="filters.group" class="w-40" :options="gOpts" @update:model-value="updateGroup" @change="$emit('change')" />
+    <Select :model-value="filters.platform" class="account-filter-select" :options="pOpts" @update:model-value="updatePlatform" @change="$emit('change')" />
+    <Select :model-value="filters.type" class="account-filter-select" :options="tOpts" @update:model-value="updateType" @change="$emit('change')" />
+    <Select :model-value="filters.status" class="account-filter-select account-filter-select-wide" :options="sOpts" @update:model-value="updateStatus" @change="$emit('change')" />
+    <Select :model-value="filters.privacy_mode" class="account-filter-select" :options="privacyOpts" @update:model-value="updatePrivacyMode" @change="$emit('change')" />
+    <Select :model-value="filters.group" class="account-filter-select account-filter-select-wide" :options="gOpts" searchable @update:model-value="updateGroup" @change="$emit('change')" />
   </div>
 </template>
 
@@ -41,3 +41,38 @@ const gOpts = computed(() => [
   ...(props.groups || []).map(g => ({ value: String(g.id), label: g.name }))
 ])
 </script>
+
+<style scoped>
+.account-filter-search {
+  min-width: min(100%, 260px);
+}
+
+.account-filter-select {
+  width: 176px;
+  min-width: 176px;
+}
+
+.account-filter-select-wide {
+  width: 212px;
+  min-width: 212px;
+}
+
+:deep(.select-trigger) {
+  padding-left: 12px !important;
+  padding-right: 10px !important;
+}
+
+:deep(.select-value) {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .account-filter-search,
+  .account-filter-select,
+  .account-filter-select-wide {
+    width: 100%;
+    min-width: 0;
+  }
+}
+</style>

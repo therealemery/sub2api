@@ -79,7 +79,7 @@
             </button>
             <div
               v-if="showColumnDropdown"
-              class="absolute right-0 top-full z-50 mt-1 max-h-80 w-48 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-dark-600 dark:bg-dark-800"
+              class="absolute right-0 top-full z-50 mt-1 max-h-80 w-48 overflow-y-auto rounded-lg border border-gray-200 bg-[var(--bg-surface)] py-1 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <button
                 v-for="col in toggleableColumns"
@@ -92,7 +92,7 @@
                   v-if="isColumnVisible(col.key)"
                   name="check"
                   size="sm"
-                  class="text-primary-500"
+                  class="text-[var(--accent)]"
                   :stroke-width="2"
                 />
               </button>

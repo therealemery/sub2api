@@ -6,6 +6,7 @@ import i18n, { initI18n } from './i18n'
 import { useAppStore } from '@/stores/app'
 import { DEFAULT_SITE_NAME, DEFAULT_SITE_SUBTITLE } from '@/constants/branding'
 import './style.css'
+import './styles/interaction-states.css'
 
 function initThemeClass() {
   const savedTheme = localStorage.getItem('theme')
@@ -13,6 +14,18 @@ function initThemeClass() {
     savedTheme === 'dark' ||
     (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
   document.documentElement.classList.toggle('dark', shouldUseDark)
+  document.documentElement.dataset.theme = shouldUseDark ? 'dark' : 'light'
+
+  const syncThemeAttribute = () => {
+    document.documentElement.dataset.theme = document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light'
+  }
+
+  new MutationObserver(syncThemeAttribute).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  })
 }
 
 async function bootstrap() {

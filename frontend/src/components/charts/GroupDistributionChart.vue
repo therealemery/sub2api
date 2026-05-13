@@ -1,18 +1,18 @@
 <template>
   <div class="card p-4">
     <div class="mb-4 flex items-center justify-between gap-3">
-      <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
         {{ t('admin.dashboard.groupDistribution') }}
       </h3>
       <div
         v-if="showMetricToggle"
-        class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
+        class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 bg-[var(--bg-surface-alt)]"
       >
         <button
           type="button"
           class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
           :class="metric === 'tokens'
-            ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+            ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
             : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
           @click="emit('update:metric', 'tokens')"
         >
@@ -22,7 +22,7 @@
           type="button"
           class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
           :class="metric === 'actual_cost'
-            ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+            ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
             : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
           @click="emit('update:metric', 'actual_cost')"
         >
@@ -58,7 +58,7 @@
               >
                 <td
                   class="max-w-[100px] truncate py-1.5 font-medium"
-                  :class="group.group_id > 0 ? 'text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300' : 'text-gray-900 dark:text-white'"
+                  :class="group.group_id > 0 ? 'text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]' : 'text-gray-900 dark:text-[var(--text-inverse)]'"
                   :title="group.group_name || String(group.group_id)"
                 >
                   <span class="inline-flex items-center gap-1">
@@ -169,23 +169,23 @@ const toggleBreakdown = async (type: string, id: number | string) => {
 }
 
 const chartColors = [
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
+  '#c4471a',
+  '#287a4b',
+  '#986b16',
   '#ef4444',
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-  '#f97316',
-  '#6366f1',
-  '#84cc16'
+  '#9a7b63',
+  '#a73c2e',
+  'var(--border-focus)',
+  '#b8851f',
+  '#6f6258',
+  '#4a7c3c'
 ]
 
 const displayGroupStats = computed(() => {
   if (!props.groupStats?.length) return []
 
   const metricKey = props.metric === 'actual_cost' ? 'actual_cost' : 'total_tokens'
-  return [...props.groupStats].sort((a, b) => b[metricKey] - a[metricKey])
+  return [...props.groupStats].sort((a, b) => (b[metricKey] ?? 0) - (a[metricKey] ?? 0))
 })
 
 const chartData = computed(() => {
@@ -195,7 +195,7 @@ const chartData = computed(() => {
     labels: displayGroupStats.value.map((g) => g.group_name || String(g.group_id)),
     datasets: [
       {
-        data: displayGroupStats.value.map((g) => props.metric === 'actual_cost' ? g.actual_cost : g.total_tokens),
+        data: displayGroupStats.value.map((g) => props.metric === 'actual_cost' ? (g.actual_cost ?? 0) : (g.total_tokens ?? 0)),
         backgroundColor: chartColors.slice(0, displayGroupStats.value.length),
         borderWidth: 0
       }
@@ -241,14 +241,15 @@ const formatNumber = (value: number): string => {
   return value.toLocaleString()
 }
 
-const formatCost = (value: number): string => {
-  if (value >= 1000) {
-    return (value / 1000).toFixed(2) + 'K'
-  } else if (value >= 1) {
-    return value.toFixed(2)
-  } else if (value >= 0.01) {
-    return value.toFixed(3)
+const formatCost = (value?: number | null): string => {
+  const safeValue = Number.isFinite(value) ? Number(value) : 0
+  if (safeValue >= 1000) {
+    return (safeValue / 1000).toFixed(2) + 'K'
+  } else if (safeValue >= 1) {
+    return safeValue.toFixed(2)
+  } else if (safeValue >= 0.01) {
+    return safeValue.toFixed(3)
   }
-  return value.toFixed(4)
+  return safeValue.toFixed(4)
 }
 </script>

@@ -3,6 +3,15 @@ import { ref } from 'vue'
 import { adminAPI } from '@/api'
 import type { CustomMenuItem } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
 export const useAdminSettingsStore = defineStore('adminSettings', () => {
   const loaded = ref(false)
   const loading = ref(false)
@@ -52,6 +61,21 @@ export const useAdminSettingsStore = defineStore('adminSettings', () => {
   const customMenuItems = ref<CustomMenuItem[]>([])
 
   async function fetch(force = false): Promise<void> {
+    if (isLocalPreviewSession()) {
+      opsMonitoringEnabled.value = true
+      opsRealtimeMonitoringEnabled.value = true
+      opsQueryModeDefault.value = 'auto'
+      paymentEnabled.value = true
+      customMenuItems.value = []
+      writeCachedBool('ops_monitoring_enabled_cached', true)
+      writeCachedBool('ops_realtime_monitoring_enabled_cached', true)
+      writeCachedString('ops_query_mode_default_cached', 'auto')
+      writeCachedBool('payment_enabled_cached', true)
+      loaded.value = true
+      loading.value = false
+      return
+    }
+
     if (loaded.value && !force) return
     if (loading.value) return
 

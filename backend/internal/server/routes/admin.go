@@ -399,6 +399,7 @@ func registerSettingsRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 	{
 		adminSettings.GET("", h.Admin.Setting.GetSettings)
 		adminSettings.PUT("", h.Admin.Setting.UpdateSettings)
+		adminSettings.PUT("/model-center", h.Admin.Setting.UpdateModelCenterConfig)
 		adminSettings.POST("/test-smtp", h.Admin.Setting.TestSMTPConnection)
 		adminSettings.POST("/send-test-email", h.Admin.Setting.SendTestEmail)
 		// Admin API Key 管理

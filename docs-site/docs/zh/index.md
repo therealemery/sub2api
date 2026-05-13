@@ -6,7 +6,7 @@ hero:
   text: "开发者文档"
   tagline: AI API 中转与配额管理平台接入指南
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: OwnAPI
   actions:
     - theme: brand

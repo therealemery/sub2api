@@ -1,17 +1,17 @@
 <template>
   <AuthLayout>
-    <div class="space-y-6">
+    <div class="login-panel">
       <!-- Title -->
-      <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+      <div class="login-copy">
+        <h2>
           {{ t('auth.welcomeBack') }}
         </h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-dark-400">
+        <p>
           {{ t('auth.signInToAccount') }}
         </p>
       </div>
 
-  <div v-if="!backendModeEnabled && (linuxdoOAuthEnabled || wechatOAuthEnabled || oidcOAuthEnabled)" class="space-y-4">
+  <div v-if="!backendModeEnabled && (linuxdoOAuthEnabled || wechatOAuthEnabled || oidcOAuthEnabled)" class="oauth-stack">
         <LinuxDoOAuthSection
           v-if="linuxdoOAuthEnabled"
           :disabled="isLoading"
@@ -29,16 +29,16 @@
           :show-divider="false"
         />
         <div class="flex items-center gap-3">
-          <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
-          <span class="text-xs text-gray-500 dark:text-dark-400">
+          <div class="login-divider"></div>
+          <span class="login-divider-text">
             {{ t('auth.oauthOrContinue') }}
           </span>
-          <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
+          <div class="login-divider"></div>
         </div>
       </div>
 
       <!-- Login Form -->
-      <form @submit.prevent="handleLogin" class="space-y-5">
+      <form @submit.prevent="handleLogin" class="login-form">
         <!-- Email Input -->
         <div>
           <label for="email" class="input-label">
@@ -46,7 +46,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="mail" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="mail" size="md" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
             <input
               id="email"
@@ -70,7 +70,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="lock" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="lock" size="md" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
             <input
               id="password"
@@ -97,7 +97,7 @@
             <router-link
               v-if="passwordResetEnabled && !backendModeEnabled"
               to="/forgot-password"
-              class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              class="auth-link"
             >
               {{ t('auth.forgotPassword') }}
             </router-link>
@@ -119,11 +119,11 @@
         <button
           type="submit"
           :disabled="isLoading || (turnstileEnabled && !turnstileToken)"
-          class="btn btn-primary w-full"
+          class="btn btn-primary w-full login-submit"
         >
           <svg
             v-if="isLoading"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+            class="-ml-1 mr-2 h-4 w-4 animate-spin text-[var(--text-inverse)]"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -144,16 +144,40 @@
           <Icon v-else name="login" size="md" class="mr-2" />
           {{ isLoading ? t('auth.signingIn') : t('auth.signIn') }}
         </button>
+
       </form>
+
+      <div v-if="localPreviewEnabled" class="local-preview-panel">
+        <div>
+          <p class="local-preview-title">本地预览入口</p>
+          <p class="local-preview-text">仅开发环境显示，用于免登录检查用户端和管理员端界面。</p>
+        </div>
+        <div class="local-preview-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="handleLocalPreview('user')"
+          >
+            进入用户端
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            @click="handleLocalPreview('admin')"
+          >
+            进入管理员后台
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
     <template v-if="!backendModeEnabled" #footer>
-      <p class="text-gray-500 dark:text-dark-400">
+      <p class="text-gray-500 text-[var(--text-muted)]">
         {{ t('auth.dontHaveAccount') }}
         <router-link
           to="/register"
-          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="auth-link"
         >
           {{ t('auth.signUp') }}
         </router-link>
@@ -211,6 +235,7 @@ const backendModeEnabled = ref<boolean>(false)
 const oidcOAuthEnabled = ref<boolean>(false)
 const oidcOAuthProviderName = ref<string>('OIDC')
 const passwordResetEnabled = ref<boolean>(false)
+const localPreviewEnabled = import.meta.env.DEV
 
 // Turnstile
 const turnstileRef = ref<InstanceType<typeof TurnstileWidget> | null>(null)
@@ -387,6 +412,14 @@ async function handleLogin(): Promise<void> {
   }
 }
 
+function handleLocalPreview(role: 'user' | 'admin'): void {
+  sessionStorage.removeItem('auth_expired')
+  errorMessage.value = ''
+  authStore.enterLocalPreview(role)
+  appStore.showInfo(role === 'admin' ? '已进入管理员本地预览' : '已进入用户端本地预览')
+  router.push(role === 'admin' ? '/admin/dashboard' : '/dashboard')
+}
+
 // ==================== 2FA Handlers ====================
 
 async function handle2FAVerify(code: string): Promise<void> {
@@ -424,9 +457,107 @@ function handle2FACancel(): void {
 </script>
 
 <style scoped>
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.login-copy {
+  text-align: center;
+}
+
+.login-copy h2 {
+  color: rgb(15 23 42);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.login-copy p {
+  margin-top: 8px;
+  color: rgb(100 116 139);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.oauth-stack,
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-divider {
+  height: 1px;
+  flex: 1;
+  background: rgba(203, 213, 225, 0.82);
+}
+
+.login-divider-text {
+  color: rgb(100 116 139);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.auth-link {
+  color: #1d7ec9;
+  font-size: 14px;
+  font-weight: 800;
+  transition: color 0.16s ease;
+}
+
+.auth-link:hover {
+  color: #2563eb;
+}
+
+.login-submit {
+  margin-top: 2px;
+  font-weight: 900;
+}
+
+.local-preview-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.local-preview-title {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.local-preview-text {
+  margin-top: 4px;
+  color: var(--text-mutedd);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.local-preview-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.local-preview-actions .btn {
+  width: 100%;
+}
+
+.login-panel :deep(.text-gray-400),
+.login-panel :deep(.dark\:text-dark-500) {
+  color: rgb(148 163 184);
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,
@@ -434,4 +565,11 @@ function handle2FACancel(): void {
   opacity: 0;
   transform: translateY(-8px);
 }
+
+@media (max-width: 520px) {
+  .local-preview-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>

@@ -3,7 +3,7 @@
     <div class="flex items-center justify-end gap-3 flex-wrap">
       <div
         role="tablist"
-        class="inline-flex p-0.5 rounded-xl bg-gray-100 dark:bg-dark-800 border border-gray-200/60 dark:border-dark-700/60 text-xs"
+        class="monitor-window-tabs inline-flex p-0.5 rounded-lg border text-xs"
       >
         <button
           v-for="opt in windowOptions"
@@ -13,7 +13,7 @@
           :aria-selected="window === opt.value"
           class="px-3 py-1 rounded-lg transition-colors"
           :class="window === opt.value
-            ? 'bg-white dark:bg-dark-700 shadow-sm text-gray-900 dark:text-white font-semibold'
+            ? 'monitor-window-tab-active text-gray-900 dark:text-[var(--text-inverse)] font-semibold'
             : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
           @click="emit('update:window', opt.value)"
         >
@@ -114,3 +114,14 @@ const overallDotClass = computed(() => {
 })
 
 </script>
+
+<style scoped>
+.monitor-window-tabs {
+  border-color: var(--border-default);
+  background: var(--bg-surface-alt);
+}
+
+.monitor-window-tab-active {
+  background: var(--bg-surface);
+}
+</style>

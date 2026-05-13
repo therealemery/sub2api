@@ -11,8 +11,8 @@
         <div class="flex items-center">
           <div
             :class="[
-              'flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold',
-              step >= 1 ? 'bg-primary-500 text-white' : 'bg-gray-200 text-gray-500 dark:bg-dark-600'
+              'flex h-8 w-8 items-center justify-center rounded-md text-sm font-semibold',
+              step >= 1 ? 'bg-[var(--accent)] text-[var(--text-inverse)]' : 'bg-gray-200 text-gray-500 bg-[var(--bg-surface-alt)]'
             ]"
           >
             1
@@ -21,12 +21,12 @@
             t('admin.accounts.oauth.authMethod')
           }}</span>
         </div>
-        <div class="h-0.5 w-8 bg-gray-300 dark:bg-dark-600" />
+        <div class="h-0.5 w-8 bg-gray-300 bg-[var(--bg-surface-alt)]" />
         <div class="flex items-center">
           <div
             :class="[
-              'flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold',
-              step >= 2 ? 'bg-primary-500 text-white' : 'bg-gray-200 text-gray-500 dark:bg-dark-600'
+              'flex h-8 w-8 items-center justify-center rounded-md text-sm font-semibold',
+              step >= 2 ? 'bg-[var(--accent)] text-[var(--text-inverse)]' : 'bg-gray-200 text-gray-500 bg-[var(--bg-surface-alt)]'
             ]"
           >
             2
@@ -70,14 +70,14 @@
       <!-- Platform Selection - Segmented Control Style -->
       <div>
         <label class="input-label">{{ t('admin.accounts.platform') }}</label>
-        <div class="mt-2 flex rounded-lg bg-gray-100 p-1 dark:bg-dark-700" data-tour="account-form-platform">
+        <div class="mt-2 flex rounded-lg bg-gray-100 p-1 bg-[var(--bg-surface-alt)]" data-tour="account-form-platform">
           <button
             type="button"
             @click="form.platform = 'anthropic'"
             :class="[
-              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'anthropic'
-                ? 'bg-white text-orange-600 shadow-sm dark:bg-dark-600 dark:text-orange-400'
+                ? 'bg-[var(--bg-surface)] text-orange-600 bg-[var(--bg-surface-alt)] dark:text-orange-400'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -88,9 +88,9 @@
             type="button"
             @click="form.platform = 'openai'"
             :class="[
-              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'openai'
-                ? 'bg-white text-green-600 shadow-sm dark:bg-dark-600 dark:text-green-400'
+                ? 'bg-[var(--bg-surface)] text-green-600 bg-[var(--bg-surface-alt)] dark:text-green-400'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -113,9 +113,9 @@
             type="button"
             @click="form.platform = 'gemini'"
             :class="[
-              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'gemini'
-                ? 'bg-white text-blue-600 shadow-sm dark:bg-dark-600 dark:text-blue-400'
+                ? 'bg-[var(--bg-surface)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -138,9 +138,9 @@
             type="button"
             @click="form.platform = 'antigravity'"
             :class="[
-              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'antigravity'
-                ? 'bg-white text-purple-600 shadow-sm dark:bg-dark-600 dark:text-purple-400'
+                ? 'bg-[var(--bg-surface)] text-purple-600 bg-[var(--bg-surface-alt)] dark:text-purple-400'
                 : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             ]"
           >
@@ -158,24 +158,24 @@
             type="button"
             @click="accountCategory = 'oauth-based'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
                 ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                : 'border-gray-200 hover:border-orange-300 dark:border-dark-600 dark:hover:border-orange-700'
+                : 'border-gray-200 hover:border-orange-300 border-[var(--border-default)] dark:hover:border-orange-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-orange-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="sparkles" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">{{
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.claudeCode')
               }}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -188,24 +188,24 @@
             type="button"
             @click="accountCategory = 'apikey'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
                 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-purple-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">{{
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.claudeConsole')
               }}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -218,24 +218,24 @@
             type="button"
             @click="accountCategory = 'bedrock'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'bedrock'
                 ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                : 'border-gray-200 hover:border-amber-300 dark:border-dark-600 dark:hover:border-amber-700'
+                : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)] dark:hover:border-amber-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'bedrock'
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-amber-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">{{
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.bedrockLabel')
               }}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -248,24 +248,24 @@
             type="button"
             @click="accountCategory = 'service_account'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'service_account'
                 ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                : 'border-gray-200 hover:border-sky-300 dark:border-dark-600 dark:hover:border-sky-700'
+                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)] dark:hover:border-sky-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'service_account'
-                  ? 'bg-sky-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-sky-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">Vertex</span>
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">Vertex</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">Service Account</span>
             </div>
           </button>
@@ -288,24 +288,24 @@
             type="button"
             @click="accountCategory = 'oauth-based'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
                 ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                : 'border-gray-200 hover:border-green-300 dark:border-dark-600 dark:hover:border-green-700'
+                : 'border-gray-200 hover:border-green-300 border-[var(--border-default)] dark:hover:border-green-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-green-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">OAuth</span>
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">OAuth</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.chatgptOauth') }}</span>
             </div>
           </button>
@@ -314,24 +314,24 @@
             type="button"
             @click="accountCategory = 'apikey'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
                 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-purple-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">API Key</span>
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">API Key</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.responsesApi') }}</span>
             </div>
           </button>
@@ -346,7 +346,7 @@
           <button
             type="button"
             @click="showGeminiHelpDialog = true"
-            class="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+            class="flex items-center gap-1 rounded px-2 py-1 text-xs text-[var(--accent)] hover:bg-[var(--bg-subtle)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
@@ -359,24 +359,24 @@
             type="button"
             @click="accountCategory = 'oauth-based'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 hover:border-blue-300 dark:border-dark-600 dark:hover:border-blue-700'
+                ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
+                : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)] dark:hover:border-[var(--border-focus)]'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-[var(--accent)] text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t('admin.accounts.gemini.accountType.oauthTitle') }}
               </span>
               <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -389,18 +389,18 @@
             type="button"
             @click="accountCategory = 'apikey'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
                 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-purple-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <svg
@@ -418,7 +418,7 @@
               </svg>
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ t('admin.accounts.gemini.accountType.apiKeyTitle') }}
               </span>
               <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -431,24 +431,24 @@
             type="button"
             @click="accountCategory = 'service_account'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'service_account'
                 ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                : 'border-gray-200 hover:border-sky-300 dark:border-dark-600 dark:hover:border-sky-700'
+                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)] dark:hover:border-sky-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'service_account'
-                  ? 'bg-sky-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-sky-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 Vertex
               </span>
               <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -466,7 +466,7 @@
           <div class="mt-2 flex flex-wrap gap-2">
             <a
               :href="geminiHelpLinks.apiKey"
-              class="font-medium text-blue-600 hover:underline dark:text-blue-400"
+              class="font-medium text-[var(--accent)] hover:underline text-[var(--accent)]"
               target="_blank"
               rel="noreferrer"
             >
@@ -491,24 +491,24 @@
               type="button"
               @click="handleSelectGeminiOAuthType('google_one')"
               :class="[
-                'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+                'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 geminiOAuthType === 'google_one'
                   ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                  : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                  : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'google_one'
-                    ? 'bg-purple-500 text-white'
-                    : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                    ? 'bg-purple-500 text-[var(--text-inverse)]'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
                 ]"
               >
                 <Icon name="user" size="sm" />
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   Google One
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -534,24 +534,24 @@
               type="button"
               @click="handleSelectGeminiOAuthType('code_assist')"
               :class="[
-                'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+                'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 geminiOAuthType === 'code_assist'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-gray-200 hover:border-blue-300 dark:border-dark-600 dark:hover:border-blue-700'
+                  ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
+                  : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)] dark:hover:border-[var(--border-focus)]'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'code_assist'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                    ? 'bg-[var(--accent)] text-[var(--text-inverse)]'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
                 ]"
               >
                 <Icon name="cloud" size="sm" />
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   GCP Code Assist
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -561,7 +561,7 @@
                   需要激活 GCP 项目并绑定信用卡
                   <a
                     :href="geminiHelpLinks.gcpProject"
-                    class="ml-1 text-blue-600 hover:underline dark:text-blue-400"
+                    class="ml-1 text-[var(--accent)] hover:underline text-[var(--accent)]"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -570,7 +570,7 @@
                 </div>
                 <div class="mt-2 flex flex-wrap gap-1">
                   <span
-                    class="rounded bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                    class="rounded bg-[var(--bg-surface-alt)] px-2 py-0.5 text-[10px] font-semibold text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
                   >
                     企业用户
                   </span>
@@ -611,19 +611,19 @@
               :disabled="!geminiAIStudioOAuthEnabled"
               @click="handleSelectGeminiOAuthType('ai_studio')"
               :class="[
-                'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+                'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 !geminiAIStudioOAuthEnabled ? 'cursor-not-allowed opacity-60' : '',
                 geminiOAuthType === 'ai_studio'
                   ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                  : 'border-gray-200 hover:border-amber-300 dark:border-dark-600 dark:hover:border-amber-700'
+                  : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)] dark:hover:border-amber-700'
               ]"
             >
               <div
                 :class="[
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'ai_studio'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                    ? 'bg-amber-500 text-[var(--text-inverse)]'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
                 ]"
               >
                 <svg
@@ -641,7 +641,7 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-white">
+                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('admin.accounts.gemini.oauthType.customTitle') }}
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">
@@ -673,7 +673,7 @@
 
             <div
               v-if="!geminiAIStudioOAuthEnabled"
-              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 opacity-0 transition-opacity group-hover:opacity-100 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
             >
               {{ t('admin.accounts.oauth.gemini.aiStudioNotConfiguredTip') }}
             </div>
@@ -724,24 +724,24 @@
             type="button"
             @click="antigravityAccountType = 'oauth'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               antigravityAccountType === 'oauth'
                 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 antigravityAccountType === 'oauth'
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-purple-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">OAuth</span>
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">OAuth</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.antigravityOauth') }}</span>
             </div>
           </button>
@@ -750,24 +750,24 @@
             type="button"
             @click="antigravityAccountType = 'upstream'"
             :class="[
-              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
+              'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               antigravityAccountType === 'upstream'
                 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 dark:border-dark-600 dark:hover:border-purple-700'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
             ]"
           >
             <div
               :class="[
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 antigravityAccountType === 'upstream'
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-gray-100 text-gray-500 dark:bg-dark-600 dark:text-gray-400'
+                  ? 'bg-purple-500 text-[var(--text-inverse)]'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-white">API Key</span>
+              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">API Key</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.antigravityApikey') }}</span>
             </div>
           </button>
@@ -816,7 +816,7 @@
               'rounded-lg border-2 border-dashed px-4 py-5 transition-colors',
               vertexServiceAccountDragActive
                 ? 'border-sky-500 bg-sky-50 dark:border-sky-500 dark:bg-sky-900/20'
-                : 'border-gray-300 bg-gray-50 hover:border-sky-400 hover:bg-sky-50/60 dark:border-dark-500 dark:bg-dark-700/40 dark:hover:border-sky-600 dark:hover:bg-sky-900/10'
+                : 'border-gray-300 bg-gray-50 hover:border-sky-400 hover:bg-sky-50/60 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-sky-600 dark:hover:bg-sky-900/10'
             ]"
             @dragenter.prevent="vertexServiceAccountDragActive = true"
             @dragover.prevent="vertexServiceAccountDragActive = true"
@@ -825,7 +825,7 @@
           >
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div class="min-w-0">
-                <div class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+                <div class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   <Icon name="upload" size="sm" />
                   <span>{{ vertexClientEmail ? t('admin.accounts.vertexSaJsonLoaded') : t('admin.accounts.vertexSaJsonDrop') }}</span>
                 </div>
@@ -844,7 +844,7 @@
             </div>
             <div
               v-if="vertexClientEmail"
-              class="mt-3 rounded-md border border-sky-200 bg-white px-3 py-2 text-xs text-sky-900 dark:border-sky-800/50 dark:bg-dark-800 dark:text-sky-200"
+              class="mt-3 rounded-md border border-sky-200 bg-[var(--bg-surface)] px-3 py-2 text-xs text-sky-900 dark:border-sky-800/50 bg-[var(--bg-surface-alt)] dark:text-sky-200"
             >
               <div class="truncate">Project ID: <span class="font-mono">{{ vertexProjectId }}</span></div>
               <div class="truncate">Client Email: <span class="font-mono">{{ vertexClientEmail }}</span></div>
@@ -892,7 +892,7 @@
 
       <!-- Antigravity model restriction (applies to OAuth + Upstream) -->
       <!-- Antigravity 只支持模型映射模式，不支持白名单模式 -->
-      <div v-if="form.platform === 'antigravity'" class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div v-if="form.platform === 'antigravity'" class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
         <!-- Mapping Mode Only (no toggle for Antigravity) -->
@@ -959,7 +959,7 @@
           <button
             type="button"
             @click="addAntigravityModelMapping"
-            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
           >
             <svg class="mr-1 inline h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -990,7 +990,7 @@
               v-model="addMethod"
               type="radio"
               value="oauth"
-              class="mr-2 text-primary-600 focus:ring-primary-500"
+              class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
             <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.types.oauth') }}</span>
           </label>
@@ -999,7 +999,7 @@
               v-model="addMethod"
               type="radio"
               value="setup-token"
-              class="mr-2 text-primary-600 focus:ring-primary-500"
+              class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
             <span class="text-sm text-gray-700 dark:text-gray-300">{{
               t('admin.accounts.setupTokenLongLived')
@@ -1055,7 +1055,7 @@
         </div>
 
         <!-- Model Restriction Section (Antigravity 已在上层条件排除) -->
-        <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+        <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
           <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
           <div
@@ -1074,10 +1074,10 @@
                 type="button"
                 @click="modelRestrictionMode = 'whitelist'"
                 :class="[
-                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'whitelist'
-                    ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                    ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                 ]"
               >
                 <svg
@@ -1099,10 +1099,10 @@
                 type="button"
                 @click="modelRestrictionMode = 'mapping'"
                 :class="[
-                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                  'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'mapping'
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                 ]"
               >
                 <svg
@@ -1206,7 +1206,7 @@
             <button
               type="button"
               @click="addModelMapping"
-              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
             >
               <svg
                 class="mr-1 inline h-4 w-4"
@@ -1241,7 +1241,7 @@
         </div>
 
         <!-- Pool Mode Section -->
-        <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+        <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
@@ -1253,20 +1253,20 @@
               type="button"
               @click="poolModeEnabled = !poolModeEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                poolModeEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                poolModeEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   poolModeEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
             </button>
           </div>
-          <div v-if="poolModeEnabled" class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-            <p class="text-xs text-blue-700 dark:text-blue-400">
+          <div v-if="poolModeEnabled" class="rounded-lg bg-[var(--bg-surface-alt)] p-3 bg-[var(--bg-surface-alt)]">
+            <p class="text-xs text-[var(--accent)] text-[var(--accent)]">
               <Icon name="exclamationCircle" size="sm" class="mr-1 inline" :stroke-width="2" />
               {{ t('admin.accounts.poolModeInfo') }}
             </p>
@@ -1293,7 +1293,7 @@
         </div>
 
         <!-- Custom Error Codes Section -->
-        <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+        <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.customErrorCodes') }}</label>
@@ -1305,13 +1305,13 @@
               type="button"
               @click="customErrorCodesEnabled = !customErrorCodesEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                customErrorCodesEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                customErrorCodesEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   customErrorCodesEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -1337,7 +1337,7 @@
                   'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                   selectedErrorCodes.includes(code.value)
                     ? 'bg-red-100 text-red-700 ring-1 ring-red-500 dark:bg-red-900/30 dark:text-red-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                 ]"
               >
                 {{ code.value }} {{ code.label }}
@@ -1372,7 +1372,7 @@
               <span
                 v-for="code in selectedErrorCodes.sort((a, b) => a - b)"
                 :key="code"
-                class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                class="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
               >
                 {{ code }}
                 <button
@@ -1403,7 +1403,7 @@
                 v-model="bedrockAuthMode"
                 type="radio"
                 value="sigv4"
-                class="mr-2 text-primary-600 focus:ring-primary-500"
+                class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockAuthModeSigv4') }}</span>
             </label>
@@ -1412,7 +1412,7 @@
                 v-model="bedrockAuthMode"
                 type="radio"
                 value="apikey"
-                class="mr-2 text-primary-600 focus:ring-primary-500"
+                class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
               <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockAuthModeApikey') }}</span>
             </label>
@@ -1509,7 +1509,7 @@
             <input
               v-model="bedrockForceGlobal"
               type="checkbox"
-              class="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-500"
+              class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
             <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockForceGlobal') }}</span>
           </label>
@@ -1517,7 +1517,7 @@
         </div>
 
         <!-- Model Restriction Section for Bedrock -->
-        <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+        <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
           <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
           <!-- Mode Toggle -->
@@ -1526,10 +1526,10 @@
               type="button"
               @click="modelRestrictionMode = 'whitelist'"
               :class="[
-                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'whitelist'
-                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                  ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
               ]"
             >
               {{ t('admin.accounts.modelWhitelist') }}
@@ -1538,10 +1538,10 @@
               type="button"
               @click="modelRestrictionMode = 'mapping'"
               :class="[
-                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'mapping'
                   ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
               ]"
             >
               {{ t('admin.accounts.modelMapping') }}
@@ -1586,7 +1586,7 @@
         </div>
 
         <!-- Pool Mode Section for Bedrock -->
-        <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+        <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
@@ -1598,20 +1598,20 @@
               type="button"
               @click="poolModeEnabled = !poolModeEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                poolModeEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                poolModeEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   poolModeEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
             </button>
           </div>
-          <div v-if="poolModeEnabled" class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-            <p class="text-xs text-blue-700 dark:text-blue-400">
+          <div v-if="poolModeEnabled" class="rounded-lg bg-[var(--bg-surface-alt)] p-3 bg-[var(--bg-surface-alt)]">
+            <p class="text-xs text-[var(--accent)] text-[var(--accent)]">
               <Icon name="exclamationCircle" size="sm" class="mr-1 inline" :stroke-width="2" />
               {{ t('admin.accounts.poolModeInfo') }}
             </p>
@@ -1641,7 +1641,7 @@
       <!-- 配额控制 (Anthropic apikey/bedrock: 配额限制 + 亲和) -->
       <div
         v-if="form.platform === 'anthropic' && (form.type === 'apikey' || form.type === 'bedrock')"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)] space-y-4"
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
@@ -1693,7 +1693,7 @@
       <!-- 配额控制 (非 Anthropic apikey/bedrock) -->
       <div
         v-else-if="form.type === 'apikey' || form.type === 'bedrock'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)] space-y-4"
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
@@ -1745,7 +1745,7 @@
       <!-- OpenAI OAuth Model Mapping (OAuth 类型没有 apikey 容器，需要独立的模型映射区域) -->
       <div
         v-if="form.platform === 'openai' && accountCategory === 'oauth-based'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
@@ -1765,10 +1765,10 @@
               type="button"
               @click="modelRestrictionMode = 'whitelist'"
               :class="[
-                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'whitelist'
-                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                  ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
               ]"
             >
               {{ t('admin.accounts.modelWhitelist') }}
@@ -1777,10 +1777,10 @@
               type="button"
               @click="modelRestrictionMode = 'mapping'"
               :class="[
-                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+                'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'mapping'
                   ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
               ]"
             >
               {{ t('admin.accounts.modelMapping') }}
@@ -1857,7 +1857,7 @@
             <button
               type="button"
               @click="addModelMapping"
-              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
             >
               + {{ t('admin.accounts.addMapping') }}
             </button>
@@ -1879,7 +1879,7 @@
       </div>
 
       <!-- Temp Unschedulable Rules -->
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)] space-y-4">
         <div class="mb-3 flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.tempUnschedulable.title') }}</label>
@@ -1891,13 +1891,13 @@
             type="button"
             @click="tempUnschedEnabled = !tempUnschedEnabled"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              tempUnschedEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              tempUnschedEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 tempUnschedEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -1905,8 +1905,8 @@
         </div>
 
         <div v-if="tempUnschedEnabled" class="space-y-3">
-          <div class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-              <p class="text-xs text-blue-700 dark:text-blue-400">
+          <div class="rounded-lg bg-[var(--bg-surface-alt)] p-3 bg-[var(--bg-surface-alt)]">
+              <p class="text-xs text-[var(--accent)] text-[var(--accent)]">
                 <Icon name="exclamationTriangle" size="sm" class="mr-1 inline" :stroke-width="2" />
                 {{ t('admin.accounts.tempUnschedulable.notice') }}
               </p>
@@ -1918,7 +1918,7 @@
               :key="preset.label"
               type="button"
               @click="addTempUnschedRule(preset.rule)"
-              class="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-300 dark:hover:bg-dark-500"
+              class="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500"
             >
               + {{ preset.label }}
             </button>
@@ -1928,7 +1928,7 @@
             <div
               v-for="(rule, index) in tempUnschedRules"
               :key="getTempUnschedRuleKey(rule)"
-              class="rounded-lg border border-gray-200 p-3 dark:border-dark-600"
+              class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
             >
               <div class="mb-2 flex items-center justify-between">
                 <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -2011,7 +2011,7 @@
           <button
             type="button"
             @click="addTempUnschedRule()"
-            class="w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 dark:border-dark-500 dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+            class="w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
           >
             <svg
               class="mr-1 inline h-4 w-4"
@@ -2029,7 +2029,7 @@
       <!-- Intercept Warmup Requests (Anthropic/Antigravity) -->
       <div
         v-if="form.platform === 'anthropic' || form.platform === 'antigravity'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2044,13 +2044,13 @@
             type="button"
             @click="interceptWarmupRequests = !interceptWarmupRequests"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              interceptWarmupRequests ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              interceptWarmupRequests ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 interceptWarmupRequests ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -2061,7 +2061,7 @@
       <!-- 配额控制 (Anthropic OAuth/SetupToken: 亲和 + 窗口费用 + 会话 + RPM 等) -->
       <div
         v-if="form.platform === 'anthropic' && accountCategory === 'oauth-based'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)] space-y-4"
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
@@ -2071,7 +2071,7 @@
         </div>
 
         <!-- Window Cost Limit -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.windowCost.label') }}</label>
@@ -2083,13 +2083,13 @@
               type="button"
               @click="windowCostEnabled = !windowCostEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                windowCostEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                windowCostEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   windowCostEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2131,7 +2131,7 @@
         </div>
 
         <!-- Session Limit -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionLimit.label') }}</label>
@@ -2143,13 +2143,13 @@
               type="button"
               @click="sessionLimitEnabled = !sessionLimitEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                sessionLimitEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                sessionLimitEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   sessionLimitEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2188,7 +2188,7 @@
         </div>
 
         <!-- RPM Limit -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.rpmLimit.label') }}</label>
@@ -2200,13 +2200,13 @@
               type="button"
               @click="rpmLimitEnabled = !rpmLimitEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                rpmLimitEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                rpmLimitEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   rpmLimitEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2235,10 +2235,10 @@
                   type="button"
                   @click="rpmStrategy = 'tiered'"
                   :class="[
-                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     rpmStrategy === 'tiered'
-                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                      ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                   ]"
                 >
                   <div class="text-center">
@@ -2250,10 +2250,10 @@
                   type="button"
                   @click="rpmStrategy = 'sticky_exempt'"
                   :class="[
-                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+                    'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     rpmStrategy === 'sticky_exempt'
-                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500'
+                      ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
                   ]"
                 >
                   <div class="text-center">
@@ -2291,8 +2291,8 @@
                 :class="[
                   'px-3 py-1.5 text-sm rounded-md border transition-colors',
                   userMsgQueueMode === opt.value
-                    ? 'bg-primary-600 text-white border-primary-600'
-                    : 'bg-white dark:bg-dark-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-dark-500 hover:bg-gray-50 dark:hover:bg-dark-600'
+                    ? 'bg-[var(--accent)] text-[var(--text-inverse)] border-[var(--border-focus)]'
+                    : 'bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] text-gray-700 dark:text-gray-300 border-gray-300 border-[var(--border-default)] hover:bg-gray-50 dark:hover:bg-dark-600'
                 ]">
                 {{ opt.label }}
               </button>
@@ -2301,7 +2301,7 @@
         </div>
 
         <!-- TLS Fingerprint -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.tlsFingerprint.label') }}</label>
@@ -2313,13 +2313,13 @@
               type="button"
               @click="tlsFingerprintEnabled = !tlsFingerprintEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                tlsFingerprintEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                tlsFingerprintEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   tlsFingerprintEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2336,7 +2336,7 @@
         </div>
 
         <!-- Session ID Masking -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionIdMasking.label') }}</label>
@@ -2348,13 +2348,13 @@
               type="button"
               @click="sessionIdMaskingEnabled = !sessionIdMaskingEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                sessionIdMaskingEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                sessionIdMaskingEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   sessionIdMaskingEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2363,7 +2363,7 @@
         </div>
 
         <!-- Cache TTL Override -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.cacheTTLOverride.label') }}</label>
@@ -2375,13 +2375,13 @@
               type="button"
               @click="cacheTTLOverrideEnabled = !cacheTTLOverrideEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                cacheTTLOverrideEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                cacheTTLOverrideEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   cacheTTLOverrideEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2391,7 +2391,7 @@
             <label class="input-label text-xs">{{ t('admin.accounts.quotaControl.cacheTTLOverride.target') }}</label>
             <select
               v-model="cacheTTLOverrideTarget"
-              class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-500 dark:bg-dark-700 dark:text-white"
+              class="mt-1 block w-full rounded-md border border-gray-300 bg-[var(--bg-surface)] px-3 py-2 text-sm focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]"
             >
               <option value="5m">5m</option>
               <option value="1h">1h</option>
@@ -2403,7 +2403,7 @@
         </div>
 
         <!-- Custom Base URL Relay -->
-        <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+        <div class="rounded-lg border border-gray-200 p-4 border-[var(--border-default)]">
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.customBaseUrl.label') }}</label>
@@ -2415,13 +2415,13 @@
               type="button"
               @click="customBaseUrlEnabled = !customBaseUrlEnabled"
               :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                customBaseUrlEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+                customBaseUrlEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <span
                 :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                   customBaseUrlEnabled ? 'translate-x-5' : 'translate-x-0'
                 ]"
               />
@@ -2473,7 +2473,7 @@
           <p class="input-hint">{{ t('admin.accounts.billingRateMultiplierHint') }}</p>
         </div>
       </div>
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <label class="input-label">{{ t('admin.accounts.expiresAt') }}</label>
         <input v-model="expiresAtInput" type="datetime-local" class="input" />
         <p class="input-hint">{{ t('admin.accounts.expiresAtHint') }}</p>
@@ -2482,7 +2482,7 @@
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
         v-if="form.platform === 'openai'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2495,13 +2495,13 @@
             type="button"
             @click="openaiPassthroughEnabled = !openaiPassthroughEnabled"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              openaiPassthroughEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              openaiPassthroughEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 openaiPassthroughEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -2512,7 +2512,7 @@
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
       <div
         v-if="form.platform === 'openai' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2533,7 +2533,7 @@
       <!-- Anthropic API Key 自动透传开关 -->
       <div
         v-if="form.platform === 'anthropic' && accountCategory === 'apikey'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2546,13 +2546,13 @@
             type="button"
             @click="anthropicPassthroughEnabled = !anthropicPassthroughEnabled"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              anthropicPassthroughEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              anthropicPassthroughEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 anthropicPassthroughEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -2563,7 +2563,7 @@
       <!-- Anthropic API Key: Web Search Emulation (hidden when global disabled) -->
       <div
         v-if="form.platform === 'anthropic' && accountCategory === 'apikey' && webSearchGlobalEnabled"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2583,7 +2583,7 @@
       <!-- OpenAI OAuth Codex 官方客户端限制开关 -->
       <div
         v-if="form.platform === 'openai' && accountCategory === 'oauth-based'"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)]"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2596,13 +2596,13 @@
             type="button"
             @click="codexCLIOnlyEnabled = !codexCLIOnlyEnabled"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              codexCLIOnlyEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              codexCLIOnlyEnabled ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 codexCLIOnlyEnabled ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -2613,7 +2613,7 @@
       <!-- OpenAI Compact 能力配置 -->
       <div
         v-if="form.platform === 'openai' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
-        class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
+        class="border-t border-gray-200 pt-4 border-[var(--border-default)] space-y-4"
       >
         <div class="flex items-center justify-between">
           <div>
@@ -2663,13 +2663,13 @@
             type="button"
             @click="autoPauseOnExpired = !autoPauseOnExpired"
             :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              autoPauseOnExpired ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              autoPauseOnExpired ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-5 w-5 transform rounded-md bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 autoPauseOnExpired ? 'translate-x-5' : 'translate-x-0'
               ]"
             />
@@ -2677,14 +2677,14 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
+      <div class="border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <!-- Mixed Scheduling (only for antigravity accounts) -->
         <div v-if="form.platform === 'antigravity'" class="flex items-center gap-2">
           <label class="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
               v-model="mixedScheduling"
-              class="h-4 w-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500 dark:border-dark-500"
+              class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t('admin.accounts.mixedScheduling') }}
@@ -2692,13 +2692,13 @@
           </label>
           <div class="group relative">
             <span
-              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500"
+              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500"
             >
               ?
             </span>
             <!-- Tooltip（向下显示避免被弹窗裁剪） -->
             <div
-              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
             >
               {{ t('admin.accounts.mixedSchedulingTooltip') }}
               <div
@@ -2712,7 +2712,7 @@
             <input
               type="checkbox"
               v-model="allowOverages"
-              class="h-4 w-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500 dark:border-dark-500"
+              class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t('admin.accounts.allowOverages') }}
@@ -2720,12 +2720,12 @@
           </label>
           <div class="group relative">
             <span
-              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 dark:bg-dark-600 dark:text-gray-400 dark:hover:bg-dark-500"
+              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500"
             >
               ?
             </span>
             <div
-              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
             >
               {{ t('admin.accounts.allowOveragesTooltip') }}
               <div
@@ -2868,7 +2868,7 @@
     <div class="space-y-6">
       <!-- Setup Guide Section -->
       <div>
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.accounts.gemini.setupGuide.title') }}
         </h3>
         <div class="space-y-4">
@@ -2894,7 +2894,7 @@
                 href="https://policies.google.com/terms"
                 target="_blank"
                 rel="noreferrer"
-                class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 {{ t('admin.accounts.gemini.setupGuide.links.countryCheck') }}
               </a>
@@ -2903,7 +2903,7 @@
                 href="https://policies.google.com/country-association-form"
                 target="_blank"
                 rel="noreferrer"
-                class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 修改归属地
               </a>
@@ -2912,7 +2912,7 @@
                 href="https://gemini.google.com/gems/create?hl=en-US&pli=1"
                 target="_blank"
                 rel="noreferrer"
-                class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 {{ t('admin.accounts.gemini.setupGuide.links.geminiWebActivation') }}
               </a>
@@ -2921,7 +2921,7 @@
                 href="https://console.cloud.google.com"
                 target="_blank"
                 rel="noreferrer"
-                class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
               >
                 {{ t('admin.accounts.gemini.setupGuide.links.gcpProject') }}
               </a>
@@ -2931,8 +2931,8 @@
       </div>
 
       <!-- Quota Policy Section -->
-      <div class="border-t border-gray-200 pt-6 dark:border-dark-600">
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+      <div class="border-t border-gray-200 pt-6 border-[var(--border-default)]">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.accounts.gemini.quotaPolicy.title') }}
         </h3>
         <p class="mb-4 text-xs text-amber-600 dark:text-amber-400">
@@ -2940,7 +2940,7 @@
         </p>
         <div class="overflow-x-auto">
           <table class="w-full text-xs">
-            <thead class="bg-gray-50 dark:bg-dark-600">
+            <thead class="bg-gray-50 bg-[var(--bg-surface-alt)]">
               <tr>
                 <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.accounts.gemini.quotaPolicy.columns.channel') }}
@@ -2955,7 +2955,7 @@
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-dark-600">
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white">
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.channel') }}
                 </td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Free</td>
@@ -2964,21 +2964,21 @@
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white"></td>
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Pro</td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.limitsPro') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white"></td>
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Ultra</td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.limitsUltra') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white">
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.gcp.channel') }}
                 </td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Standard</td>
@@ -2987,14 +2987,14 @@
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white"></td>
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Enterprise</td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.gcp.limitsEnterprise') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white">
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.aiStudio.channel') }}
                 </td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Free</td>
@@ -3003,7 +3003,7 @@
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-white"></td>
+                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Paid</td>
                 <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.aiStudio.limitsPaid') }}
@@ -3017,7 +3017,7 @@
             :href="geminiQuotaDocs.codeAssist"
             target="_blank"
             rel="noreferrer"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
           >
             {{ t('admin.accounts.gemini.quotaPolicy.docs.codeAssist') }}
           </a>
@@ -3025,7 +3025,7 @@
             :href="geminiQuotaDocs.aiStudio"
             target="_blank"
             rel="noreferrer"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
           >
             {{ t('admin.accounts.gemini.quotaPolicy.docs.aiStudio') }}
           </a>
@@ -3033,7 +3033,7 @@
             :href="geminiQuotaDocs.vertex"
             target="_blank"
             rel="noreferrer"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
           >
             {{ t('admin.accounts.gemini.quotaPolicy.docs.vertex') }}
           </a>
@@ -3041,8 +3041,8 @@
       </div>
 
       <!-- API Key Links Section -->
-      <div class="border-t border-gray-200 pt-6 dark:border-dark-600">
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+      <div class="border-t border-gray-200 pt-6 border-[var(--border-default)]">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.accounts.gemini.helpDialog.apiKeySection') }}
         </h3>
         <div class="flex flex-wrap gap-3">
@@ -3050,7 +3050,7 @@
             :href="geminiHelpLinks.apiKey"
             target="_blank"
             rel="noreferrer"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
           >
             {{ t('admin.accounts.gemini.accountType.apiKeyLink') }}
           </a>
@@ -3058,7 +3058,7 @@
             :href="geminiHelpLinks.aiStudioPricing"
             target="_blank"
             rel="noreferrer"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="text-sm text-[var(--accent)] hover:underline text-[var(--accent)]"
           >
             {{ t('admin.accounts.gemini.accountType.quotaLink') }}
           </a>

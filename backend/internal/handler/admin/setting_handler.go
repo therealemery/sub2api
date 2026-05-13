@@ -183,6 +183,7 @@ func (h *SettingHandler) GetSettings(c *gin.Context) {
 		TablePageSizeOptions:                   settings.TablePageSizeOptions,
 		CustomMenuItems:                        dto.ParseCustomMenuItems(settings.CustomMenuItems),
 		CustomEndpoints:                        dto.ParseCustomEndpoints(settings.CustomEndpoints),
+		ModelCenterConfig:                      dto.ParseRawJSONObject(settings.ModelCenterConfig),
 		DefaultConcurrency:                     settings.DefaultConcurrency,
 		DefaultBalance:                         settings.DefaultBalance,
 		AffiliateRebateRate:                    settings.AffiliateRebateRate,
@@ -383,6 +384,7 @@ type UpdateSettingsRequest struct {
 	TablePageSizeOptions        []int                 `json:"table_page_size_options"`
 	CustomMenuItems             *[]dto.CustomMenuItem `json:"custom_menu_items"`
 	CustomEndpoints             *[]dto.CustomEndpoint `json:"custom_endpoints"`
+	ModelCenterConfig           *json.RawMessage      `json:"model_center_config"`
 
 	// 默认配置
 	DefaultConcurrency                       int                               `json:"default_concurrency"`
@@ -1096,6 +1098,24 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		customEndpointsJSON = string(endpointBytes)
 	}
 
+	modelCenterConfigJSON := previousSettings.ModelCenterConfig
+	if req.ModelCenterConfig != nil {
+		raw := strings.TrimSpace(string(*req.ModelCenterConfig))
+		if raw == "" {
+			raw = "{}"
+		}
+		if len(raw) > 64*1024 {
+			response.BadRequest(c, "Model center config is too large (max 64KB)")
+			return
+		}
+		var value map[string]any
+		if err := json.Unmarshal([]byte(raw), &value); err != nil {
+			response.BadRequest(c, "Model center config must be a valid JSON object")
+			return
+		}
+		modelCenterConfigJSON = raw
+	}
+
 	// Ops metrics collector interval validation (seconds).
 	if req.OpsMetricsIntervalSeconds != nil {
 		v := *req.OpsMetricsIntervalSeconds
@@ -1214,6 +1234,7 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		TablePageSizeOptions:             req.TablePageSizeOptions,
 		CustomMenuItems:                  customMenuJSON,
 		CustomEndpoints:                  customEndpointsJSON,
+		ModelCenterConfig:                modelCenterConfigJSON,
 		DefaultConcurrency:               req.DefaultConcurrency,
 		DefaultBalance:                   req.DefaultBalance,
 		AffiliateRebateRate:              affiliateRebateRate,
@@ -1552,6 +1573,7 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		TablePageSizeOptions:                   updatedSettings.TablePageSizeOptions,
 		CustomMenuItems:                        dto.ParseCustomMenuItems(updatedSettings.CustomMenuItems),
 		CustomEndpoints:                        dto.ParseCustomEndpoints(updatedSettings.CustomEndpoints),
+		ModelCenterConfig:                      dto.ParseRawJSONObject(updatedSettings.ModelCenterConfig),
 		DefaultConcurrency:                     updatedSettings.DefaultConcurrency,
 		DefaultBalance:                         updatedSettings.DefaultBalance,
 		AffiliateRebateRate:                    updatedSettings.AffiliateRebateRate,
@@ -1623,6 +1645,52 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		payload.OpenAIFastPolicySettings = openaiFastPolicySettingsToDTO(fastPolicy)
 	}
 	response.Success(c, systemSettingsResponseData(payload, updatedAuthSourceDefaults))
+}
+
+type UpdateModelCenterConfigRequest struct {
+	ModelCenterConfig json.RawMessage `json:"model_center_config"`
+}
+
+// PUT /api/v1/admin/settings/model-center
+func (h *SettingHandler) UpdateModelCenterConfig(c *gin.Context) {
+	var req UpdateModelCenterConfigRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+
+	modelCenterConfigJSON, message := normalizeModelCenterConfigJSON(req.ModelCenterConfig)
+	if message != "" {
+		response.BadRequest(c, message)
+		return
+	}
+
+	previousSettings, err := h.settingService.GetAllSettings(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	previousAuthSourceDefaults, err := h.settingService.GetAuthSourceDefaultSettings(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+
+	nextSettings := *previousSettings
+	nextSettings.ModelCenterConfig = modelCenterConfigJSON
+
+	if err := h.settingService.UpdateSettingsWithAuthSourceDefaults(c.Request.Context(), &nextSettings, previousAuthSourceDefaults); err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+
+	h.auditSettingsUpdate(c, previousSettings, &nextSettings, previousAuthSourceDefaults, previousAuthSourceDefaults, UpdateSettingsRequest{
+		ModelCenterConfig: &req.ModelCenterConfig,
+	})
+
+	response.Success(c, gin.H{
+		"model_center_config": dto.ParseRawJSONObject(nextSettings.ModelCenterConfig),
+	})
 }
 
 // hasPaymentFields returns true if any payment-related field was explicitly provided.
@@ -1949,6 +2017,9 @@ func diffSettings(before *service.SystemSettings, after *service.SystemSettings,
 	if before.CustomEndpoints != after.CustomEndpoints {
 		changed = append(changed, "custom_endpoints")
 	}
+	if before.ModelCenterConfig != after.ModelCenterConfig {
+		changed = append(changed, "model_center_config")
+	}
 	if before.EnableFingerprintUnification != after.EnableFingerprintUnification {
 		changed = append(changed, "enable_fingerprint_unification")
 	}
@@ -2095,6 +2166,21 @@ func boolValueOrDefault(value *bool, fallback bool) bool {
 		return fallback
 	}
 	return *value
+}
+
+func normalizeModelCenterConfigJSON(raw json.RawMessage) (string, string) {
+	value := strings.TrimSpace(string(raw))
+	if value == "" {
+		value = "{}"
+	}
+	if len(value) > 64*1024 {
+		return "", "Model center config is too large (max 64KB)"
+	}
+	var object map[string]any
+	if err := json.Unmarshal([]byte(value), &object); err != nil {
+		return "", "Model center config must be a valid JSON object"
+	}
+	return value, ""
 }
 
 func defaultSubscriptionsValueOrDefault(input *[]dto.DefaultSubscriptionSetting, fallback []service.DefaultSubscriptionSetting) []service.DefaultSubscriptionSetting {

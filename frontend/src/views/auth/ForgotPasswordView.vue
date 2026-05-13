@@ -3,17 +3,17 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('auth.forgotPasswordTitle') }}
         </h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-dark-400">
+        <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
           {{ t('auth.forgotPasswordHint') }}
         </p>
       </div>
 
       <!-- Success State -->
       <div v-if="isSubmitted" class="space-y-6">
-        <div class="rounded-xl border border-green-200 bg-green-50 p-6 dark:border-green-800/50 dark:bg-green-900/20">
+        <div class="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-800/50 dark:bg-green-900/20">
           <div class="flex flex-col items-center gap-4 text-center">
             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50">
               <Icon name="checkCircle" size="lg" class="text-green-600 dark:text-green-400" />
@@ -32,7 +32,7 @@
         <div class="text-center">
           <router-link
             to="/login"
-            class="inline-flex items-center gap-2 font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+            class="inline-flex items-center gap-2 font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
           >
             <Icon name="arrowLeft" size="sm" />
             {{ t('auth.backToLogin') }}
@@ -49,7 +49,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="mail" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="mail" size="md" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
             <input
               id="email"
@@ -85,7 +85,7 @@
         >
           <svg
             v-if="isLoading"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+            class="-ml-1 mr-2 h-4 w-4 animate-spin text-[var(--text-inverse)]"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -111,11 +111,11 @@
 
     <!-- Footer -->
     <template #footer>
-      <p class="text-gray-500 dark:text-dark-400">
+      <p class="text-gray-500 text-[var(--text-muted)]">
         {{ t('auth.rememberedPassword') }}
         <router-link
           to="/login"
-          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
         >
           {{ t('auth.signIn') }}
         </router-link>
@@ -271,7 +271,7 @@ async function handleSubmit(): Promise<void> {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,

@@ -1,9 +1,9 @@
 <template>
-  <component :is="isFullscreen ? 'div' : AppLayout" :class="isFullscreen ? 'flex min-h-screen flex-col justify-center bg-gray-50 dark:bg-dark-950' : ''">
+  <component :is="isFullscreen ? 'div' : AppLayout" :class="isFullscreen ? 'flex min-h-screen flex-col justify-center bg-gray-50 bg-[var(--bg-surface-alt)]' : ''">
     <div :class="[isFullscreen ? 'p-4 md:p-6' : '', 'space-y-6 pb-12']">
       <div
         v-if="errorMessage"
-        class="rounded-2xl bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400"
+        class="rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400"
       >
         {{ errorMessage }}
       </div>
@@ -39,69 +39,99 @@
         @exit-fullscreen="exitFullscreen"
       />
 
-      <!-- Row: Concurrency + Throughput -->
-      <div v-if="opsEnabled && !(loading && !hasLoadedOnce)" class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        <div class="lg:col-span-1 min-h-[360px]">
-          <OpsConcurrencyCard :platform-filter="platform" :group-id-filter="groupId" :refresh-token="dashboardRefreshToken" />
-        </div>
-        <div class="lg:col-span-1 min-h-[360px]">
-          <OpsSwitchRateTrendChart
-            :points="switchTrend?.points ?? []"
-            :loading="loadingSwitchTrend"
-            :time-range="switchTrendTimeRange"
-            :fullscreen="isFullscreen"
-          />
-        </div>
-        <div class="lg:col-span-2 min-h-[360px]">
-          <OpsThroughputTrendChart
-            :points="throughputTrend?.points ?? []"
-            :by-platform="throughputTrend?.by_platform ?? []"
-            :top-groups="throughputTrend?.top_groups ?? []"
-            :loading="loadingTrend"
-            :time-range="timeRange"
-            :fullscreen="isFullscreen"
-            @select-platform="handleThroughputSelectPlatform"
-            @select-group="handleThroughputSelectGroup"
-            @open-details="handleOpenRequestDetails"
-          />
-        </div>
-      </div>
-
-      <!-- Row: Visual Analysis (baseline 3-up grid) -->
-      <div v-if="opsEnabled && !(loading && !hasLoadedOnce)" class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <OpsLatencyChart :latency-data="latencyHistogram" :loading="loadingLatency" />
-        <OpsErrorDistributionChart
-          :data="errorDistribution"
-          :loading="loadingErrorDistribution"
-          @open-details="openErrorDetails('request')"
-        />
-        <OpsErrorTrendChart
-          :points="errorTrend?.points ?? []"
-          :loading="loadingErrorTrend"
-          :time-range="timeRange"
-          @open-request-errors="openErrorDetails('request')"
-          @open-upstream-errors="openErrorDetails('upstream')"
-        />
-      </div>
-
-      <!-- Row: OpenAI Token Stats -->
-      <div v-if="opsEnabled && showOpenAITokenStats && !(loading && !hasLoadedOnce)" class="grid grid-cols-1 gap-6">
-        <OpsOpenAITokenStatsCard
-          :platform-filter="platform"
-          :group-id-filter="groupId"
-          :refresh-token="dashboardRefreshToken"
-        />
-      </div>
-
-      <!-- Alert Events -->
-      <OpsAlertEventsCard v-if="opsEnabled && showAlertEvents && !(loading && !hasLoadedOnce)" />
-
-      <!-- System Logs -->
-      <OpsSystemLogTable
+      <section
         v-if="opsEnabled && !(loading && !hasLoadedOnce)"
-        :platform-filter="platform"
-        :refresh-token="dashboardRefreshToken"
-      />
+        class="ops-section space-y-6"
+      >
+        <div class="flex flex-col gap-1">
+          <h2 class="text-lg font-semibold text-gray-950 dark:text-[var(--text-inverse)]">流量与性能</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            查看并发、切换率、吞吐、延迟和错误分布，用来判断当前调用链路是否稳定。
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-4">
+          <div class="ops-panel min-h-[360px] lg:col-span-1">
+            <OpsConcurrencyCard :platform-filter="platform" :group-id-filter="groupId" :refresh-token="dashboardRefreshToken" />
+          </div>
+          <div class="ops-panel min-h-[360px] lg:col-span-1">
+            <OpsSwitchRateTrendChart
+              :points="switchTrend?.points ?? []"
+              :loading="loadingSwitchTrend"
+              :time-range="switchTrendTimeRange"
+              :fullscreen="isFullscreen"
+            />
+          </div>
+          <div class="ops-panel min-h-[360px] lg:col-span-2">
+            <OpsThroughputTrendChart
+              :points="throughputTrend?.points ?? []"
+              :by-platform="throughputTrend?.by_platform ?? []"
+              :top-groups="throughputTrend?.top_groups ?? []"
+              :loading="loadingTrend"
+              :time-range="timeRange"
+              :fullscreen="isFullscreen"
+              @select-platform="handleThroughputSelectPlatform"
+              @select-group="handleThroughputSelectGroup"
+              @open-details="handleOpenRequestDetails"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div class="ops-panel">
+            <OpsLatencyChart :latency-data="latencyHistogram" :loading="loadingLatency" />
+          </div>
+          <div class="ops-panel">
+            <OpsErrorDistributionChart
+              :data="errorDistribution"
+              :loading="loadingErrorDistribution"
+              @open-details="openErrorDetails('request')"
+            />
+          </div>
+          <div class="ops-panel">
+            <OpsErrorTrendChart
+              :points="errorTrend?.points ?? []"
+              :loading="loadingErrorTrend"
+              :time-range="timeRange"
+              @open-request-errors="openErrorDetails('request')"
+              @open-upstream-errors="openErrorDetails('upstream')"
+            />
+          </div>
+        </div>
+
+        <div v-if="showOpenAITokenStats" class="grid grid-cols-1 gap-5">
+          <div class="ops-panel">
+            <OpsOpenAITokenStatsCard
+              :platform-filter="platform"
+              :group-id-filter="groupId"
+              :refresh-token="dashboardRefreshToken"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        v-if="opsEnabled && !(loading && !hasLoadedOnce)"
+        class="ops-section space-y-6"
+      >
+        <div class="flex flex-col gap-1">
+          <h2 class="text-lg font-semibold text-gray-950 dark:text-[var(--text-inverse)]">告警与日志</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            汇总最近告警、请求错误和系统日志，方便定位需要处理的异常。
+          </p>
+        </div>
+
+        <div v-if="showAlertEvents" class="ops-panel">
+          <OpsAlertEventsCard />
+        </div>
+
+        <div class="ops-panel">
+          <OpsSystemLogTable
+            :platform-filter="platform"
+            :refresh-token="dashboardRefreshToken"
+          />
+        </div>
+      </section>
 
       <!-- Settings Dialog (hidden in fullscreen mode) -->
       <template v-if="!isFullscreen">

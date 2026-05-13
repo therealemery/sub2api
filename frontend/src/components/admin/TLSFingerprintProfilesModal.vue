@@ -23,10 +23,10 @@
       </div>
 
       <div v-else-if="profiles.length === 0" class="py-8 text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-dark-700">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 bg-[var(--bg-surface-alt)]">
           <Icon name="shield" size="lg" class="text-gray-400" />
         </div>
-        <h4 class="mb-1 text-sm font-medium text-gray-900 dark:text-white">
+        <h4 class="mb-1 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('admin.tlsFingerprintProfiles.noProfiles') }}
         </h4>
         <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -34,9 +34,9 @@
         </p>
       </div>
 
-      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 dark:border-dark-600">
+      <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-700">
-          <thead class="sticky top-0 bg-gray-50 dark:bg-dark-700">
+          <thead class="sticky top-0 bg-gray-50 bg-[var(--bg-surface-alt)]">
             <tr>
               <th class="px-3 py-2 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                 {{ t('admin.tlsFingerprintProfiles.columns.name') }}
@@ -55,10 +55,10 @@
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-800">
+          <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
             <tr v-for="profile in profiles" :key="profile.id" class="hover:bg-gray-50 dark:hover:bg-dark-700">
               <td class="px-3 py-2">
-                <div class="font-medium text-gray-900 dark:text-white text-sm">{{ profile.name }}</div>
+                <div class="font-medium text-gray-900 dark:text-[var(--text-inverse)] text-sm">{{ profile.name }}</div>
               </td>
               <td class="px-3 py-2">
                 <div v-if="profile.description" class="text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
@@ -92,7 +92,7 @@
                 <div class="flex items-center gap-1">
                   <button
                     @click="handleEdit(profile)"
-                    class="p-1 text-gray-500 hover:text-primary-600 dark:hover:text-primary-400"
+                    class="p-1 text-gray-500 hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
                     :title="t('common.edit')"
                   >
                     <Icon name="edit" size="sm" />
@@ -150,7 +150,7 @@
           </div>
         </div>
 
-        <hr class="border-gray-200 dark:border-dark-600" />
+        <hr class="border-gray-200 border-[var(--border-default)]" />
 
         <!-- Basic Info -->
         <div class="grid grid-cols-2 gap-4">
@@ -181,13 +181,13 @@
             type="button"
             @click="form.enable_grease = !form.enable_grease"
             :class="[
-              'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              form.enable_grease ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
+              'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              form.enable_grease ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]'
             ]"
           >
             <span
               :class="[
-                'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
                 form.enable_grease ? 'translate-x-4' : 'translate-x-0'
               ]"
             />

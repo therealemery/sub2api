@@ -7,6 +7,7 @@ import { resolveDocumentTitle } from '@/router/title'
 import AnnouncementPopup from '@/components/common/AnnouncementPopup.vue'
 import { useAppStore, useAuthStore, useSubscriptionStore, useAnnouncementStore } from '@/stores'
 import { getSetupStatus } from '@/api/setup'
+import { DEFAULT_SITE_LOGO, resolveThemedSiteLogoPath } from '@/constants/branding'
 
 const router = useRouter()
 const route = useRoute()
@@ -27,20 +28,28 @@ function updateFavicon(logoUrl: string) {
     link.rel = 'icon'
     document.head.appendChild(link)
   }
-  link.type = logoUrl.endsWith('.svg') ? 'image/svg+xml' : 'image/x-icon'
+  const logoPath = logoUrl.split(/[?#]/)[0]
+  link.type = logoPath.endsWith('.svg') ? 'image/svg+xml' : logoPath.endsWith('.png') ? 'image/png' : 'image/x-icon'
   link.href = logoUrl
+}
+
+function resolveCurrentFavicon(): string {
+  return resolveThemedSiteLogoPath(
+    appStore.siteLogo || DEFAULT_SITE_LOGO,
+    document.documentElement.classList.contains('dark')
+  )
 }
 
 // Watch for site settings changes and update favicon/title
 watch(
   () => appStore.siteLogo,
-  (newLogo) => {
-    if (newLogo) {
-      updateFavicon(newLogo)
-    }
+  () => {
+    updateFavicon(resolveCurrentFavicon())
   },
   { immediate: true }
 )
+
+let themeObserver: MutationObserver | null = null
 
 // Watch for authentication state and manage subscription data + announcements
 function onVisibilityChange() {
@@ -89,9 +98,19 @@ router.afterEach(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', onVisibilityChange)
+  themeObserver?.disconnect()
+  themeObserver = null
 })
 
 onMounted(async () => {
+  themeObserver = new MutationObserver(() => {
+    updateFavicon(resolveCurrentFavicon())
+  })
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class', 'data-theme']
+  })
+
   // Check if setup is needed
   try {
     const status = await getSetupStatus()
@@ -108,6 +127,7 @@ onMounted(async () => {
 
   // Re-resolve document title now that siteName is available
   document.title = resolveDocumentTitle(route.meta.title, appStore.siteName, route.meta.titleKey as string)
+  updateFavicon(resolveCurrentFavicon())
 })
 </script>
 

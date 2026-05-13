@@ -4,12 +4,12 @@
       <div class="card p-6">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.backup.s3.title') }}
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {{ t('admin.backup.s3.descriptionPrefix') }}
-              <button type="button" class="text-primary-600 underline hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300" @click="showR2Guide = true">Cloudflare R2</button>
+              <button type="button" class="text-[var(--accent)] underline hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]" @click="showR2Guide = true">Cloudflare R2</button>
               {{ t('admin.backup.s3.descriptionSuffix') }}
             </p>
           </div>
@@ -57,7 +57,7 @@
       <!-- Schedule Config -->
       <div class="card p-6">
         <div class="mb-4">
-          <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+          <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('admin.backup.schedule.title') }}
           </h3>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -96,7 +96,7 @@
       <div class="card p-6">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.backup.operations.title') }}
             </h3>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -120,7 +120,7 @@
         <div class="overflow-x-auto">
           <table class="w-full min-w-[800px] text-sm">
             <thead>
-              <tr class="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500 dark:border-dark-700 dark:text-gray-400">
+              <tr class="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500 border-[var(--border-default)] dark:text-gray-400">
                 <th class="py-2 pr-4">ID</th>
                 <th class="py-2 pr-4">{{ t('admin.backup.columns.status') }}</th>
                 <th class="py-2 pr-4">{{ t('admin.backup.columns.fileName') }}</th>
@@ -132,7 +132,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="record in backups" :key="record.id" class="border-b border-gray-100 align-top dark:border-dark-800">
+              <tr v-for="record in backups" :key="record.id" class="border-b border-gray-100 align-top border-[var(--border-default)]">
                 <td class="py-3 pr-4 font-mono text-xs">{{ record.id }}</td>
                 <td class="py-3 pr-4">
                   <span
@@ -198,18 +198,18 @@
       <transition name="modal">
         <div v-if="showR2Guide" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showR2Guide = false">
           <div class="fixed inset-0 bg-black/50" @click="showR2Guide = false"></div>
-          <div class="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-2xl dark:bg-dark-800">
+          <div class="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]">
             <button type="button" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" @click="showR2Guide = false">
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
-            <h2 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">{{ t('admin.backup.r2Guide.title') }}</h2>
+            <h2 class="mb-4 text-lg font-bold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.backup.r2Guide.title') }}</h2>
             <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">{{ t('admin.backup.r2Guide.intro') }}</p>
 
             <!-- Step 1 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">1</span>
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-surface-alt)] text-xs font-bold text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]">1</span>
                 {{ t('admin.backup.r2Guide.step1.title') }}
               </h3>
               <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600 dark:text-gray-300">
@@ -221,8 +221,8 @@
 
             <!-- Step 2 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">2</span>
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-surface-alt)] text-xs font-bold text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]">2</span>
                 {{ t('admin.backup.r2Guide.step2.title') }}
               </h3>
               <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600 dark:text-gray-300">
@@ -238,25 +238,25 @@
 
             <!-- Step 3 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">3</span>
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-surface-alt)] text-xs font-bold text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]">3</span>
                 {{ t('admin.backup.r2Guide.step3.title') }}
               </h3>
               <p class="ml-8 text-sm text-gray-600 dark:text-gray-300">{{ t('admin.backup.r2Guide.step3.desc') }}</p>
-              <code class="ml-8 mt-1 block rounded bg-gray-100 px-3 py-2 text-xs text-gray-800 dark:bg-dark-700 dark:text-gray-200">https://&lt;{{ t('admin.backup.r2Guide.step3.accountId') }}&gt;.r2.cloudflarestorage.com</code>
+              <code class="ml-8 mt-1 block rounded bg-gray-100 px-3 py-2 text-xs text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-200">https://&lt;{{ t('admin.backup.r2Guide.step3.accountId') }}&gt;.r2.cloudflarestorage.com</code>
             </div>
 
             <!-- Step 4: Fill form -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">4</span>
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-surface-alt)] text-xs font-bold text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]">4</span>
                 {{ t('admin.backup.r2Guide.step4.title') }}
               </h3>
-              <div class="ml-8 overflow-hidden rounded-lg border border-gray-200 dark:border-dark-600">
+              <div class="ml-8 overflow-hidden rounded-lg border border-gray-200 border-[var(--border-default)]">
                 <table class="w-full text-sm">
                   <tbody>
-                    <tr v-for="(row, i) in r2ConfigRows" :key="i" class="border-b border-gray-100 dark:border-dark-700 last:border-0">
-                      <td class="whitespace-nowrap bg-gray-50 px-3 py-2 font-medium text-gray-700 dark:bg-dark-700 dark:text-gray-300">{{ row.field }}</td>
+                    <tr v-for="(row, i) in r2ConfigRows" :key="i" class="border-b border-gray-100 border-[var(--border-default)] last:border-0">
+                      <td class="whitespace-nowrap bg-gray-50 px-3 py-2 font-medium text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300">{{ row.field }}</td>
                       <td class="px-3 py-2 text-gray-600 dark:text-gray-400"><code class="text-xs">{{ row.value }}</code></td>
                     </tr>
                   </tbody>
@@ -581,11 +581,11 @@ function statusClass(status: string): string {
     case 'completed':
       return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
     case 'running':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+      return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
     case 'failed':
       return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
     default:
-      return 'bg-gray-100 text-gray-700 dark:bg-dark-800 dark:text-gray-300'
+      return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300'
   }
 }
 

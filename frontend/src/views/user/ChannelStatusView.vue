@@ -1,23 +1,30 @@
 <template>
   <AppLayout>
-    <MonitorHero
-      :overall-status="overallStatus"
-      :interval-seconds="DEFAULT_INTERVAL_SECONDS"
-      :window="currentWindow"
-      :loading="loading"
-      :auto-refresh="autoRefresh"
-      @update:window="handleWindowChange"
-      @refresh="manualReload"
-    />
+    <div class="space-y-6">
+      <PageIntro
+        title="渠道状态"
+        description="查看主流模型渠道的可用性、延迟和最近检查结果，帮助判断当前调用体验是否稳定。"
+      />
 
-    <MonitorCardGrid
-      :items="items"
-      :window="currentWindow"
-      :countdown-seconds="countdown"
-      :loading="loading"
-      :detail-cache="detailCache"
-      @card-click="openDetail"
-    />
+      <MonitorHero
+        :overall-status="overallStatus"
+        :interval-seconds="DEFAULT_INTERVAL_SECONDS"
+        :window="currentWindow"
+        :loading="loading"
+        :auto-refresh="autoRefresh"
+        @update:window="handleWindowChange"
+        @refresh="manualReload"
+      />
+
+      <MonitorCardGrid
+        :items="items"
+        :window="currentWindow"
+        :countdown-seconds="countdown"
+        :loading="loading"
+        :detail-cache="detailCache"
+        @card-click="openDetail"
+      />
+    </div>
 
     <MonitorDetailDialog
       :show="showDetail"
@@ -40,6 +47,7 @@ import {
   type UserMonitorDetail,
 } from '@/api/channelMonitor'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import MonitorHero, {
   type MonitorWindow,
   type OverallStatus,

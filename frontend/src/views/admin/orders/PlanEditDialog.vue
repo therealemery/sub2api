@@ -15,14 +15,14 @@
             </template>
             <template #option="{ option, selected }">
               <span class="flex-1 truncate text-left" :class="option.platform ? platformTextClass(String(option.platform)) : ''">{{ option.label }}</span>
-              <Icon v-if="selected" name="check" size="sm" class="text-primary-500" :stroke-width="2" />
+              <Icon v-if="selected" name="check" size="sm" class="text-[var(--accent)]" :stroke-width="2" />
             </template>
           </Select>
         </div>
       </div>
 
       <!-- Group Info Preview -->
-      <div v-if="selectedGroupInfo" class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-dark-600 dark:bg-dark-800">
+      <div v-if="selectedGroupInfo" class="rounded-lg border border-gray-200 bg-gray-50 p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
         <div class="mb-2 flex items-center gap-2">
           <GroupBadge :name="selectedGroupInfo.name" :platform="selectedGroupInfo.platform" :rate-multiplier="selectedGroupInfo.rate_multiplier" />
         </div>
@@ -55,13 +55,13 @@
         <button
           type="button"
           :class="[
-            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-            planForm.for_sale ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600'
+            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+            planForm.for_sale ? 'bg-[var(--accent)]' : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
           ]"
           @click="planForm.for_sale = !planForm.for_sale"
         >
           <span :class="[
-            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
             planForm.for_sale ? 'translate-x-5' : 'translate-x-0'
           ]" />
         </button>

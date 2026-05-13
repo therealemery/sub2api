@@ -18,11 +18,12 @@
               {{ title }}
             </h3>
             <button
+              type="button"
               @click="emit('close')"
-              class="-mr-2 rounded-xl p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-dark-500 dark:hover:bg-dark-700 dark:hover:text-dark-300"
-              aria-label="Close modal"
+              class="modal-close-button"
+              aria-label="关闭弹窗"
             >
-              <Icon name="x" size="md" />
+              <Icon name="x" size="xl" :stroke-width="2.8" />
             </button>
           </div>
 

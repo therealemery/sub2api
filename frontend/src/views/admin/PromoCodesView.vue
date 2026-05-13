@@ -75,7 +75,7 @@
           </template>
 
           <template #cell-bonus_amount="{ value }">
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
+            <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
               ${{ value.toFixed(2) }}
             </span>
           </template>
@@ -98,13 +98,13 @@
           </template>
 
           <template #cell-expires_at="{ value }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">
               {{ value ? formatDateTime(value) : t('admin.promo.neverExpires') }}
             </span>
           </template>
 
           <template #cell-created_at="{ value }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">
               {{ formatDateTime(value) }}
             </span>
           </template>
@@ -120,7 +120,7 @@
               </button>
               <button
                 @click="handleViewUsages(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
                 :title="t('admin.promo.viewUsages')"
               >
                 <Icon name="eye" size="sm" />
@@ -330,14 +330,14 @@
         <div
           v-for="usage in usages"
           :key="usage.id"
-          class="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600"
+          class="flex items-center justify-between rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
         >
           <div class="flex items-center gap-3">
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <Icon name="user" size="sm" class="text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
+              <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                 {{ usage.user?.email || t('admin.promo.userPrefix', { id: usage.user_id }) }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400">

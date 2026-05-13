@@ -1,6 +1,6 @@
 <template>
   <div class="card p-4">
-    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
       {{ t('payment.admin.topUsers') }}
     </h3>
     <div
@@ -26,7 +26,7 @@
           </span>
           <span class="text-sm text-gray-700 dark:text-gray-300">{{ user.email }}</span>
         </div>
-        <span class="text-sm font-medium text-gray-900 dark:text-white">
+        <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
           ${{ user.amount.toFixed(2) }}
         </span>
       </div>
@@ -47,6 +47,6 @@ function rankClass(idx: number): string {
   if (idx === 0) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
   if (idx === 1) return 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
   if (idx === 2) return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-  return 'bg-gray-100 text-gray-500 dark:bg-dark-700 dark:text-gray-400'
+  return 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
 }
 </script>

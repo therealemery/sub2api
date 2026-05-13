@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50/50 dark:bg-dark-700/30">
+  <div class="bg-gray-50/50 bg-[var(--bg-surface-alt)]">
     <div v-if="loading" class="flex items-center justify-center py-3">
       <LoadingSpinner />
     </div>

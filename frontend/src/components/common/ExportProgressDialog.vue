@@ -6,16 +6,16 @@
       </div>
       <div class="flex items-center justify-between text-sm text-gray-700 dark:text-gray-300">
         <span>{{ t('usage.exportedCount', { current, total }) }}</span>
-        <span class="font-medium text-gray-900 dark:text-white">{{ normalizedProgress }}%</span>
+        <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ normalizedProgress }}%</span>
       </div>
-      <div class="h-2 w-full rounded-full bg-gray-200 dark:bg-dark-700">
+      <div class="h-2 w-full rounded-full bg-gray-200 bg-[var(--bg-surface-alt)]">
         <div
           role="progressbar"
           :aria-valuenow="normalizedProgress"
           aria-valuemin="0"
           aria-valuemax="100"
           :aria-label="`${t('usage.exportingProgress')}: ${normalizedProgress}%`"
-          class="h-2 rounded-full bg-primary-600 transition-all"
+          class="h-2 rounded-full bg-[var(--accent)] transition-colors"
           :style="{ width: `${normalizedProgress}%` }"
         ></div>
       </div>
@@ -28,7 +28,7 @@
       <button
         @click="handleCancel"
         type="button"
-        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-200 dark:hover:bg-dark-600 dark:focus:ring-offset-dark-800"
+        class="rounded-md border border-gray-300 bg-[var(--bg-surface)] px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200 dark:hover:bg-dark-600 dark:focus:ring-offset-dark-800"
       >
         {{ t('usage.cancelExport') }}
       </button>

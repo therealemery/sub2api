@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-dark-600 dark:bg-dark-800">
+  <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
     <!-- Collapsed summary header (clickable) -->
     <div
       class="flex cursor-pointer select-none items-center gap-2"
@@ -19,9 +19,10 @@
           <span
             v-for="(m, i) in entry.models.slice(0, 3)"
             :key="i"
-            class="inline-flex shrink-0 rounded px-1.5 py-0.5 text-xs"
+            class="inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs"
             :class="getPlatformTagClass(props.platform || '')"
           >
+            <img v-if="getModelLogo(m)" :src="getModelLogo(m)" :alt="getModelDisplayName(m)" class="model-tag-logo" />
             {{ m }}
           </span>
           <span
@@ -40,7 +41,7 @@
 
         <!-- Billing mode badge -->
         <span
-          class="flex-shrink-0 rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+          class="flex-shrink-0 rounded-full bg-[var(--bg-surface-alt)] px-2 py-0.5 text-xs font-medium text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
         >
           {{ billingModeLabel }}
         </span>
@@ -136,7 +137,7 @@
                 {{ t('admin.channels.form.intervals', '上下文区间定价（可选）') }}
                 <span class="ml-1 font-normal text-gray-400">(min, max]</span>
               </label>
-              <button type="button" @click="addInterval" class="text-xs text-primary-600 hover:text-primary-700">
+              <button type="button" @click="addInterval" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
                 + {{ t('admin.channels.form.addInterval', '添加区间') }}
               </button>
             </div>
@@ -170,7 +171,7 @@
             <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
               {{ t('admin.channels.form.requestTiers', '按次计费层级') }}
             </label>
-            <button type="button" @click="addInterval" class="text-xs text-primary-600 hover:text-primary-700">
+            <button type="button" @click="addInterval" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
               + {{ t('admin.channels.form.addTier', '添加层级') }}
             </button>
           </div>
@@ -184,7 +185,7 @@
               @remove="removeInterval(idx)"
             />
           </div>
-          <div v-else class="mt-2 rounded border border-dashed border-gray-300 p-3 text-center text-xs text-gray-400 dark:border-dark-500">
+          <div v-else class="mt-2 rounded border border-dashed border-gray-300 p-3 text-center text-xs text-gray-400 border-[var(--border-default)]">
             {{ t('admin.channels.form.noTiersYet', '暂无层级，点击添加配置按次计费价格') }}
           </div>
         </div>
@@ -206,7 +207,7 @@
             <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
               {{ t('admin.channels.form.imageTiers', '图片计费层级（按次）') }}
             </label>
-            <button type="button" @click="addImageTier" class="text-xs text-primary-600 hover:text-primary-700">
+            <button type="button" @click="addImageTier" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
               + {{ t('admin.channels.form.addTier', '添加层级') }}
             </button>
           </div>
@@ -237,6 +238,7 @@ import type { PricingFormEntry, IntervalFormEntry } from './types'
 import { perTokenToMTok, getPlatformTagClass } from './types'
 import type { BillingMode } from '@/api/admin/channels'
 import channelsAPI from '@/api/admin/channels'
+import { getModelDisplayName, getModelLogo } from '@/constants/modelLogos'
 
 const { t } = useI18n()
 
@@ -350,5 +352,11 @@ async function onModelsUpdate(newModels: string[]) {
 
 .collapsible-inner {
   overflow: hidden;
+}
+
+.model-tag-logo {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
 }
 </style>

@@ -3,7 +3,7 @@
     <!-- Preview Box -->
     <div class="flex-shrink-0">
       <div
-        class="flex items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 dark:border-dark-600 dark:bg-dark-800"
+        class="flex items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         :class="[previewSizeClass, { 'border-solid': !!modelValue }]"
       >
         <!-- SVG mode: render inline -->
@@ -23,7 +23,7 @@
         <!-- Empty placeholder -->
         <svg
           v-else
-          class="text-gray-400 dark:text-dark-500"
+          class="text-gray-400 text-[var(--text-muted)]"
           :class="placeholderSizeClass"
           fill="none"
           viewBox="0 0 24 24"

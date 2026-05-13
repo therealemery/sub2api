@@ -51,11 +51,11 @@
           <template #cell-title="{ value, row }">
             <div class="min-w-0">
               <div class="flex items-center gap-2">
-                <span class="truncate font-medium text-gray-900 dark:text-white">{{ value }}</span>
+                <span class="truncate font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
               </div>
-              <div class="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-dark-400">
+              <div class="mt-1 flex items-center gap-2 text-xs text-gray-500 text-[var(--text-muted)]">
                 <span>#{{ row.id }}</span>
-                <span class="text-gray-300 dark:text-dark-700">·</span>
+                <span class="text-gray-300 text-[var(--text-muted)]">·</span>
                 <span>{{ formatDateTime(row.created_at) }}</span>
               </div>
             </div>
@@ -109,14 +109,14 @@
           </template>
 
           <template #cell-created_at="{ value }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">{{ formatDateTime(value) }}</span>
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">{{ formatDateTime(value) }}</span>
           </template>
 
           <template #cell-actions="{ row }">
             <div class="flex items-center space-x-1">
               <button
                 @click="openReadStatus(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
                 :title="t('admin.announcements.readStatus')"
               >
                 <Icon name="eye" size="sm" />

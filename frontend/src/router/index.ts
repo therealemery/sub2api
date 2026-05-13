@@ -38,6 +38,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/agent-recruitment',
+    name: 'AgentRecruitment',
+    component: () => import('@/views/AgentRecruitmentView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: '中转站代理招募'
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/auth/LoginView.vue'),
@@ -160,6 +169,17 @@ const routes: RouteRecordRaw[] = [
       title: 'Dashboard',
       titleKey: 'dashboard.title',
       descriptionKey: 'dashboard.welcomeMessage'
+    }
+  },
+  {
+    path: '/models',
+    name: 'Models',
+    component: () => import('@/views/user/ModelsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: '模型中心',
+      description: '查看主推模型与主流 AI 模型生态，进入 API 密钥页面完成调用配置。'
     }
   },
   {
@@ -409,6 +429,17 @@ const routes: RouteRecordRaw[] = [
       title: 'Channel Monitor',
       titleKey: 'admin.channelMonitor.title',
       descriptionKey: 'admin.channelMonitor.description'
+    }
+  },
+  {
+    path: '/admin/models',
+    name: 'AdminModelCenter',
+    component: () => import('@/views/admin/ModelCenterView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: '模型中心配置',
+      description: '管理前台模型中心展示内容和模型 logo，不改变真实模型调用逻辑。'
     }
   },
   {
@@ -766,7 +797,7 @@ router.beforeEach((to, _from, next) => {
   }
 
   // Backend mode: admin gets full access, non-admin blocked
-  if (appStore.backendModeEnabled) {
+  if (appStore.backendModeEnabled && !authStore.isLocalPreview) {
     if (authStore.isAuthenticated && authStore.isAdmin) {
       next()
       return

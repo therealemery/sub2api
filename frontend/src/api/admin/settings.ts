@@ -5,6 +5,17 @@
 
 import { apiClient } from "../client";
 import type { CustomMenuItem, CustomEndpoint, NotifyEmailEntry } from "@/types";
+import { DEFAULT_MODEL_CENTER_CONFIG, type ModelCenterConfig } from "@/constants/modelCenter";
+import { DEFAULT_SITE_LOGO } from "@/constants/branding";
+
+const LOCAL_PREVIEW_TOKEN_PREFIX = "local-preview-";
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem("auth_token")?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  );
+}
 
 export interface DefaultSubscriptionSetting {
   group_id: number;
@@ -350,6 +361,7 @@ export interface SystemSettings {
   backend_mode_enabled: boolean;
   custom_menu_items: CustomMenuItem[];
   custom_endpoints: CustomEndpoint[];
+  model_center_config?: ModelCenterConfig;
   // SMTP settings
   smtp_host: string;
   smtp_port: number;
@@ -541,6 +553,7 @@ export interface UpdateSettingsRequest {
   backend_mode_enabled?: boolean;
   custom_menu_items?: CustomMenuItem[];
   custom_endpoints?: CustomEndpoint[];
+  model_center_config?: ModelCenterConfig;
   smtp_host?: string;
   smtp_port?: number;
   smtp_username?: string;
@@ -658,11 +671,178 @@ export interface UpdateSettingsRequest {
   openai_fast_policy_settings?: OpenAIFastPolicySettings;
 }
 
+function previewSystemSettings(): SystemSettings {
+  return {
+    registration_enabled: true,
+    email_verify_enabled: false,
+    registration_email_suffix_whitelist: [],
+    promo_code_enabled: true,
+    password_reset_enabled: true,
+    frontend_url: "http://127.0.0.1:3000",
+    invitation_code_enabled: false,
+    totp_enabled: false,
+    totp_encryption_key_configured: false,
+    default_balance: 0,
+    affiliate_rebate_rate: 0.3,
+    affiliate_rebate_freeze_hours: 0,
+    affiliate_rebate_duration_days: 365,
+    affiliate_rebate_per_invitee_cap: 0,
+    default_concurrency: 10,
+    default_user_rpm_limit: 0,
+    default_subscriptions: [],
+    auth_source_default_email_balance: 0,
+    auth_source_default_email_concurrency: 5,
+    auth_source_default_email_subscriptions: [],
+    auth_source_default_email_grant_on_signup: false,
+    auth_source_default_email_grant_on_first_bind: false,
+    auth_source_default_linuxdo_balance: 0,
+    auth_source_default_linuxdo_concurrency: 5,
+    auth_source_default_linuxdo_subscriptions: [],
+    auth_source_default_linuxdo_grant_on_signup: false,
+    auth_source_default_linuxdo_grant_on_first_bind: false,
+    auth_source_default_oidc_balance: 0,
+    auth_source_default_oidc_concurrency: 5,
+    auth_source_default_oidc_subscriptions: [],
+    auth_source_default_oidc_grant_on_signup: false,
+    auth_source_default_oidc_grant_on_first_bind: false,
+    auth_source_default_wechat_balance: 0,
+    auth_source_default_wechat_concurrency: 5,
+    auth_source_default_wechat_subscriptions: [],
+    auth_source_default_wechat_grant_on_signup: false,
+    auth_source_default_wechat_grant_on_first_bind: false,
+    force_email_on_third_party_signup: false,
+    site_name: "OwnAPI",
+    site_logo: DEFAULT_SITE_LOGO,
+    site_subtitle: "畅用主流 AI 模型",
+    api_base_url: "https://ownapi.dev/v1",
+    contact_info: "",
+    doc_url: "https://docs.ownapi.dev/zh/",
+    home_content: "",
+    hide_ccs_import_button: false,
+    table_default_page_size: 20,
+    table_page_size_options: [10, 20, 50, 100],
+    backend_mode_enabled: false,
+    custom_menu_items: [],
+    custom_endpoints: [],
+    model_center_config: DEFAULT_MODEL_CENTER_CONFIG,
+    smtp_host: "",
+    smtp_port: 587,
+    smtp_username: "",
+    smtp_password_configured: false,
+    smtp_from_email: "",
+    smtp_from_name: "OwnAPI",
+    smtp_use_tls: true,
+    turnstile_enabled: false,
+    turnstile_site_key: "",
+    turnstile_secret_key_configured: false,
+    linuxdo_connect_enabled: false,
+    linuxdo_connect_client_id: "",
+    linuxdo_connect_client_secret_configured: false,
+    linuxdo_connect_redirect_url: "",
+    wechat_connect_enabled: false,
+    wechat_connect_app_id: "",
+    wechat_connect_app_secret_configured: false,
+    wechat_connect_open_app_id: "",
+    wechat_connect_open_app_secret_configured: false,
+    wechat_connect_mp_app_id: "",
+    wechat_connect_mp_app_secret_configured: false,
+    wechat_connect_mobile_app_id: "",
+    wechat_connect_mobile_app_secret_configured: false,
+    wechat_connect_open_enabled: false,
+    wechat_connect_mp_enabled: false,
+    wechat_connect_mobile_enabled: false,
+    wechat_connect_mode: "open",
+    wechat_connect_scopes: "snsapi_login",
+    wechat_connect_redirect_url: "",
+    wechat_connect_frontend_redirect_url: "",
+    oidc_connect_enabled: false,
+    oidc_connect_provider_name: "",
+    oidc_connect_client_id: "",
+    oidc_connect_client_secret_configured: false,
+    oidc_connect_issuer_url: "",
+    oidc_connect_discovery_url: "",
+    oidc_connect_authorize_url: "",
+    oidc_connect_token_url: "",
+    oidc_connect_userinfo_url: "",
+    oidc_connect_jwks_url: "",
+    oidc_connect_scopes: "openid email profile",
+    oidc_connect_redirect_url: "",
+    oidc_connect_frontend_redirect_url: "",
+    oidc_connect_token_auth_method: "client_secret_basic",
+    oidc_connect_use_pkce: true,
+    oidc_connect_validate_id_token: true,
+    oidc_connect_allowed_signing_algs: "RS256",
+    oidc_connect_clock_skew_seconds: 60,
+    oidc_connect_require_email_verified: false,
+    oidc_connect_userinfo_email_path: "email",
+    oidc_connect_userinfo_id_path: "sub",
+    oidc_connect_userinfo_username_path: "name",
+    enable_model_fallback: true,
+    fallback_model_anthropic: "claude-4.6",
+    fallback_model_openai: "gpt-5.4",
+    fallback_model_gemini: "gemini-2.5-pro",
+    fallback_model_antigravity: "",
+    enable_identity_patch: false,
+    identity_patch_prompt: "",
+    ops_monitoring_enabled: true,
+    ops_realtime_monitoring_enabled: true,
+    ops_query_mode_default: "auto",
+    ops_metrics_interval_seconds: 30,
+    min_claude_code_version: "",
+    max_claude_code_version: "",
+    allow_ungrouped_key_scheduling: false,
+    enable_fingerprint_unification: false,
+    enable_metadata_passthrough: true,
+    enable_cch_signing: false,
+    enable_anthropic_cache_ttl_1h_injection: false,
+    web_search_emulation_enabled: false,
+    payment_enabled: true,
+    payment_min_amount: 1,
+    payment_max_amount: 500,
+    payment_daily_limit: 1000,
+    payment_order_timeout_minutes: 15,
+    payment_max_pending_orders: 3,
+    payment_enabled_types: ["stripe"],
+    payment_balance_disabled: false,
+    payment_balance_recharge_multiplier: 1,
+    payment_recharge_fee_rate: 0,
+    payment_load_balance_strategy: "round_robin",
+    payment_product_name_prefix: "OwnAPI",
+    payment_product_name_suffix: "",
+    payment_help_image_url: "",
+    payment_help_text: "",
+    payment_cancel_rate_limit_enabled: false,
+    payment_cancel_rate_limit_max: 3,
+    payment_cancel_rate_limit_window: 10,
+    payment_cancel_rate_limit_unit: "minute",
+    payment_cancel_rate_limit_window_mode: "rolling",
+    payment_visible_method_alipay_source: "",
+    payment_visible_method_wxpay_source: "",
+    payment_visible_method_alipay_enabled: false,
+    payment_visible_method_wxpay_enabled: false,
+    openai_advanced_scheduler_enabled: false,
+    balance_low_notify_enabled: false,
+    balance_low_notify_threshold: 10,
+    balance_low_notify_recharge_url: "",
+    account_quota_notify_enabled: false,
+    account_quota_notify_emails: [],
+    channel_monitor_enabled: true,
+    channel_monitor_default_interval_seconds: 60,
+    available_channels_enabled: true,
+    affiliate_enabled: true,
+    openai_fast_policy_settings: { rules: [] },
+  };
+}
+
 /**
  * Get all system settings
  * @returns System settings
  */
 export async function getSettings(): Promise<SystemSettings> {
+  if (isLocalPreviewSession()) {
+    return previewSystemSettings();
+  }
+
   const { data } = await apiClient.get<SystemSettings>("/admin/settings");
   return data;
 }
@@ -675,11 +855,29 @@ export async function getSettings(): Promise<SystemSettings> {
 export async function updateSettings(
   settings: UpdateSettingsRequest,
 ): Promise<SystemSettings> {
+  if (isLocalPreviewSession()) {
+    return { ...previewSystemSettings(), ...settings };
+  }
+
   const { data } = await apiClient.put<SystemSettings>(
     "/admin/settings",
     settings,
   );
   return data;
+}
+
+export async function updateModelCenterConfig(
+  modelCenterConfig: ModelCenterConfig,
+): Promise<ModelCenterConfig> {
+  if (isLocalPreviewSession()) {
+    return modelCenterConfig;
+  }
+
+  const { data } = await apiClient.put<{ model_center_config: ModelCenterConfig }>(
+    "/admin/settings/model-center",
+    { model_center_config: modelCenterConfig },
+  );
+  return data.model_center_config;
 }
 
 /**
@@ -701,6 +899,10 @@ export interface TestSmtpRequest {
 export async function testSmtpConnection(
   config: TestSmtpRequest,
 ): Promise<{ message: string }> {
+  if (isLocalPreviewSession()) {
+    return { message: "本地预览模式：SMTP 测试已跳过。" };
+  }
+
   const { data } = await apiClient.post<{ message: string }>(
     "/admin/settings/test-smtp",
     config,
@@ -730,6 +932,10 @@ export interface SendTestEmailRequest {
 export async function sendTestEmail(
   request: SendTestEmailRequest,
 ): Promise<{ message: string }> {
+  if (isLocalPreviewSession()) {
+    return { message: `本地预览模式：测试邮件未实际发送到 ${request.email}。` };
+  }
+
   const { data } = await apiClient.post<{ message: string }>(
     "/admin/settings/send-test-email",
     request,
@@ -750,6 +956,13 @@ export interface AdminApiKeyStatus {
  * @returns Status indicating if key exists and masked version
  */
 export async function getAdminApiKey(): Promise<AdminApiKeyStatus> {
+  if (isLocalPreviewSession()) {
+    return {
+      exists: true,
+      masked_key: "sk-ownapi-local-preview",
+    };
+  }
+
   const { data } = await apiClient.get<AdminApiKeyStatus>(
     "/admin/settings/admin-api-key",
   );
@@ -761,6 +974,10 @@ export async function getAdminApiKey(): Promise<AdminApiKeyStatus> {
  * @returns The new full API key (only shown once)
  */
 export async function regenerateAdminApiKey(): Promise<{ key: string }> {
+  if (isLocalPreviewSession()) {
+    return { key: "sk-ownapi-local-preview-generated" };
+  }
+
   const { data } = await apiClient.post<{ key: string }>(
     "/admin/settings/admin-api-key/regenerate",
   );
@@ -772,6 +989,10 @@ export async function regenerateAdminApiKey(): Promise<{ key: string }> {
  * @returns Success message
  */
 export async function deleteAdminApiKey(): Promise<{ message: string }> {
+  if (isLocalPreviewSession()) {
+    return { message: "本地预览模式：管理员 API Key 已模拟删除。" };
+  }
+
   const { data } = await apiClient.delete<{ message: string }>(
     "/admin/settings/admin-api-key",
   );
@@ -789,6 +1010,13 @@ export interface OverloadCooldownSettings {
 }
 
 export async function getOverloadCooldownSettings(): Promise<OverloadCooldownSettings> {
+  if (isLocalPreviewSession()) {
+    return {
+      enabled: true,
+      cooldown_minutes: 15,
+    };
+  }
+
   const { data } = await apiClient.get<OverloadCooldownSettings>(
     "/admin/settings/overload-cooldown",
   );
@@ -798,6 +1026,10 @@ export async function getOverloadCooldownSettings(): Promise<OverloadCooldownSet
 export async function updateOverloadCooldownSettings(
   settings: OverloadCooldownSettings,
 ): Promise<OverloadCooldownSettings> {
+  if (isLocalPreviewSession()) {
+    return settings;
+  }
+
   const { data } = await apiClient.put<OverloadCooldownSettings>(
     "/admin/settings/overload-cooldown",
     settings,
@@ -823,6 +1055,16 @@ export interface StreamTimeoutSettings {
  * @returns Stream timeout settings
  */
 export async function getStreamTimeoutSettings(): Promise<StreamTimeoutSettings> {
+  if (isLocalPreviewSession()) {
+    return {
+      enabled: false,
+      action: "none",
+      temp_unsched_minutes: 10,
+      threshold_count: 3,
+      threshold_window_minutes: 10,
+    };
+  }
+
   const { data } = await apiClient.get<StreamTimeoutSettings>(
     "/admin/settings/stream-timeout",
   );
@@ -837,6 +1079,10 @@ export async function getStreamTimeoutSettings(): Promise<StreamTimeoutSettings>
 export async function updateStreamTimeoutSettings(
   settings: StreamTimeoutSettings,
 ): Promise<StreamTimeoutSettings> {
+  if (isLocalPreviewSession()) {
+    return settings;
+  }
+
   const { data } = await apiClient.put<StreamTimeoutSettings>(
     "/admin/settings/stream-timeout",
     settings,
@@ -862,6 +1108,16 @@ export interface RectifierSettings {
  * @returns Rectifier settings
  */
 export async function getRectifierSettings(): Promise<RectifierSettings> {
+  if (isLocalPreviewSession()) {
+    return {
+      enabled: false,
+      thinking_signature_enabled: false,
+      thinking_budget_enabled: false,
+      apikey_signature_enabled: false,
+      apikey_signature_patterns: [],
+    };
+  }
+
   const { data } = await apiClient.get<RectifierSettings>(
     "/admin/settings/rectifier",
   );
@@ -876,6 +1132,10 @@ export async function getRectifierSettings(): Promise<RectifierSettings> {
 export async function updateRectifierSettings(
   settings: RectifierSettings,
 ): Promise<RectifierSettings> {
+  if (isLocalPreviewSession()) {
+    return settings;
+  }
+
   const { data } = await apiClient.put<RectifierSettings>(
     "/admin/settings/rectifier",
     settings,
@@ -933,6 +1193,10 @@ export interface BetaPolicySettings {
  * @returns Beta policy settings
  */
 export async function getBetaPolicySettings(): Promise<BetaPolicySettings> {
+  if (isLocalPreviewSession()) {
+    return { rules: [] };
+  }
+
   const { data } = await apiClient.get<BetaPolicySettings>(
     "/admin/settings/beta-policy",
   );
@@ -947,6 +1211,10 @@ export async function getBetaPolicySettings(): Promise<BetaPolicySettings> {
 export async function updateBetaPolicySettings(
   settings: BetaPolicySettings,
 ): Promise<BetaPolicySettings> {
+  if (isLocalPreviewSession()) {
+    return settings;
+  }
+
   const { data } = await apiClient.put<BetaPolicySettings>(
     "/admin/settings/beta-policy",
     settings,
@@ -979,6 +1247,13 @@ export interface WebSearchTestResult {
 }
 
 export async function getWebSearchEmulationConfig(): Promise<WebSearchEmulationConfig> {
+  if (isLocalPreviewSession()) {
+    return {
+      enabled: false,
+      providers: [],
+    };
+  }
+
   const { data } = await apiClient.get<WebSearchEmulationConfig>(
     "/admin/settings/web-search-emulation",
   );
@@ -988,6 +1263,10 @@ export async function getWebSearchEmulationConfig(): Promise<WebSearchEmulationC
 export async function updateWebSearchEmulationConfig(
   config: WebSearchEmulationConfig,
 ): Promise<WebSearchEmulationConfig> {
+  if (isLocalPreviewSession()) {
+    return config;
+  }
+
   const { data } = await apiClient.put<WebSearchEmulationConfig>(
     "/admin/settings/web-search-emulation",
     config,
@@ -998,6 +1277,14 @@ export async function updateWebSearchEmulationConfig(
 export async function testWebSearchEmulation(
   query: string,
 ): Promise<WebSearchTestResult> {
+  if (isLocalPreviewSession()) {
+    return {
+      provider: "local-preview",
+      results: [],
+      query,
+    };
+  }
+
   const { data } = await apiClient.post<WebSearchTestResult>(
     "/admin/settings/web-search-emulation/test",
     { query },
@@ -1008,6 +1295,10 @@ export async function testWebSearchEmulation(
 export async function resetWebSearchUsage(payload: {
   provider_type: string;
 }): Promise<void> {
+  if (isLocalPreviewSession()) {
+    return;
+  }
+
   await apiClient.post(
     "/admin/settings/web-search-emulation/reset-usage",
     payload,
@@ -1017,6 +1308,7 @@ export async function resetWebSearchUsage(payload: {
 export const settingsAPI = {
   getSettings,
   updateSettings,
+  updateModelCenterConfig,
   testSmtpConnection,
   sendTestEmail,
   getAdminApiKey,

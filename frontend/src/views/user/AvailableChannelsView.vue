@@ -1,6 +1,12 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
+    <div class="table-page-with-intro">
+      <PageIntro
+        title="可用渠道"
+        description="查看当前账号可使用的模型渠道、分组费率和支持模型，方便判断密钥能调用哪些能力。"
+      />
+
+      <TablePageLayout>
       <template #filters>
         <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div class="flex flex-1 flex-wrap items-center gap-3">
@@ -44,7 +50,8 @@
           :empty-label="t('availableChannels.empty')"
         />
       </template>
-    </TablePageLayout>
+      </TablePageLayout>
+    </div>
   </AppLayout>
 </template>
 
@@ -52,6 +59,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
 import AvailableChannelsTable from '@/components/channels/AvailableChannelsTable.vue'

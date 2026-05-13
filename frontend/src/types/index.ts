@@ -2,6 +2,8 @@
  * Core Type Definitions for ownapi Frontend
  */
 
+import type { ModelCenterConfig } from '@/constants/modelCenter'
+
 // ==================== Common Types ====================
 
 export interface SelectOption {
@@ -201,6 +203,7 @@ export interface PublicSettings {
   table_page_size_options: number[]
   custom_menu_items: CustomMenuItem[]
   custom_endpoints: CustomEndpoint[]
+  model_center_config?: ModelCenterConfig
   linuxdo_oauth_enabled: boolean
   wechat_oauth_enabled: boolean
   wechat_oauth_open_enabled?: boolean

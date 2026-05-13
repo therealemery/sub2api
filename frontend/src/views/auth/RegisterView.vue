@@ -3,10 +3,10 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('auth.createAccount') }}
         </h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-dark-400">
+        <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
           {{ t('auth.signUpToStart', { siteName }) }}
         </p>
       </div>
@@ -32,18 +32,18 @@
           :show-divider="false"
         />
         <div class="flex items-center gap-3">
-          <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
-          <span class="text-xs text-gray-500 dark:text-dark-400">
+          <div class="h-px flex-1 bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
+          <span class="text-xs text-gray-500 text-[var(--text-muted)]">
             {{ t('auth.oauthOrContinue') }}
           </span>
-          <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
+          <div class="h-px flex-1 bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         </div>
       </div>
 
       <!-- Registration Disabled Message -->
       <div
         v-if="!registrationEnabled && settingsLoaded"
-        class="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20"
+        class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20"
       >
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
@@ -64,7 +64,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="mail" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="mail" size="md" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
             <input
               id="email"
@@ -88,7 +88,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="lock" size="md" class="text-gray-400 dark:text-dark-500" />
+              <Icon name="lock" size="md" class="text-gray-400 text-[var(--text-muted)]" />
             </div>
             <input
               id="password"
@@ -122,7 +122,7 @@
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="key" size="md" :class="invitationValidation.valid ? 'text-green-500' : 'text-gray-400 dark:text-dark-500'" />
+              <Icon name="key" size="md" :class="invitationValidation.valid ? 'text-green-500' : 'text-gray-400 text-[var(--text-muted)]'" />
             </div>
             <input
               id="invitation_code"
@@ -166,11 +166,11 @@
         <div v-if="promoCodeEnabled">
           <label for="promo_code" class="input-label">
             {{ t('auth.promoCodeLabel') }}
-            <span class="ml-1 text-xs font-normal text-gray-400 dark:text-dark-500">({{ t('common.optional') }})</span>
+            <span class="ml-1 text-xs font-normal text-gray-400 text-[var(--text-muted)]">({{ t('common.optional') }})</span>
           </label>
           <div class="relative">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-              <Icon name="gift" size="md" :class="promoValidation.valid ? 'text-green-500' : 'text-gray-400 dark:text-dark-500'" />
+              <Icon name="gift" size="md" :class="promoValidation.valid ? 'text-green-500' : 'text-gray-400 text-[var(--text-muted)]'" />
             </div>
             <input
               id="promo_code"
@@ -229,7 +229,7 @@
         >
           <svg
             v-if="isLoading"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+            class="-ml-1 mr-2 h-4 w-4 animate-spin text-[var(--text-inverse)]"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -261,11 +261,11 @@
 
     <!-- Footer -->
     <template #footer>
-      <p class="text-gray-500 dark:text-dark-400">
+      <p class="text-gray-500 text-[var(--text-muted)]">
         {{ t('auth.alreadyHaveAccount') }}
         <router-link
           to="/login"
-          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
         >
           {{ t('auth.signIn') }}
         </router-link>
@@ -789,7 +789,7 @@ async function handleRegister(): Promise<void> {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,

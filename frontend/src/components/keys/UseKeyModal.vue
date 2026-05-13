@@ -29,7 +29,7 @@
         </p>
 
         <!-- Client Tabs -->
-        <div v-if="clientTabs.length" class="border-b border-gray-200 dark:border-dark-700">
+        <div v-if="clientTabs.length" class="border-b border-gray-200 border-[var(--border-default)]">
           <nav class="-mb-px flex space-x-6" aria-label="Client">
             <button
               v-for="tab in clientTabs"
@@ -38,7 +38,7 @@
               :class="[
                 'whitespace-nowrap py-2.5 px-1 border-b-2 font-medium text-sm transition-colors',
                 activeClientTab === tab.id
-                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
               ]"
             >
@@ -51,7 +51,7 @@
         </div>
 
         <!-- OS/Shell Tabs -->
-        <div v-if="showShellTabs" class="border-b border-gray-200 dark:border-dark-700">
+        <div v-if="showShellTabs" class="border-b border-gray-200 border-[var(--border-default)]">
           <nav class="-mb-px flex space-x-4" aria-label="Tabs">
             <button
               v-for="tab in currentTabs"
@@ -60,7 +60,7 @@
               :class="[
                 'whitespace-nowrap py-2.5 px-1 border-b-2 font-medium text-sm transition-colors',
                 activeTab === tab.id
-                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
               ]"
             >
@@ -84,16 +84,16 @@
               <Icon name="exclamationCircle" size="sm" class="flex-shrink-0" />
               {{ file.hint }}
             </p>
-            <div class="bg-gray-900 dark:bg-dark-900 rounded-xl overflow-hidden">
+            <div class="bg-gray-900 bg-[var(--bg-surface-alt)] rounded-lg overflow-hidden">
               <!-- Code Header -->
-              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 dark:bg-dark-800 border-b border-gray-700 dark:border-dark-700">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 bg-[var(--bg-surface-alt)] border-b border-gray-700 border-[var(--border-default)]">
                 <span class="text-xs text-gray-400 font-mono">{{ file.path }}</span>
                 <button
                   @click="copyContent(file.content, index)"
                   class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors"
                   :class="copiedIndex === index
                     ? 'bg-green-500/20 text-green-400'
-                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white'"
+                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-[var(--text-inverse)]'"
                 >
                   <svg v-if="copiedIndex === index" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -111,9 +111,9 @@
         </div>
 
         <!-- Usage Note -->
-        <div v-if="showPlatformNote" class="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-          <Icon name="infoCircle" size="md" class="text-blue-500 flex-shrink-0 mt-0.5" />
-          <p class="text-sm text-blue-700 dark:text-blue-300">
+        <div v-if="showPlatformNote" class="flex items-start gap-3 p-3 rounded-lg bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)] border border-[var(--border-focus)] border-[var(--border-focus)]">
+          <Icon name="infoCircle" size="md" class="text-[var(--accent)] flex-shrink-0 mt-0.5" />
+          <p class="text-sm text-[var(--accent)] text-[var(--accent)]">
             {{ platformNote }}
           </p>
         </div>

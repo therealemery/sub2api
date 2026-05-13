@@ -1,145 +1,164 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
-      <template #filters>
-        <div class="flex flex-wrap-reverse items-start justify-between gap-3">
-          <AccountTableFilters
-            v-model:searchQuery="params.search"
-            :filters="params"
-            :groups="groups"
-            @update:filters="(newFilters) => Object.assign(params, newFilters)"
-            @change="debouncedReload"
-            @update:searchQuery="debouncedReload"
-          />
-          <AccountTableActions
-            :loading="loading"
-            @refresh="handleManualRefresh"
-            @sync="showSync = true"
-            @create="showCreate = true"
-          >
-            <template #after>
-              <!-- Auto Refresh Dropdown -->
-              <div class="relative" ref="autoRefreshDropdownRef">
-                <button
-                  @click="
-                    showAutoRefreshDropdown = !showAutoRefreshDropdown;
-                    showColumnDropdown = false
-                  "
-                  class="btn btn-secondary px-2 md:px-3"
-                  :title="t('admin.accounts.autoRefresh')"
-                >
-                  <Icon name="refresh" size="sm" :class="[autoRefreshEnabled ? 'animate-spin' : '']" />
-                  <span class="hidden md:inline">
-                    {{
-                      autoRefreshEnabled
-                        ? t('admin.accounts.autoRefreshCountdown', { seconds: autoRefreshCountdown })
-                        : t('admin.accounts.autoRefresh')
-                    }}
-                  </span>
+    <div class="table-page-with-intro admin-accounts-page">
+      <PageIntro
+        title="账号管理"
+        description="管理真实参与调度的上游账号资源，检查账号状态、分组绑定、可调度性、容量和用量。这里不改变渠道或分组规则，只负责账号资源本身。"
+        compact
+      />
+      <TablePageLayout>
+        <template #filters>
+          <div class="admin-accounts-toolbar">
+            <div class="admin-accounts-toolbar-head">
+              <div>
+                <h3>筛选账号资源</h3>
+                <p>先按平台、类型、状态和分组缩小范围，再执行创建、同步或批量维护。</p>
+              </div>
+              <div class="admin-accounts-primary-actions">
+                <button @click="handleManualRefresh" :disabled="loading" class="btn btn-secondary">
+                  <Icon name="refresh" size="md" :class="[loading ? 'animate-spin' : '']" />
+                  <span class="hidden sm:inline">{{ t('common.refresh') }}</span>
                 </button>
-                <div
-                  v-if="showAutoRefreshDropdown"
-                  class="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                <button @click="showCreate = true" class="btn btn-primary">
+                  {{ t('admin.accounts.createAccount') }}
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-accounts-toolbar-body">
+              <AccountTableFilters
+                v-model:searchQuery="params.search"
+                class="admin-accounts-filters"
+                :filters="params"
+                :groups="groups"
+                @update:filters="(newFilters) => Object.assign(params, newFilters)"
+                @change="debouncedReload"
+                @update:searchQuery="debouncedReload"
+              />
+
+              <div class="admin-accounts-secondary-actions" aria-label="账号高级操作">
+                <button @click="showSync = true" class="btn btn-secondary toolbar-subtle-btn">
+                  {{ t('admin.accounts.syncFromCrs') }}
+                </button>
+                <button @click="showImportData = true" class="btn btn-secondary toolbar-subtle-btn">
+                  {{ t('admin.accounts.dataImport') }}
+                </button>
+                <button @click="openExportDataDialog" class="btn btn-secondary toolbar-subtle-btn">
+                  {{ selIds.length ? t('admin.accounts.dataExportSelected') : t('admin.accounts.dataExport') }}
+                </button>
+
+                <!-- Auto Refresh Dropdown -->
+                <div class="relative" ref="autoRefreshDropdownRef">
+                  <button
+                    @click="
+                      showAutoRefreshDropdown = !showAutoRefreshDropdown;
+                      showColumnDropdown = false
+                    "
+                    class="btn btn-secondary toolbar-subtle-btn px-2 md:px-3"
+                    :title="t('admin.accounts.autoRefresh')"
+                  >
+                    <Icon name="refresh" size="sm" :class="[autoRefreshEnabled ? 'animate-spin' : '']" />
+                    <span class="hidden md:inline">
+                      {{
+                        autoRefreshEnabled
+                          ? t('admin.accounts.autoRefreshCountdown', { seconds: autoRefreshCountdown })
+                          : t('admin.accounts.autoRefresh')
+                      }}
+                    </span>
+                  </button>
+                  <div
+                    v-if="showAutoRefreshDropdown"
+                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                  >
+                    <div class="p-2">
+                      <button
+                        @click="setAutoRefreshEnabled(!autoRefreshEnabled)"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      >
+                        <span>{{ t('admin.accounts.enableAutoRefresh') }}</span>
+                        <Icon v-if="autoRefreshEnabled" name="check" size="sm" class="text-[var(--accent)]" />
+                      </button>
+                      <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+                      <button
+                        v-for="sec in autoRefreshIntervals"
+                        :key="sec"
+                        @click="setAutoRefreshInterval(sec)"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      >
+                        <span>{{ autoRefreshIntervalLabel(sec) }}</span>
+                        <Icon v-if="autoRefreshIntervalSeconds === sec" name="check" size="sm" class="text-[var(--accent)]" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  @click="showErrorPassthrough = true"
+                  class="btn btn-secondary toolbar-subtle-btn"
+                  :title="t('admin.errorPassthrough.title')"
                 >
-                  <div class="p-2">
-                    <button
-                      @click="setAutoRefreshEnabled(!autoRefreshEnabled)"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      <span>{{ t('admin.accounts.enableAutoRefresh') }}</span>
-                      <Icon v-if="autoRefreshEnabled" name="check" size="sm" class="text-primary-500" />
-                    </button>
-                    <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
-                    <button
-                      v-for="sec in autoRefreshIntervals"
-                      :key="sec"
-                      @click="setAutoRefreshInterval(sec)"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      <span>{{ autoRefreshIntervalLabel(sec) }}</span>
-                      <Icon v-if="autoRefreshIntervalSeconds === sec" name="check" size="sm" class="text-primary-500" />
-                    </button>
+                  <Icon name="shield" size="md" class="mr-1.5" />
+                  <span class="hidden md:inline">{{ t('admin.errorPassthrough.title') }}</span>
+                </button>
+
+                <button
+                  @click="showTLSFingerprintProfiles = true"
+                  class="btn btn-secondary toolbar-subtle-btn"
+                  :title="t('admin.tlsFingerprintProfiles.title')"
+                >
+                  <Icon name="lock" size="md" class="mr-1.5" />
+                  <span class="hidden md:inline">{{ t('admin.tlsFingerprintProfiles.title') }}</span>
+                </button>
+
+                <!-- Column Settings Dropdown -->
+                <div class="relative" ref="columnDropdownRef">
+                  <button
+                    @click="
+                      showColumnDropdown = !showColumnDropdown;
+                      showAutoRefreshDropdown = false
+                    "
+                    class="btn btn-secondary toolbar-subtle-btn px-2 md:px-3"
+                    :title="t('admin.users.columnSettings')"
+                  >
+                    <svg class="h-4 w-4 md:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
+                    </svg>
+                    <span class="hidden md:inline">{{ t('admin.users.columnSettings') }}</span>
+                  </button>
+                  <div
+                    v-if="showColumnDropdown"
+                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                  >
+                    <div class="max-h-80 overflow-y-auto p-2">
+                      <button
+                        v-for="col in toggleableColumns"
+                        :key="col.key"
+                        @click="toggleColumn(col.key)"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      >
+                        <span>{{ col.label }}</span>
+                        <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-[var(--accent)]" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- Error Passthrough Rules -->
-              <button
-                @click="showErrorPassthrough = true"
-                class="btn btn-secondary"
-                :title="t('admin.errorPassthrough.title')"
-              >
-                <Icon name="shield" size="md" class="mr-1.5" />
-                <span class="hidden md:inline">{{ t('admin.errorPassthrough.title') }}</span>
-              </button>
-
-              <!-- TLS Fingerprint Profiles -->
-              <button
-                @click="showTLSFingerprintProfiles = true"
-                class="btn btn-secondary"
-                :title="t('admin.tlsFingerprintProfiles.title')"
-              >
-                <Icon name="lock" size="md" class="mr-1.5" />
-                <span class="hidden md:inline">{{ t('admin.tlsFingerprintProfiles.title') }}</span>
-              </button>
-
-              <!-- Column Settings Dropdown -->
-              <div class="relative" ref="columnDropdownRef">
-                <button
-                  @click="
-                    showColumnDropdown = !showColumnDropdown;
-                    showAutoRefreshDropdown = false
-                  "
-                  class="btn btn-secondary px-2 md:px-3"
-                  :title="t('admin.users.columnSettings')"
-                >
-                  <svg class="h-4 w-4 md:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
-                  </svg>
-                  <span class="hidden md:inline">{{ t('admin.users.columnSettings') }}</span>
-                </button>
-                <!-- Dropdown menu -->
-                <div
-                  v-if="showColumnDropdown"
-                  class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
-                >
-                  <div class="max-h-80 overflow-y-auto p-2">
-                    <button
-                      v-for="col in toggleableColumns"
-                      :key="col.key"
-                      @click="toggleColumn(col.key)"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                    >
-                      <span>{{ col.label }}</span>
-                      <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-primary-500" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </template>
-            <template #beforeCreate>
-              <button @click="showImportData = true" class="btn btn-secondary">
-                {{ t('admin.accounts.dataImport') }}
-              </button>
-              <button @click="openExportDataDialog" class="btn btn-secondary">
-                {{ selIds.length ? t('admin.accounts.dataExportSelected') : t('admin.accounts.dataExport') }}
-              </button>
-            </template>
-          </AccountTableActions>
-        </div>
-        <div
-          v-if="hasPendingListSync"
-          class="mt-2 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-700/40 dark:bg-amber-900/20 dark:text-amber-200"
-        >
-          <span>{{ t('admin.accounts.listPendingSyncHint') }}</span>
-          <button
-            class="btn btn-secondary px-2 py-1 text-xs"
-            @click="syncPendingListChanges"
+          <div
+            v-if="hasPendingListSync"
+            class="admin-accounts-sync-hint mt-2 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-700/40 dark:bg-amber-900/20 dark:text-amber-200"
           >
-            {{ t('admin.accounts.listPendingSyncAction') }}
-          </button>
-        </div>
-      </template>
+            <span>{{ t('admin.accounts.listPendingSyncHint') }}</span>
+            <button
+              class="btn btn-secondary px-2 py-1 text-xs"
+              @click="syncPendingListChanges"
+            >
+              {{ t('admin.accounts.listPendingSyncAction') }}
+            </button>
+          </div>
+        </template>
       <template #table>
         <AccountBulkActionsBar
           :selected-ids="selIds"
@@ -167,21 +186,35 @@
           :estimate-row-height="72"
           :overscan="5"
         >
+          <template #empty>
+            <div class="admin-accounts-empty">
+              <EmptyState
+                :title="accountsEmptyTitle"
+                :description="accountsEmptyDescription"
+                :action-text="hasActiveAccountFilters ? '清空筛选' : t('admin.accounts.createAccount')"
+                @action="hasActiveAccountFilters ? resetAccountFilters() : (showCreate = true)"
+              >
+                <template #icon>
+                  <Icon name="server" size="xl" class="empty-state-icon h-10 w-10" />
+                </template>
+              </EmptyState>
+            </div>
+          </template>
           <template #header-select>
             <input
               type="checkbox"
-              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              class="h-4 w-4 cursor-pointer rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               :checked="allVisibleSelected"
               @click.stop
               @change="toggleSelectAllVisible($event)"
             />
           </template>
           <template #cell-select="{ row }">
-            <input type="checkbox" :checked="isSelected(row.id)" @change="toggleSel(row.id)" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+            <input type="checkbox" :checked="isSelected(row.id)" @change="toggleSel(row.id)" class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]" />
           </template>
           <template #cell-name="{ row, value }">
             <div class="flex flex-col">
-              <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
               <span
                 v-if="row.extra?.email_address"
                 class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]"
@@ -193,7 +226,7 @@
           </template>
           <template #cell-notes="{ value }">
             <span v-if="value" :title="value" class="block max-w-xs truncate text-sm text-gray-600 dark:text-gray-300">{{ value }}</span>
-            <span v-else class="text-sm text-gray-400 dark:text-dark-500">-</span>
+            <span v-else class="text-sm text-gray-400 text-[var(--text-muted)]">-</span>
           </template>
           <template #cell-platform_type="{ row }">
             <div class="flex flex-wrap items-center gap-1">
@@ -222,8 +255,8 @@
             </div>
           </template>
           <template #cell-schedulable="{ row }">
-            <button @click="handleToggleSchedulable(row)" :disabled="togglingSchedulable === row.id" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-dark-800" :class="[row.schedulable ? 'bg-primary-500 hover:bg-primary-600' : 'bg-gray-200 hover:bg-gray-300 dark:bg-dark-600 dark:hover:bg-dark-500']" :title="row.schedulable ? t('admin.accounts.schedulableEnabled') : t('admin.accounts.schedulableDisabled')">
-              <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out" :class="[row.schedulable ? 'translate-x-4' : 'translate-x-0']" />
+            <button @click="handleToggleSchedulable(row)" :disabled="togglingSchedulable === row.id" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-dark-800" :class="[row.schedulable ? 'bg-[var(--accent)] hover:bg-[var(--bg-subtle)]' : 'bg-gray-200 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:hover:bg-dark-500']" :title="row.schedulable ? t('admin.accounts.schedulableEnabled') : t('admin.accounts.schedulableDisabled')">
+              <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out" :class="[row.schedulable ? 'translate-x-4' : 'translate-x-0']" />
             </button>
           </template>
           <template #cell-today_stats="{ row }">
@@ -251,7 +284,7 @@
                 ({{ row.proxy.country_code }})
               </span>
             </div>
-            <span v-else class="text-sm text-gray-400 dark:text-dark-500">-</span>
+            <span v-else class="text-sm text-gray-400 text-[var(--text-muted)]">-</span>
           </template>
           <template #cell-rate_multiplier="{ row }">
             <span class="text-sm font-mono text-gray-700 dark:text-gray-300">
@@ -262,11 +295,11 @@
             <span class="text-sm text-gray-700 dark:text-gray-300">{{ value }}</span>
           </template>
           <template #cell-last_used_at="{ value }">
-            <span class="text-sm text-gray-500 dark:text-dark-400">{{ formatRelativeTime(value) }}</span>
+            <span class="text-sm text-gray-500 text-[var(--text-muted)]">{{ formatRelativeTime(value) }}</span>
           </template>
           <template #cell-expires_at="{ row, value }">
             <div class="flex flex-col items-start gap-1">
-              <span class="text-sm text-gray-500 dark:text-dark-400">{{ formatExpiresAt(value) }}</span>
+              <span class="text-sm text-gray-500 text-[var(--text-muted)]">{{ formatExpiresAt(value) }}</span>
               <div v-if="isExpired(value) || (row.auto_pause_on_expired && value)" class="flex items-center gap-1">
                 <span
                   v-if="isExpired(value)"
@@ -285,7 +318,7 @@
           </template>
           <template #cell-actions="{ row }">
             <div class="flex items-center gap-1">
-              <button @click="handleEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400">
+              <button @click="handleEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                 <span class="text-xs">{{ t('common.edit') }}</span>
               </button>
@@ -293,7 +326,7 @@
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
                 <span class="text-xs">{{ t('common.delete') }}</span>
               </button>
-              <button @click="openMenu(row, $event)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-white">
+              <button @click="openMenu(row, $event)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-[var(--text-inverse)]">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
                 <span class="text-xs">{{ t('common.more') }}</span>
               </button>
@@ -304,6 +337,7 @@
       </template>
       <template #pagination><Pagination v-if="pagination.total > 0" :page="pagination.page" :total="pagination.total" :page-size="pagination.page_size" @update:page="handlePageChange" @update:pageSize="handlePageSizeChange" /></template>
     </TablePageLayout>
+    </div>
     <CreateAccountModal :show="showCreate" :proxies="proxies" :groups="groups" @close="showCreate = false" @created="reload" />
     <EditAccountModal :show="showEdit" :account="edAcc" :proxies="proxies" :groups="groups" @close="showEdit = false" @updated="handleAccountUpdated" />
     <ReAuthAccountModal :show="showReAuth" :account="reAuthAcc" @close="closeReAuthModal" @reauthorized="handleAccountUpdated" />
@@ -328,7 +362,7 @@
     <ConfirmDialog :show="showDeleteDialog" :title="t('admin.accounts.deleteAccount')" :message="t('admin.accounts.deleteConfirm', { name: deletingAcc?.name })" :confirm-text="t('common.delete')" :cancel-text="t('common.cancel')" :danger="true" @confirm="confirmDelete" @cancel="showDeleteDialog = false" />
     <ConfirmDialog :show="showExportDataDialog" :title="t('admin.accounts.dataExport')" :message="t('admin.accounts.dataExportConfirmMessage')" :confirm-text="t('admin.accounts.dataExportConfirm')" :cancel-text="t('common.cancel')" @confirm="handleExportData" @cancel="showExportDataDialog = false">
       <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-        <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" v-model="includeProxyOnExport" />
+        <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]" v-model="includeProxyOnExport" />
         <span>{{ t('admin.accounts.dataExportIncludeProxies') }}</span>
       </label>
     </ConfirmDialog>
@@ -352,8 +386,9 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import { CreateAccountModal, EditAccountModal, BulkEditAccountModal, SyncFromCrsModal, TempUnschedStatusModal } from '@/components/account'
-import AccountTableActions from '@/components/admin/account/AccountTableActions.vue'
 import AccountTableFilters from '@/components/admin/account/AccountTableFilters.vue'
 import AccountBulkActionsBar from '@/components/admin/account/AccountBulkActionsBar.vue'
 import AccountActionMenu from '@/components/admin/account/AccountActionMenu.vue'
@@ -696,6 +731,27 @@ const {
   }
 })
 
+const hasActiveAccountFilters = computed(() => {
+  return Boolean(
+    params.search ||
+    params.platform ||
+    params.type ||
+    params.status ||
+    params.privacy_mode ||
+    params.group
+  )
+})
+
+const accountsEmptyTitle = computed(() =>
+  hasActiveAccountFilters.value ? '没有匹配的账号' : '还没有接入账号资源'
+)
+
+const accountsEmptyDescription = computed(() =>
+  hasActiveAccountFilters.value
+    ? '当前筛选条件下没有账号。可以清空筛选后重新查看，或确认账号是否已接入对应平台、类型和分组。'
+    : '账号是实际调度资源。建议先确认渠道和分组，再添加可用账号并绑定到对应分组。'
+)
+
 const {
   selectedIds: selIds,
   allVisibleSelected,
@@ -762,6 +818,19 @@ const debouncedReload = () => {
   resetAutoRefreshCache()
   pendingTodayStatsRefresh.value = true
   baseDebouncedReload()
+}
+
+const resetAccountFilters = () => {
+  Object.assign(params, {
+    platform: '',
+    type: '',
+    status: '',
+    privacy_mode: '',
+    group: '',
+    search: ''
+  })
+  pagination.page = 1
+  void load()
 }
 
 const handlePageChange = (page: number) => {
@@ -1024,7 +1093,7 @@ function getAntigravityTierClass(row: any): string {
   const tier = getAntigravityTierFromRow(row)
   switch (tier) {
     case 'free-tier': return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-    case 'g1-pro-tier': return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    case 'g1-pro-tier': return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
     case 'g1-ultra-tier': return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
     default: return ''
   }
@@ -1592,3 +1661,140 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
+<style scoped>
+.admin-accounts-toolbar {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-accounts-toolbar-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-accounts-toolbar-head h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.admin-accounts-toolbar-head p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.admin-accounts-primary-actions,
+.admin-accounts-secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-accounts-toolbar-body {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-accounts-filters {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 1.3fr) repeat(3, minmax(176px, 0.8fr)) repeat(2, minmax(212px, 1fr));
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100%;
+}
+
+.admin-accounts-filters :deep(.account-filter-search),
+.admin-accounts-filters :deep(.account-filter-select),
+.admin-accounts-filters :deep(.account-filter-select-wide) {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-accounts-filters :deep(.select-trigger) {
+  min-width: 0;
+}
+
+.admin-accounts-secondary-actions {
+  justify-content: flex-start;
+  border-top: 1px solid var(--border-default);
+  padding-top: 12px;
+}
+
+.toolbar-subtle-btn {
+  min-height: 36px !important;
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  box-shadow: none;
+}
+
+.toolbar-subtle-btn:hover {
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.toolbar-dropdown {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+}
+
+.admin-accounts-sync-hint {
+  background: color-mix(in srgb, var(--warning) 10%, var(--bg-surface) 90%) !important;
+  border-color: color-mix(in srgb, var(--warning) 28%, var(--border-default) 72%) !important;
+  color: var(--text-primary) !important;
+}
+
+.admin-accounts-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+
+.admin-accounts-page :deep(.table-scroll-container) {
+  min-height: 340px;
+}
+
+.admin-accounts-page :deep(.data-mobile-card .admin-accounts-empty) {
+  min-height: 220px;
+}
+
+@media (max-width: 1280px) {
+  .admin-accounts-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-accounts-toolbar-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-accounts-primary-actions,
+  .admin-accounts-secondary-actions {
+    justify-content: flex-start;
+  }
+
+  .admin-accounts-primary-actions > *,
+  .admin-accounts-secondary-actions > * {
+    flex: 1 1 160px;
+  }
+
+  .admin-accounts-filters {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

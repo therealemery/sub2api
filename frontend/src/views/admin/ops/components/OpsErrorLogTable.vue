@@ -1,51 +1,51 @@
 <template>
-  <div class="flex h-full min-h-0 flex-col bg-white dark:bg-dark-900">
+  <div class="flex h-full min-h-0 flex-col bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)]">
     <!-- Loading State -->
     <div v-if="loading" class="flex flex-1 items-center justify-center py-10">
-      <div class="h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600"></div>
+      <div class="h-8 w-8 animate-spin rounded-full border-b-2 border-[var(--border-focus)]"></div>
     </div>
 
     <!-- Table Container -->
     <div v-else class="flex min-h-0 flex-1 flex-col">
-      <div class="min-h-0 flex-1 overflow-auto border-b border-gray-200 dark:border-dark-700">
+      <div class="min-h-0 flex-1 overflow-auto border-b border-gray-200 border-[var(--border-default)]">
         <table class="w-full border-separate border-spacing-0">
-          <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-dark-800">
+          <thead class="sticky top-0 z-10 bg-gray-50 bg-[var(--bg-surface-alt)]">
             <tr>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.time') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.type') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.endpoint') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.platform') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.model') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.group') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.user') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.status') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.message') }}
               </th>
-              <th class="border-b border-gray-200 px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:border-dark-700 dark:text-dark-400">
+              <th class="border-b border-gray-200 px-4 py-2.5 text-right text-[11px] font-bold uppercase tracking-wider text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.action') }}
               </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-700">
             <tr v-if="rows.length === 0">
-              <td colspan="10" class="py-12 text-center text-sm text-gray-400 dark:text-dark-500">
+              <td colspan="10" class="py-12 text-center text-sm text-gray-400 text-[var(--text-muted)]">
                 {{ t('admin.ops.errorLog.noErrors') }}
               </td>
             </tr>
@@ -91,7 +91,7 @@
 
               <!-- Platform -->
               <td class="whitespace-nowrap px-4 py-2">
-                <span class="inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gray-600 dark:bg-dark-700 dark:text-gray-300">
+                <span class="inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300">
                   {{ log.platform || '-' }}
                 </span>
               </td>
@@ -104,7 +104,7 @@
                       <span class="flex items-center gap-1 truncate font-mono text-[11px] text-gray-700 dark:text-gray-300">
                         <span class="truncate">{{ log.requested_model }}</span>
                         <span class="flex-shrink-0 text-gray-400">→</span>
-                        <span class="truncate text-primary-600 dark:text-primary-400">{{ log.upstream_model }}</span>
+                        <span class="truncate text-[var(--accent)] text-[var(--accent)]">{{ log.upstream_model }}</span>
                       </span>
                     </el-tooltip>
                   </template>
@@ -166,7 +166,7 @@
                   </span>
                   <span
                     v-if="log.request_type != null && log.request_type > 0"
-                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-dark-700 dark:text-gray-300"
+                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300"
                   >
                     {{ formatRequestType(log.request_type) }}
                   </span>
@@ -185,7 +185,7 @@
               <!-- Actions -->
               <td class="whitespace-nowrap px-4 py-2 text-right" @click.stop>
                 <div class="flex items-center justify-end gap-3">
-                  <button type="button" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 text-xs font-bold" @click="emit('openErrorDetail', log.id)">
+                  <button type="button" class="text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] text-xs font-bold" @click="emit('openErrorDetail', log.id)">
                     {{ t('admin.ops.errorLog.details') }}
                   </button>
                 </div>
@@ -196,7 +196,7 @@
       </div>
 
       <!-- Pagination -->
-      <div class="bg-gray-50/50 dark:bg-dark-800/50">
+      <div class="bg-gray-50/50 bg-[var(--bg-surface-alt)]">
         <Pagination
           v-if="total > 0"
           :total="total"
@@ -273,17 +273,17 @@ function getTypeBadge(log: OpsErrorLog): { label: string; className: string } {
     return { label: t('admin.ops.errorLog.typeRequest'), className: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-500/30' }
   }
   if (phase === 'auth' && owner === 'client') {
-    return { label: t('admin.ops.errorLog.typeAuth'), className: 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-500/30' }
+    return { label: t('admin.ops.errorLog.typeAuth'), className: 'bg-gray-100 text-gray-700 ring-gray-500/20 dark:bg-[var(--bg-surface)]/10 dark:text-gray-300 dark:ring-white/10' }
   }
   if (phase === 'routing' && owner === 'platform') {
     return { label: t('admin.ops.errorLog.typeRouting'), className: 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-400 dark:ring-purple-500/30' }
   }
   if (phase === 'internal' && owner === 'platform') {
-    return { label: t('admin.ops.errorLog.typeInternal'), className: 'bg-gray-100 text-gray-800 ring-gray-600/20 dark:bg-dark-700 dark:text-gray-200 dark:ring-dark-500/40' }
+    return { label: t('admin.ops.errorLog.typeInternal'), className: 'bg-gray-100 text-gray-800 ring-gray-600/20 bg-[var(--bg-surface-alt)] dark:text-gray-200 dark:ring-dark-500/40' }
   }
 
     const fallback = phase || owner || t('common.unknown')
-    return { label: fallback, className: 'bg-gray-50 text-gray-700 ring-gray-600/10 dark:bg-dark-900 dark:text-gray-300 dark:ring-dark-700' }
+    return { label: fallback, className: 'bg-gray-50 text-gray-700 ring-gray-600/10 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:ring-dark-700' }
 }
 
 interface Props {

@@ -8,14 +8,14 @@
         :class="[
           hasUpdate
             ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-800 dark:text-dark-400 dark:hover:bg-dark-700'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--text-muted)] dark:hover:bg-dark-700'
         ]"
         :title="hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
       >
         <span v-if="currentVersion" class="font-medium">v{{ currentVersion }}</span>
         <span
           v-else
-          class="h-3 w-12 animate-pulse rounded bg-gray-200 font-medium dark:bg-dark-600"
+          class="h-3 w-12 animate-pulse rounded bg-gray-200 font-medium bg-[var(--bg-surface-alt)]"
         ></span>
         <!-- Update indicator -->
         <span v-if="hasUpdate" class="relative flex h-2 w-2">
@@ -31,13 +31,13 @@
         <div
           v-if="dropdownOpen"
           ref="dropdownRef"
-          class="absolute left-0 z-50 mt-2 w-64 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-dark-700 dark:bg-dark-800"
+          class="absolute left-0 z-50 mt-2 w-64 overflow-hidden rounded-lg border border-gray-200 bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         >
           <!-- Header with refresh button -->
           <div
-            class="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-dark-700"
+            class="flex items-center justify-between border-b border-gray-100 px-4 py-3 border-[var(--border-default)]"
           >
-            <span class="text-sm font-medium text-gray-700 dark:text-dark-300">{{
+            <span class="text-sm font-medium text-gray-700 text-[var(--text-muted)]">{{
               t('version.currentVersion')
             }}</span>
             <button
@@ -58,7 +58,7 @@
           <div class="p-4">
             <!-- Loading state -->
             <div v-if="loading" class="flex items-center justify-center py-6">
-              <svg class="h-6 w-6 animate-spin text-primary-500" fill="none" viewBox="0 0 24 24">
+              <svg class="h-6 w-6 animate-spin text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
                 <circle
                   class="opacity-25"
                   cx="12"
@@ -82,10 +82,10 @@
                 <div class="inline-flex items-center gap-2">
                   <span
                     v-if="currentVersion"
-                    class="text-2xl font-bold text-gray-900 dark:text-white"
+                    class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]"
                     >v{{ currentVersion }}</span
                   >
-                  <span v-else class="text-2xl font-bold text-gray-400 dark:text-dark-500">--</span>
+                  <span v-else class="text-2xl font-bold text-gray-400 text-[var(--text-muted)]">--</span>
                   <!-- Show check mark when up to date -->
                   <span
                     v-if="!hasUpdate"
@@ -104,7 +104,7 @@
                     </svg>
                   </span>
                 </div>
-                <p class="mt-1 text-xs text-gray-500 dark:text-dark-400">
+                <p class="mt-1 text-xs text-gray-500 text-[var(--text-muted)]">
                   {{
                     hasUpdate
                       ? t('version.latestVersion') + ': v' + latestVersion
@@ -142,7 +142,7 @@
                 <button
                   @click="handleUpdate"
                   :disabled="updating"
-                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-[var(--text-inverse)] transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {{ t('version.retry') }}
                 </button>
@@ -180,7 +180,7 @@
                 <button
                   @click="handleRestart"
                   :disabled="restarting"
-                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-[var(--text-inverse)] transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <svg
                     v-if="restarting"
@@ -265,10 +265,10 @@
                 </a>
                 <!-- Source build hint -->
                 <div
-                  class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-2 dark:border-blue-800/50 dark:bg-blue-900/20"
+                  class="flex items-center gap-2 rounded-lg border border-[var(--border-focus)] bg-[var(--bg-surface-alt)] p-2 border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
                 >
                   <svg
-                    class="h-3.5 w-3.5 flex-shrink-0 text-blue-500 dark:text-blue-400"
+                    class="h-3.5 w-3.5 flex-shrink-0 text-[var(--accent)] text-[var(--accent)]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -280,7 +280,7 @@
                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <p class="text-xs text-blue-600 dark:text-blue-400">
+                  <p class="text-xs text-[var(--accent)] text-[var(--accent)]">
                     {{ t('version.sourceModeHint') }}
                   </p>
                 </div>
@@ -316,7 +316,7 @@
                 <button
                   @click="handleUpdate"
                   :disabled="updating"
-                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--text-inverse)] transition-colors hover:bg-[var(--bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <svg v-if="updating" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle
@@ -343,7 +343,7 @@
                   :href="releaseInfo.html_url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex items-center justify-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-700 dark:text-dark-400 dark:hover:text-dark-200"
+                  class="flex items-center justify-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-dark-200"
                 >
                   {{ t('version.viewChangelog') }}
                   <Icon name="externalLink" size="xs" :stroke-width="2" />
@@ -356,7 +356,7 @@
                 :href="releaseInfo.html_url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-dark-400 dark:hover:text-dark-200"
+                class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-dark-200"
               >
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -374,7 +374,7 @@
     </template>
 
     <!-- Non-admin: Simple static version text -->
-    <span v-else-if="version" class="text-xs text-gray-500 dark:text-dark-400">
+    <span v-else-if="version" class="text-xs text-gray-500 text-[var(--text-muted)]">
       v{{ version }}
     </span>
   </div>
@@ -537,7 +537,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .dropdown-enter-from,

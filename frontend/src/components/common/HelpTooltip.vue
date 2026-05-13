@@ -100,7 +100,7 @@ onBeforeUnmount(() => {
     <!-- Trigger Icon -->
     <slot name="trigger">
       <svg
-        class="h-4 w-4 cursor-help text-gray-400 transition-colors hover:text-primary-600 dark:text-gray-500 dark:hover:text-primary-400"
+        class="h-4 w-4 cursor-help text-gray-400 transition-colors hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
         v-show="show"
         role="tooltip"
         :class="[
-          'fixed z-[99999] -translate-x-1/2 -translate-y-full rounded-lg bg-gray-900 p-3 text-xs leading-relaxed text-white shadow-xl ring-1 ring-white/10 dark:bg-gray-800',
+          'fixed z-[99999] -translate-x-1/2 -translate-y-full rounded-lg bg-gray-900 p-3 text-xs leading-relaxed text-[var(--text-inverse)] ring-1 ring-white/10 dark:bg-gray-800',
           props.widthClass,
         ]"
         :style="{ top: `calc(${tooltipStyle.top} - 8px)`, left: tooltipStyle.left }"
@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
         <button
           v-if="props.trigger === 'click'"
           type="button"
-          class="absolute right-1.5 top-1.5 rounded p-1 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+          class="absolute right-1.5 top-1.5 rounded p-1 text-gray-300 transition-colors hover:bg-[var(--bg-surface)]/10 hover:text-[var(--text-inverse)]"
           aria-label="Close"
           @click.stop="closeTooltip"
         >

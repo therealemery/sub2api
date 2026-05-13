@@ -1,6 +1,6 @@
 <template>
   <div class="card p-4">
-    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+    <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
       {{ t('admin.dashboard.tokenUsageTrend') }}
     </h3>
     <div v-if="loading" class="flex h-48 items-center justify-center">
@@ -61,11 +61,11 @@ const isDarkMode = computed(() => {
 const chartColors = computed(() => ({
   text: isDarkMode.value ? '#e5e7eb' : '#374151',
   grid: isDarkMode.value ? '#374151' : '#e5e7eb',
-  input: '#3b82f6',
-  output: '#10b981',
-  cacheCreation: '#f59e0b',
-  cacheRead: '#06b6d4',
-  cacheHitRate: '#8b5cf6'
+  input: '#c4471a',
+  output: '#287a4b',
+  cacheCreation: '#986b16',
+  cacheRead: '#716d64',
+  cacheHitRate: '#9a7b63'
 }))
 
 const chartData = computed(() => {

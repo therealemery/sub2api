@@ -2,10 +2,10 @@
   <AuthLayout>
     <div class="space-y-6">
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('auth.oidc.callbackTitle', { providerName }) }}
         </h2>
-        <p class="mt-2 text-sm text-gray-500 dark:text-dark-400">
+        <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
           {{
             isProcessing
               ? t('auth.oidc.callbackProcessing', { providerName })
@@ -28,28 +28,28 @@
         >
           <div
             v-if="adoptionRequired && (suggestedDisplayName || suggestedAvatarUrl)"
-            class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-dark-600 dark:bg-dark-800/60"
+            class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           >
             <div class="space-y-3">
               <div class="space-y-1">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ t('auth.oauthFlow.profileDetailsTitle', { providerName }) }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-dark-400">
+                <p class="text-xs text-gray-500 text-[var(--text-muted)]">
                   {{ t('auth.oauthFlow.profileDetailsDescription', { providerName }) }}
                 </p>
               </div>
 
               <label
                 v-if="suggestedDisplayName"
-                class="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-sm dark:border-dark-600 dark:bg-dark-900/50"
+                class="flex items-start gap-3 rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-3 text-sm border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               >
                 <input v-model="adoptDisplayName" type="checkbox" class="mt-1 h-4 w-4" />
                 <span class="space-y-1">
-                  <span class="block font-medium text-gray-900 dark:text-white">
+                  <span class="block font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t('auth.oauthFlow.useDisplayName') }}
                   </span>
-                  <span class="block text-gray-500 dark:text-dark-400">
+                  <span class="block text-gray-500 text-[var(--text-muted)]">
                     {{ suggestedDisplayName }}
                   </span>
                 </span>
@@ -57,19 +57,19 @@
 
               <label
                 v-if="suggestedAvatarUrl"
-                class="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-sm dark:border-dark-600 dark:bg-dark-900/50"
+                class="flex items-start gap-3 rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-3 text-sm border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               >
                 <input v-model="adoptAvatar" type="checkbox" class="mt-1 h-4 w-4" />
                 <img
                   :src="suggestedAvatarUrl"
                   :alt="t('auth.oauthFlow.avatarAlt', { providerName })"
-                  class="h-10 w-10 rounded-full border border-gray-200 object-cover dark:border-dark-600"
+                  class="h-10 w-10 rounded-full border border-gray-200 object-cover border-[var(--border-default)]"
                 />
                 <span class="space-y-1">
-                  <span class="block font-medium text-gray-900 dark:text-white">
+                  <span class="block font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t('auth.oauthFlow.useAvatar') }}
                   </span>
-                  <span class="block break-all text-gray-500 dark:text-dark-400">
+                  <span class="block break-all text-gray-500 text-[var(--text-muted)]">
                     {{ suggestedAvatarUrl }}
                   </span>
                 </span>
@@ -104,14 +104,14 @@
             </button>
 
             <div
-              class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-dark-600 dark:bg-dark-800/60"
+              class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <div class="space-y-3">
                 <div class="space-y-1">
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t('auth.alreadyHaveAccount') }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-dark-400">
+                  <p class="text-xs text-gray-500 text-[var(--text-muted)]">
                     {{
                       hasCurrentAuthToken
                         ? t('auth.oauthFlow.bindCurrentAccountDescription', { providerName })
@@ -145,14 +145,14 @@
 
           <template v-else-if="needsChooser">
             <div
-              class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-dark-600 dark:bg-dark-800/60"
+              class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <div class="space-y-4">
                 <div class="space-y-1">
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t('auth.oauthFlow.chooseHowToContinue') }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-dark-400">
+                  <p class="text-xs text-gray-500 text-[var(--text-muted)]">
                     {{ t('auth.oauthFlow.chooseAccountActionHint') }}
                   </p>
                 </div>
@@ -217,14 +217,14 @@
             </p>
             <div
               v-if="hasCurrentAuthToken"
-              class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-dark-600 dark:bg-dark-800/60"
+              class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <div class="space-y-3">
                 <div class="space-y-1">
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ t('auth.oauthFlow.bindCurrentAccountTitle') }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-dark-400">
+                  <p class="text-xs text-gray-500 text-[var(--text-muted)]">
                     {{ t('auth.oauthFlow.bindCurrentAccountDescription', { providerName }) }}
                   </p>
                 </div>
@@ -1091,7 +1091,7 @@ onMounted(async () => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,

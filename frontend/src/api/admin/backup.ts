@@ -1,5 +1,14 @@
 import { apiClient } from '../client'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
 export interface BackupS3Config {
   endpoint: string
   region: string
@@ -46,27 +55,59 @@ export interface TestS3Response {
 
 // S3 Config
 export async function getS3Config(): Promise<BackupS3Config> {
+  if (isLocalPreviewSession()) {
+    return {
+      endpoint: '',
+      region: '',
+      bucket: '',
+      access_key_id: '',
+      prefix: '',
+      force_path_style: false,
+    }
+  }
+
   const { data } = await apiClient.get<BackupS3Config>('/admin/backups/s3-config')
   return data
 }
 
 export async function updateS3Config(config: BackupS3Config): Promise<BackupS3Config> {
+  if (isLocalPreviewSession()) {
+    return config
+  }
+
   const { data } = await apiClient.put<BackupS3Config>('/admin/backups/s3-config', config)
   return data
 }
 
 export async function testS3Connection(config: BackupS3Config): Promise<TestS3Response> {
+  if (isLocalPreviewSession()) {
+    return { ok: true, message: '本地预览模式：S3 连接测试已跳过。' }
+  }
+
   const { data } = await apiClient.post<TestS3Response>('/admin/backups/s3-config/test', config)
   return data
 }
 
 // Schedule
 export async function getSchedule(): Promise<BackupScheduleConfig> {
+  if (isLocalPreviewSession()) {
+    return {
+      enabled: false,
+      cron_expr: '0 3 * * *',
+      retain_days: 30,
+      retain_count: 7,
+    }
+  }
+
   const { data } = await apiClient.get<BackupScheduleConfig>('/admin/backups/schedule')
   return data
 }
 
 export async function updateSchedule(config: BackupScheduleConfig): Promise<BackupScheduleConfig> {
+  if (isLocalPreviewSession()) {
+    return config
+  }
+
   const { data } = await apiClient.put<BackupScheduleConfig>('/admin/backups/schedule', config)
   return data
 }
@@ -78,6 +119,10 @@ export async function createBackup(req?: CreateBackupRequest): Promise<BackupRec
 }
 
 export async function listBackups(): Promise<{ items: BackupRecord[] }> {
+  if (isLocalPreviewSession()) {
+    return { items: [] }
+  }
+
   const { data } = await apiClient.get<{ items: BackupRecord[] }>('/admin/backups')
   return data
 }

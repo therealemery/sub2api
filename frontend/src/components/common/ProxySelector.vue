@@ -72,7 +72,7 @@
             :class="['select-option', modelValue === null && 'select-option-selected']"
           >
             <span class="select-option-label">{{ t('admin.accounts.noProxy') }}</span>
-            <Icon v-if="modelValue === null" name="check" size="sm" class="text-primary-500" />
+            <Icon v-if="modelValue === null" name="check" size="sm" class="text-[var(--accent)]" />
           </div>
 
           <!-- Proxy options -->
@@ -88,7 +88,7 @@
                 <!-- Account count badge -->
                 <span
                   v-if="proxy.account_count !== undefined"
-                  class="inline-flex flex-shrink-0 items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 dark:bg-dark-600 dark:text-gray-400"
+                  class="inline-flex flex-shrink-0 items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-400"
                 >
                   {{ proxy.account_count }}
                 </span>
@@ -153,7 +153,7 @@
               v-if="modelValue === proxy.id"
               name="check"
               size="sm"
-              class="flex-shrink-0 text-primary-500"
+              class="flex-shrink-0 text-[var(--accent)]"
             />
           </div>
 
@@ -321,22 +321,22 @@ onUnmounted(() => {
 <style scoped>
 .select-trigger {
   @apply flex w-full items-center justify-between gap-2;
-  @apply rounded-xl px-4 py-2.5 text-sm;
-  @apply bg-white dark:bg-dark-800;
-  @apply border border-gray-200 dark:border-dark-600;
+  @apply rounded-lg px-4 py-2.5 text-sm;
+  @apply bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)];
+  @apply border border-gray-200 border-[var(--border-default)];
   @apply text-gray-900 dark:text-gray-100;
-  @apply transition-all duration-200;
-  @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
+  @apply transition-colors duration-200;
+  @apply focus:border-[var(--border-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)];
   @apply hover:border-gray-300 dark:hover:border-dark-500;
   @apply cursor-pointer;
 }
 
 .select-trigger-open {
-  @apply border-primary-500 ring-2 ring-primary-500/30;
+  @apply border-[var(--border-focus)] ring-2 ring-[var(--border-focus)];
 }
 
 .select-trigger-disabled {
-  @apply cursor-not-allowed bg-gray-100 opacity-60 dark:bg-dark-900;
+  @apply cursor-not-allowed bg-gray-100 opacity-60 bg-[var(--bg-surface-alt)];
 }
 
 .select-value {
@@ -344,21 +344,21 @@ onUnmounted(() => {
 }
 
 .select-icon {
-  @apply flex-shrink-0 text-gray-400 dark:text-dark-400;
+  @apply flex-shrink-0 text-gray-400 text-[var(--text-muted)];
 }
 
 .select-dropdown {
   @apply absolute z-[100] mt-2 w-full;
-  @apply bg-white dark:bg-dark-800;
-  @apply rounded-xl;
-  @apply border border-gray-200 dark:border-dark-700;
-  @apply shadow-lg shadow-black/10 dark:shadow-black/30;
+  @apply bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)];
+  @apply rounded-lg;
+  @apply border border-gray-200 border-[var(--border-default)];
+  box-shadow: none;
   @apply overflow-hidden;
 }
 
 .select-header {
   @apply flex items-center gap-2 px-3 py-2;
-  @apply border-b border-gray-100 dark:border-dark-700;
+  @apply border-b border-gray-100 border-[var(--border-default)];
 }
 
 .select-search {
@@ -374,8 +374,8 @@ onUnmounted(() => {
 
 .batch-test-btn {
   @apply flex-shrink-0 rounded-lg p-1.5;
-  @apply text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400;
-  @apply hover:bg-emerald-50 dark:hover:bg-emerald-900/20;
+  @apply text-gray-500 hover:text-[var(--accent)] dark:hover:text-[var(--accent)];
+  @apply hover:bg-[var(--bg-subtle)] dark:hover:bg-[var(--bg-subtle)];
   @apply transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 
@@ -392,8 +392,8 @@ onUnmounted(() => {
 }
 
 .select-option-selected {
-  @apply bg-primary-50 dark:bg-primary-900/20;
-  @apply text-primary-700 dark:text-primary-300;
+  @apply bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)];
+  @apply text-[var(--accent)] text-[var(--accent)];
 }
 
 .select-option-label {
@@ -402,20 +402,21 @@ onUnmounted(() => {
 
 .select-empty {
   @apply px-4 py-8 text-center text-sm;
-  @apply text-gray-500 dark:text-dark-400;
+  @apply text-gray-500 text-[var(--text-muted)];
 }
 
 .test-btn {
   @apply flex-shrink-0 rounded p-1;
-  @apply text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400;
-  @apply hover:bg-emerald-50 dark:hover:bg-emerald-900/20;
+  @apply text-gray-400 hover:text-[var(--accent)] dark:hover:text-[var(--accent)];
+  @apply hover:bg-[var(--bg-subtle)] dark:hover:bg-[var(--bg-subtle)];
   @apply transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 /* Dropdown animation */
 .select-dropdown-enter-active,
 .select-dropdown-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .select-dropdown-enter-from,

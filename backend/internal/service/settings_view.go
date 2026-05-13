@@ -103,6 +103,7 @@ type SystemSettings struct {
 	TablePageSizeOptions        []int
 	CustomMenuItems             string // JSON array of custom menu items
 	CustomEndpoints             string // JSON array of custom endpoints
+	ModelCenterConfig           string // JSON object of model center display config
 
 	DefaultConcurrency           int
 	DefaultBalance               float64
@@ -207,6 +208,7 @@ type PublicSettings struct {
 	TablePageSizeOptions        []int
 	CustomMenuItems             string // JSON array of custom menu items
 	CustomEndpoints             string // JSON array of custom endpoints
+	ModelCenterConfig           string // JSON object of model center display config
 
 	LinuxDoOAuthEnabled      bool
 	WeChatOAuthEnabled       bool

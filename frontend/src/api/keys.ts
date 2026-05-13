@@ -6,6 +6,77 @@
 import { apiClient } from './client'
 import type { ApiKey, CreateApiKeyRequest, UpdateApiKeyRequest, PaginatedResponse } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function previewApiKeys(): ApiKey[] {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: 1,
+      user_id: 2,
+      key: 'sk-ownapi-preview-gpt',
+      name: 'GPT 5.5 主力密钥',
+      group_id: 1,
+      status: 'active',
+      ip_whitelist: [],
+      ip_blacklist: [],
+      last_used_at: now,
+      quota: 0,
+      quota_used: 4.2,
+      expires_at: null,
+      created_at: now,
+      updated_at: now,
+      rate_limit_5h: 0,
+      rate_limit_1d: 0,
+      rate_limit_7d: 0,
+      usage_5h: 12,
+      usage_1d: 38,
+      usage_7d: 184,
+      window_5h_start: null,
+      window_1d_start: null,
+      window_7d_start: null,
+      reset_5h_at: null,
+      reset_1d_at: null,
+      reset_7d_at: null
+    },
+    {
+      id: 2,
+      user_id: 2,
+      key: 'sk-ownapi-preview-claude',
+      name: 'Claude 4.7 备用密钥',
+      group_id: 2,
+      status: 'active',
+      ip_whitelist: [],
+      ip_blacklist: [],
+      last_used_at: now,
+      quota: 50,
+      quota_used: 8.6,
+      expires_at: null,
+      created_at: now,
+      updated_at: now,
+      rate_limit_5h: 0,
+      rate_limit_1d: 0,
+      rate_limit_7d: 0,
+      usage_5h: 6,
+      usage_1d: 21,
+      usage_7d: 90,
+      window_5h_start: null,
+      window_1d_start: null,
+      window_7d_start: null,
+      reset_5h_at: null,
+      reset_1d_at: null,
+      reset_7d_at: null
+    }
+  ]
+}
+
 /**
  * List all API keys for current user
  * @param page - Page number (default: 1)
@@ -28,6 +99,17 @@ export async function list(
     signal?: AbortSignal
   }
 ): Promise<PaginatedResponse<ApiKey>> {
+  if (isLocalPreviewSession()) {
+    const items = previewApiKeys()
+    return {
+      items,
+      total: items.length,
+      page,
+      page_size: pageSize,
+      pages: 1
+    }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<ApiKey>>('/keys', {
     params: { page, page_size: pageSize, ...filters },
     signal: options?.signal
@@ -41,6 +123,10 @@ export async function list(
  * @returns API key details
  */
 export async function getById(id: number): Promise<ApiKey> {
+  if (isLocalPreviewSession()) {
+    return previewApiKeys().find((item) => item.id === id) ?? previewApiKeys()[0]
+  }
+
   const { data } = await apiClient.get<ApiKey>(`/keys/${id}`)
   return data
 }
@@ -67,6 +153,26 @@ export async function create(
   expiresInDays?: number,
   rateLimitData?: { rate_limit_5h?: number; rate_limit_1d?: number; rate_limit_7d?: number }
 ): Promise<ApiKey> {
+  if (isLocalPreviewSession()) {
+    const now = new Date().toISOString()
+    return {
+      ...previewApiKeys()[0],
+      id: Date.now(),
+      name,
+      group_id: groupId ?? null,
+      key: customKey || 'sk-ownapi-preview-created',
+      ip_whitelist: ipWhitelist ?? [],
+      ip_blacklist: ipBlacklist ?? [],
+      quota: quota ?? 0,
+      expires_at: expiresInDays ? new Date(Date.now() + expiresInDays * 86400000).toISOString() : null,
+      created_at: now,
+      updated_at: now,
+      rate_limit_5h: rateLimitData?.rate_limit_5h ?? 0,
+      rate_limit_1d: rateLimitData?.rate_limit_1d ?? 0,
+      rate_limit_7d: rateLimitData?.rate_limit_7d ?? 0
+    }
+  }
+
   const payload: CreateApiKeyRequest = { name }
   if (groupId !== undefined) {
     payload.group_id = groupId
@@ -107,6 +213,14 @@ export async function create(
  * @returns Updated API key
  */
 export async function update(id: number, updates: UpdateApiKeyRequest): Promise<ApiKey> {
+  if (isLocalPreviewSession()) {
+    return {
+      ...(previewApiKeys().find((item) => item.id === id) ?? previewApiKeys()[0]),
+      ...updates,
+      updated_at: new Date().toISOString()
+    }
+  }
+
   const { data } = await apiClient.put<ApiKey>(`/keys/${id}`, updates)
   return data
 }
@@ -117,6 +231,10 @@ export async function update(id: number, updates: UpdateApiKeyRequest): Promise<
  * @returns Success confirmation
  */
 export async function deleteKey(id: number): Promise<{ message: string }> {
+  if (isLocalPreviewSession()) {
+    return { message: '本地预览模式：密钥删除已模拟完成。' }
+  }
+
   const { data } = await apiClient.delete<{ message: string }>(`/keys/${id}`)
   return data
 }

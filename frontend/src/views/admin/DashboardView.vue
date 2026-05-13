@@ -1,6 +1,10 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="admin-dashboard-page space-y-6">
+      <PageIntro
+        title="管理员仪表盘"
+        description="集中查看系统健康、今日调用、账号状态、成本和用户增长。第一屏用于判断是否需要处理异常，下方图表继续保留详细分析。"
+      />
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <LoadingSpinner />
@@ -8,18 +12,18 @@
 
       <template v-else-if="stats">
         <!-- Row 1: Core Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="admin-primary-metrics grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- Total API Keys -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-                <Icon name="key" size="md" class="text-blue-600 dark:text-blue-400" :stroke-width="2" />
+              <div class="rounded-lg bg-[var(--bg-surface-alt)] p-2 bg-[var(--bg-surface-alt)]">
+                <Icon name="key" size="md" class="text-[var(--accent)] text-[var(--accent)]" :stroke-width="2" />
               </div>
               <div>
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.apiKeys') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ stats.total_api_keys }}
                 </p>
                 <p class="text-xs text-green-600 dark:text-green-400">
@@ -39,7 +43,7 @@
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.accounts') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ stats.total_accounts }}
                 </p>
                 <p class="text-xs">
@@ -64,7 +68,7 @@
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.todayRequests') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ stats.today_requests }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -96,7 +100,7 @@
         </div>
 
         <!-- Row 2: Token Stats -->
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="admin-secondary-metrics grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- Today Tokens -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
@@ -107,7 +111,7 @@
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.todayTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ formatTokens(stats.today_tokens) }}
                 </p>
                 <p class="text-xs">
@@ -143,7 +147,7 @@
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.totalTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ formatTokens(stats.total_tokens) }}
                 </p>
                 <p class="text-xs">
@@ -180,7 +184,7 @@
                   {{ t('admin.dashboard.performance') }}
                 </p>
                 <div class="flex items-baseline gap-2">
-                  <p class="text-xl font-bold text-gray-900 dark:text-white">
+                  <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                     {{ formatTokens(stats.rpm) }}
                   </p>
                   <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
@@ -205,7 +209,7 @@
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
                   {{ t('admin.dashboard.avgResponse') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">
+                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ formatDuration(stats.average_duration_ms) }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -270,7 +274,7 @@
 
           <!-- User Usage Trend (Full Width) -->
           <div class="card p-4">
-            <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+            <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ t('admin.dashboard.recentUsage') }} (Top 12)
             </h3>
             <div class="h-64">
@@ -309,6 +313,7 @@ import type {
 } from '@/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Icon from '@/components/icons/Icon.vue'
 import DateRangePicker from '@/components/common/DateRangePicker.vue'
 import Select from '@/components/common/Select.vue'
@@ -491,17 +496,17 @@ const userTrendChartData = computed(() => {
 
   const sortedDates = Array.from(allDates).sort()
   const colors = [
-    '#3b82f6',
-    '#10b981',
-    '#f59e0b',
+    '#c4471a',
+    '#287a4b',
+    '#986b16',
     '#ef4444',
-    '#8b5cf6',
-    '#ec4899',
-    '#14b8a6',
-    '#f97316',
-    '#6366f1',
-    '#84cc16',
-    '#06b6d4',
+    '#9a7b63',
+    '#a73c2e',
+    'var(--border-focus)',
+    '#b8851f',
+    '#6f6258',
+    '#4a7c3c',
+    '#716d64',
     '#a855f7'
   ]
 
@@ -537,15 +542,16 @@ const formatNumber = (value: number): string => {
   return value.toLocaleString()
 }
 
-const formatCost = (value: number): string => {
-  if (value >= 1000) {
-    return (value / 1000).toFixed(2) + 'K'
-  } else if (value >= 1) {
-    return value.toFixed(2)
-  } else if (value >= 0.01) {
-    return value.toFixed(3)
+const formatCost = (value?: number | null): string => {
+  const safeValue = Number.isFinite(value) ? Number(value) : 0
+  if (safeValue >= 1000) {
+    return (safeValue / 1000).toFixed(2) + 'K'
+  } else if (safeValue >= 1) {
+    return safeValue.toFixed(2)
+  } else if (safeValue >= 0.01) {
+    return safeValue.toFixed(3)
   }
-  return value.toFixed(4)
+  return safeValue.toFixed(4)
 }
 
 const formatDuration = (ms: number): string => {
@@ -594,6 +600,7 @@ const loadDashboardSnapshot = async (includeStats: boolean) => {
     loading.value = true
   }
   chartsLoading.value = true
+
   try {
     const response = await adminAPI.dashboard.getSnapshotV2({
       start_date: startDate.value,
@@ -626,6 +633,7 @@ const loadDashboardSnapshot = async (includeStats: boolean) => {
 const loadUsersTrend = async () => {
   const currentSeq = ++usersTrendLoadSeq
   userTrendLoading.value = true
+
   try {
     const response = await adminAPI.dashboard.getUserUsageTrend({
       start_date: startDate.value,
@@ -650,6 +658,7 @@ const loadUserSpendingRanking = async () => {
   const currentSeq = ++rankingLoadSeq
   rankingLoading.value = true
   rankingError.value = false
+
   try {
     const response = await adminAPI.dashboard.getUserSpendingRanking({
       start_date: startDate.value,
@@ -698,4 +707,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.admin-primary-metrics :deep(.card),
+.admin-secondary-metrics :deep(.card) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+}
+
+.admin-primary-metrics :deep(.card) {
+  min-height: 116px;
+}
+
+.admin-secondary-metrics :deep(.card) {
+  min-height: 96px;
+  background: var(--bg-surface-alt) !important;
+}
+
+.admin-dashboard-page :deep(.rounded-lg) {
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+@media (max-width: 768px) {
+  .admin-primary-metrics,
+  .admin-secondary-metrics {
+    grid-template-columns: 1fr !important;
+  }
+}
 </style>

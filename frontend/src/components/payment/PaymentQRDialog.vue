@@ -4,7 +4,7 @@
     <div v-if="!success" class="flex flex-col items-center space-y-4">
       <!-- QR Code mode -->
       <template v-if="qrUrl">
-        <div class="rounded-2xl bg-white p-4 shadow-sm dark:bg-dark-800">
+        <div class="rounded-lg bg-[var(--bg-surface)] p-4 bg-[var(--bg-surface-alt)]">
           <canvas ref="qrCanvas" class="mx-auto"></canvas>
         </div>
         <p v-if="scanHint" class="text-center text-sm text-gray-500 dark:text-gray-400">
@@ -14,7 +14,7 @@
       <!-- Popup window waiting mode (no QR code) -->
       <template v-else>
         <div class="flex flex-col items-center py-4">
-          <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+          <div class="h-10 w-10 animate-spin rounded-full border-4 border-[var(--border-focus)] border-t-transparent"></div>
           <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ t('payment.qr.payInNewWindowHint') }}</p>
           <button v-if="payUrl" class="btn btn-secondary mt-3 text-sm" @click="reopenPopup">
             {{ t('payment.qr.openPayWindow') }}
@@ -27,7 +27,7 @@
       </div>
       <div v-else class="text-center">
         <p class="text-sm text-gray-500 dark:text-gray-400">{{ qrUrl ? t('payment.qr.expiresIn') : '' }}</p>
-        <p class="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ countdownDisplay }}</p>
+        <p class="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-[var(--text-inverse)]">{{ countdownDisplay }}</p>
         <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ t('payment.qr.waitingPayment') }}</p>
       </div>
     </div>
@@ -36,20 +36,20 @@
       <div class="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
         <Icon name="check" size="lg" class="text-green-500" />
       </div>
-      <p class="text-lg font-bold text-gray-900 dark:text-white">{{ t('payment.result.success') }}</p>
-      <div v-if="paidOrder" class="w-full rounded-xl bg-gray-50 p-4 dark:bg-dark-800">
+      <p class="text-lg font-bold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('payment.result.success') }}</p>
+      <div v-if="paidOrder" class="w-full rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.orderId') }}</span>
-            <span class="font-medium text-gray-900 dark:text-white">#{{ paidOrder.id }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">#{{ paidOrder.id }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.amount') }}</span>
-            <span class="font-medium text-gray-900 dark:text-white">{{ paidOrder.order_type === 'balance' ? '$' : '¥' }}{{ paidOrder.amount.toFixed(2) }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ paidOrder.order_type === 'balance' ? '$' : '¥' }}{{ paidOrder.amount.toFixed(2) }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.payAmount') }}</span>
-            <span class="font-medium text-gray-900 dark:text-white">¥{{ paidOrder.pay_amount.toFixed(2) }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ paidOrder.pay_amount.toFixed(2) }}</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,11 @@
 <template>
   <AppLayout>
-    <TablePageLayout>
+    <div class="table-page-with-intro">
+      <PageIntro
+        title="渠道管理"
+        description="配置上游模型来源、模型价格和可用状态。渠道只负责能力来源，后续由分组决定哪些用户或 API Key 可以使用。"
+      />
+      <TablePageLayout>
       <template #filters>
         <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <!-- Left: Search + Filters -->
@@ -58,7 +63,7 @@
           @sort="handleSort"
         >
           <template #cell-name="{ value }">
-            <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
           </template>
 
           <template #cell-description="{ value }">
@@ -74,7 +79,7 @@
 
           <template #cell-group_count="{ row }">
             <span
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
             >
               {{ (row.group_ids || []).length }}
               {{ t('admin.channels.groupsUnit', 'groups') }}
@@ -83,7 +88,7 @@
 
           <template #cell-pricing_count="{ row }">
             <span
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-dark-600 dark:text-gray-300"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
             >
               {{ (row.model_pricing || []).length }}
               {{ t('admin.channels.pricingUnit', 'pricing rules') }}
@@ -100,7 +105,7 @@
             <div class="flex items-center gap-1">
               <button
                 @click="openEditDialog(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 dark:hover:bg-dark-700 dark:hover:text-primary-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t('common.edit', 'Edit') }}</span>
@@ -118,7 +123,7 @@
           <template #empty>
             <EmptyState
               :title="t('admin.channels.noChannelsYet', 'No Channels Yet')"
-              :description="t('admin.channels.createFirstChannel', 'Create your first channel to manage model pricing')"
+              description="还没有渠道。先创建模型来源和价格规则，再到分组页面把渠道分配给用户或 API 密钥。"
               :action-text="t('admin.channels.createChannel', 'Create Channel')"
               @action="openCreateDialog"
             />
@@ -136,7 +141,8 @@
           @update:pageSize="handlePageSizeChange"
         />
       </template>
-    </TablePageLayout>
+      </TablePageLayout>
+    </div>
 
     <!-- Create/Edit Dialog -->
     <BaseDialog
@@ -146,8 +152,13 @@
       @close="closeDialog"
     >
       <div class="channel-dialog-body">
+        <div class="admin-config-impact-note mb-4">
+          <strong>渠道影响：</strong>
+          渠道只定义模型来源、价格规则和可用状态。保存后，只会影响已关联到该渠道的分组和 API Key。
+        </div>
+
         <!-- Tab Bar -->
-        <div class="flex items-center border-b border-gray-200 dark:border-dark-700 flex-shrink-0 -mx-4 sm:-mx-6 px-4 sm:px-6 -mt-3 sm:-mt-4">
+        <div class="flex items-center border-b border-gray-200 border-[var(--border-default)] flex-shrink-0 -mx-4 sm:-mx-6 px-4 sm:px-6 -mt-3 sm:-mt-4">
           <!-- Basic Settings Tab -->
           <button
             type="button"
@@ -166,7 +177,14 @@
             class="channel-tab group"
             :class="activeTab === section.platform ? 'channel-tab-active' : 'channel-tab-inactive'"
           >
-            <PlatformIcon :platform="section.platform" size="xs" :class="platformTextClass(section.platform)" />
+            <span class="channel-platform-logo">
+              <img
+                v-if="platformLogo(section.platform)"
+                :src="platformLogo(section.platform)"
+                :alt="platformLogoLabel(section.platform)"
+              />
+              <PlatformIcon v-else :platform="section.platform" size="xs" />
+            </span>
             <span :class="platformTextClass(section.platform)">{{ t('admin.groups.platforms.' + section.platform, section.platform) }}</span>
           </button>
         </div>
@@ -175,6 +193,11 @@
         <form id="channel-form" @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto pt-4">
           <!-- Basic Settings Tab -->
           <div v-show="activeTab === 'basic'" class="space-y-5">
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>基础信息</h4>
+                <p>给渠道一个清晰名称，并说明它代表哪一类上游模型来源。</p>
+              </div>
             <!-- Name -->
             <div>
               <label class="input-label">{{ t('admin.channels.form.name', 'Name') }} <span class="text-red-500">*</span></label>
@@ -203,6 +226,13 @@
               <label class="input-label">{{ t('admin.channels.form.status', 'Status') }}</label>
               <Select v-model="form.status" :options="statusEditOptions" />
             </div>
+            </section>
+
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>计费口径</h4>
+                <p>这里决定模型价格如何匹配，以及是否把价格同步用于账号统计。</p>
+              </div>
 
             <!-- Model Restriction -->
             <div>
@@ -210,7 +240,7 @@
                 <input
                   type="checkbox"
                   v-model="form.restrict_models"
-                  class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                 />
                 <span class="input-label mb-0">{{ t('admin.channels.form.restrictModels', 'Restrict Models') }}</span>
               </label>
@@ -227,6 +257,13 @@
                 {{ t('admin.channels.form.billingModelSourceHint', 'Controls which model name is used for pricing lookup') }}
               </p>
             </div>
+            </section>
+
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>启用平台</h4>
+                <p>选择这个渠道承载的平台。启用后会出现对应平台的分组、映射和模型价格配置。</p>
+              </div>
 
             <!-- Platform Management -->
             <div class="space-y-3">
@@ -237,23 +274,37 @@
                   :key="p"
                   class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors"
                   :class="activePlatforms.includes(p)
-                    ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/20 dark:border-primary-700'
-                    : 'border-gray-200 hover:bg-gray-50 dark:border-dark-600 dark:hover:bg-dark-700'"
+                    ? 'bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)]'
+                    : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700'"
                 >
                   <input
                     type="checkbox"
                     :checked="activePlatforms.includes(p)"
-                    class="h-3.5 w-3.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    class="h-3.5 w-3.5 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                     @change="togglePlatform(p)"
                   />
-                  <PlatformIcon :platform="p" size="xs" :class="platformTextClass(p)" />
+                  <span class="channel-platform-logo">
+                    <img
+                      v-if="platformLogo(p)"
+                      :src="platformLogo(p)"
+                      :alt="platformLogoLabel(p)"
+                    />
+                    <PlatformIcon v-else :platform="p" size="xs" />
+                  </span>
                   <span :class="platformTextClass(p)">{{ t('admin.groups.platforms.' + p, p) }}</span>
                 </label>
               </div>
             </div>
+            </section>
+
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>账号统计计费</h4>
+                <p>仅影响统计口径，不会改变渠道、分组或密钥的真实创建流程。</p>
+              </div>
 
             <!-- Apply Pricing to Account Stats (toggle only in basic settings) -->
-            <div class="border-t border-gray-200 pt-4 dark:border-dark-700">
+            <div>
               <div class="flex items-center justify-between">
                 <div>
                   <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -269,6 +320,7 @@
                 />
               </div>
             </div>
+            </section>
           </div>
 
           <!-- Platform Tab Content -->
@@ -278,6 +330,11 @@
             v-show="section.enabled && activeTab === section.platform"
             class="space-y-4"
           >
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>可用分组</h4>
+                <p>把这个渠道分配给哪些分组。分组决定用户或 API Key 能否使用该渠道。</p>
+              </div>
             <!-- Groups -->
             <div>
               <label class="input-label text-xs">
@@ -286,7 +343,7 @@
                   ({{ t('admin.channels.form.selectedCount', { count: section.group_ids.length }, `已选 ${section.group_ids.length} 个`) }})
                 </span>
               </label>
-              <div class="max-h-40 overflow-auto rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-dark-600 dark:bg-dark-900">
+              <div class="max-h-40 overflow-auto rounded-lg border border-gray-200 bg-gray-50 p-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
                 <div v-if="groupsLoading" class="py-2 text-center text-xs text-gray-500">
                   {{ t('common.loading', 'Loading...') }}
                 </div>
@@ -297,9 +354,9 @@
                   <label
                     v-for="group in getGroupsForPlatform(section.platform)"
                     :key="group.id"
-                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 px-2 py-1 text-xs transition-colors hover:bg-gray-50 dark:border-dark-600 dark:hover:bg-dark-700"
+                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 px-2 py-1 text-xs transition-colors hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700"
                     :class="[
-                      section.group_ids.includes(group.id) ? 'bg-primary-50 border-primary-300 dark:bg-primary-900/20 dark:border-primary-700' : '',
+                      section.group_ids.includes(group.id) ? 'bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)]' : '',
                       isGroupInOtherChannel(group.id, section.platform) ? 'opacity-40' : ''
                     ]"
                   >
@@ -307,9 +364,17 @@
                       type="checkbox"
                       :checked="section.group_ids.includes(group.id)"
                       :disabled="isGroupInOtherChannel(group.id, section.platform)"
-                      class="h-3 w-3 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      class="h-3 w-3 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
                       @change="toggleGroupInSection(sIdx, group.id)"
                     />
+                    <span class="channel-platform-logo channel-platform-logo-sm">
+                      <img
+                        v-if="platformLogo(group.platform)"
+                        :src="platformLogo(group.platform)"
+                        :alt="platformLogoLabel(group.platform)"
+                      />
+                      <PlatformIcon v-else :platform="group.platform" size="xs" />
+                    </span>
                     <span :class="['font-medium', platformTextClass(group.platform)]">{{ group.name }}</span>
                     <span
                       :class="['rounded-full px-1 py-0 text-[10px]', platformBadgeLightClass(group.platform)]"
@@ -323,9 +388,11 @@
                 </div>
               </div>
             </div>
+            </section>
 
             <!-- Web Search Emulation (Anthropic only, hidden when global disabled) -->
-            <div v-if="section.platform === 'anthropic' && webSearchGlobalEnabled" class="border-t border-gray-200 pt-3 dark:border-dark-600">
+            <section v-if="section.platform === 'anthropic' && webSearchGlobalEnabled" class="admin-config-section">
+            <div>
               <div class="flex items-center justify-between">
                 <div>
                   <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -338,18 +405,24 @@
                 <Toggle v-model="section.web_search_emulation" />
               </div>
             </div>
+            </section>
 
             <!-- Model Mapping -->
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>模型映射</h4>
+                <p>可选配置。用于把用户侧模型名映射到上游实际模型名。</p>
+              </div>
             <div>
               <div class="mb-1 flex items-center justify-between">
                 <label class="input-label text-xs mb-0">{{ t('admin.channels.form.modelMapping', 'Model Mapping') }}</label>
-                <button type="button" @click="addMappingEntry(sIdx)" class="text-xs text-primary-600 hover:text-primary-700">
+                <button type="button" @click="addMappingEntry(sIdx)" class="admin-config-action-link">
                   + {{ t('common.add', 'Add') }}
                 </button>
               </div>
               <div
                 v-if="Object.keys(section.model_mapping).length === 0"
-                class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 dark:border-dark-500"
+                class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 border-[var(--border-default)]"
               >
                 {{ t('admin.channels.form.noMappingRules', 'No mapping rules. Click "Add" to create one.') }}
               </div>
@@ -386,18 +459,42 @@
                 </div>
               </div>
             </div>
+            </section>
 
             <!-- Model Pricing -->
+            <section class="admin-config-section">
+              <div class="admin-config-section-header">
+                <h4>模型价格</h4>
+                <p>这个区域是渠道的核心配置。每条规则只保存为原有模型价格参数。</p>
+              </div>
             <div>
-              <div class="mb-1 flex items-center justify-between">
+              <div class="mb-1 flex flex-wrap items-center justify-between gap-2">
                 <label class="input-label text-xs mb-0">{{ t('admin.channels.form.modelPricing', 'Model Pricing') }}</label>
-                <button type="button" @click="addPricingEntry(sIdx)" class="text-xs text-primary-600 hover:text-primary-700">
-                  + {{ t('common.add', 'Add') }}
-                </button>
+                <div class="channel-pricing-actions">
+                  <button
+                    v-if="section.platform === 'openai'"
+                    type="button"
+                    class="channel-image-preset-button"
+                    @click="addOpenAIImage2Entry(sIdx)"
+                  >
+                    <span class="channel-platform-logo channel-platform-logo-sm">
+                      <img
+                        v-if="platformLogo('openai')"
+                        :src="platformLogo('openai')"
+                        :alt="platformLogoLabel('openai')"
+                      />
+                      <PlatformIcon v-else platform="openai" size="xs" />
+                    </span>
+                    <span>+ OpenAI Image 2</span>
+                  </button>
+                  <button type="button" @click="addPricingEntry(sIdx)" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
+                    + {{ t('common.add', 'Add') }}
+                  </button>
+                </div>
               </div>
               <div
                 v-if="section.model_pricing.length === 0"
-                class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 dark:border-dark-500"
+                class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 border-[var(--border-default)]"
               >
                 {{ t('admin.channels.form.noPricingRules', 'No pricing rules yet. Click "Add" to create one.') }}
               </div>
@@ -412,9 +509,14 @@
                 />
               </div>
             </div>
+            </section>
 
             <!-- Account Stats Pricing Rules (per-platform, always visible) -->
-            <div class="mt-4 border-t border-gray-200 pt-4 dark:border-dark-700 space-y-3">
+            <section class="admin-config-section space-y-3">
+              <div class="admin-config-section-header">
+                <h4>高级统计规则</h4>
+                <p>用于账号统计侧的计费覆盖，属于高级配置；不影响基础渠道保存动作。</p>
+              </div>
               <div class="flex items-center justify-between">
                 <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {{ t('admin.channels.form.accountStatsPricingRules') }}
@@ -422,7 +524,7 @@
                 <button
                   type="button"
                   @click="addAccountStatsRule(sIdx)"
-                  class="rounded-lg border border-primary-300 px-3 py-1 text-xs font-medium text-primary-600 hover:bg-primary-50 dark:border-primary-600 dark:text-primary-400 dark:hover:bg-primary-900/20"
+                  class="rounded-lg border border-[var(--border-focus)] px-3 py-1 text-xs font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
                 >
                   + {{ t('admin.channels.form.addRule') }}
                 </button>
@@ -439,7 +541,7 @@
               <div
                 v-for="(rule, ruleIndex) in section.account_stats_pricing_rules"
                 :key="ruleIndex"
-                class="space-y-3 rounded-lg border border-gray-200 p-4 dark:border-dark-600"
+                class="space-y-3 rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
               >
                 <div class="flex items-center justify-between">
                   <input
@@ -460,10 +562,18 @@
                       :key="gid"
                       class="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors"
                       :class="rule.group_ids.includes(gid)
-                        ? 'border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-900/20'
-                        : 'border-gray-200 hover:bg-gray-50 dark:border-dark-600 dark:hover:bg-dark-700'"
+                        ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]'
+                        : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700'"
                     >
-                      <input type="checkbox" :checked="rule.group_ids.includes(gid)" class="h-3 w-3 rounded border-gray-300 text-primary-600 focus:ring-primary-500" @change="rule.group_ids.includes(gid) ? rule.group_ids.splice(rule.group_ids.indexOf(gid), 1) : rule.group_ids.push(gid)" />
+                      <input type="checkbox" :checked="rule.group_ids.includes(gid)" class="h-3 w-3 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]" @change="rule.group_ids.includes(gid) ? rule.group_ids.splice(rule.group_ids.indexOf(gid), 1) : rule.group_ids.push(gid)" />
+                      <span class="channel-platform-logo channel-platform-logo-sm">
+                        <img
+                          v-if="platformLogo(section.platform)"
+                          :src="platformLogo(section.platform)"
+                          :alt="platformLogoLabel(section.platform)"
+                        />
+                        <PlatformIcon v-else :platform="asGroupPlatform(section.platform)" size="xs" />
+                      </span>
                       <span :class="['font-medium', platformTextClass(section.platform)]">{{ getGroupNameById(gid) }}</span>
                     </label>
                   </div>
@@ -479,7 +589,7 @@
                     <span
                       v-for="accountId in rule.account_ids"
                       :key="accountId"
-                      class="inline-flex items-center gap-1 rounded-md border border-primary-300 bg-primary-50 px-2 py-0.5 text-xs dark:border-primary-700 dark:bg-primary-900/20"
+                      class="inline-flex items-center gap-1 rounded-md border border-[var(--border-focus)] bg-[var(--bg-surface-alt)] px-2 py-0.5 text-xs border-[var(--border-focus)] bg-[var(--bg-surface-alt)]"
                     >
                       <span :class="['font-medium', platformTextClass(section.platform)]">{{ getRuleAccountLabel(accountId) }}</span>
                       <button type="button" @click="removeRuleAccount(rule, accountId)" class="text-gray-400 hover:text-red-500">
@@ -500,7 +610,7 @@
                     <!-- Search results dropdown -->
                     <div
                       v-if="showRuleAccountDropdown[`${section.platform}-${ruleIndex}`] && (ruleAccountSearchResults[`${section.platform}-${ruleIndex}`]?.length ?? 0) > 0"
-                      class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-white shadow-lg dark:border-dark-600 dark:bg-dark-800"
+                      class="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                     >
                       <button
                         v-for="account in ruleAccountSearchResults[`${section.platform}-${ruleIndex}`]"
@@ -524,11 +634,11 @@
                 <div>
                   <div class="mb-1 flex items-center justify-between">
                     <label class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.channels.form.ruleModelPricing') }}</label>
-                    <button type="button" @click="addRulePricingEntry(sIdx, ruleIndex)" class="text-xs text-primary-600 hover:text-primary-700">
+                    <button type="button" @click="addRulePricingEntry(sIdx, ruleIndex)" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
                       + {{ t('common.add') }}
                     </button>
                   </div>
-                  <div v-if="rule.pricing.length === 0" class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 dark:border-dark-500">
+                  <div v-if="rule.pricing.length === 0" class="rounded border border-dashed border-gray-300 p-2 text-center text-xs text-gray-400 border-[var(--border-default)]">
                     {{ t('admin.channels.form.noPricingRules') }}
                   </div>
                   <div v-else class="space-y-2">
@@ -543,13 +653,17 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </form>
       </div>
 
       <template #footer>
         <div class="flex justify-end gap-3">
+          <div class="config-save-note mr-auto hidden max-w-lg text-left lg:block">
+            <strong>保存区：</strong>
+            只保存当前渠道配置，不会自动创建分组、账号或用户密钥。
+          </div>
           <button @click="closeDialog" type="button" class="btn btn-secondary">
             {{ t('common.cancel', 'Cancel') }}
           </button>
@@ -603,6 +717,7 @@ import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Select from '@/components/common/Select.vue'
 import Icon from '@/components/icons/Icon.vue'
 import PlatformIcon from '@/components/common/PlatformIcon.vue'
@@ -610,9 +725,14 @@ import Toggle from '@/components/common/Toggle.vue'
 import PricingEntryCard from '@/components/admin/channel/PricingEntryCard.vue'
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 import { useKeyedDebouncedSearch } from '@/composables/useKeyedDebouncedSearch'
+import { getPlatformDisplayName, getPlatformLogo } from '@/constants/modelLogos'
 
 const { t } = useI18n()
 const appStore = useAppStore()
+
+const platformLogo = (platform: unknown) => getPlatformLogo(String(platform ?? ''))
+const platformLogoLabel = (platform: unknown) => getPlatformDisplayName(String(platform ?? ''))
+const asGroupPlatform = (platform: unknown) => String(platform ?? '') as GroupPlatform
 
 // Web Search global enabled state (loaded once on mount)
 const webSearchGlobalEnabled = ref(false)
@@ -803,8 +923,8 @@ function toggleGroupInSection(sectionIdx: number, groupId: number) {
 }
 
 // ── Pricing helpers ──
-function addPricingEntry(sectionIdx: number) {
-  form.platforms[sectionIdx].model_pricing.push({
+function createPricingEntry(overrides: Partial<PricingFormEntry> = {}): PricingFormEntry {
+  return {
     models: [],
     billing_mode: 'token',
     input_price: null,
@@ -813,8 +933,23 @@ function addPricingEntry(sectionIdx: number) {
     cache_read_price: null,
     image_output_price: null,
     per_request_price: null,
-    intervals: []
-  })
+    intervals: [],
+    ...overrides
+  }
+}
+
+function addPricingEntry(sectionIdx: number) {
+  form.platforms[sectionIdx].model_pricing.push(createPricingEntry())
+}
+
+function addOpenAIImage2Entry(sectionIdx: number) {
+  const section = form.platforms[sectionIdx]
+  if (!section || section.platform !== 'openai') return
+
+  section.model_pricing.push(createPricingEntry({
+    models: ['gpt-image-2'],
+    billing_mode: 'image'
+  }))
 }
 
 function updatePricingEntry(sectionIdx: number, idx: number, updated: PricingFormEntry) {
@@ -1505,15 +1640,111 @@ onUnmounted(() => {
   min-height: 400px;
 }
 
+.channel-platform-logo {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.channel-platform-logo-sm {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+}
+
+.channel-platform-logo img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.channel-platform-logo-sm img {
+  width: 10px;
+  height: 10px;
+}
+
+:global(.dark) .channel-platform-logo {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark) .channel-platform-logo img {
+  filter: none;
+}
+
+.channel-pricing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.channel-image-preset-button {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-default);
+  border-radius: 9999px;
+  background: var(--bg-surface);
+  padding: 0 10px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.channel-image-preset-button:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-surface-alt);
+}
+
+.channel-image-preset-button:active {
+  background: color-mix(in srgb, var(--text-primary) 12%, var(--bg-surface) 88%);
+}
+
+:global(.dark) .channel-image-preset-button {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+:global(.dark) .channel-image-preset-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .channel-tab {
   @apply flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap;
 }
 
 .channel-tab-active {
-  @apply border-primary-600 text-primary-600 dark:border-primary-400 dark:text-primary-400;
+  border-color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .channel-tab-inactive {
   @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300;
+}
+
+.channel-dialog-body :deep([class*='text-orange-']),
+.channel-dialog-body :deep([class*='text-purple-']),
+.channel-dialog-body :deep([class*='text-violet-']),
+.channel-dialog-body :deep([class*='text-accent']) {
+  color: var(--text-primary) !important;
+}
+
+.channel-dialog-body :deep([class*='bg-orange-']),
+.channel-dialog-body :deep([class*='bg-purple-']),
+.channel-dialog-body :deep([class*='bg-violet-']),
+.channel-dialog-body :deep([class*='bg-accent']) {
+  background-color: var(--bg-surface-alt) !important;
 }
 </style>

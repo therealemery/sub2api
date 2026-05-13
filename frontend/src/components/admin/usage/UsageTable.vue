@@ -14,47 +14,47 @@
           <div class="text-sm">
             <button
               v-if="row.user?.email"
-              class="font-medium text-primary-600 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              class="font-medium text-[var(--accent)] underline decoration-dashed underline-offset-2 transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
               @click="$emit('userClick', row.user_id, row.user?.email)"
               :title="t('admin.usage.clickToViewBalance')"
             >
               {{ row.user.email }}
             </button>
-            <span v-else class="font-medium text-gray-900 dark:text-white">-</span>
+            <span v-else class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">-</span>
             <span class="ml-1 text-gray-500 dark:text-gray-400">#{{ row.user_id }}</span>
           </div>
         </template>
 
         <template #cell-api_key="{ row }">
-          <span class="text-sm text-gray-900 dark:text-white">{{ row.api_key?.name || '-' }}</span>
+          <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">{{ row.api_key?.name || '-' }}</span>
         </template>
 
         <template #cell-account="{ row }">
-          <span class="text-sm text-gray-900 dark:text-white">{{ row.account?.name || '-' }}</span>
+          <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">{{ row.account?.name || '-' }}</span>
         </template>
 
         <template #cell-model="{ row }">
           <div v-if="row.model_mapping_chain && row.model_mapping_chain.includes('→')" class="space-y-0.5 text-xs">
             <div v-for="(step, i) in row.model_mapping_chain.split('→')" :key="i"
                  class="break-all"
-                 :class="i === 0 ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'"
+                 :class="i === 0 ? 'font-medium text-gray-900 dark:text-[var(--text-inverse)]' : 'text-gray-500 dark:text-gray-400'"
                  :style="i > 0 ? `padding-left: ${i * 0.75}rem` : ''">
               <span v-if="i > 0" class="mr-0.5">↳</span>{{ step }}
             </div>
           </div>
           <div v-else-if="row.upstream_model && row.upstream_model !== row.model" class="space-y-0.5 text-xs">
-            <div class="break-all font-medium text-gray-900 dark:text-white">
+            <div class="break-all font-medium text-gray-900 dark:text-[var(--text-inverse)]">
               {{ row.model }}
             </div>
             <div class="break-all text-gray-500 dark:text-gray-400">
               <span class="mr-0.5">↳</span>{{ row.upstream_model }}
             </div>
           </div>
-          <span v-else class="font-medium text-gray-900 dark:text-white">{{ row.model }}</span>
+          <span v-else class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ row.model }}</span>
         </template>
 
         <template #cell-reasoning_effort="{ row }">
-          <span class="text-sm text-gray-900 dark:text-white">
+          <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">
             {{ formatReasoningEffort(row.reasoning_effort) }}
           </span>
         </template>
@@ -97,7 +97,7 @@
             <svg class="h-4 w-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span class="font-medium text-gray-900 dark:text-white">{{ row.image_count }}{{ t('usage.imageUnit') }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ row.image_count }}{{ t('usage.imageUnit') }}</span>
             <span class="text-gray-400">({{ row.image_size || '2K' }})</span>
           </div>
           <!-- Token 请求 -->
@@ -106,11 +106,11 @@
               <div class="flex items-center gap-2">
                 <div class="inline-flex items-center gap-1">
                   <Icon name="arrowDown" size="sm" class="h-3.5 w-3.5 text-emerald-500" />
-                  <span class="font-medium text-gray-900 dark:text-white">{{ row.input_tokens?.toLocaleString() || 0 }}</span>
+                  <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ row.input_tokens?.toLocaleString() || 0 }}</span>
                 </div>
                 <div class="inline-flex items-center gap-1">
                   <Icon name="arrowUp" size="sm" class="h-3.5 w-3.5 text-violet-500" />
-                  <span class="font-medium text-gray-900 dark:text-white">{{ row.output_tokens?.toLocaleString() || 0 }}</span>
+                  <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ row.output_tokens?.toLocaleString() || 0 }}</span>
                 </div>
               </div>
               <div v-if="row.cache_read_tokens > 0 || row.cache_creation_tokens > 0" class="flex items-center gap-2">
@@ -132,8 +132,8 @@
               @mouseenter="showTokenTooltip($event, row)"
               @mouseleave="hideTokenTooltip"
             >
-              <div class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-blue-100 dark:bg-gray-700 dark:group-hover:bg-blue-900/50">
-                <Icon name="infoCircle" size="xs" class="text-gray-400 group-hover:text-blue-500 dark:text-gray-500 dark:group-hover:text-blue-400" />
+              <div class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-[var(--bg-subtle)] dark:bg-gray-700 dark:group-hover:bg-[var(--bg-subtle)]">
+                <Icon name="infoCircle" size="xs" class="text-gray-400 group-hover:text-[var(--accent-hover)] dark:text-gray-500 dark:group-hover:text-[var(--accent-hover)]" />
               </div>
             </div>
           </div>
@@ -149,8 +149,8 @@
                 @mouseenter="showTooltip($event, row)"
                 @mouseleave="hideTooltip"
               >
-                <div class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-blue-100 dark:bg-gray-700 dark:group-hover:bg-blue-900/50">
-                  <Icon name="infoCircle" size="xs" class="text-gray-400 group-hover:text-blue-500 dark:text-gray-500 dark:group-hover:text-blue-400" />
+                <div class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-[var(--bg-subtle)] dark:bg-gray-700 dark:group-hover:bg-[var(--bg-subtle)]">
+                  <Icon name="infoCircle" size="xs" class="text-gray-400 group-hover:text-[var(--accent-hover)] dark:text-gray-500 dark:group-hover:text-[var(--accent-hover)]" />
                 </div>
               </div>
             </div>
@@ -198,17 +198,17 @@
         top: tokenTooltipPosition.y + 'px'
       }"
     >
-      <div class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-white shadow-xl dark:border-gray-600 dark:bg-gray-800">
+      <div class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)] dark:border-gray-600 dark:bg-gray-800">
         <div class="space-y-1.5">
           <div>
             <div class="text-xs font-semibold text-gray-300 mb-1">{{ t('usage.tokenDetails') }}</div>
             <div v-if="tokenTooltipData && tokenTooltipData.input_tokens > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.inputTokens') }}</span>
-              <span class="font-medium text-white">{{ tokenTooltipData.input_tokens.toLocaleString() }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.input_tokens.toLocaleString() }}</span>
             </div>
             <div v-if="tokenTooltipData && tokenTooltipData.output_tokens > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.outputTokens') }}</span>
-              <span class="font-medium text-white">{{ tokenTooltipData.output_tokens.toLocaleString() }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.output_tokens.toLocaleString() }}</span>
             </div>
             <div v-if="tokenTooltipData && tokenTooltipData.cache_creation_tokens > 0">
               <!-- 有 5m/1h 明细时，展开显示 -->
@@ -218,20 +218,20 @@
                     {{ t('admin.usage.cacheCreation5mTokens') }}
                     <span class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-amber-500/20 text-amber-400 ring-1 ring-inset ring-amber-500/30">5m</span>
                   </span>
-                  <span class="font-medium text-white">{{ tokenTooltipData.cache_creation_5m_tokens.toLocaleString() }}</span>
+                  <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.cache_creation_5m_tokens.toLocaleString() }}</span>
                 </div>
                 <div v-if="tokenTooltipData.cache_creation_1h_tokens > 0" class="flex items-center justify-between gap-4">
                   <span class="text-gray-400 flex items-center gap-1.5">
                     {{ t('admin.usage.cacheCreation1hTokens') }}
                     <span class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-orange-500/20 text-orange-400 ring-1 ring-inset ring-orange-500/30">1h</span>
                   </span>
-                  <span class="font-medium text-white">{{ tokenTooltipData.cache_creation_1h_tokens.toLocaleString() }}</span>
+                  <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.cache_creation_1h_tokens.toLocaleString() }}</span>
                 </div>
               </template>
               <!-- 无明细时，只显示聚合值 -->
               <div v-else class="flex items-center justify-between gap-4">
                 <span class="text-gray-400">{{ t('admin.usage.cacheCreationTokens') }}</span>
-                <span class="font-medium text-white">{{ tokenTooltipData.cache_creation_tokens.toLocaleString() }}</span>
+                <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.cache_creation_tokens.toLocaleString() }}</span>
               </div>
             </div>
             <div v-if="tokenTooltipData && tokenTooltipData.cache_ttl_overridden" class="flex items-center justify-between gap-4">
@@ -243,12 +243,12 @@
             </div>
             <div v-if="tokenTooltipData && tokenTooltipData.cache_read_tokens > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.cacheReadTokens') }}</span>
-              <span class="font-medium text-white">{{ tokenTooltipData.cache_read_tokens.toLocaleString() }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">{{ tokenTooltipData.cache_read_tokens.toLocaleString() }}</span>
             </div>
           </div>
           <div class="flex items-center justify-between gap-6 border-t border-gray-700 pt-1.5">
             <span class="text-gray-400">{{ t('usage.totalTokens') }}</span>
-            <span class="font-semibold text-blue-400">{{ ((tokenTooltipData?.input_tokens || 0) + (tokenTooltipData?.output_tokens || 0) + (tokenTooltipData?.cache_creation_tokens || 0) + (tokenTooltipData?.cache_read_tokens || 0)).toLocaleString() }}</span>
+            <span class="font-semibold text-[var(--accent)]">{{ ((tokenTooltipData?.input_tokens || 0) + (tokenTooltipData?.output_tokens || 0) + (tokenTooltipData?.cache_creation_tokens || 0) + (tokenTooltipData?.cache_read_tokens || 0)).toLocaleString() }}</span>
           </div>
         </div>
         <div class="absolute right-full top-1/2 h-0 w-0 -translate-y-1/2 border-b-[6px] border-r-[6px] border-t-[6px] border-b-transparent border-r-gray-900 border-t-transparent dark:border-r-gray-800"></div>
@@ -266,18 +266,18 @@
         top: tooltipPosition.y + 'px'
       }"
     >
-      <div class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-white shadow-xl dark:border-gray-600 dark:bg-gray-800">
+      <div class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)] dark:border-gray-600 dark:bg-gray-800">
         <div class="space-y-1.5">
           <!-- Cost Breakdown -->
           <div class="mb-2 border-b border-gray-700 pb-1.5">
             <div class="text-xs font-semibold text-gray-300 mb-1">{{ t('usage.costDetails') }}</div>
             <div v-if="tooltipData && tooltipData.input_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.inputCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.input_cost.toFixed(6) }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData.input_cost.toFixed(6) }}</span>
             </div>
             <div v-if="tooltipData && tooltipData.output_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.outputCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.output_cost.toFixed(6) }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData.output_cost.toFixed(6) }}</span>
             </div>
             <!-- Token billing: show unit prices per 1M tokens -->
             <template v-if="!tooltipData?.billing_mode || tooltipData.billing_mode === BILLING_MODE_TOKEN">
@@ -294,7 +294,7 @@
             <template v-else-if="tooltipData?.billing_mode === BILLING_MODE_IMAGE">
               <div class="flex items-center justify-between gap-4">
                 <span class="text-gray-400">{{ t('usage.imageCount') }}</span>
-                <span class="font-medium text-white">{{ tooltipData.image_count }}{{ t('usage.imageUnit') }} ({{ tooltipData.image_size || '2K' }})</span>
+                <span class="font-medium text-[var(--text-inverse)]">{{ tooltipData.image_count }}{{ t('usage.imageUnit') }} ({{ tooltipData.image_size || '2K' }})</span>
               </div>
               <div class="flex items-center justify-between gap-4">
                 <span class="text-gray-400">{{ t('usage.imageUnitPrice') }}</span>
@@ -302,7 +302,7 @@
               </div>
               <div class="flex items-center justify-between gap-4">
                 <span class="text-gray-400">{{ t('usage.imageTotalPrice') }}</span>
-                <span class="font-medium text-white">${{ tooltipData.total_cost?.toFixed(6) || '0.000000' }}</span>
+                <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData.total_cost?.toFixed(6) || '0.000000' }}</span>
               </div>
             </template>
             <div v-else class="flex items-center justify-between gap-4">
@@ -311,11 +311,11 @@
             </div>
             <div v-if="tooltipData && tooltipData.cache_creation_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.cacheCreationCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.cache_creation_cost.toFixed(6) }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData.cache_creation_cost.toFixed(6) }}</span>
             </div>
             <div v-if="tooltipData && tooltipData.cache_read_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.cacheReadCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.cache_read_cost.toFixed(6) }}</span>
+              <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData.cache_read_cost.toFixed(6) }}</span>
             </div>
           </div>
           <!-- Rate and Summary -->
@@ -325,11 +325,11 @@
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.rate') }}</span>
-            <span class="font-semibold text-blue-400">{{ formatMultiplier(tooltipData?.rate_multiplier || 1) }}x</span>
+            <span class="font-semibold text-[var(--accent)]">{{ formatMultiplier(tooltipData?.rate_multiplier || 1) }}x</span>
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.original') }}</span>
-            <span class="font-medium text-white">${{ tooltipData?.total_cost?.toFixed(6) || '0.000000' }}</span>
+            <span class="font-medium text-[var(--text-inverse)]">${{ tooltipData?.total_cost?.toFixed(6) || '0.000000' }}</span>
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.userBilled') }}</span>
@@ -338,7 +338,7 @@
           <!-- Account billing (separated from user billing) -->
           <div class="flex items-center justify-between gap-6 border-t border-gray-700 pt-1.5">
             <span class="text-gray-400">{{ t('usage.accountMultiplier') }}</span>
-            <span class="font-semibold text-blue-400">{{ formatMultiplier(tooltipData?.account_rate_multiplier ?? 1) }}x</span>
+            <span class="font-semibold text-[var(--accent)]">{{ formatMultiplier(tooltipData?.account_rate_multiplier ?? 1) }}x</span>
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.accountBilled') }}</span>
@@ -429,7 +429,7 @@ const getRequestTypeLabel = (row: AdminUsageLog): string => {
 const getRequestTypeBadgeClass = (row: AdminUsageLog): string => {
   const requestType = resolveUsageRequestType(row)
   if (requestType === 'ws_v2') return 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200'
-  if (requestType === 'stream') return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+  if (requestType === 'stream') return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
   if (requestType === 'sync') return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
   return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
 }

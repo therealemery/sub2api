@@ -1,148 +1,42 @@
 <template>
-  <!-- Row 1: Core Stats -->
-  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <!-- Balance -->
-    <div v-if="!isSimple" class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-          <svg class="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
-          </svg>
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.balance') }}</p>
-          <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">${{ formatBalance(balance) }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.available') }}</p>
-        </div>
-      </div>
+  <section class="dashboard-stats">
+    <div class="dashboard-primary-grid">
+      <article
+        v-for="item in primaryMetrics"
+        :key="item.label"
+        class="dashboard-primary-card"
+      >
+        <p>{{ item.label }}</p>
+        <strong :class="{ 'money-value': item.isMoney }">{{ item.value }}</strong>
+        <span>{{ item.detail }}</span>
+      </article>
     </div>
 
-    <!-- API Keys -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-          <Icon name="key" size="md" class="text-blue-600 dark:text-blue-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.apiKeys') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats?.total_api_keys || 0 }}</p>
-          <p class="text-xs text-green-600 dark:text-green-400">{{ stats?.active_api_keys || 0 }} {{ t('common.active') }}</p>
-        </div>
+    <div class="dashboard-secondary-strip">
+      <div
+        v-for="item in secondaryMetrics"
+        :key="item.label"
+        class="dashboard-secondary-item"
+      >
+        <span>{{ item.label }}</span>
+        <strong :class="{ 'money-value': item.isMoney }">{{ item.value }}</strong>
+        <small>{{ item.detail }}</small>
       </div>
     </div>
-
-    <!-- Today Requests -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-green-100 p-2 dark:bg-green-900/30">
-          <Icon name="chart" size="md" class="text-green-600 dark:text-green-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.todayRequests') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ stats?.today_requests || 0 }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.total') }}: {{ formatNumber(stats?.total_requests || 0) }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Today Cost -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30">
-          <Icon name="dollar" size="md" class="text-purple-600 dark:text-purple-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.todayCost') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">
-            <span class="text-purple-600 dark:text-purple-400" :title="t('dashboard.actual')">${{ formatCost(stats?.today_actual_cost || 0) }}</span>
-            <span class="text-sm font-normal text-gray-400 dark:text-gray-500" :title="t('dashboard.standard')"> / ${{ formatCost(stats?.today_cost || 0) }}</span>
-          </p>
-          <p class="text-xs">
-            <span class="text-gray-500 dark:text-gray-400">{{ t('common.total') }}: </span>
-            <span class="text-purple-600 dark:text-purple-400" :title="t('dashboard.actual')">${{ formatCost(stats?.total_actual_cost || 0) }}</span>
-            <span class="text-gray-400 dark:text-gray-500" :title="t('dashboard.standard')"> / ${{ formatCost(stats?.total_cost || 0) }}</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Row 2: Token Stats -->
-  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <!-- Today Tokens -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-          <Icon name="cube" size="md" class="text-amber-600 dark:text-amber-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.todayTokens') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatTokens(stats?.today_tokens || 0) }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('dashboard.input') }}: {{ formatTokens(stats?.today_input_tokens || 0) }} / {{ t('dashboard.output') }}: {{ formatTokens(stats?.today_output_tokens || 0) }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Total Tokens -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-indigo-100 p-2 dark:bg-indigo-900/30">
-          <Icon name="database" size="md" class="text-indigo-600 dark:text-indigo-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.totalTokens') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatTokens(stats?.total_tokens || 0) }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('dashboard.input') }}: {{ formatTokens(stats?.total_input_tokens || 0) }} / {{ t('dashboard.output') }}: {{ formatTokens(stats?.total_output_tokens || 0) }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Performance (RPM/TPM) -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30">
-          <Icon name="bolt" size="md" class="text-violet-600 dark:text-violet-400" :stroke-width="2" />
-        </div>
-        <div class="flex-1">
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.performance') }}</p>
-          <div class="flex items-baseline gap-2">
-            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatTokens(stats?.rpm || 0) }}</p>
-            <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
-          </div>
-          <div class="flex items-baseline gap-2">
-            <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">{{ formatTokens(stats?.tpm || 0) }}</p>
-            <span class="text-xs text-gray-500 dark:text-gray-400">TPM</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Avg Response Time -->
-    <div class="card p-4">
-      <div class="flex items-center gap-3">
-        <div class="rounded-lg bg-rose-100 p-2 dark:bg-rose-900/30">
-          <Icon name="clock" size="md" class="text-rose-600 dark:text-rose-400" :stroke-width="2" />
-        </div>
-        <div>
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('dashboard.avgResponse') }}</p>
-          <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatDuration(stats?.average_duration_ms || 0) }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('dashboard.averageTime') }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Icon from '@/components/icons/Icon.vue'
 import type { UserDashboardStats as UserStatsType } from '@/api/usage'
 
-defineProps<{
+const props = defineProps<{
   stats: UserStatsType
   balance: number
   isSimple: boolean
 }>()
+
 const { t } = useI18n()
 
 const formatBalance = (b: number) =>
@@ -153,10 +47,194 @@ const formatBalance = (b: number) =>
 
 const formatNumber = (n: number) => n.toLocaleString()
 const formatCost = (c: number) => c.toFixed(4)
-const formatTokens = (t: number) => {
-  if (t >= 1_000_000) return `${(t / 1_000_000).toFixed(1)}M`
-  if (t >= 1000) return `${(t / 1000).toFixed(1)}K`
-  return t.toString()
+const formatTokens = (value: number) => {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`
+  return value.toString()
 }
 const formatDuration = (ms: number) => ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${ms.toFixed(0)}ms`
+
+interface DashboardMetric {
+  label: string
+  value: string
+  detail: string
+  isMoney?: boolean
+}
+
+const primaryMetrics = computed<DashboardMetric[]>(() => {
+  const base = props.isSimple
+    ? []
+    : [{
+        label: t('dashboard.balance'),
+        value: `$${formatBalance(props.balance)}`,
+        detail: t('common.available'),
+        isMoney: true
+      }]
+
+  return [
+    ...base,
+    {
+      label: t('dashboard.todayRequests'),
+      value: formatNumber(props.stats.today_requests || 0),
+      detail: `${t('common.total')}: ${formatNumber(props.stats.total_requests || 0)}`
+    },
+    {
+      label: t('dashboard.todayCost'),
+      value: `$${formatCost(props.stats.today_actual_cost || 0)}`,
+      detail: `${t('dashboard.standard')}: $${formatCost(props.stats.today_cost || 0)}`,
+      isMoney: true
+    },
+    {
+      label: t('dashboard.todayTokens'),
+      value: formatTokens(props.stats.today_tokens || 0),
+      detail: `${t('dashboard.input')}: ${formatTokens(props.stats.today_input_tokens || 0)} / ${t('dashboard.output')}: ${formatTokens(props.stats.today_output_tokens || 0)}`
+    }
+  ].slice(0, 3)
+})
+
+const secondaryMetrics = computed<DashboardMetric[]>(() => [
+  {
+    label: t('dashboard.apiKeys'),
+    value: String(props.stats.total_api_keys || 0),
+    detail: `${props.stats.active_api_keys || 0} ${t('common.active')}`
+  },
+  {
+    label: t('dashboard.totalTokens'),
+    value: formatTokens(props.stats.total_tokens || 0),
+    detail: `${t('dashboard.input')}: ${formatTokens(props.stats.total_input_tokens || 0)}`
+  },
+  {
+    label: t('dashboard.performance'),
+    value: `${formatTokens(props.stats.rpm || 0)} RPM`,
+    detail: `${formatTokens(props.stats.tpm || 0)} TPM`
+  },
+  {
+    label: t('dashboard.avgResponse'),
+    value: formatDuration(props.stats.average_duration_ms || 0),
+    detail: t('dashboard.averageTime')
+  },
+  {
+    label: t('common.total'),
+    value: `$${formatCost(props.stats.total_actual_cost || 0)}`,
+    detail: `${t('dashboard.standard')}: $${formatCost(props.stats.total_cost || 0)}`,
+    isMoney: true
+  }
+])
 </script>
+
+<style scoped>
+.dashboard-stats {
+  display: grid;
+  gap: 14px;
+}
+
+.dashboard-primary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dashboard-primary-card,
+.dashboard-secondary-strip {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.dashboard-primary-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.dashboard-primary-card p,
+.dashboard-secondary-item small {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption, 12px);
+  line-height: 1.5;
+}
+
+.dashboard-primary-card p,
+.dashboard-secondary-item span {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.dashboard-primary-card strong {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-primary-card span {
+  color: var(--text-primary);
+  font-size: var(--text-body-sm, 14px);
+  line-height: 1.5;
+}
+
+.dashboard-secondary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: hidden;
+}
+
+.dashboard-secondary-item {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  background: var(--bg-surface-alt);
+  padding: 14px 16px;
+}
+
+.dashboard-secondary-item + .dashboard-secondary-item {
+  border-left: 1px solid var(--border-default);
+}
+
+.dashboard-secondary-item strong {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-primary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-secondary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-secondary-item + .dashboard-secondary-item {
+    border-left: 0;
+    border-top: 1px solid var(--border-default);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-primary-card {
+    padding: 18px;
+  }
+
+  .dashboard-primary-card strong {
+    font-size: 24px;
+  }
+
+  .dashboard-secondary-strip {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

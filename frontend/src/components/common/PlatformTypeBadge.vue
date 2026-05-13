@@ -126,7 +126,7 @@ const platformClass = computed(() => {
   if (props.platform === 'antigravity') {
     return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
   }
-  return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+  return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
 })
 
 const typeClass = computed(() => {
@@ -139,7 +139,7 @@ const typeClass = computed(() => {
   if (props.platform === 'antigravity') {
     return 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
   }
-  return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+  return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
 })
 
 const planBadgeClass = computed(() => {

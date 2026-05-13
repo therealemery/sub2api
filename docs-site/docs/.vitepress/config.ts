@@ -11,7 +11,7 @@ export default defineConfig({
 
   // Favicon
   head: [
-    ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/ownapi-logo-light.png' }],
   ],
 
   // 最后更新时间
@@ -73,7 +73,10 @@ export default defineConfig({
   
   themeConfig: {
     // Logo
-    logo: '/logo.png',
+    logo: {
+      light: '/ownapi-logo-light.png',
+      dark: '/ownapi-logo-dark.png',
+    },
     
     // 站点标题
     siteTitle: 'OwnAPI',
@@ -148,7 +151,7 @@ function sidebarZh() {
       {
         text: '开始',
         items: [
-          { text: '快速开始', link: '/zh/guide/getting-started' },
+          { text: '快速开始与使用流程', link: '/zh/guide/getting-started' },
           { text: '认证', link: '/zh/guide/authentication' },
         ],
       },

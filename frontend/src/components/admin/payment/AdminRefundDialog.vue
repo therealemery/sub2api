@@ -28,18 +28,18 @@
       </div>
 
       <!-- Order Info -->
-      <div class="rounded-lg bg-gray-50 p-3 dark:bg-dark-700">
+      <div class="rounded-lg bg-gray-50 p-3 bg-[var(--bg-surface-alt)]">
         <div class="flex justify-between text-sm">
           <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.orderId') }}</span>
-          <span class="font-mono text-gray-900 dark:text-white">#{{ order?.id }}</span>
+          <span class="font-mono text-gray-900 dark:text-[var(--text-inverse)]">#{{ order?.id }}</span>
         </div>
         <div class="mt-1 flex justify-between text-sm">
           <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.creditedAmount') }}</span>
-          <span class="font-medium text-gray-900 dark:text-white">{{ order?.order_type === 'balance' ? '$' : '¥' }}{{ order?.amount?.toFixed(2) }}</span>
+          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ order?.order_type === 'balance' ? '$' : '¥' }}{{ order?.amount?.toFixed(2) }}</span>
         </div>
         <div class="mt-1 flex justify-between text-sm">
           <span class="text-gray-500 dark:text-gray-400">{{ t('payment.orders.payAmount') }}</span>
-          <span class="font-medium text-gray-900 dark:text-white">¥{{ order?.pay_amount?.toFixed(2) }}</span>
+          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ order?.pay_amount?.toFixed(2) }}</span>
         </div>
         <div v-if="actuallyRefunded > 0" class="mt-1 flex justify-between text-sm">
           <span class="text-gray-500 dark:text-gray-400">{{ t('payment.admin.alreadyRefunded') }}</span>
@@ -54,7 +54,7 @@
             id="deduct-balance"
             v-model="form.deduct_balance"
             type="checkbox"
-            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]"
           />
           <label for="deduct-balance" class="text-sm text-gray-700 dark:text-gray-300">
             {{ t('payment.admin.deductBalance') }}
@@ -64,13 +64,13 @@
 
         <!-- User Balance Info (when deduct_balance is checked) -->
         <div v-if="form.deduct_balance && userBalance != null" class="mt-3 grid grid-cols-2 gap-3">
-          <div class="rounded-lg bg-gray-50 p-3 text-sm dark:bg-dark-700">
+          <div class="rounded-lg bg-gray-50 p-3 text-sm bg-[var(--bg-surface-alt)]">
             <div class="text-gray-500 dark:text-gray-400">{{ t('payment.admin.userBalance') }}</div>
-            <div class="mt-1 font-semibold text-gray-900 dark:text-white">${{ userBalance.toFixed(2) }}</div>
+            <div class="mt-1 font-semibold text-gray-900 dark:text-[var(--text-inverse)]">${{ userBalance.toFixed(2) }}</div>
           </div>
-          <div class="rounded-lg bg-gray-50 p-3 text-sm dark:bg-dark-700">
+          <div class="rounded-lg bg-gray-50 p-3 text-sm bg-[var(--bg-surface-alt)]">
             <div class="text-gray-500 dark:text-gray-400">{{ t('payment.admin.orderAmount') }}</div>
-            <div class="mt-1 font-semibold text-gray-900 dark:text-white">{{ order?.order_type === 'balance' ? '$' : '¥' }}{{ order?.amount?.toFixed(2) }}</div>
+            <div class="mt-1 font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ order?.order_type === 'balance' ? '$' : '¥' }}{{ order?.amount?.toFixed(2) }}</div>
           </div>
         </div>
 
@@ -85,7 +85,7 @@
         <!-- No deduction info -->
         <div
           v-if="!form.deduct_balance"
-          class="mt-2 rounded-lg bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+          class="mt-2 rounded-lg bg-[var(--bg-surface-alt)] p-3 text-sm text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
         >
           {{ t('payment.admin.noDeduction') }}
         </div>
@@ -154,7 +154,7 @@
           type="submit"
           form="refund-form"
           :disabled="submitting || form.amount <= 0 || (requireForce && !form.force)"
-          class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-dark-800"
+          class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-[var(--text-inverse)] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-dark-800"
         >
           {{ submitting ? t('common.processing') : t('payment.admin.confirmRefund') }}
         </button>

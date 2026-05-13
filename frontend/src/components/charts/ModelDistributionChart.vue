@@ -1,7 +1,7 @@
 <template>
   <div class="card p-4">
     <div class="mb-4 flex items-center justify-between gap-3">
-      <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
         {{ !enableRankingView || activeView === 'model_distribution'
           ? t('admin.dashboard.modelDistribution')
           : t('admin.dashboard.spendingRankingTitle') }}
@@ -9,13 +9,13 @@
       <div class="flex flex-wrap items-center justify-end gap-2">
         <div
           v-if="showSourceToggle"
-          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
+          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 bg-[var(--bg-surface-alt)]"
         >
           <button
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="source === 'requested'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+              ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
             @click="emit('update:source', 'requested')"
           >
@@ -25,7 +25,7 @@
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="source === 'upstream'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+              ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
             @click="emit('update:source', 'upstream')"
           >
@@ -35,7 +35,7 @@
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="source === 'mapping'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+              ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
             @click="emit('update:source', 'mapping')"
           >
@@ -44,13 +44,13 @@
         </div>
         <div
           v-if="showMetricToggle"
-          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
+          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 bg-[var(--bg-surface-alt)]"
         >
           <button
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="metric === 'tokens'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+              ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
             @click="emit('update:metric', 'tokens')"
           >
@@ -60,20 +60,20 @@
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="metric === 'actual_cost'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+              ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
             @click="emit('update:metric', 'actual_cost')"
           >
             {{ t('admin.dashboard.metricActualCost') }}
           </button>
         </div>
-        <div v-if="enableRankingView" class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-dark-800">
+        <div v-if="enableRankingView" class="inline-flex rounded-lg bg-gray-100 p-1 bg-[var(--bg-surface-alt)]">
           <button
             type="button"
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="
               activeView === 'model_distribution'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+                ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             "
             @click="activeView = 'model_distribution'"
@@ -85,7 +85,7 @@
             class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
             :class="
               activeView === 'spending_ranking'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
+                ? 'bg-[var(--bg-surface)] text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             "
             @click="activeView = 'spending_ranking'"
@@ -125,7 +125,7 @@
                 @click="toggleBreakdown('model', model.model)"
               >
                 <td
-                  class="max-w-[100px] truncate py-1.5 font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  class="max-w-[100px] truncate py-1.5 font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
                   :title="model.model"
                 >
                   <span class="inline-flex items-center gap-1">
@@ -199,7 +199,7 @@
               :key="item.isOther ? 'others' : `${item.user_id}-${index}`"
               class="border-t border-gray-100 transition-colors dark:border-gray-700"
               :class="item.isOther
-                ? 'bg-gray-50/70 dark:bg-dark-700/20'
+                ? 'bg-gray-50/70 bg-[var(--bg-surface-alt)]'
                 : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700/40'"
               @click="item.isOther ? undefined : emit('ranking-click', item)"
             >
@@ -209,7 +209,7 @@
                     {{ item.isOther ? 'Σ' : `#${index + 1}` }}
                   </span>
                   <span
-                    class="block max-w-[140px] truncate font-medium text-gray-900 dark:text-white"
+                    class="block max-w-[140px] truncate font-medium text-gray-900 dark:text-[var(--text-inverse)]"
                     :title="getRankingRowLabel(item)"
                   >
                     {{ getRankingRowLabel(item) }}
@@ -331,17 +331,17 @@ const enableRankingView = computed(() => props.enableRankingView)
 const activeView = ref<'model_distribution' | 'spending_ranking'>('model_distribution')
 
 const chartColors = [
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
+  '#c4471a',
+  '#287a4b',
+  '#986b16',
   '#ef4444',
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-  '#f97316',
-  '#6366f1',
-  '#84cc16',
-  '#06b6d4',
+  '#9a7b63',
+  '#a73c2e',
+  'var(--border-focus)',
+  '#b8851f',
+  '#6f6258',
+  '#4a7c3c',
+  '#716d64',
   '#a855f7'
 ]
 
@@ -354,7 +354,7 @@ const displayModelStats = computed(() => {
   if (!sourceStats?.length) return []
 
   const metricKey = props.metric === 'actual_cost' ? 'actual_cost' : 'total_tokens'
-  return [...sourceStats].sort((a, b) => b[metricKey] - a[metricKey])
+  return [...sourceStats].sort((a, b) => (b[metricKey] ?? 0) - (a[metricKey] ?? 0))
 })
 
 const chartData = computed(() => {
@@ -364,7 +364,7 @@ const chartData = computed(() => {
     labels: displayModelStats.value.map((m) => m.model),
     datasets: [
       {
-        data: displayModelStats.value.map((m) => props.metric === 'actual_cost' ? m.actual_cost : m.total_tokens),
+        data: displayModelStats.value.map((m) => props.metric === 'actual_cost' ? (m.actual_cost ?? 0) : (m.total_tokens ?? 0)),
         backgroundColor: chartColors.slice(0, displayModelStats.value.length),
         borderWidth: 0
       }
@@ -376,13 +376,13 @@ const rankingChartData = computed(() => {
   if (!props.rankingItems?.length) return null
 
   const labels = props.rankingItems.map((item, index) => `#${index + 1} ${getRankingUserLabel(item)}`)
-  const data = props.rankingItems.map((item) => item.actual_cost)
+  const data = props.rankingItems.map((item) => item.actual_cost ?? 0)
   const backgroundColor = chartColors.slice(0, props.rankingItems.length)
 
   if (otherRankingItem.value) {
     labels.push(t('admin.dashboard.spendingRankingOther'))
     data.push(otherRankingItem.value.actual_cost)
-    backgroundColor.push('#94a3b8')
+    backgroundColor.push('#9a978f')
   }
 
   return {
@@ -400,7 +400,7 @@ const rankingChartData = computed(() => {
 const otherRankingItem = computed<RankingDisplayItem | null>(() => {
   if (!props.rankingItems?.length) return null
 
-  const rankedActualCost = props.rankingItems.reduce((sum, item) => sum + item.actual_cost, 0)
+  const rankedActualCost = props.rankingItems.reduce((sum, item) => sum + (item.actual_cost ?? 0), 0)
   const rankedRequests = props.rankingItems.reduce((sum, item) => sum + item.requests, 0)
   const rankedTokens = props.rankingItems.reduce((sum, item) => sum + item.tokens, 0)
 
@@ -495,14 +495,15 @@ const getRankingRowLabel = (item: RankingDisplayItem): string => {
   return getRankingUserLabel(item)
 }
 
-const formatCost = (value: number): string => {
-  if (value >= 1000) {
-    return (value / 1000).toFixed(2) + 'K'
-  } else if (value >= 1) {
-    return value.toFixed(2)
-  } else if (value >= 0.01) {
-    return value.toFixed(3)
+const formatCost = (value?: number | null): string => {
+  const safeValue = Number.isFinite(value) ? Number(value) : 0
+  if (safeValue >= 1000) {
+    return (safeValue / 1000).toFixed(2) + 'K'
+  } else if (safeValue >= 1) {
+    return safeValue.toFixed(2)
+  } else if (safeValue >= 0.01) {
+    return safeValue.toFixed(3)
   }
-  return value.toFixed(4)
+  return safeValue.toFixed(4)
 }
 </script>

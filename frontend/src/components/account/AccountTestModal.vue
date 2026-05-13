@@ -9,19 +9,19 @@
       <!-- Account Info Card -->
       <div
         v-if="account"
-        class="flex items-center justify-between rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-3 dark:border-dark-500 dark:from-dark-700 dark:to-dark-600"
+        class="flex items-center justify-between rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3"
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600"
+            class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent)]"
           >
-            <Icon name="play" size="md" class="text-white" :stroke-width="2" />
+            <Icon name="play" size="md" class="text-[var(--text-inverse)]" :stroke-width="2" />
           </div>
           <div>
             <div class="font-semibold text-gray-900 dark:text-gray-100">{{ account.name }}</div>
             <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
               <span
-                class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium uppercase dark:bg-dark-500"
+                class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium uppercase bg-[var(--bg-surface-alt)]"
               >
                 {{ account.type }}
               </span>
@@ -31,7 +31,7 @@
         </div>
         <span
           :class="[
-            'rounded-full px-2.5 py-1 text-xs font-semibold',
+            'rounded-md px-2.5 py-1 text-xs font-semibold',
             account.status === 'active'
               ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
               : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
@@ -81,7 +81,7 @@
       <div class="group relative">
         <div
           ref="terminalRef"
-          class="max-h-[240px] min-h-[120px] overflow-y-auto rounded-xl border border-gray-700 bg-gray-900 p-4 font-mono text-sm dark:border-gray-800 dark:bg-black"
+          class="max-h-[240px] min-h-[120px] overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-4 font-mono text-sm dark:border-gray-800 dark:bg-black"
         >
           <!-- Status Line -->
           <div v-if="status === 'idle'" class="flex items-center gap-2 text-gray-500">
@@ -124,7 +124,7 @@
         <button
           v-if="outputLines.length > 0"
           @click="copyOutput"
-          class="absolute right-2 top-2 rounded-lg bg-gray-800/80 p-1.5 text-gray-400 opacity-0 transition-all hover:bg-gray-700 hover:text-white group-hover:opacity-100"
+          class="absolute right-2 top-2 rounded-lg bg-gray-800/80 p-1.5 text-gray-400 opacity-0 transition-colors hover:bg-gray-700 hover:text-[var(--text-inverse)] group-hover:opacity-100"
           :title="t('admin.accounts.copyOutput')"
         >
           <Icon name="link" size="sm" :stroke-width="2" />
@@ -139,14 +139,14 @@
           <div
             v-for="(image, index) in generatedImages"
             :key="`${image.url}-${index}`"
-            class="group/img relative cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:border-primary-300 hover:shadow-md dark:border-dark-500 dark:bg-dark-700"
+            class="group/img relative cursor-pointer overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] transition-colors hover:border-[var(--border-focus)]"
             @click="previewImageUrl = image.url"
           >
             <img :src="image.url" :alt="`test-image-${index + 1}`" class="max-h-[360px] w-full object-contain" />
             <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/img:bg-black/20">
-              <Icon name="eye" size="lg" class="text-white opacity-0 drop-shadow-lg transition-opacity group-hover/img:opacity-100" :stroke-width="2" />
+              <Icon name="eye" size="lg" class="text-[var(--text-inverse)] opacity-0  transition-opacity group-hover/img:opacity-100" :stroke-width="2" />
             </div>
-            <div class="border-t border-gray-100 px-3 py-1.5 text-xs text-gray-500 dark:border-dark-500 dark:text-gray-300">
+            <div class="border-t border-gray-100 px-3 py-1.5 text-xs text-gray-500 border-[var(--border-default)] dark:text-gray-300">
               {{ image.mimeType || 'image/*' }}
             </div>
           </div>
@@ -162,7 +162,7 @@
             @click.self="previewImageUrl = ''"
           >
             <button
-              class="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70"
+              class="absolute right-4 top-4 rounded-md bg-black/50 p-2 text-[var(--text-inverse)] transition-colors hover:bg-black/70"
               @click="previewImageUrl = ''"
             >
               <Icon name="x" size="lg" :stroke-width="2" />
@@ -170,7 +170,7 @@
             <img
               :src="previewImageUrl"
               alt="preview"
-              class="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+              class="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
             />
           </div>
         </Transition>
@@ -199,7 +199,7 @@
       <div class="flex justify-end gap-3">
         <button
           @click="handleClose"
-          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-300 dark:hover:bg-dark-500"
+          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500"
         >
           {{ t('common.close') }}
         </button>
@@ -207,14 +207,14 @@
           @click="startTest"
           :disabled="status === 'connecting' || !selectedModelId"
           :class="[
-            'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all',
+            'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
             status === 'connecting' || !selectedModelId
-              ? 'cursor-not-allowed bg-primary-400 text-white'
+              ? 'cursor-not-allowed bg-[var(--accent)] text-[var(--text-inverse)]'
               : status === 'success'
-                ? 'bg-green-500 text-white hover:bg-green-600'
+                ? 'bg-green-500 text-[var(--text-inverse)] hover:bg-green-600'
                 : status === 'error'
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-primary-500 text-white hover:bg-primary-600'
+                  ? 'bg-orange-500 text-[var(--text-inverse)] hover:bg-orange-600'
+                  : 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--bg-subtle)]'
           ]"
         >
           <Icon
@@ -408,7 +408,7 @@ const startTest = async () => {
 
   resetState()
   status.value = 'connecting'
-  addLine(t('admin.accounts.startingTestForAccount', { name: props.account.name }), 'text-blue-400')
+  addLine(t('admin.accounts.startingTestForAccount', { name: props.account.name }), 'text-[var(--accent)]')
   addLine(t('admin.accounts.testAccountTypeLabel', { type: props.account.type }), 'text-gray-400')
   addLine('', 'text-gray-300')
 

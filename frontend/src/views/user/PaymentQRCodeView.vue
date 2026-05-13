@@ -1,10 +1,10 @@
 <template>
   <AppLayout>
     <div class="mx-auto flex max-w-md flex-col items-center space-y-6 py-8">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
         {{ qrUrl ? scanTitle : t('payment.qr.payInNewWindow') }}
       </h2>
-      <div v-if="qrUrl" class="rounded-2xl bg-white p-6 shadow-lg dark:bg-dark-800">
+      <div v-if="qrUrl" class="qr-panel rounded-lg p-6">
         <canvas ref="qrCanvas" class="mx-auto"></canvas>
       </div>
       <!-- Scan prompt for QR code -->
@@ -17,7 +17,7 @@
       </div>
       <div v-else class="text-center">
         <p class="text-sm text-gray-500 dark:text-gray-400">{{ qrUrl ? t('payment.qr.expiresIn') : t('payment.qr.payInNewWindowHint') }}</p>
-        <p class="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ countdownDisplay }}</p>
+        <p class="mt-1 text-2xl font-bold tabular-nums text-gray-900 dark:text-[var(--text-inverse)]">{{ countdownDisplay }}</p>
         <p class="mt-2 text-sm text-gray-400 dark:text-gray-500">{{ t('payment.qr.waitingPayment') }}</p>
       </div>
       <a v-if="payUrl && !qrUrl && !expired" :href="payUrl" target="_blank" rel="noopener noreferrer"
@@ -201,3 +201,10 @@ onMounted(() => {
 
 onUnmounted(() => cleanup())
 </script>
+
+<style scoped>
+.qr-panel {
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+</style>

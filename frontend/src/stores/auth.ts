@@ -11,6 +11,7 @@ import type { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types'
 const AUTH_TOKEN_KEY = 'auth_token'
 const AUTH_USER_KEY = 'auth_user'
 const REFRESH_TOKEN_KEY = 'refresh_token'
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
 const TOKEN_EXPIRES_AT_KEY = 'token_expires_at' // 存储过期时间戳而非有效期
 const PENDING_AUTH_SESSION_KEY = 'pending_auth_session'
 const AUTO_REFRESH_INTERVAL = 60 * 1000 // 60 seconds for user data refresh
@@ -26,6 +27,44 @@ interface PendingAuthSessionSummary {
   adoption_required?: boolean
   suggested_display_name?: string
   suggested_avatar_url?: string
+}
+
+type LocalPreviewRole = 'user' | 'admin'
+
+function isLocalPreviewToken(value: string | null): boolean {
+  return !!value && value.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+}
+
+function isLocalPreviewHost(): boolean {
+  return ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)
+}
+
+function isLocalPreviewAllowed(): boolean {
+  return import.meta.env.DEV || isLocalPreviewHost()
+}
+
+function createLocalPreviewUser(role: LocalPreviewRole): User {
+  const now = new Date().toISOString()
+
+  return {
+    id: role === 'admin' ? 1 : 2,
+    username: role === 'admin' ? 'Admin Preview' : 'User Preview',
+    email: role === 'admin' ? 'admin-preview@ownapi.local' : 'user-preview@ownapi.local',
+    avatar_url: null,
+    role,
+    balance: 100,
+    concurrency: 10,
+    rpm_limit: 0,
+    status: 'active',
+    allowed_groups: null,
+    balance_notify_enabled: false,
+    balance_notify_threshold: null,
+    balance_notify_extra_emails: [],
+    subscriptions: [],
+    last_active_at: now,
+    created_at: now,
+    updated_at: now
+  }
 }
 
 function normalizePendingAuthTokenField(value: unknown): PendingAuthTokenField {
@@ -92,6 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isSimpleMode = computed(() => runMode.value === 'simple')
   const hasPendingAuthSession = computed(() => pendingAuthSession.value !== null)
+  const isLocalPreview = computed(() => isLocalPreviewAllowed() && isLocalPreviewToken(token.value))
 
   // ==================== Actions ====================
 
@@ -109,6 +149,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (savedToken && savedUser) {
       try {
+        if (isLocalPreviewToken(savedToken)) {
+          if (isLocalPreviewAllowed()) {
+            token.value = savedToken
+            user.value = JSON.parse(savedUser)
+            refreshTokenValue.value = null
+            tokenExpiresAt.value = null
+            return
+          }
+
+          clearAuth({ preservePendingAuthSession: true })
+          return
+        }
+
         token.value = savedToken
         user.value = JSON.parse(savedUser)
         refreshTokenValue.value = savedRefreshToken
@@ -397,6 +450,11 @@ export const useAuthStore = defineStore('auth', () => {
    * Clears all authentication state and persisted data
    */
   async function logout(): Promise<void> {
+    if (isLocalPreviewToken(token.value)) {
+      clearAuth()
+      return
+    }
+
     // Call API logout (revokes refresh token on server)
     await authAPI.logout()
 
@@ -413,6 +471,14 @@ export const useAuthStore = defineStore('auth', () => {
   async function refreshUser(): Promise<User> {
     if (!token.value) {
       throw new Error('Not authenticated')
+    }
+
+    if (isLocalPreview.value) {
+      const previewRole: LocalPreviewRole = token.value.includes('admin') ? 'admin' : 'user'
+      const previewUser = user.value ?? createLocalPreviewUser(previewRole)
+      user.value = previewUser
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(previewUser))
+      return previewUser
     }
 
     try {
@@ -464,6 +530,30 @@ export const useAuthStore = defineStore('auth', () => {
     clearPendingAuthSessionStorage()
   }
 
+  function enterLocalPreview(role: LocalPreviewRole): void {
+    if (!isLocalPreviewAllowed()) {
+      return
+    }
+
+    stopAutoRefresh()
+    stopTokenRefresh()
+
+    const previewToken = `${LOCAL_PREVIEW_TOKEN_PREFIX}${role}`
+    const previewUser = createLocalPreviewUser(role)
+
+    token.value = previewToken
+    user.value = previewUser
+    refreshTokenValue.value = null
+    tokenExpiresAt.value = null
+    runMode.value = 'standard'
+
+    localStorage.setItem(AUTH_TOKEN_KEY, previewToken)
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(previewUser))
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+    localStorage.removeItem(TOKEN_EXPIRES_AT_KEY)
+    clearPendingAuthSession()
+  }
+
   // ==================== Return Store API ====================
 
   return {
@@ -477,6 +567,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isAdmin,
     isSimpleMode,
+    isLocalPreview,
     hasPendingAuthSession,
 
     // Actions
@@ -488,6 +579,7 @@ export const useAuthStore = defineStore('auth', () => {
     checkAuth,
     refreshUser,
     setPendingAuthSession,
-    clearPendingAuthSession
+    clearPendingAuthSession,
+    enterLocalPreview
   }
 })

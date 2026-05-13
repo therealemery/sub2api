@@ -105,6 +105,7 @@ type SystemSettings struct {
 	TablePageSizeOptions        []int            `json:"table_page_size_options"`
 	CustomMenuItems             []CustomMenuItem `json:"custom_menu_items"`
 	CustomEndpoints             []CustomEndpoint `json:"custom_endpoints"`
+	ModelCenterConfig           json.RawMessage  `json:"model_center_config"`
 
 	DefaultConcurrency           int                          `json:"default_concurrency"`
 	DefaultBalance               float64                      `json:"default_balance"`
@@ -234,6 +235,7 @@ type PublicSettings struct {
 	TablePageSizeOptions             []int            `json:"table_page_size_options"`
 	CustomMenuItems                  []CustomMenuItem `json:"custom_menu_items"`
 	CustomEndpoints                  []CustomEndpoint `json:"custom_endpoints"`
+	ModelCenterConfig                json.RawMessage  `json:"model_center_config"`
 	LinuxDoOAuthEnabled              bool             `json:"linuxdo_oauth_enabled"`
 	WeChatOAuthEnabled               bool             `json:"wechat_oauth_enabled"`
 	WeChatOAuthOpenEnabled           bool             `json:"wechat_oauth_open_enabled"`
@@ -352,4 +354,16 @@ func ParseCustomEndpoints(raw string) []CustomEndpoint {
 		return []CustomEndpoint{}
 	}
 	return items
+}
+
+func ParseRawJSONObject(raw string) json.RawMessage {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return json.RawMessage("{}")
+	}
+	var value map[string]any
+	if err := json.Unmarshal([]byte(raw), &value); err != nil {
+		return json.RawMessage("{}")
+	}
+	return json.RawMessage(raw)
 }

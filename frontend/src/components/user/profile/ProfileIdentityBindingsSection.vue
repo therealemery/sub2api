@@ -2,9 +2,9 @@
   <div :class="props.embedded ? 'space-y-4' : 'card overflow-hidden'">
     <div
       v-if="!props.embedded"
-      class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
+      class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
     >
-      <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+      <h2 class="text-lg font-medium text-gray-900 dark:text-[var(--text-inverse)]">
         {{ t('profile.authBindings.title') }}
       </h2>
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -14,7 +14,7 @@
 
     <div :class="props.embedded ? 'space-y-4' : 'divide-y divide-gray-100 dark:divide-dark-700'">
       <div v-if="props.embedded">
-        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+        <p class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
           {{ t('profile.authBindings.title') }}
         </p>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -31,7 +31,7 @@
           <div class="flex min-w-0 flex-1 items-start gap-4">
             <div
               :class="providerIconClass(item.provider)"
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm font-semibold"
             >
               <Icon
                 v-if="item.provider === 'email'"
@@ -44,7 +44,7 @@
 
             <div class="min-w-0 flex-1 space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h3 class="font-medium text-gray-900 dark:text-white">
+                <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
                   {{ item.label }}
                 </h3>
                 <span
@@ -282,8 +282,8 @@ const compact = computed(() => props.compact)
 const rowClass = computed(() =>
   props.embedded
     ? compact.value
-      ? 'rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-dark-700 dark:bg-dark-900/40'
-      : 'rounded-2xl border border-gray-100 bg-gray-50/70 p-4 dark:border-dark-700 dark:bg-dark-900/30'
+      ? 'rounded-lg border border-gray-100 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]'
+      : 'rounded-lg border border-gray-100 bg-gray-50/70 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]'
     : 'px-6 py-5'
 )
 const emailBound = computed(() => getBindingStatus('email'))
@@ -477,9 +477,9 @@ function providerIconClass(provider: UserAuthProvider): string {
     return 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-300'
   }
   if (provider === 'oidc') {
-    return 'bg-sky-100 text-sky-600 dark:bg-sky-900/20 dark:text-sky-300'
+    return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200'
   }
-  return 'bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300'
+  return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200'
 }
 
 function providerSummary(provider: UserAuthProvider): string {

@@ -29,7 +29,7 @@
         </template>
         <template #cell-price="{ value, row }">
           <div class="text-sm">
-            <span class="font-medium text-gray-900 dark:text-white">${{ (value ?? 0).toFixed(2) }}</span>
+            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">${{ (value ?? 0).toFixed(2) }}</span>
             <span v-if="row.original_price" class="ml-1 text-xs text-gray-400 line-through">${{ row.original_price.toFixed(2) }}</span>
           </div>
         </template>
@@ -40,20 +40,20 @@
           <button
             type="button"
             :class="[
-              'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              value ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600'
+              'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2',
+              value ? 'bg-[var(--accent)]' : 'bg-gray-300 bg-[var(--bg-surface-alt)]'
             ]"
             @click="toggleForSale(row)"
           >
             <span :class="[
-              'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+              'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out',
               value ? 'translate-x-4' : 'translate-x-0'
             ]" />
           </button>
         </template>
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-2">
-            <button @click="openPlanEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400">
+            <button @click="openPlanEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]">
               <Icon name="edit" size="sm" />
               <span class="text-xs">{{ t('common.edit') }}</span>
             </button>
@@ -114,7 +114,7 @@ function isGroupMissing(id: number): boolean {
 
 function getPlanNameClass(groupId: number): string {
   const group = getGroup(groupId)
-  return group ? platformTextClass(group.platform) : 'text-gray-900 dark:text-white'
+  return group ? platformTextClass(group.platform) : 'text-gray-900 dark:text-[var(--text-inverse)]'
 }
 
 

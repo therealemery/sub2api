@@ -55,7 +55,7 @@
     <p v-if="sendCodeSuccess" class="text-sm text-green-600 dark:text-green-400">
       {{ t('auth.codeSentSuccess') }}
     </p>
-    <p v-else class="text-xs text-gray-500 dark:text-dark-400">
+    <p v-else class="text-xs text-gray-500 text-[var(--text-muted)]">
       {{ t('auth.verificationCodeHint') }}
     </p>
     <input
@@ -277,7 +277,7 @@ onUnmounted(() => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,

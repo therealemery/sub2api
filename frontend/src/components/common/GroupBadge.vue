@@ -99,7 +99,7 @@ const labelClass = computed(() => {
 
   if (!isSubscription.value) {
     // Standard: subtle background (不再为专属倍率使用不同的背景色)
-    return `${base} bg-black/10 dark:bg-white/10`
+    return `${base} bg-black/10 dark:bg-[var(--bg-surface)]/10`
   }
 
   // 订阅类型：根据剩余天数显示不同颜色
@@ -122,7 +122,7 @@ const labelClass = computed(() => {
     return `${base} bg-emerald-200/60 text-emerald-800 dark:bg-emerald-800/40 dark:text-emerald-300`
   }
   if (props.platform === 'gemini') {
-    return `${base} bg-blue-200/60 text-blue-800 dark:bg-blue-800/40 dark:text-blue-300`
+    return `${base} bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]`
   }
   return `${base} bg-violet-200/60 text-violet-800 dark:bg-violet-800/40 dark:text-violet-300`
 })
@@ -142,7 +142,7 @@ const badgeClass = computed(() => {
   }
   if (props.platform === 'gemini') {
     return isSubscription.value
-      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+      ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
       : 'bg-sky-50 text-sky-700 dark:bg-sky-900/20 dark:text-sky-400'
   }
   // Fallback: original colors

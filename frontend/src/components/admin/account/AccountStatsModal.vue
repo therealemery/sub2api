@@ -9,13 +9,13 @@
       <!-- Account Info Header -->
       <div
         v-if="account"
-        class="flex items-center justify-between rounded-xl border border-primary-200 bg-gradient-to-r from-primary-50 to-primary-100 p-3 dark:border-primary-700/50 dark:from-primary-900/20 dark:to-primary-800/20"
+        class="flex items-center justify-between rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3"
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600"
+            class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent)]"
           >
-            <Icon name="chartBar" size="md" class="text-white" />
+            <Icon name="chartBar" size="md" class="text-[var(--text-inverse)]" />
           </div>
           <div>
             <div class="font-semibold text-gray-900 dark:text-gray-100">{{ account.name }}</div>
@@ -26,7 +26,7 @@
         </div>
         <span
           :class="[
-            'rounded-full px-2.5 py-1 text-xs font-semibold',
+            'rounded-md px-2.5 py-1 text-xs font-semibold',
             account.status === 'active'
               ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
               : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
@@ -46,7 +46,7 @@
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <!-- 30-Day Total Cost -->
           <div
-            class="card border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 dark:border-emerald-800/30 dark:from-emerald-900/10 dark:to-dark-700"
+            class="card border-[var(--border-default)] bg-[var(--bg-surface)] p-4"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
@@ -56,7 +56,7 @@
                 <Icon name="dollar" size="sm" class="text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            <p class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
               ${{ formatCost(stats.summary.total_cost) }}
             </p>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -72,17 +72,17 @@
 
           <!-- 30-Day Total Requests -->
           <div
-            class="card border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-dark-700"
+            class="card border-[var(--border-default)] bg-[var(--bg-surface)] p-4"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
                 t('admin.accounts.stats.totalRequests')
               }}</span>
-              <div class="rounded-lg bg-blue-100 p-1.5 dark:bg-blue-900/30">
-                <Icon name="bolt" size="sm" class="text-blue-600 dark:text-blue-400" />
+              <div class="rounded-lg bg-[var(--bg-surface-alt)] p-1.5 bg-[var(--bg-surface-alt)]">
+                <Icon name="bolt" size="sm" class="text-[var(--accent)] text-[var(--accent)]" />
               </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            <p class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ formatNumber(stats.summary.total_requests) }}
             </p>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -92,7 +92,7 @@
 
           <!-- Daily Average Cost -->
           <div
-            class="card border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 dark:border-amber-800/30 dark:from-amber-900/10 dark:to-dark-700"
+            class="card border-[var(--border-default)] bg-[var(--bg-surface)] p-4"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
@@ -106,7 +106,7 @@
                 />
               </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            <p class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
               ${{ formatCost(stats.summary.avg_daily_cost) }}
             </p>
              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -123,7 +123,7 @@
 
           <!-- Daily Average Requests -->
           <div
-            class="card border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 dark:border-purple-800/30 dark:from-purple-900/10 dark:to-dark-700"
+            class="card border-[var(--border-default)] bg-[var(--bg-surface)] p-4"
           >
             <div class="mb-2 flex items-center justify-between">
               <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{
@@ -145,7 +145,7 @@
                 </svg>
               </div>
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            <p class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
               {{ formatNumber(Math.round(stats.summary.avg_daily_requests)) }}
             </p>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -162,20 +162,20 @@
               <div class="rounded-lg bg-cyan-100 p-1.5 dark:bg-cyan-900/30">
                 <Icon name="clock" size="sm" class="text-cyan-600 dark:text-cyan-400" />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.todayOverview')
               }}</span>
             </div>
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.today?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.today?.user_cost || 0) }}</span
                 >
               </div>
@@ -183,7 +183,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.requests')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatNumber(stats.summary.today?.requests || 0)
                 }}</span>
               </div>
@@ -191,7 +191,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.tokens')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatTokens(stats.summary.today?.tokens || 0)
                 }}</span>
               </div>
@@ -204,7 +204,7 @@
               <div class="rounded-lg bg-orange-100 p-1.5 dark:bg-orange-900/30">
                 <Icon name="fire" size="sm" class="text-orange-600 dark:text-orange-400" />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.highestCostDay')
               }}</span>
             </div>
@@ -213,7 +213,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.date')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   stats.summary.highest_cost_day?.label || '-'
                 }}</span>
               </div>
@@ -225,7 +225,7 @@
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.highest_cost_day?.user_cost || 0) }}</span
                 >
               </div>
@@ -233,7 +233,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.requests')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatNumber(stats.summary.highest_cost_day?.requests || 0)
                 }}</span>
               </div>
@@ -250,7 +250,7 @@
                   class="text-indigo-600 dark:text-indigo-400"
                 />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.highestRequestDay')
               }}</span>
             </div>
@@ -259,7 +259,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.date')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   stats.summary.highest_request_day?.label || '-'
                 }}</span>
               </div>
@@ -273,13 +273,13 @@
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.accountBilled') }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.highest_request_day?.cost || 0) }}</span
                 >
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.userBilled') }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.highest_request_day?.user_cost || 0) }}</span
                 >
               </div>
@@ -295,7 +295,7 @@
               <div class="rounded-lg bg-teal-100 p-1.5 dark:bg-teal-900/30">
                 <Icon name="cube" size="sm" class="text-teal-600 dark:text-teal-400" />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.accumulatedTokens')
               }}</span>
             </div>
@@ -304,7 +304,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.totalTokens')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatTokens(stats.summary.total_tokens)
                 }}</span>
               </div>
@@ -312,7 +312,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.dailyAvgTokens')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatTokens(Math.round(stats.summary.avg_daily_tokens))
                 }}</span>
               </div>
@@ -325,7 +325,7 @@
               <div class="rounded-lg bg-rose-100 p-1.5 dark:bg-rose-900/30">
                 <Icon name="bolt" size="sm" class="text-rose-600 dark:text-rose-400" />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.performance')
               }}</span>
             </div>
@@ -334,7 +334,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.avgResponseTime')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatDuration(stats.summary.avg_duration_ms)
                 }}</span>
               </div>
@@ -342,7 +342,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.daysActive')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >{{ stats.summary.actual_days_used }} / {{ stats.summary.days }}</span
                 >
               </div>
@@ -359,7 +359,7 @@
                   class="text-lime-600 dark:text-lime-400"
                 />
               </div>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+              <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                 t('admin.accounts.stats.recentActivity')
               }}</span>
             </div>
@@ -368,7 +368,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.todayRequests')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatNumber(stats.summary.today?.requests || 0)
                 }}</span>
               </div>
@@ -376,7 +376,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.todayTokens')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{
                   formatTokens(stats.summary.today?.tokens || 0)
                 }}</span>
               </div>
@@ -384,7 +384,7 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
                   t('admin.accounts.stats.todayCost')
                 }}</span>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                <span class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]"
                   >${{ formatCost(stats.summary.today?.cost || 0) }}</span
                 >
               </div>
@@ -394,7 +394,7 @@
 
         <!-- Usage Trend Chart -->
         <div class="card p-4">
-          <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-white">
+          <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
             {{ t('admin.accounts.stats.usageTrend') }}
           </h3>
           <div class="h-64">
@@ -438,7 +438,7 @@
       <div class="flex justify-end">
         <button
           @click="handleClose"
-          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-dark-600 dark:text-gray-300 dark:hover:bg-dark-500"
+          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500"
         >
           {{ t('common.close') }}
         </button>
@@ -516,8 +516,8 @@ const trendChartData = computed(() => {
       {
         label: t('usage.accountBilled') + ' (USD)',
         data: stats.value.history.map((h) => h.actual_cost),
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#c4471a',
+        backgroundColor: 'rgba(196, 71, 26, 0.12)',
         fill: true,
         tension: 0.3,
         yAxisID: 'y'
@@ -525,8 +525,8 @@ const trendChartData = computed(() => {
       {
         label: t('usage.userBilled') + ' (USD)',
         data: stats.value.history.map((h) => h.user_cost),
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+        borderColor: '#287a4b',
+        backgroundColor: 'rgba(40, 122, 75, 0.12)',
         fill: false,
         tension: 0.3,
         borderDash: [5, 5],
@@ -535,8 +535,8 @@ const trendChartData = computed(() => {
       {
         label: t('admin.accounts.stats.requests'),
         data: stats.value.history.map((h) => h.requests),
-        borderColor: '#f97316',
-        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+        borderColor: '#b8851f',
+        backgroundColor: 'rgba(184, 133, 31, 0.12)',
         fill: false,
         tension: 0.3,
         yAxisID: 'y1'
@@ -601,7 +601,7 @@ const lineChartOptions = computed(() => ({
         color: chartColors.value.grid
       },
       ticks: {
-        color: '#3b82f6',
+        color: '#c4471a',
         font: {
           size: 10
         },
@@ -610,7 +610,7 @@ const lineChartOptions = computed(() => ({
       title: {
         display: true,
         text: t('usage.accountBilled') + ' (USD)',
-        color: '#3b82f6',
+        color: '#c4471a',
         font: {
           size: 11
         }
@@ -624,7 +624,7 @@ const lineChartOptions = computed(() => ({
         drawOnChartArea: false
       },
       ticks: {
-        color: '#f97316',
+        color: '#b8851f',
         font: {
           size: 10
         },
@@ -633,7 +633,7 @@ const lineChartOptions = computed(() => ({
       title: {
         display: true,
         text: t('admin.accounts.stats.requests'),
-        color: '#f97316',
+        color: '#b8851f',
         font: {
           size: 11
         }

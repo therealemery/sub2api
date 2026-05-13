@@ -9,100 +9,100 @@ export type Platform = 'anthropic' | 'openai' | 'antigravity' | 'gemini'
 
 // ── Badge (bg + text + border, for inline badges with border) ───────
 const BADGE: Record<Platform, string> = {
-  anthropic: 'bg-orange-500/10 text-orange-600 border-orange-500/30 dark:text-orange-400',
-  openai: 'bg-green-500/10 text-green-600 border-green-500/30 dark:text-green-400',
-  antigravity: 'bg-purple-500/10 text-purple-600 border-purple-500/30 dark:text-purple-400',
-  gemini: 'bg-blue-500/10 text-blue-600 border-blue-500/30 dark:text-blue-400',
+  anthropic: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] border-[var(--border-default)]',
+  openai: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] border-[var(--border-default)]',
+  antigravity: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] border-[var(--border-default)]',
+  gemini: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] border-[var(--border-default)]',
 }
-const BADGE_DEFAULT = 'bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-400'
+const BADGE_DEFAULT = 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)] border-[var(--border-default)]'
 
 // ── Light badge (softer bg, no border) ──────────────────────────────
 const BADGE_LIGHT: Record<Platform, string> = {
-  anthropic: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/10 dark:text-orange-300',
-  openai: 'bg-green-500/10 text-green-600 dark:bg-green-500/10 dark:text-green-300',
-  antigravity: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/10 dark:text-purple-300',
-  gemini: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300',
+  anthropic: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)]',
+  openai: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)]',
+  antigravity: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)]',
+  gemini: 'bg-[var(--bg-surface-alt)] text-[var(--text-secondary)]',
 }
 
 // ── Border ──────────────────────────────────────────────────────────
 const BORDER: Record<Platform, string> = {
-  anthropic: 'border-orange-500/20 dark:border-orange-500/20',
-  openai: 'border-green-500/20 dark:border-green-500/20',
-  antigravity: 'border-purple-500/20 dark:border-purple-500/20',
-  gemini: 'border-blue-500/20 dark:border-blue-500/20',
+  anthropic: 'border-[var(--border-default)]',
+  openai: 'border-[var(--border-default)]',
+  antigravity: 'border-[var(--border-default)]',
+  gemini: 'border-[var(--border-default)]',
 }
-const BORDER_DEFAULT = 'border-gray-200 dark:border-dark-700'
+const BORDER_DEFAULT = 'border-[var(--border-default)]'
 
 // ── Accent bar (gradient) ───────────────────────────────────────────
 const ACCENT_BAR: Record<Platform, string> = {
-  anthropic: 'bg-gradient-to-r from-orange-400 to-orange-500',
-  openai: 'bg-gradient-to-r from-emerald-400 to-emerald-500',
-  antigravity: 'bg-gradient-to-r from-purple-400 to-purple-500',
-  gemini: 'bg-gradient-to-r from-blue-400 to-blue-500',
+  anthropic: 'bg-[var(--accent)]',
+  openai: 'bg-[var(--accent)]',
+  antigravity: 'bg-[var(--accent)]',
+  gemini: 'bg-[var(--accent)]',
 }
-const ACCENT_BAR_DEFAULT = 'bg-gradient-to-r from-primary-400 to-primary-500'
+const ACCENT_BAR_DEFAULT = 'bg-[var(--accent)]'
 
 // ── Text (price, icon) ─────────────────────────────────────────────
 const TEXT: Record<Platform, string> = {
-  anthropic: 'text-orange-600 dark:text-orange-400',
-  openai: 'text-emerald-600 dark:text-emerald-400',
-  antigravity: 'text-purple-600 dark:text-purple-400',
-  gemini: 'text-blue-600 dark:text-blue-400',
+  anthropic: 'text-[var(--accent)]',
+  openai: 'text-[var(--accent)]',
+  antigravity: 'text-[var(--accent)]',
+  gemini: 'text-[var(--accent)]',
 }
-const TEXT_DEFAULT = 'text-primary-600 dark:text-primary-400'
+const TEXT_DEFAULT = 'text-[var(--accent)]'
 
 // ── Icon (check mark etc.) ──────────────────────────────────────────
 const ICON: Record<Platform, string> = {
-  anthropic: 'text-orange-500 dark:text-orange-400',
-  openai: 'text-emerald-500 dark:text-emerald-400',
-  antigravity: 'text-purple-500 dark:text-purple-400',
-  gemini: 'text-blue-500 dark:text-blue-400',
+  anthropic: 'text-[var(--accent)]',
+  openai: 'text-[var(--accent)]',
+  antigravity: 'text-[var(--accent)]',
+  gemini: 'text-[var(--accent)]',
 }
-const ICON_DEFAULT = 'text-primary-500 dark:text-primary-400'
+const ICON_DEFAULT = 'text-[var(--accent)]'
 
 // ── Button (solid bg) ───────────────────────────────────────────────
 const BUTTON: Record<Platform, string> = {
-  anthropic: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 dark:bg-orange-500/80 dark:hover:bg-orange-500',
-  openai: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 dark:bg-green-600/80 dark:hover:bg-green-600',
-  antigravity: 'bg-purple-500 text-white hover:bg-purple-600 active:bg-purple-700 dark:bg-purple-500/80 dark:hover:bg-purple-500',
-  gemini: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-500/80 dark:hover:bg-blue-500',
+  anthropic: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)]',
+  openai: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)]',
+  antigravity: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)]',
+  gemini: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] active:bg-[var(--accent-hover)]',
 }
-const BUTTON_DEFAULT = 'bg-primary-500 text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500'
+const BUTTON_DEFAULT = 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]'
 
 // ── Discount badge ──────────────────────────────────────────────────
 const DISCOUNT: Record<Platform, string> = {
-  anthropic: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-  openai: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-  antigravity: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-  gemini: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  anthropic: 'bg-[var(--accent-soft)] text-[var(--accent)]',
+  openai: 'bg-[var(--accent-soft)] text-[var(--accent)]',
+  antigravity: 'bg-[var(--accent-soft)] text-[var(--accent)]',
+  gemini: 'bg-[var(--accent-soft)] text-[var(--accent)]',
 }
 const DISCOUNT_DEFAULT = 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
 
 // ── Header gradient (subscription confirm) ─────────────────────────
 const GRADIENT: Record<Platform, string> = {
-  anthropic: 'from-orange-500 to-orange-600',
-  openai: 'from-emerald-500 to-emerald-600',
-  antigravity: 'from-purple-500 to-purple-600',
-  gemini: 'from-blue-500 to-blue-600',
+  anthropic: 'from-[var(--accent)] to-[var(--accent)]',
+  openai: 'from-[var(--accent)] to-[var(--accent)]',
+  antigravity: 'from-[var(--accent)] to-[var(--accent)]',
+  gemini: 'from-[var(--accent)] to-[var(--accent)]',
 }
-const GRADIENT_DEFAULT = 'from-primary-500 to-primary-600'
+const GRADIENT_DEFAULT = 'from-[var(--accent)] to-[var(--accent)]'
 
 // ── Header text (light text on gradient bg) ────────────────────────
 const GRADIENT_TEXT: Record<Platform, string> = {
-  anthropic: 'text-orange-100',
-  openai: 'text-emerald-100',
-  antigravity: 'text-purple-100',
-  gemini: 'text-blue-100',
+  anthropic: 'text-[var(--text-inverse)]',
+  openai: 'text-[var(--text-inverse)]',
+  antigravity: 'text-[var(--text-inverse)]',
+  gemini: 'text-[var(--text-inverse)]',
 }
-const GRADIENT_TEXT_DEFAULT = 'text-primary-100'
+const GRADIENT_TEXT_DEFAULT = 'text-[var(--text-inverse)]'
 
 const GRADIENT_SUBTEXT: Record<Platform, string> = {
-  anthropic: 'text-orange-200',
-  openai: 'text-emerald-200',
-  antigravity: 'text-purple-200',
-  gemini: 'text-blue-200',
+  anthropic: 'text-[var(--text-inverse)]',
+  openai: 'text-[var(--text-inverse)]',
+  antigravity: 'text-[var(--text-inverse)]',
+  gemini: 'text-[var(--text-inverse)]',
 }
-const GRADIENT_SUBTEXT_DEFAULT = 'text-primary-200'
+const GRADIENT_SUBTEXT_DEFAULT = 'text-[var(--text-inverse)]'
 
 // ── Public API ──────────────────────────────────────────────────────
 

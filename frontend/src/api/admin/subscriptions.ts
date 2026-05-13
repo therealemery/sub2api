@@ -13,6 +13,59 @@ import type {
   PaginatedResponse
 } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewHost(): boolean {
+  return ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)
+}
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || isLocalPreviewHost()) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function previewSubscriptions(): UserSubscription[] {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: 1,
+      user_id: 2,
+      group_id: 2,
+      status: 'active',
+      daily_usage_usd: 1.8,
+      weekly_usage_usd: 8.6,
+      monthly_usage_usd: 24.5,
+      daily_window_start: now,
+      weekly_window_start: now,
+      monthly_window_start: now,
+      created_at: now,
+      updated_at: now,
+      expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+      user: {
+        id: 2,
+        username: 'User Preview',
+        email: 'user-preview@ownapi.local',
+        avatar_url: null,
+        role: 'user',
+        balance: 100,
+        concurrency: 10,
+        rpm_limit: 0,
+        status: 'active',
+        allowed_groups: null,
+        balance_notify_enabled: false,
+        balance_notify_threshold: null,
+        balance_notify_extra_emails: [],
+        subscriptions: [],
+        last_active_at: now,
+        created_at: now,
+        updated_at: now
+      }
+    }
+  ]
+}
+
 /**
  * List all subscriptions with pagination
  * @param page - Page number (default: 1)
@@ -35,6 +88,17 @@ export async function list(
     signal?: AbortSignal
   }
 ): Promise<PaginatedResponse<UserSubscription>> {
+  if (isLocalPreviewSession()) {
+    const items = previewSubscriptions()
+    return {
+      items,
+      total: items.length,
+      page,
+      page_size: pageSize,
+      pages: 1
+    }
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<UserSubscription>>(
     '/admin/subscriptions',
     {
@@ -55,6 +119,10 @@ export async function list(
  * @returns Subscription details
  */
 export async function getById(id: number): Promise<UserSubscription> {
+  if (isLocalPreviewSession()) {
+    return previewSubscriptions().find((item) => item.id === id) ?? previewSubscriptions()[0]
+  }
+
   const { data } = await apiClient.get<UserSubscription>(`/admin/subscriptions/${id}`)
   return data
 }
@@ -75,6 +143,16 @@ export async function getProgress(id: number): Promise<SubscriptionProgress> {
  * @returns Created subscription
  */
 export async function assign(request: AssignSubscriptionRequest): Promise<UserSubscription> {
+  if (isLocalPreviewSession()) {
+    const validityDays = request.validity_days ?? 30
+    return {
+      ...previewSubscriptions()[0],
+      user_id: request.user_id,
+      group_id: request.group_id,
+      expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * validityDays).toISOString()
+    }
+  }
+
   const { data } = await apiClient.post<UserSubscription>('/admin/subscriptions/assign', request)
   return data
 }

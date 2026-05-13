@@ -6,7 +6,7 @@ hero:
   text: "Documentation"
   tagline: AI API Gateway & Quota Management Platform
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: OwnAPI
   actions:
     - theme: brand

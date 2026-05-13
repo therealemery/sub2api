@@ -58,8 +58,8 @@
           </template>
           <template #cell-order="{ row }">
             <div class="space-y-0.5">
-              <div class="font-mono text-sm text-gray-900 dark:text-white">#{{ row.order_id }}</div>
-              <div class="max-w-56 truncate text-sm text-gray-500 dark:text-dark-400">{{ row.out_trade_no }}</div>
+              <div class="font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]">#{{ row.order_id }}</div>
+              <div class="max-w-56 truncate text-sm text-gray-500 text-[var(--text-muted)]">{{ row.out_trade_no }}</div>
             </div>
           </template>
           <template #cell-payment_type="{ row }">
@@ -75,7 +75,7 @@
             <AmountText :value="row.order_amount" />
           </template>
           <template #cell-pay_amount="{ row }">
-            <span class="text-sm text-gray-900 dark:text-white">¥{{ formatAmount(row.pay_amount) }}</span>
+            <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">¥{{ formatAmount(row.pay_amount) }}</span>
           </template>
           <template #cell-rebate_amount="{ row }">
             <AmountText :value="row.rebate_amount" strong />
@@ -120,13 +120,13 @@
       @close="overviewDialog = false"
     >
       <div v-if="overviewLoading" class="flex justify-center py-8">
-        <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
+        <div class="h-6 w-6 animate-spin rounded-full border-2 border-[var(--border-focus)] border-t-transparent"></div>
       </div>
       <div v-else-if="selectedOverview" class="space-y-4">
-        <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-dark-700 dark:bg-dark-800">
-          <div class="font-mono text-sm text-gray-900 dark:text-white">#{{ selectedOverview.user_id }}</div>
-          <div class="mt-1 text-sm font-medium text-gray-900 dark:text-white">{{ selectedOverview.email || '-' }}</div>
-          <div class="mt-0.5 text-sm text-gray-500 dark:text-dark-400">{{ selectedOverview.username || '-' }}</div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
+          <div class="font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]">#{{ selectedOverview.user_id }}</div>
+          <div class="mt-1 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ selectedOverview.email || '-' }}</div>
+          <div class="mt-0.5 text-sm text-gray-500 text-[var(--text-muted)]">{{ selectedOverview.username || '-' }}</div>
         </div>
         <div class="grid gap-3 sm:grid-cols-2">
           <OverviewStat :label="t('admin.affiliates.overview.affCode')" :value="selectedOverview.aff_code || '-'" mono />
@@ -341,15 +341,15 @@ const UserCell = defineComponent({
   emits: ['open'],
   setup(cellProps, { emit }) {
     return () => h('div', { class: 'space-y-0.5' }, [
-      h('div', { class: 'font-mono text-sm text-gray-900 dark:text-white' }, `#${cellProps.id}`),
+      h('div', { class: 'font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]' }, `#${cellProps.id}`),
       h(cellProps.clickable ? 'button' : 'div', {
         class: cellProps.clickable
-          ? 'max-w-56 truncate text-left text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline dark:text-primary-400 dark:hover:text-primary-300'
+          ? 'max-w-56 truncate text-left text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] hover:underline text-[var(--accent)] dark:hover:text-[var(--accent-hover)]'
           : 'max-w-56 truncate text-sm text-gray-700 dark:text-gray-300',
         type: cellProps.clickable ? 'button' : undefined,
         onClick: cellProps.clickable ? () => emit('open', cellProps.id) : undefined,
       }, cellProps.email || '-'),
-      h('div', { class: 'max-w-56 truncate text-sm text-gray-500 dark:text-dark-400' }, cellProps.username || '-'),
+      h('div', { class: 'max-w-56 truncate text-sm text-gray-500 text-[var(--text-muted)]' }, cellProps.username || '-'),
     ])
   },
 })
@@ -363,7 +363,7 @@ const AmountText = defineComponent({
     return () => h('span', {
       class: amountProps.strong
         ? 'text-sm font-semibold text-emerald-600 dark:text-emerald-400'
-        : 'text-sm text-gray-900 dark:text-white',
+        : 'text-sm text-gray-900 dark:text-[var(--text-inverse)]',
     }, `$${formatAmount(amountProps.value)}`)
   },
 })
@@ -376,7 +376,7 @@ const NullableAmountText = defineComponent({
     return () => {
       const value = amountProps.value
       if (value === null || value === undefined) {
-        return h('span', { class: 'text-sm text-gray-400 dark:text-dark-500' }, '-')
+        return h('span', { class: 'text-sm text-gray-400 text-[var(--text-muted)]' }, '-')
       }
       return h(AmountText, { value })
     }
@@ -390,12 +390,12 @@ const OverviewStat = defineComponent({
     mono: { type: Boolean, default: false },
   },
   setup(statProps) {
-    return () => h('div', { class: 'rounded-lg border border-gray-100 bg-white p-3 dark:border-dark-700 dark:bg-dark-900' }, [
-      h('div', { class: 'text-sm text-gray-500 dark:text-dark-400' }, statProps.label),
+    return () => h('div', { class: 'rounded-lg border border-gray-100 bg-[var(--bg-surface)] p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]' }, [
+      h('div', { class: 'text-sm text-gray-500 text-[var(--text-muted)]' }, statProps.label),
       h('div', {
         class: statProps.mono
-          ? 'mt-1 font-mono text-base font-semibold text-gray-900 dark:text-white'
-          : 'mt-1 text-base font-semibold text-gray-900 dark:text-white',
+          ? 'mt-1 font-mono text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]'
+          : 'mt-1 text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]',
       }, statProps.value),
     ])
   },

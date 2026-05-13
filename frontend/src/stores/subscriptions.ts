@@ -10,9 +10,18 @@ import type { UserSubscription } from '@/types'
 
 // Cache TTL: 60 seconds
 const CACHE_TTL_MS = 60_000
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
 
 // Request generation counter to invalidate stale in-flight responses
 let requestGeneration = 0
+
+function isLocalPreviewSession(): boolean {
+  if (
+    typeof localStorage === 'undefined' ||
+    (!import.meta.env.DEV && !['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname))
+  ) return false
+  return !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+}
 
 export const useSubscriptionStore = defineStore('subscriptions', () => {
   // State
@@ -36,6 +45,15 @@ export const useSubscriptionStore = defineStore('subscriptions', () => {
    */
   async function fetchActiveSubscriptions(force = false): Promise<UserSubscription[]> {
     const now = Date.now()
+
+    if (isLocalPreviewSession()) {
+      activeSubscriptions.value = []
+      loaded.value = true
+      lastFetchedAt.value = now
+      activePromise = null
+      loading.value = false
+      return []
+    }
 
     // Return cached data if valid
     if (
@@ -86,6 +104,7 @@ export const useSubscriptionStore = defineStore('subscriptions', () => {
    * Start auto-refresh polling 
    */
   function startPolling() {
+    if (isLocalPreviewSession()) return
     if (pollerInterval) return
 
     pollerInterval = setInterval(() => {

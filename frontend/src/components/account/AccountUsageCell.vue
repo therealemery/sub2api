@@ -78,7 +78,7 @@
           </span>
           <button
             type="button"
-            class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors"
+            class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)] transition-colors"
             :disabled="activeQueryLoading"
             @click="loadActiveUsage"
           >
@@ -171,7 +171,7 @@
             />
           </svg>
           <span
-            class="pointer-events-none absolute left-0 top-full z-50 mt-1 w-80 whitespace-normal break-words rounded bg-gray-900 px-3 py-2 text-xs leading-relaxed text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+            class="pointer-events-none absolute left-0 top-full z-50 mt-1 w-80 whitespace-normal break-words rounded bg-gray-900 px-3 py-2 text-xs leading-relaxed text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
           >
             {{ t('admin.accounts.ineligibleWarning') }}
           </span>
@@ -193,7 +193,7 @@
             :href="validationURL"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-[10px] text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            class="text-[10px] text-[var(--accent)] hover:text-[var(--accent-hover)] hover:underline text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
             :title="t('admin.accounts.openVerification')"
           >
             {{ t('admin.accounts.openVerification') }}
@@ -313,7 +313,7 @@
             />
           </svg>
           <span
-            class="pointer-events-none absolute left-0 top-full z-50 mt-1 w-80 whitespace-normal break-words rounded bg-gray-900 px-3 py-2 text-xs leading-relaxed text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+            class="pointer-events-none absolute left-0 top-full z-50 mt-1 w-80 whitespace-normal break-words rounded bg-gray-900 px-3 py-2 text-xs leading-relaxed text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
           >
             <div class="font-semibold mb-1">{{ t('admin.accounts.gemini.quotaPolicy.title') }}</div>
             <div class="mb-2 text-gray-300">{{ t('admin.accounts.gemini.quotaPolicy.note') }}</div>
@@ -321,7 +321,7 @@
               <div><strong>{{ geminiQuotaPolicyChannel }}:</strong></div>
               <div class="pl-2">• {{ geminiQuotaPolicyLimits }}</div>
               <div class="mt-2">
-                <a :href="geminiQuotaPolicyDocsUrl" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline">
+                <a :href="geminiQuotaPolicyDocsUrl" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] hover:text-[var(--accent-hover)] underline">
                   {{ t('admin.accounts.gemini.quotaPolicy.columns.docs') }} →
                 </a>
               </div>
@@ -767,18 +767,18 @@ const geminiTierClass = computed(() => {
   const level = geminiUserLevel.value
 
   if (channel === 'client' || channel === 'ai studio') {
-    return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
   }
 
   if (channel === 'google one') {
     if (level === 'ultra') return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
-    if (level === 'pro') return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    if (level === 'pro') return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
     return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
   }
 
   if (channel === 'gcp') {
     if (level === 'enterprise') return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
-    return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
   }
 
   return ''
@@ -915,7 +915,7 @@ const antigravityTierClass = computed(() => {
     case 'free-tier':
       return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
     case 'g1-pro-tier':
-      return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+      return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
     case 'g1-ultra-tier':
       return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
     default:
@@ -1001,7 +1001,12 @@ const loadUsage = async (options?: { source?: 'passive' | 'active'; bypassCache?
   error.value = null
 
   try {
-    const fetchFn = () => adminAPI.accounts.getUsage(props.account.id, options?.source)
+    const fetchFn = () => {
+      if (options?.source) {
+        return adminAPI.accounts.getUsage(props.account.id, options.source)
+      }
+      return adminAPI.accounts.getUsage(props.account.id)
+    }
     const result = await enqueueUsageRequest(props.account, fetchFn)
     if (!unmounted.value) {
       usageInfo.value = result
@@ -1201,6 +1206,22 @@ watch(
     _usageCache.delete(props.account.id)
     loadUsage({ source, bypassCache: true }).catch((e) => {
       console.error('Failed to refresh usage after manual refresh:', e)
+    })
+  }
+)
+
+watch(
+  () => [props.account.id, props.account.updated_at],
+  ([nextId, nextUpdatedAt], [prevId, prevUpdatedAt]) => {
+    if (nextId === prevId && nextUpdatedAt === prevUpdatedAt) return
+    usageInfo.value = null
+    error.value = null
+    if (!shouldFetchUsage.value) return
+
+    const source = isAnthropicOAuthOrSetupToken.value ? 'passive' : undefined
+    _usageCache.delete(props.account.id)
+    loadUsage({ source, bypassCache: true }).catch((e) => {
+      console.error('Failed to refresh usage after account data changed:', e)
     })
   }
 )

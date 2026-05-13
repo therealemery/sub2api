@@ -9,7 +9,7 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.orderId') }}</p>
-          <p class="font-mono text-sm font-medium text-gray-900 dark:text-white">#{{ order.id }}</p>
+          <p class="font-mono text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">#{{ order.id }}</p>
         </div>
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.status') }}</p>
@@ -19,19 +19,19 @@
         </div>
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.baseAmount') }}</p>
-          <p class="text-sm font-medium text-gray-900 dark:text-white">¥{{ baseAmount.toFixed(2) }}</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ baseAmount.toFixed(2) }}</p>
         </div>
         <div v-if="order.fee_rate > 0">
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.fee') }} ({{ order.fee_rate }}%)</p>
-          <p class="text-sm font-medium text-gray-900 dark:text-white">¥{{ feeAmount.toFixed(2) }}</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ feeAmount.toFixed(2) }}</p>
         </div>
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.payAmount') }}</p>
-          <p class="text-sm font-medium text-gray-900 dark:text-white">¥{{ order.pay_amount.toFixed(2) }}</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">¥{{ order.pay_amount.toFixed(2) }}</p>
         </div>
         <div v-if="order.amount !== order.pay_amount">
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.creditedAmount') }}</p>
-          <p class="text-sm font-medium text-gray-900 dark:text-white">{{ order.order_type === 'balance' ? '$' : '¥' }}{{ order.amount.toFixed(2) }}</p>
+          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ order.order_type === 'balance' ? '$' : '¥' }}{{ order.amount.toFixed(2) }}</p>
         </div>
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('payment.orders.paymentMethod') }}</p>
@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 border-t border-gray-200 pt-4 dark:border-dark-700">
+      <div class="flex items-center justify-end gap-2 border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <button
           v-if="order.status === 'PENDING'"
           @click="emit('cancel', order)"

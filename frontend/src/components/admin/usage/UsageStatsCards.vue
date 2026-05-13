@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
     <div class="card p-4 flex items-center gap-3">
-      <div class="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30 text-blue-600">
+      <div class="rounded-lg bg-[var(--bg-surface-alt)] p-2 bg-[var(--bg-surface-alt)] text-[var(--accent)]">
         <Icon name="document" size="md" />
       </div>
       <div>
