@@ -1,9 +1,9 @@
 <template>
-  <component :is="isFullscreen ? 'div' : AppLayout" :class="isFullscreen ? 'flex min-h-screen flex-col justify-center bg-gray-50 bg-[var(--bg-surface-alt)]' : ''">
+  <component :is="isFullscreen ? 'div' : AppLayout" :class="isFullscreen ? 'ops-fullscreen-shell' : ''">
     <div :class="[isFullscreen ? 'p-4 md:p-6' : '', 'space-y-6 pb-12']">
       <div
         v-if="errorMessage"
-        class="rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400"
+        class="ops-error-message"
       >
         {{ errorMessage }}
       </div>
@@ -44,8 +44,8 @@
         class="ops-section space-y-6"
       >
         <div class="flex flex-col gap-1">
-          <h2 class="text-lg font-semibold text-gray-950 dark:text-[var(--text-inverse)]">流量与性能</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
+          <h2 class="ops-section-title">流量与性能</h2>
+          <p class="ops-section-description">
             查看并发、切换率、吞吐、延迟和错误分布，用来判断当前调用链路是否稳定。
           </p>
         </div>
@@ -115,8 +115,8 @@
         class="ops-section space-y-6"
       >
         <div class="flex flex-col gap-1">
-          <h2 class="text-lg font-semibold text-gray-950 dark:text-[var(--text-inverse)]">告警与日志</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
+          <h2 class="ops-section-title">告警与日志</h2>
+          <p class="ops-section-description">
             汇总最近告警、请求错误和系统日志，方便定位需要处理的异常。
           </p>
         </div>
@@ -860,3 +860,39 @@ watch(showSettingsDialog, async (show) => {
   }
 })
 </script>
+
+<style scoped>
+.ops-fullscreen-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+.ops-error-message {
+  border: 1px solid var(--status-danger);
+  border-radius: var(--radius-md);
+  background: var(--status-danger-soft);
+  padding: 14px 16px;
+  color: var(--status-danger);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ops-section-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.ops-section-description {
+  margin: 0;
+  color: var(--accent);
+  font-size: 14px;
+  line-height: 1.7;
+}
+</style>

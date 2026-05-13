@@ -26,7 +26,7 @@
         <Icon
           name="chevronDown"
           size="md"
-          :class="['transition-transform duration-200', isOpen && 'rotate-180']"
+          :class="['select-chevron', isOpen && 'select-chevron-open']"
         />
       </span>
     </button>
@@ -81,7 +81,7 @@
                   v-if="option._creatable"
                   name="search"
                   size="sm"
-                  class="flex-shrink-0 text-gray-400"
+                  class="flex-shrink-0 text-[var(--text-muted)]"
                 />
                 <span class="select-option-label" :class="option._creatable && 'italic text-muted'">{{ getOptionLabel(option) }}</span>
                 <Icon
@@ -506,6 +506,14 @@ onUnmounted(() => {
 .select-icon {
   color: var(--text-secondary) !important;
 }
+
+.select-chevron {
+  transition: none !important;
+}
+
+.select-chevron-open {
+  transform: rotate(180deg);
+}
 </style>
 
 <style>
@@ -605,14 +613,13 @@ onUnmounted(() => {
 
 .select-dropdown-enter-active,
 .select-dropdown-leave-active {
-  transition: opacity var(--duration-fast) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+  transition: none !important;
 }
 
 .select-dropdown-enter-from,
 .select-dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
+  opacity: 1;
+  transform: none;
 }
 
 .select-dropdown-portal {
@@ -642,12 +649,17 @@ onUnmounted(() => {
   color: var(--text-primary) !important;
   font-size: 14px !important;
   font-weight: 400 !important;
+  transition: none !important;
 }
 
 .select-dropdown-portal .select-option:hover,
-.select-dropdown-portal .select-option-focused,
-.select-dropdown-portal .select-option-selected {
+.select-dropdown-portal .select-option-focused {
   background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.select-dropdown-portal .select-option-selected {
+  background: transparent !important;
   color: var(--text-primary) !important;
 }
 

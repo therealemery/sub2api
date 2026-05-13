@@ -479,7 +479,7 @@
               </div>
             </div>
           </div>
-          <!-- 閻庣懓鎲￠悡锟犲焵椤掆偓椤︻垶宕规惔锝囩＜闁告洦鍓涢崹鑲╃磼?-->
+          <!-- Selected source groups -->
           <div
             v-if="createForm.copy_accounts_from_group_ids.length > 0"
             class="flex flex-wrap gap-1.5 mb-2"
@@ -1698,7 +1698,7 @@
               </div>
             </div>
           </div>
-          <!-- 閻庣懓鎲￠悡锟犲焵椤掆偓椤︻垶宕规惔锝囩＜闁告洦鍓涢崹鑲╃磼?-->
+          <!-- Selected source groups -->
           <div
             v-if="editForm.copy_accounts_from_group_ids.length > 0"
             class="flex flex-wrap gap-1.5 mb-2"

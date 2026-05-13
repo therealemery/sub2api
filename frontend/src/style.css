@@ -3417,3 +3417,233 @@ html.dark .theme-logo-dark {
   -webkit-text-fill-color: currentColor !important;
 }
 
+/* RELAY v2 final stabilizer: remove legacy bars, hover jumping, double focus rings and dark-mode white panels. */
+.app-shell,
+.app-shell :is(.app-main, .main-content, .page-content, .dashboard-page, .models-page, .monitor-page, .channel-status-page),
+html.dark .app-shell,
+html.dark .app-shell :is(.app-main, .main-content, .page-content, .dashboard-page, .models-page, .monitor-page, .channel-status-page) {
+  background: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell :is(
+  .card,
+  .page-intro,
+  .table-page,
+  .table-card,
+  .table-filter-bar,
+  .table-scroll-container,
+  .empty-state,
+  .model-card,
+  .featured-model-card,
+  .ecosystem-card,
+  .admin-model-card,
+  .ops-section,
+  .ops-panel,
+  .ops-metric-card,
+  .settings-panel,
+  .admin-config-section,
+  .subscription-card,
+  .payment-card,
+  .redeem-card
+),
+.modal-content,
+.dialog-container,
+.select-dropdown-portal {
+  transition: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(
+  .card,
+  .page-intro,
+  .table-page,
+  .table-card,
+  .table-filter-bar,
+  .table-scroll-container,
+  .empty-state,
+  .model-card,
+  .featured-model-card,
+  .ecosystem-card,
+  .admin-model-card,
+  .ops-section,
+  .ops-panel,
+  .ops-metric-card,
+  .settings-panel,
+  .admin-config-section,
+  .subscription-card,
+  .payment-card,
+  .redeem-card
+):hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: var(--border-default) !important;
+}
+
+.app-shell :is(
+  .card,
+  .page-intro,
+  .table-page,
+  .table-card,
+  .table-filter-bar,
+  .table-scroll-container,
+  .empty-state,
+  .model-card,
+  .featured-model-card,
+  .ecosystem-card,
+  .admin-model-card,
+  .ops-section,
+  .ops-panel,
+  .ops-metric-card,
+  .settings-panel,
+  .admin-config-section,
+  .subscription-card,
+  .payment-card,
+  .redeem-card,
+  .btn,
+  .modal-content,
+  .dialog-container
+)::before,
+.app-shell :is(
+  .card,
+  .page-intro,
+  .table-page,
+  .table-card,
+  .table-filter-bar,
+  .table-scroll-container,
+  .empty-state,
+  .model-card,
+  .featured-model-card,
+  .ecosystem-card,
+  .admin-model-card,
+  .ops-section,
+  .ops-panel,
+  .ops-metric-card,
+  .settings-panel,
+  .admin-config-section,
+  .subscription-card,
+  .payment-card,
+  .redeem-card,
+  .btn,
+  .modal-content,
+  .dialog-container
+)::after {
+  border-left: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button),
+.modal-content :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button),
+.dialog-container :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button) {
+  color: var(--accent-contrast) !important;
+  -webkit-text-fill-color: var(--accent-contrast) !important;
+}
+
+.app-shell :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button) *,
+.modal-content :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button) *,
+.dialog-container :is(.btn-primary, .btn-success, .btn-stripe, .button-primary, .primary-button) * {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.app-shell :is(.data-table-row, .data-table-row td, .select-option, .sidebar-link, .nav-link, .model-card, .admin-model-card) {
+  transition: none !important;
+}
+
+.app-shell :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+),
+.modal-content :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+),
+.dialog-container :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+) {
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+):is(:focus, :focus-visible),
+.modal-content :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+):is(:focus, :focus-visible),
+.dialog-container :is(
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  .input,
+  .select-trigger,
+  .search-input,
+  .form-input,
+  .form-select
+):is(:focus, :focus-visible) {
+  border-color: var(--border-focus) !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+html.dark .app-shell :is(
+  .bg-white,
+  [class~='bg-white'],
+  [class*='bg-gray-50'],
+  [class*='bg-gray-100'],
+  [class*='bg-slate-50'],
+  [class*='bg-zinc-50'],
+  [class*='bg-neutral-50']
+) {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .app-shell :is(
+  .text-black,
+  [class~='text-black'],
+  [class*='text-gray-900'],
+  [class*='text-slate-900'],
+  [class*='text-zinc-900'],
+  [class*='text-neutral-900']
+) {
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-text-stroke-width: 0 !important;
+  text-shadow: none !important;
+}
+

@@ -1,16 +1,16 @@
 <template>
   <BaseDialog :show="show" :title="title" width="narrow" @close="handleCancel">
     <div class="space-y-4">
-      <p class="text-sm text-gray-600 dark:text-gray-400">{{ message }}</p>
+      <p class="text-sm text-[var(--text-secondary)]">{{ message }}</p>
       <slot></slot>
     </div>
 
     <template #footer>
-      <div class="flex justify-end space-x-3">
+      <div class="flex justify-end gap-3">
         <button
           @click="handleCancel"
           type="button"
-          class="rounded-md border border-gray-300 bg-[var(--bg-surface)] px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200 dark:hover:bg-dark-600 dark:focus:ring-offset-dark-800"
+          class="btn btn-secondary"
         >
           {{ cancelText }}
         </button>
@@ -18,10 +18,8 @@
           @click="handleConfirm"
           type="button"
           :class="[
-            'rounded-md px-4 py-2 text-sm font-medium text-[var(--text-inverse)] focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-dark-800',
-            danger
-              ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
-              : 'bg-[var(--accent)] hover:bg-[var(--bg-subtle)] focus:ring-[var(--border-focus)]'
+            'btn',
+            danger ? 'btn-danger' : 'btn-primary'
           ]"
         >
           {{ confirmText }}

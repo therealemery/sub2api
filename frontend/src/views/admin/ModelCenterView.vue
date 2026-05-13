@@ -3,7 +3,7 @@
     <div class="admin-model-center-page">
       <PageIntro
         title="模型中心配置"
-        description="管理 /models 页面模型展示卡片。这里只影响模型中心展示，不改变真实调用、渠道、分组或密钥逻辑。"
+        description="管理 /models 页面展示的模型卡片。这里只影响前台展示，不改变真实调用、渠道、分组或密钥逻辑。"
       >
         <template #actions>
           <router-link to="/models" class="btn btn-secondary">查看前台</router-link>
@@ -17,7 +17,7 @@
         <div class="panel-heading panel-heading-actions">
           <div>
             <h3>模型展示卡片</h3>
-            <p>选择 logo、展示状态和文案。隐藏后只是不在前台模型中心显示，不影响渠道、分组和真实调用。</p>
+            <p>选择 logo、展示状态、版本和说明。隐藏后只是不在前台模型中心显示，不影响渠道、分组和真实调用。</p>
           </div>
           <div class="add-model-control">
             <select v-model="selectedLogoId" class="input">
@@ -395,16 +395,17 @@ onMounted(loadConfig)
   gap: 0;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  background: var(--bg-surface-alt) !important;
-  color: var(--text-primary) !important;
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
   overflow: hidden;
   padding: 0;
+  transition: none;
 }
 
 .admin-model-card.is-expanded {
   grid-column: span 2;
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--border-default));
-  background: var(--bg-surface) !important;
+  border-color: var(--border-strong);
+  background: var(--bg-surface);
 }
 
 .model-card-header {
@@ -413,7 +414,6 @@ onMounted(loadConfig)
   gap: 10px;
   align-items: center;
   padding: 12px;
-  border-bottom: 0;
 }
 
 .admin-model-card.is-expanded .model-card-header {
@@ -449,8 +449,8 @@ onMounted(loadConfig)
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm) !important;
-  background: var(--bg-surface) !important;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
 }
 
 .model-logo-preview img {
@@ -485,188 +485,109 @@ onMounted(loadConfig)
   gap: 8px;
 }
 
-.model-card-expand-label {
+.model-card-expand-label,
+.model-status-chip {
   display: inline-flex;
-  min-height: 28px;
+  min-height: 26px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
-  background: var(--bg-surface);
   padding: 0 9px;
-  color: var(--text-primary);
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
 
+.model-card-expand-label {
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
 .model-status-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
   border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
   background: var(--accent-soft);
-  padding: 0 9px;
   color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
 }
 
 .model-visible-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-primary);
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
   font-weight: 700;
-  white-space: nowrap;
-}
-
-.model-visible-toggle input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
 }
 
 .model-card-form {
   display: grid;
-  gap: 14px;
-  padding: 14px;
+  gap: 12px;
+  padding: 12px;
 }
 
 .model-form-section {
-  display: grid;
-  gap: 14px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface-alt);
-  padding: 16px;
+  padding: 14px;
+}
+
+.model-form-section-title {
+  margin-bottom: 14px;
 }
 
 .model-form-section-title h5 {
   font-size: 14px;
-  line-height: 1.35;
 }
 
-.model-form-section-title p {
-  margin-top: 4px;
-  font-size: 12px;
-}
-
-.model-form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.admin-model-card :deep(.input) {
-  min-height: 40px;
-  padding: 9px 11px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-}
-
-.admin-model-card textarea.input {
-  min-height: 72px;
-  resize: vertical;
-}
-
-.highlight-inputs,
-.model-version-inputs {
-  display: grid;
-  gap: 8px;
-}
-
-.model-version-inputs {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
+.model-form-grid,
+.model-version-inputs,
 .highlight-inputs {
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.model-card-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 14px 14px;
-}
-
+.model-card-footer,
 .model-save-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
+}
+
+.model-card-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 12px;
+}
+
+.model-save-bar {
   padding: 16px 18px;
 }
 
-.model-save-bar p {
-  margin: 0;
-}
-
-:global(.dark) .model-admin-panel,
-:global(.dark) .model-save-bar,
-:global(.dark) .admin-model-card.is-expanded {
-  background: var(--bg-surface) !important;
-}
-
-:global(.dark) .admin-model-card {
-  background: var(--bg-surface-alt) !important;
-}
-
-:global(.dark) .model-form-section {
-  background: var(--bg-surface-alt) !important;
-}
-
-:global(.dark) .model-logo-preview,
-:global(.dark) .model-card-expand-label {
-  background: var(--bg-surface) !important;
-}
-
-:global(.dark) .model-logo-preview img {
-  filter: none;
-}
-
 @media (max-width: 980px) {
+  .admin-model-card.is-expanded {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 760px) {
   .panel-heading,
   .panel-heading-actions,
+  .add-model-control,
   .model-save-bar {
-    display: grid;
-  }
-
-  .add-model-control {
-    width: 100%;
-    flex-wrap: wrap;
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .add-model-control .input {
-    width: min(100%, 220px);
+    width: 100%;
   }
 
   .model-form-grid,
-  .admin-model-grid,
-  .highlight-inputs,
-  .model-version-inputs {
+  .model-version-inputs,
+  .highlight-inputs {
     grid-template-columns: 1fr;
-  }
-
-  .admin-model-card.is-expanded {
-    grid-column: auto;
-  }
-}
-
-@media (max-width: 640px) {
-  .model-admin-panel {
-    padding: 18px;
-  }
-
-  .model-card-header {
-    grid-template-columns: 1fr;
-  }
-
-  .model-card-state {
-    justify-items: start;
   }
 }
 </style>
