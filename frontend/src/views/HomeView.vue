@@ -14,8 +14,6 @@
 
   <!-- Default Home Page -->
   <div v-else class="landing-page">
-    <div class="dot-grid" aria-hidden="true"></div>
-
     <!-- Header -->
     <header class="landing-header">
       <nav class="landing-nav">
@@ -132,6 +130,21 @@
         <div class="trust-note">
           <strong>{{ t('home.trust.title') }}</strong>
           <span>{{ t('home.trust.description') }}</span>
+        </div>
+
+        <div class="trust-grid" aria-label="OwnAPI trust commitments">
+          <article>
+            <strong>{{ t('home.trust.longTermTitle') }}</strong>
+            <span>{{ t('home.trust.longTermDescription') }}</span>
+          </article>
+          <article>
+            <strong>{{ t('home.trust.transparentTitle') }}</strong>
+            <span>{{ t('home.trust.transparentDescription') }}</span>
+          </article>
+          <article>
+            <strong>{{ t('home.trust.modelQualityTitle') }}</strong>
+            <span>{{ t('home.trust.modelQualityDescription') }}</span>
+          </article>
         </div>
       </section>
 
@@ -348,10 +361,6 @@ onMounted(() => {
 .landing-page *::before,
 .landing-page *::after {
   box-sizing: border-box;
-}
-
-.dot-grid {
-  display: none;
 }
 
 .landing-header {
@@ -595,26 +604,26 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   padding: 0 28px;
   font-size: 15px;
   font-weight: 800;
-  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+  transition: none;
 }
 
 .primary-cta {
-  background: rgb(20 184 166);
-  color: white;
+  background: var(--accent);
+  color: var(--accent-contrast);
   box-shadow: none;
 }
 
 .primary-cta:hover {
-  background: rgb(13 148 136);
+  background: var(--accent);
 }
 
 .secondary-cta {
   border: 1px solid var(--border-focus);
-  color: rgb(13 148 136);
+  color: var(--accent);
 }
 
 .secondary-cta:hover {
@@ -624,7 +633,7 @@ onMounted(() => {
 
 .primary-cta:active,
 .secondary-cta:active {
-  transform: translateY(1px);
+  transform: none;
 }
 
 .tag-row {
@@ -637,7 +646,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.76);
   padding: 10px 16px;
@@ -647,17 +656,17 @@ onMounted(() => {
 }
 
 .landing-tag svg {
-  color: rgb(20 184 166);
+  color: var(--accent);
 }
 
 .trust-note {
   display: grid;
   gap: 6px;
-  width: min(100%, 720px);
+  width: min(100%, 760px);
   border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.72);
-  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: 18px 22px;
   color: rgb(51 65 85);
   text-align: center;
 }
@@ -674,11 +683,42 @@ onMounted(() => {
   line-height: 1.65;
 }
 
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 860px);
+}
+
+.trust-grid article {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  padding: 16px;
+  text-align: left;
+}
+
+.trust-grid strong {
+  color: rgb(15 23 42);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.trust-grid span {
+  color: rgb(100 116 139);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
 .feature-section,
 .providers-section {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;
-  padding: 48px 0;
+  padding: 54px 0;
 }
 
 .section-heading {
@@ -709,7 +749,7 @@ onMounted(() => {
 
 .feature-card {
   min-width: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.72);
   padding: 20px;
@@ -724,7 +764,7 @@ onMounted(() => {
   justify-content: center;
   border-radius: 12px;
   background: var(--accent-soft);
-  color: rgb(13 148 136);
+  color: var(--accent);
 }
 
 .feature-card h3 {
@@ -754,7 +794,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.72);
   padding: 26px 24px;
@@ -822,7 +862,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: rgba(255, 255, 255, 0.78);
   padding: 12px 18px;

@@ -6,6 +6,28 @@
         description="创建和管理调用凭证，查看绑定分组、额度限制和使用状态。分组会影响可用模型、费率和调度渠道。"
       />
 
+      <section class="keys-model-summary" aria-label="当前可用模型">
+        <div class="keys-model-summary-copy">
+          <span>当前可用模型</span>
+          <h2>创建密钥前，先确认可调用范围</h2>
+          <p>
+            这里根据公开模型配置和当前可用分组做只读展示。实际调用范围仍以 API 密钥绑定的分组为准，不改变创建或保存逻辑。
+          </p>
+        </div>
+        <div class="keys-model-grid">
+          <article v-for="model in availableKeyModels" :key="model.id" class="keys-model-card">
+            <img :src="model.logo" :alt="model.name" />
+            <div>
+              <strong>{{ model.name }}</strong>
+              <span>{{ model.versions.slice(0, 3).join(' / ') }}</span>
+            </div>
+          </article>
+        </div>
+        <div class="keys-model-footnote">
+          可用分组：<strong>{{ activeGroupCount }}</strong>
+        </div>
+      </section>
+
       <TablePageLayout>
       <template #filters>
         <div class="flex flex-col gap-3">
@@ -1082,6 +1104,7 @@ import type { BatchApiKeyUsageStats } from '@/api/usage'
 import { formatDateTime } from '@/utils/format'
 import { maskApiKey } from '@/utils/maskApiKey'
 import { DEFAULT_SITE_NAME } from '@/constants/branding'
+import { normalizeModelCenterConfig, type ModelCenterModel } from '@/constants/modelCenter'
 
 // Helper to format date for datetime-local input
 const formatDateTimeLocal = (isoDate: string): string => {
@@ -1258,6 +1281,44 @@ const groupOptions = computed(() =>
     platform: group.platform
   }))
 )
+
+const modelCenterConfig = computed(() =>
+  normalizeModelCenterConfig(publicSettings.value?.model_center_config)
+)
+
+const activeGroupCount = computed(() =>
+  groups.value.filter((group) => group.status === 'active').length
+)
+
+const platformModelAliases: Record<GroupPlatform, string[]> = {
+  anthropic: ['claude', 'anthropic', 'sonnet', 'opus', 'haiku'],
+  openai: ['openai', 'chatgpt', 'gpt', 'o1', 'o3', 'o4'],
+  gemini: ['gemini', 'google'],
+  antigravity: ['gemini', 'antigravity'],
+}
+
+const modelMatchesPlatform = (model: ModelCenterModel, platform: GroupPlatform) => {
+  const searchable = `${model.id} ${model.name} ${model.versions.join(' ')}`.toLowerCase()
+  return platformModelAliases[platform].some((alias) => searchable.includes(alias))
+}
+
+const availableKeyModels = computed(() => {
+  const activePlatforms = Array.from(
+    new Set(
+      groups.value
+        .filter((group) => group.status === 'active')
+        .map((group) => group.platform)
+    )
+  )
+  const visibleModels = modelCenterConfig.value.models.filter((model) => model.visible)
+  const models = activePlatforms.length
+    ? visibleModels.filter((model) =>
+        activePlatforms.some((platform) => modelMatchesPlatform(model, platform))
+      )
+    : visibleModels
+
+  return models.slice(0, 4)
+})
 
 // Group dropdown search
 const groupSearchQuery = ref('')
@@ -1823,3 +1884,119 @@ onUnmounted(() => {
   if (resetTimer) clearInterval(resetTimer)
 })
 </script>
+
+<style scoped>
+.keys-model-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 1.4fr) auto;
+  gap: 18px;
+  align-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: 22px 24px;
+  color: var(--text-primary);
+}
+
+.keys-model-summary-copy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.keys-model-summary-copy > span {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.keys-model-summary-copy h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.keys-model-summary-copy p {
+  margin: 0;
+  max-width: 620px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.keys-model-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.keys-model-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  padding: 10px;
+}
+
+.keys-model-card img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.keys-model-card strong,
+.keys-model-card span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keys-model-card strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.keys-model-card span {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.keys-model-footnote {
+  align-self: stretch;
+  display: flex;
+  min-width: 92px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  padding: 10px 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.keys-model-footnote strong {
+  color: var(--accent);
+}
+
+@media (max-width: 1100px) {
+  .keys-model-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .keys-model-footnote {
+    justify-content: flex-start;
+  }
+}
+</style>

@@ -859,7 +859,7 @@ function handleToolbarRefresh() {
 </script>
 
 <template>
-  <div :class="['flex flex-col gap-4 rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700', props.fullscreen ? 'p-8' : 'p-6']">
+  <div :class="['ops-dashboard-header flex flex-col gap-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)]', props.fullscreen ? 'p-8' : 'p-6']">
     <!-- Top Toolbar -->
     <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4 border-[var(--border-default)]">
       <div>
@@ -1003,11 +1003,11 @@ function handleToolbarRefresh() {
 
     <div v-if="overview" class="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <!-- Left: Health + Realtime -->
-      <div class="grid gap-4 lg:col-span-5">
-        <div class="grid h-full grid-cols-1 gap-4">
+      <div class="ops-health-column grid gap-4 lg:col-span-5">
+        <div class="ops-health-grid grid h-full grid-cols-1 gap-4">
           <!-- 1) Health Score -->
           <div
-            :class="['group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']"
+            :class="['ops-health-card group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']"
           >
             <!-- Diagnosis Popover (hover) -->
             <div class="hidden">
@@ -1110,7 +1110,7 @@ function handleToolbarRefresh() {
           </div>
 
           <!-- 2) Realtime Traffic -->
-          <div :class="['flex h-full flex-col justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']">
+          <div :class="['ops-health-card flex h-full flex-col justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <div class="relative flex h-3 w-3 shrink-0">
@@ -1187,32 +1187,10 @@ function handleToolbarRefresh() {
                 </div>
               </div>
 
-              <!-- Animated Pulse Line (Heart Beat Animation) -->
-              <div class="h-8 w-full overflow-hidden opacity-50">
-                <svg class="h-full w-full" viewBox="0 0 280 32" preserveAspectRatio="none">
-                  <path
-                    d="M0 16 Q 20 16, 40 16 T 80 16 T 120 10 T 160 22 T 200 16 T 240 16 T 280 16"
-                    fill="none"
-                    stroke="#64748b"
-                    stroke-width="2"
-                    vector-effect="non-scaling-stroke"
-                  >
-                    <animate
-                      attributeName="d"
-                      dur="2s"
-                      repeatCount="indefinite"
-                      values="M0 16 Q 20 16, 40 16 T 80 16 T 120 10 T 160 22 T 200 16 T 240 16 T 280 16;
-                              M0 16 Q 20 16, 40 16 T 80 16 T 120 16 T 160 16 T 200 10 T 240 22 T 280 16;
-                              M0 16 Q 20 16, 40 16 T 80 16 T 120 16 T 160 16 T 200 16 T 240 16 T 280 16"
-                      keyTimes="0;0.5;1"
-                    />
-                  </path>
-                </svg>
-              </div>
             </div>
           </div>
 
-          <div :class="['rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']">
+          <div :class="['ops-health-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-6' : 'p-4']">
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-2">
                 <Icon name="brain" size="sm" class="text-gray-500 dark:text-gray-300" />
@@ -1267,9 +1245,9 @@ function handleToolbarRefresh() {
       </div>
 
       <!-- Right: 6 cards (3 cols x 2 rows) -->
-      <div class="grid h-full grid-cols-1 content-center gap-4 sm:grid-cols-2 lg:col-span-7 lg:grid-cols-3">
+      <div class="ops-metric-grid grid h-full grid-cols-1 content-center gap-4 sm:grid-cols-2 lg:col-span-7 lg:grid-cols-3">
         <!-- Card 1: Requests -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 1;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 1;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <span class="text-[10px] font-bold uppercase text-gray-400">{{ t('admin.ops.requestsTitle') }}</span>
@@ -1305,7 +1283,7 @@ function handleToolbarRefresh() {
         </div>
 
         <!-- Card 2: SLA -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 2;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 2;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-bold uppercase text-gray-400">{{ t('admin.ops.sla') }}</span>
@@ -1336,7 +1314,7 @@ function handleToolbarRefresh() {
         </div>
 
         <!-- Card 4: Request Duration -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 4;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 4;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <span class="text-[10px] font-bold uppercase text-gray-400">{{ t('admin.ops.latencyDuration') }}</span>
@@ -1387,7 +1365,7 @@ function handleToolbarRefresh() {
         </div>
 
         <!-- Card 5: TTFT -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 5;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 5;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <span class="text-[10px] font-bold uppercase text-gray-400">TTFT</span>
@@ -1438,7 +1416,7 @@ function handleToolbarRefresh() {
         </div>
 
         <!-- Card 3: Request Errors -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 3;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 3;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <span class="text-[10px] font-bold uppercase text-gray-400">{{ t('admin.ops.requestErrors') }}</span>
@@ -1464,7 +1442,7 @@ function handleToolbarRefresh() {
         </div>
 
         <!-- Card 6: Upstream Errors -->
-        <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 6;">
+        <div class="ops-metric-card rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-4" style="order: 6;">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
               <span class="text-[10px] font-bold uppercase text-gray-400">{{ t('admin.ops.upstreamErrors') }}</span>
@@ -1689,3 +1667,57 @@ function handleToolbarRefresh() {
     </BaseDialog>
   </div>
 </template>
+
+<style scoped>
+.ops-dashboard-header {
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+}
+
+.ops-health-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.ops-health-card,
+.ops-metric-card {
+  min-width: 0;
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+  transition: none !important;
+  box-shadow: none !important;
+}
+
+.ops-health-card:hover,
+.ops-metric-card:hover {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.ops-health-card:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.ops-metric-grid {
+  align-content: stretch !important;
+}
+
+.ops-metric-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.ops-dashboard-header :deep(button) {
+  transition: none !important;
+}
+
+@media (max-width: 1280px) {
+  .ops-health-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>

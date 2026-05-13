@@ -25,7 +25,13 @@ export default {
     },
     trust: {
       title: 'Fair, long-term service with no watered-down models',
-      description: 'We operate for the long run with transparent pricing and consistent model quality.'
+      description: 'We operate for the long run with transparent pricing and consistent model quality.',
+      longTermTitle: 'Long-term operation',
+      longTermDescription: 'Service and configuration are maintained for sustained daily use.',
+      transparentTitle: 'Transparent pricing',
+      transparentDescription: 'Mainstream model pricing stays clear so users know where spend goes.',
+      modelQualityTitle: 'No watered-down models',
+      modelQualityDescription: 'Displayed models and actual access stay aligned without quality swaps.'
     },
     // Pain points section
     painPoints: {

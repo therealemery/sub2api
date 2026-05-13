@@ -3647,3 +3647,87 @@ html.dark .app-shell :is(
   text-shadow: none !important;
 }
 
+/* OwnAPI RELAY v2 project lock: keep visible hierarchy stable across user and admin pages. */
+html,
+body,
+#app,
+html.dark,
+html.dark body,
+html.dark #app {
+  min-height: 100%;
+  background: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell :is(.transition-all, [class*='transition-all']) {
+  transition: none !important;
+}
+
+.app-shell .page-intro {
+  gap: 20px !important;
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  padding: 26px 28px !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell .page-intro :is(h1, h2) {
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+.app-shell .page-intro .page-intro-description,
+.app-shell .page-intro-main > p:not(.page-intro-eyebrow) {
+  max-width: 920px !important;
+  color: var(--accent) !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+}
+
+.app-shell .page-intro-eyebrow {
+  color: var(--text-secondary) !important;
+}
+
+.app-shell :is(.card, .table-page, .table-card, .table-filter-bar, .table-scroll-container, .empty-state) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell :is(.card, .table-page, .table-card, .table-filter-bar, .table-scroll-container, .empty-state) :is(.bg-white, [class~='bg-white']) {
+  background: var(--bg-surface-alt) !important;
+}
+
+.app-shell :is(.data-table-row, .select-option, .sidebar-link, .nav-link, .model-card, .admin-model-card, .featured-model-card, .ecosystem-card):hover {
+  transition: none !important;
+}
+
+.modal-close-button,
+.dialog-close-button,
+.app-shell :is([aria-label='关闭弹窗'], [aria-label='Close'], [aria-label='close']) {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-close-button svg,
+.dialog-close-button svg,
+.app-shell :is([aria-label='关闭弹窗'], [aria-label='Close'], [aria-label='close']) svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke-width: 2.4 !important;
+}
+
+html.dark .app-shell :is(.models-page, .monitor-page, .channel-status-page, .dashboard-page, .profile-page, .keys-page),
+html.dark .app-shell :is(.models-section, .models-guide, .model-card, .featured-model-card, .ecosystem-card, .monitor-card, .channel-card) {
+  background-color: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+

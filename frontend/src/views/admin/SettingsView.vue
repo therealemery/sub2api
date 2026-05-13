@@ -39,6 +39,10 @@
           <span class="settings-tab-kicker">当前配置区</span>
           <h2>{{ activeTabSummary.title }}</h2>
           <p>{{ activeTabSummary.description }}</p>
+          <div class="settings-impact-note">
+            <strong>影响范围</strong>
+            <span>{{ activeTabSummary.impact }}</span>
+          </div>
         </section>
 
         <!-- Tab: Security — Admin API Key -->
@@ -5594,38 +5598,46 @@ const settingsTabs = [
   { key: "email" as SettingsTab, icon: "mail" as const },
   { key: "backup" as SettingsTab, icon: "database" as const },
 ];
-const settingsTabSummaries: Record<SettingsTab, { title: string; description: string }> = {
+const settingsTabSummaries: Record<SettingsTab, { title: string; description: string; impact: string }> = {
   general: {
     title: "基础品牌与访问入口",
     description: "影响站点名称、Logo、文档链接、首页和用户可见的公共信息。",
+    impact: "用户看到的品牌、入口和公共展示。",
   },
   features: {
     title: "功能开关",
     description: "控制监控、支付、渠道展示、推广等功能入口是否对用户开放。",
+    impact: "前台入口、用户可见菜单和功能开关。",
   },
   security: {
     title: "安全与注册",
     description: "管理管理员 API Key、注册策略、验证方式和登录相关安全规则。",
+    impact: "注册、登录、管理员访问和验证策略。",
   },
   users: {
     title: "用户默认值",
     description: "影响新用户默认额度、并发、分组、余额提醒和用户侧限制。",
+    impact: "新用户初始配置和用户端默认限制。",
   },
   gateway: {
     title: "网关与模型调用",
     description: "影响上游请求、冷却、Claude Code、OpenAI 兼容模式等调用行为。",
+    impact: "模型调用、上游请求和兼容入口。",
   },
   payment: {
     title: "支付与订阅",
     description: "管理支付方式、套餐、订单行为和充值订阅展示。",
+    impact: "用户充值、订阅和订单展示。",
   },
   email: {
     title: "邮件通知",
     description: "配置 SMTP、验证邮件、余额提醒和测试发送。",
+    impact: "邮件验证、通知和系统邮件送达。",
   },
   backup: {
     title: "备份与恢复",
     description: "管理数据备份相关操作，保存按钮由备份模块自身处理。",
+    impact: "备份模块自身流程，不走本页统一保存按钮。",
   },
 };
 const activeTabSummary = computed(() => settingsTabSummaries[activeTab.value]);
@@ -8627,9 +8639,30 @@ watch(
 
 .settings-tab-summary p {
   max-width: 920px !important;
-  color: var(--text-secondary) !important;
+  color: var(--accent) !important;
   font-size: 14px !important;
   line-height: 1.75 !important;
+}
+
+.settings-impact-note {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px 12px !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface) !important;
+  padding: 9px 12px !important;
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+.settings-impact-note strong {
+  color: var(--text-primary) !important;
+  font-weight: 750 !important;
 }
 
 .admin-settings-form > .space-y-6 {

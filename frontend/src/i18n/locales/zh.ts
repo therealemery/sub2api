@@ -25,7 +25,13 @@ export default {
     },
     trust: {
       title: '良心长线生意，不注水',
-      description: '我们按长期运营来做服务，价格透明，模型体验不偷换、不缩水。'
+      description: '我们按长期运营来做服务，价格透明，模型体验不偷换、不缩水。',
+      longTermTitle: '长期经营',
+      longTermDescription: '服务和配置按长期使用维护，不做短期收割式体验。',
+      transparentTitle: '价格透明',
+      transparentDescription: '主流模型价格清楚，尽量让用户知道钱花在哪里。',
+      modelQualityTitle: '模型不注水',
+      modelQualityDescription: '展示和调用口径保持一致，不用低质量模型偷换体验。'
     },
     // 用户痛点区块
     painPoints: {
