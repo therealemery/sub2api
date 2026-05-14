@@ -107,6 +107,22 @@ describe('API Client', () => {
       const config = adapter.mock.calls[0][0]
       expect(config.withCredentials).toBe(true)
     })
+
+    it('returns local preview data for protected read endpoints without network calls', async () => {
+      localStorage.setItem('auth_token', 'local-preview-user')
+
+      const adapter = vi.fn().mockRejectedValue(new Error('network should not be called'))
+      apiClient.defaults.adapter = adapter
+
+      const response = await apiClient.get('/user/totp/status')
+
+      expect(adapter).not.toHaveBeenCalled()
+      expect(response.data).toEqual({
+        enabled: false,
+        enabled_at: null,
+        feature_enabled: true,
+      })
+    })
   })
 
   // --- 响应拦截器 ---

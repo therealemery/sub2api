@@ -5,17 +5,13 @@
 
 import { apiClient } from "../client";
 import type { CustomMenuItem, CustomEndpoint, NotifyEmailEntry } from "@/types";
-import { DEFAULT_MODEL_CENTER_CONFIG, type ModelCenterConfig } from "@/constants/modelCenter";
+import type { ModelCenterConfig } from "@/constants/modelCenter";
 import { DEFAULT_SITE_LOGO } from "@/constants/branding";
-
-const LOCAL_PREVIEW_TOKEN_PREFIX = "local-preview-";
-
-function isLocalPreviewSession(): boolean {
-  return (
-    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
-    !!localStorage.getItem("auth_token")?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
-  );
-}
+import {
+  isLocalPreviewSession,
+  readPreviewModelCenterConfig,
+  writePreviewModelCenterConfig,
+} from "@/api/localPreviewData";
 
 export interface DefaultSubscriptionSetting {
   group_id: number;
@@ -464,6 +460,7 @@ export interface SystemSettings {
   payment_enabled_types: string[];
   payment_balance_disabled: boolean;
   payment_balance_recharge_multiplier: number;
+  payment_points_per_rmb?: number;
   payment_recharge_fee_rate: number;
   payment_load_balance_strategy: string;
   payment_product_name_prefix: string;
@@ -634,6 +631,7 @@ export interface UpdateSettingsRequest {
   payment_enabled_types?: string[];
   payment_balance_disabled?: boolean;
   payment_balance_recharge_multiplier?: number;
+  payment_points_per_rmb?: number;
   payment_recharge_fee_rate?: number;
   payment_load_balance_strategy?: string;
   payment_product_name_prefix?: string;
@@ -683,7 +681,7 @@ function previewSystemSettings(): SystemSettings {
     totp_enabled: false,
     totp_encryption_key_configured: false,
     default_balance: 0,
-    affiliate_rebate_rate: 0.3,
+    affiliate_rebate_rate: 10,
     affiliate_rebate_freeze_hours: 0,
     affiliate_rebate_duration_days: 365,
     affiliate_rebate_per_invitee_cap: 0,
@@ -724,7 +722,7 @@ function previewSystemSettings(): SystemSettings {
     backend_mode_enabled: false,
     custom_menu_items: [],
     custom_endpoints: [],
-    model_center_config: DEFAULT_MODEL_CENTER_CONFIG,
+    model_center_config: readPreviewModelCenterConfig(),
     smtp_host: "",
     smtp_port: 587,
     smtp_username: "",
@@ -797,14 +795,15 @@ function previewSystemSettings(): SystemSettings {
     enable_anthropic_cache_ttl_1h_injection: false,
     web_search_emulation_enabled: false,
     payment_enabled: true,
-    payment_min_amount: 1,
+    payment_min_amount: 10,
     payment_max_amount: 500,
     payment_daily_limit: 1000,
     payment_order_timeout_minutes: 15,
     payment_max_pending_orders: 3,
     payment_enabled_types: ["stripe"],
     payment_balance_disabled: false,
-    payment_balance_recharge_multiplier: 1,
+    payment_balance_recharge_multiplier: 10,
+    payment_points_per_rmb: 10,
     payment_recharge_fee_rate: 0,
     payment_load_balance_strategy: "round_robin",
     payment_product_name_prefix: "OwnAPI",
@@ -856,6 +855,9 @@ export async function updateSettings(
   settings: UpdateSettingsRequest,
 ): Promise<SystemSettings> {
   if (isLocalPreviewSession()) {
+    if (settings.model_center_config) {
+      writePreviewModelCenterConfig(settings.model_center_config);
+    }
     return { ...previewSystemSettings(), ...settings };
   }
 
@@ -870,7 +872,7 @@ export async function updateModelCenterConfig(
   modelCenterConfig: ModelCenterConfig,
 ): Promise<ModelCenterConfig> {
   if (isLocalPreviewSession()) {
-    return modelCenterConfig;
+    return writePreviewModelCenterConfig(modelCenterConfig);
   }
 
   const { data } = await apiClient.put<{ model_center_config: ModelCenterConfig }>(

@@ -1,30 +1,30 @@
 <template>
   <div class="card">
     <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.quickActions') }}</h2>
+      <h2 class="text-lg font-semibold text-gray-900">{{ t('dashboard.quickActions') }}</h2>
     </div>
     <div class="space-y-3 p-4">
-      <button @click="router.push('/keys')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)] dark:hover:bg-dark-800">
+      <button @click="router.push('/keys')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)]">
         <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 transition-transform group-hover:scale-105 bg-[var(--bg-surface-alt)]">
-          <Icon name="key" size="lg" class="text-gray-700 dark:text-gray-200" />
+          <Icon name="key" size="lg" class="text-gray-700" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.createApiKey') }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ t('dashboard.createApiKey') }}</p>
           <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ t('dashboard.generateNewKey') }}</p>
         </div>
         <Icon
           name="chevronRight"
           size="md"
-          class="text-gray-400 transition-colors group-hover:text-gray-700 text-[var(--text-muted)] dark:group-hover:text-gray-200"
+          class="text-gray-400 transition-colors group-hover:text-gray-700 text-[var(--text-muted)]"
         />
       </button>
 
-      <button @click="router.push('/usage')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)] dark:hover:bg-dark-800">
-        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 transition-transform group-hover:scale-105 dark:bg-emerald-900/30">
-          <Icon name="chart" size="lg" class="text-emerald-600 dark:text-emerald-400" />
+      <button @click="router.push('/usage')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)]">
+        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100 transition-transform group-hover:scale-105">
+          <Icon name="chart" size="lg" class="text-emerald-600" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.viewUsage') }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ t('dashboard.viewUsage') }}</p>
           <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ t('dashboard.checkDetailedLogs') }}</p>
         </div>
         <Icon
@@ -34,12 +34,12 @@
         />
       </button>
 
-      <button @click="router.push('/redeem')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)] dark:hover:bg-dark-800">
-        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-amber-100 transition-transform group-hover:scale-105 dark:bg-amber-900/30">
-          <Icon name="gift" size="lg" class="text-amber-600 dark:text-amber-400" />
+      <button @click="router.push('/redeem')" class="group flex w-full items-center gap-4 rounded-lg bg-gray-50 p-4 text-left transition-colors duration-200 hover:bg-gray-100 bg-[var(--bg-surface-alt)]">
+        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-amber-100 transition-transform group-hover:scale-105">
+          <Icon name="gift" size="lg" class="text-amber-600" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.redeemCode') }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ t('dashboard.redeemCode') }}</p>
           <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ t('dashboard.addBalanceWithCode') }}</p>
         </div>
         <Icon

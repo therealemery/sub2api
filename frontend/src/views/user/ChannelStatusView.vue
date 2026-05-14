@@ -1,9 +1,9 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="channel-status-page space-y-6">
       <PageIntro
-        title="渠道状态"
-        description="查看主流模型渠道的可用性、延迟和最近检查结果，帮助判断当前调用体验是否稳定。"
+        title="模型状态"
+        description="查看主流模型的可用性、延迟和最近检查结果，帮助判断当前调用体验是否稳定。"
       />
 
       <MonitorHero

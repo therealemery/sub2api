@@ -3,7 +3,7 @@
     <button
       @click="toggleDropdown"
       :disabled="switching"
-      class="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+      class="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
       :title="currentLocale?.name"
     >
       <span class="text-base">{{ currentLocale?.flag }}</span>
@@ -26,7 +26,7 @@
           :key="locale.code"
           :disabled="switching"
           @click="selectLocale(locale.code)"
-          class="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-700"
+          class="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
           :class="{
             'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]':
               locale.code === currentLocaleCode

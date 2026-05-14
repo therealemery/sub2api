@@ -1,5 +1,11 @@
 <template>
   <AppLayout>
+    <div class="admin-list-page">
+    <PageIntro
+      title="用户管理"
+      description="查看和维护用户账户、角色、状态、分组、额度与自定义属性。筛选、列设置和批量操作都保留原有逻辑。"
+    />
+
     <TablePageLayout>
       <!-- Single Row: Search, Filters, and Actions -->
       <template #filters>
@@ -145,7 +151,7 @@
                     v-for="filter in builtInFilters"
                     :key="filter.key"
                     @click="toggleBuiltInFilter(filter.key)"
-                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <span>{{ filter.name }}</span>
                     <Icon
@@ -166,7 +172,7 @@
                     v-for="attr in filterableAttributes"
                     :key="attr.id"
                     @click="toggleAttributeFilter(attr)"
-                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <span>{{ attr.name }}</span>
                     <Icon
@@ -200,7 +206,7 @@
                     v-for="col in toggleableColumns"
                     :key="col.key"
                     @click="toggleColumn(col.key)"
-                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                    class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <span>{{ col.label }}</span>
                     <Icon
@@ -255,12 +261,12 @@
                   {{ value.charAt(0).toUpperCase() }}
                 </span>
               </div>
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+              <span class="font-medium text-gray-900">{{ value }}</span>
             </div>
           </template>
 
           <template #cell-username="{ value }">
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ value || '-' }}</span>
+            <span class="text-sm text-gray-700">{{ value || '-' }}</span>
           </template>
 
           <template #cell-notes="{ value }">
@@ -268,7 +274,7 @@
               <span
                 v-if="value"
                 :title="value.length > 30 ? value : undefined"
-                class="block truncate text-sm text-gray-600 dark:text-gray-400"
+                class="block truncate text-sm text-gray-600"
               >
                 {{ value.length > 30 ? value.substring(0, 25) + '...' : value }}
               </span>
@@ -284,7 +290,7 @@
           >
             <div class="max-w-xs">
               <span
-                class="block truncate text-sm text-gray-700 dark:text-gray-300"
+                class="block truncate text-sm text-gray-700"
                 :title="getAttributeValue(row.id, def.id)"
               >
                 {{ getAttributeValue(row.id, def.id) }}
@@ -306,15 +312,15 @@
                 class="group/ex relative inline-flex cursor-pointer items-center gap-1 whitespace-nowrap text-xs"
                 @click.stop="toggleExpandedGroup(row.id)"
               >
-                <Icon name="shield" size="xs" class="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />
-                <span class="font-medium text-purple-600 dark:text-purple-400">{{ getUserGroups(row).exclusive.length }}</span>
+                <Icon name="shield" size="xs" class="h-3.5 w-3.5 text-purple-500" />
+                <span class="font-medium text-purple-600">{{ getUserGroups(row).exclusive.length }}</span>
                 <span class="text-gray-500 text-[var(--text-muted)]">{{ t('admin.users.exclusiveLabel') }}</span>
                 <!-- Hover tooltip（操作菜单未打开时显示） -->
                 <div
                   v-if="expandedGroupUserId !== row.id"
                   class="pointer-events-none absolute left-0 top-full z-50 mt-1.5 rounded bg-gray-900 px-2.5 py-1.5 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity duration-75 group-hover/ex:opacity-100 bg-[var(--bg-surface-alt)]"
                 >
-                  <div class="absolute left-4 bottom-full border-4 border-transparent border-b-gray-900 dark:border-b-dark-600"></div>
+                  <div class="absolute left-4 bottom-full border-4 border-transparent border-b-gray-900"></div>
                   <div class="flex flex-col gap-0.5 whitespace-nowrap">
                     <span v-for="g in getUserGroups(row).exclusive" :key="g.id">{{ g.name }}</span>
                   </div>
@@ -330,7 +336,7 @@
                   <div
                     v-for="g in getUserGroups(row).exclusive"
                     :key="g.id"
-                    class="flex cursor-pointer items-center gap-2 px-3 py-2 text-gray-700 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] text-[var(--text-muted)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
+                    class="flex cursor-pointer items-center gap-2 px-3 py-2 text-gray-700 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] text-[var(--text-muted)]"
                     @click.stop="openGroupReplace(row, g)"
                   >
                     <Icon name="swap" size="xs" class="h-3.5 w-3.5 flex-shrink-0 opacity-50" />
@@ -348,7 +354,7 @@
                 <span class="text-gray-400 text-[var(--text-muted)]">{{ t('admin.users.publicLabel') }}</span>
                 <!-- Tooltip: 向下弹出 -->
                 <div class="pointer-events-none absolute left-0 top-full z-50 mt-1.5 rounded bg-gray-900 px-2.5 py-1.5 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity duration-75 group-hover/pub:opacity-100 bg-[var(--bg-surface-alt)]">
-                  <div class="absolute left-4 bottom-full border-4 border-transparent border-b-gray-900 dark:border-b-dark-600"></div>
+                  <div class="absolute left-4 bottom-full border-4 border-transparent border-b-gray-900"></div>
                   <div class="flex flex-col gap-0.5 whitespace-nowrap">
                     <span v-for="g in getUserGroups(row).publicGroups" :key="g.id">{{ g.name }}</span>
                   </div>
@@ -392,7 +398,7 @@
             <div class="flex items-center gap-2">
               <div class="group relative">
                 <button
-                  class="font-medium text-gray-900 underline decoration-dashed decoration-gray-300 underline-offset-4 transition-colors hover:text-[var(--accent-hover)] dark:text-[var(--text-inverse)] dark:decoration-dark-500 dark:hover:text-[var(--accent-hover)]"
+                  class="font-medium text-gray-900 underline decoration-dashed decoration-gray-300 underline-offset-4 transition-colors hover:text-[var(--accent-hover)]"
                   @click="handleBalanceHistory(row)"
                 >
                   ${{ value.toFixed(2) }}
@@ -400,12 +406,12 @@
                 <!-- Instant tooltip -->
                 <div class="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity duration-75 group-hover:opacity-100 bg-[var(--bg-surface-alt)]">
                   {{ t('admin.users.balanceHistoryTip') }}
-                  <div class="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-dark-600"></div>
+                  <div class="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
               <button
                 @click.stop="handleDeposit(row)"
-                class="rounded px-2 py-0.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                class="rounded px-2 py-0.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-50"
                 :title="t('admin.users.deposit')"
               >
                 {{ t('admin.users.deposit') }}
@@ -416,13 +422,13 @@
           <template #cell-usage="{ row }">
             <div class="text-sm">
               <div class="flex items-center gap-1.5">
-                <span class="text-gray-500 dark:text-gray-400">{{ t('admin.users.today') }}:</span>
+                <span class="text-gray-500">{{ t('admin.users.today') }}:</span>
                 <span class="money-value font-medium">
                   ${{ (usageStats[row.id]?.today_actual_cost ?? 0).toFixed(4) }}
                 </span>
               </div>
               <div class="mt-0.5 flex items-center gap-1.5">
-                <span class="text-gray-500 dark:text-gray-400">{{ t('admin.users.total') }}:</span>
+                <span class="text-gray-500">{{ t('admin.users.total') }}:</span>
                 <span class="money-value font-medium">
                   ${{ (usageStats[row.id]?.total_actual_cost ?? 0).toFixed(4) }}
                 </span>
@@ -445,7 +451,7 @@
                   value === 'active' ? 'bg-green-500' : 'bg-red-500'
                 ]"
               ></span>
-              <span class="text-sm text-gray-700 dark:text-gray-300">
+              <span class="text-sm text-gray-700">
                 {{ value === 'active' ? t('common.active') : t('admin.users.disabled') }}
               </span>
             </div>
@@ -472,7 +478,7 @@
               <!-- Edit Button -->
               <button
                 @click="handleEdit(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t('common.edit') }}</span>
@@ -485,8 +491,8 @@
                 :class="[
                   'flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors',
                   row.status === 'active'
-                    ? 'hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-900/20 dark:hover:text-orange-400'
-                    : 'hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400'
+                    ? 'hover:bg-orange-50 hover:text-orange-600'
+                    : 'hover:bg-green-50 hover:text-green-600'
                 ]"
               >
                 <Icon v-if="row.status === 'active'" name="ban" size="sm" />
@@ -497,8 +503,8 @@
               <!-- More Actions Menu Trigger -->
               <button
                 @click="openActionMenu(row, $event)"
-                class="action-menu-trigger flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-[var(--text-inverse)]"
-                :class="{ 'bg-gray-100 text-gray-900 bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]': activeMenuId === row.id }"
+                class="action-menu-trigger flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                :class="{ 'bg-gray-100 text-gray-900 bg-[var(--bg-surface-alt)]': activeMenuId === row.id }"
               >
                 <Icon name="more" size="sm" />
                 <span class="text-xs">{{ t('common.more') }}</span>
@@ -529,12 +535,13 @@
       />
       </template>
     </TablePageLayout>
+    </div>
 
     <!-- Action Menu (Teleported) -->
     <Teleport to="body">
       <div
         v-if="activeMenuId !== null && menuPosition"
-        class="action-menu-content fixed z-[9999] w-48 overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 bg-[var(--bg-surface-alt)] dark:ring-white/10"
+        class="action-menu-content fixed z-[9999] w-48 overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 bg-[var(--bg-surface-alt)]"
         :style="{ top: menuPosition.top + 'px', left: menuPosition.left + 'px' }"
       >
         <div class="py-1">
@@ -543,7 +550,7 @@
               <!-- View API Keys -->
               <button
                 @click="handleViewApiKeys(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Icon name="key" size="sm" class="text-gray-400" :stroke-width="2" />
                 {{ t('admin.users.apiKeys') }}
@@ -552,7 +559,7 @@
               <!-- Allowed Groups -->
               <button
                 @click="handleAllowedGroups(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Icon name="users" size="sm" class="text-gray-400" :stroke-width="2" />
                 {{ t('admin.users.groups') }}
@@ -563,7 +570,7 @@
               <!-- Deposit -->
               <button
                 @click="handleDeposit(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Icon name="plus" size="sm" class="text-emerald-500" :stroke-width="2" />
                 {{ t('admin.users.deposit') }}
@@ -572,7 +579,7 @@
               <!-- Withdraw -->
               <button
                 @click="handleWithdraw(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
@@ -583,7 +590,7 @@
               <!-- Balance History -->
               <button
                 @click="handleBalanceHistory(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Icon name="dollar" size="sm" class="text-gray-400" :stroke-width="2" />
                 {{ t('admin.users.balanceHistory') }}
@@ -595,7 +602,7 @@
               <button
                 v-if="user.role !== 'admin'"
                 @click="handleDelete(user); closeActionMenu()"
-                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <Icon name="trash" size="sm" :stroke-width="2" />
                 {{ t('common.delete') }}
@@ -634,6 +641,7 @@ import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'

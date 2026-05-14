@@ -4,20 +4,20 @@
       v-if="!props.embedded"
       class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
     >
-      <h2 class="text-lg font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+      <h2 class="text-lg font-medium text-gray-900">
         {{ t('profile.authBindings.title') }}
       </h2>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      <p class="mt-1 text-sm text-gray-500">
         {{ t('profile.authBindings.description') }}
       </p>
     </div>
 
-    <div :class="props.embedded ? 'space-y-4' : 'divide-y divide-gray-100 dark:divide-dark-700'">
+    <div :class="props.embedded ? 'space-y-4' : 'divide-y divide-gray-100'">
       <div v-if="props.embedded">
-        <p class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <p class="text-sm font-semibold text-gray-900">
           {{ t('profile.authBindings.title') }}
         </p>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-1 text-sm text-gray-500">
           {{ t('profile.authBindings.description') }}
         </p>
       </div>
@@ -44,7 +44,7 @@
 
             <div class="min-w-0 flex-1 space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h3 class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <h3 class="font-medium text-gray-900">
                   {{ item.label }}
                 </h3>
                 <span
@@ -61,18 +61,18 @@
 
               <p
                 v-if="providerSummary(item.provider)"
-                class="text-sm text-gray-600 dark:text-gray-300"
+                class="text-sm text-gray-600"
               >
                 {{ providerSummary(item.provider) }}
               </p>
 
               <div
                 v-if="hasBindingDetails(item.provider, item.details)"
-                class="grid gap-1 text-sm text-gray-500 dark:text-gray-400"
+                class="grid gap-1 text-sm text-gray-500"
               >
                 <p
                   v-if="item.provider !== 'email' && item.details?.display_name"
-                  class="font-medium text-gray-700 dark:text-gray-200"
+                  class="font-medium text-gray-700"
                 >
                   {{ item.details.display_name }}
                 </p>
@@ -471,15 +471,15 @@ function providerInitial(provider: UserAuthProvider): string {
 
 function providerIconClass(provider: UserAuthProvider): string {
   if (provider === 'linuxdo') {
-    return 'bg-orange-100 text-orange-600 dark:bg-orange-900/20 dark:text-orange-300'
+    return 'bg-orange-100 text-orange-600'
   }
   if (provider === 'wechat') {
-    return 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-300'
+    return 'bg-green-100 text-green-600'
   }
   if (provider === 'oidc') {
-    return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200'
+    return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)]'
   }
-  return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-200'
+  return 'bg-gray-100 text-gray-700 bg-[var(--bg-surface-alt)]'
 }
 
 function providerSummary(provider: UserAuthProvider): string {

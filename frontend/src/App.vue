@@ -7,7 +7,8 @@ import { resolveDocumentTitle } from '@/router/title'
 import AnnouncementPopup from '@/components/common/AnnouncementPopup.vue'
 import { useAppStore, useAuthStore, useSubscriptionStore, useAnnouncementStore } from '@/stores'
 import { getSetupStatus } from '@/api/setup'
-import { DEFAULT_SITE_LOGO, resolveThemedSiteLogoPath } from '@/constants/branding'
+import { DEFAULT_SITE_LOGO, resolveSiteLogoPath } from '@/constants/branding'
+import { LOCALE_CHANGED_EVENT } from '@/i18n'
 
 const router = useRouter()
 const route = useRoute()
@@ -34,10 +35,11 @@ function updateFavicon(logoUrl: string) {
 }
 
 function resolveCurrentFavicon(): string {
-  return resolveThemedSiteLogoPath(
-    appStore.siteLogo || DEFAULT_SITE_LOGO,
-    document.documentElement.classList.contains('dark')
-  )
+  return resolveSiteLogoPath(appStore.siteLogo || DEFAULT_SITE_LOGO)
+}
+
+function updateDocumentTitle() {
+  document.title = resolveDocumentTitle(route.meta.title, appStore.siteName, route.meta.titleKey as string)
 }
 
 // Watch for site settings changes and update favicon/title
@@ -48,8 +50,6 @@ watch(
   },
   { immediate: true }
 )
-
-let themeObserver: MutationObserver | null = null
 
 // Watch for authentication state and manage subscription data + announcements
 function onVisibilityChange() {
@@ -98,18 +98,12 @@ router.afterEach(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('visibilitychange', onVisibilityChange)
-  themeObserver?.disconnect()
-  themeObserver = null
+  window.removeEventListener(LOCALE_CHANGED_EVENT, updateDocumentTitle)
 })
 
 onMounted(async () => {
-  themeObserver = new MutationObserver(() => {
-    updateFavicon(resolveCurrentFavicon())
-  })
-  themeObserver.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class', 'data-theme']
-  })
+  window.addEventListener(LOCALE_CHANGED_EVENT, updateDocumentTitle)
+  document.documentElement.classList.remove('dark')
 
   // Check if setup is needed
   try {
@@ -126,7 +120,7 @@ onMounted(async () => {
   await appStore.fetchPublicSettings()
 
   // Re-resolve document title now that siteName is available
-  document.title = resolveDocumentTitle(route.meta.title, appStore.siteName, route.meta.titleKey as string)
+  updateDocumentTitle()
   updateFavicon(resolveCurrentFavicon())
 })
 </script>

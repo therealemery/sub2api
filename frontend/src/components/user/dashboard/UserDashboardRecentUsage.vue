@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.recentUsage') }}</h2>
+      <h2 class="text-lg font-semibold text-gray-900">{{ t('dashboard.recentUsage') }}</h2>
       <span class="badge badge-gray">{{ t('dashboard.last7Days') }}</span>
     </div>
     <div class="p-6">
@@ -19,20 +19,20 @@
               <Icon v-else name="beaker" size="md" />
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ log.model }}</p>
+              <p class="text-sm font-medium text-gray-900">{{ log.model }}</p>
               <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ formatDateTime(log.created_at) }}</p>
             </div>
           </div>
           <div class="text-right">
             <p class="text-sm font-semibold">
               <span class="money-value" :title="t('dashboard.actual')">${{ formatCost(log.actual_cost) }}</span>
-              <span class="font-normal text-gray-400 dark:text-gray-500" :title="t('dashboard.standard')"> / ${{ formatCost(log.total_cost) }}</span>
+              <span class="font-normal text-gray-400" :title="t('dashboard.standard')"> / ${{ formatCost(log.total_cost) }}</span>
             </p>
             <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ (log.input_tokens + log.output_tokens).toLocaleString() }} tokens</p>
           </div>
         </div>
 
-        <router-link to="/usage" class="flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-200 dark:hover:text-[var(--text-inverse)]">
+        <router-link to="/usage" class="flex items-center justify-center gap-2 py-3 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900">
           {{ t('dashboard.viewAllUsage') }}
           <Icon name="arrowRight" size="sm" />
         </router-link>

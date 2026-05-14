@@ -1,5 +1,10 @@
 <template>
   <AppLayout>
+    <PageIntro
+      :title="pageIntro.title"
+      :description="pageIntro.description"
+    />
+
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -54,11 +59,11 @@
             />
           </template>
           <template #cell-aff_code="{ row }">
-            <span class="font-mono text-sm text-gray-700 dark:text-gray-300">{{ row.aff_code || '-' }}</span>
+            <span class="font-mono text-sm text-gray-700">{{ row.aff_code || '-' }}</span>
           </template>
           <template #cell-order="{ row }">
             <div class="space-y-0.5">
-              <div class="font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]">#{{ row.order_id }}</div>
+              <div class="font-mono text-sm text-gray-900">#{{ row.order_id }}</div>
               <div class="max-w-56 truncate text-sm text-gray-500 text-[var(--text-muted)]">{{ row.out_trade_no }}</div>
             </div>
           </template>
@@ -75,7 +80,7 @@
             <AmountText :value="row.order_amount" />
           </template>
           <template #cell-pay_amount="{ row }">
-            <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">¥{{ formatAmount(row.pay_amount) }}</span>
+            <span class="text-sm text-gray-900">¥{{ formatAmount(row.pay_amount) }}</span>
           </template>
           <template #cell-rebate_amount="{ row }">
             <AmountText :value="row.rebate_amount" strong />
@@ -96,7 +101,7 @@
             <NullableAmountText :value="row.history_quota_after" />
           </template>
           <template #cell-created_at="{ row }">
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ formatDateTime(row.created_at) }}</span>
+            <span class="text-sm text-gray-700">{{ formatDateTime(row.created_at) }}</span>
           </template>
         </DataTable>
       </template>
@@ -124,8 +129,8 @@
       </div>
       <div v-else-if="selectedOverview" class="space-y-4">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
-          <div class="font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]">#{{ selectedOverview.user_id }}</div>
-          <div class="mt-1 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ selectedOverview.email || '-' }}</div>
+          <div class="font-mono text-sm text-gray-900">#{{ selectedOverview.user_id }}</div>
+          <div class="mt-1 text-sm font-medium text-gray-900">{{ selectedOverview.email || '-' }}</div>
           <div class="mt-0.5 text-sm text-gray-500 text-[var(--text-muted)]">{{ selectedOverview.username || '-' }}</div>
         </div>
         <div class="grid gap-3 sm:grid-cols-2">
@@ -145,6 +150,7 @@
 import { computed, defineComponent, h, onMounted, reactive, ref, type PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
@@ -167,6 +173,30 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const pageIntro = computed(() => {
+  switch (props.type) {
+    case 'invites':
+      return {
+        title: '邀请记录',
+        description: '查看用户邀请关系、邀请码、注册时间和来源信息，用于核对邀请链路是否正常。',
+      }
+    case 'rebates':
+      return {
+        title: '返利记录',
+        description: '查看邀请返利产生的订单、比例、金额和状态，用于核对返利是否准确入账。',
+      }
+    case 'transfers':
+      return {
+        title: '返利转入',
+        description: '查看用户将可转返利转入账户的记录，核对处理状态和到账金额。',
+      }
+    default:
+      return {
+        title: '邀请返利记录',
+        description: '查看邀请、返利和转入相关记录，帮助管理员核对推广链路。',
+      }
+  }
+})
 const loading = ref(false)
 const records = ref<AffiliateRecord[]>([])
 const filters = reactive({ search: '', start_at: '', end_at: '' })
@@ -341,11 +371,11 @@ const UserCell = defineComponent({
   emits: ['open'],
   setup(cellProps, { emit }) {
     return () => h('div', { class: 'space-y-0.5' }, [
-      h('div', { class: 'font-mono text-sm text-gray-900 dark:text-[var(--text-inverse)]' }, `#${cellProps.id}`),
+      h('div', { class: 'font-mono text-sm text-gray-900' }, `#${cellProps.id}`),
       h(cellProps.clickable ? 'button' : 'div', {
         class: cellProps.clickable
-          ? 'max-w-56 truncate text-left text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] hover:underline text-[var(--accent)] dark:hover:text-[var(--accent-hover)]'
-          : 'max-w-56 truncate text-sm text-gray-700 dark:text-gray-300',
+          ? 'max-w-56 truncate text-left text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] hover:underline text-[var(--accent)]'
+          : 'max-w-56 truncate text-sm text-gray-700',
         type: cellProps.clickable ? 'button' : undefined,
         onClick: cellProps.clickable ? () => emit('open', cellProps.id) : undefined,
       }, cellProps.email || '-'),
@@ -362,8 +392,8 @@ const AmountText = defineComponent({
   setup(amountProps) {
     return () => h('span', {
       class: amountProps.strong
-        ? 'text-sm font-semibold text-emerald-600 dark:text-emerald-400'
-        : 'text-sm text-gray-900 dark:text-[var(--text-inverse)]',
+        ? 'text-sm font-semibold text-emerald-600'
+        : 'text-sm text-gray-900',
     }, `$${formatAmount(amountProps.value)}`)
   },
 })
@@ -394,8 +424,8 @@ const OverviewStat = defineComponent({
       h('div', { class: 'text-sm text-gray-500 text-[var(--text-muted)]' }, statProps.label),
       h('div', {
         class: statProps.mono
-          ? 'mt-1 font-mono text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]'
-          : 'mt-1 text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]',
+          ? 'mt-1 font-mono text-base font-semibold text-gray-900'
+          : 'mt-1 text-base font-semibold text-gray-900',
       }, statProps.value),
     ])
   },

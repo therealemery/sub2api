@@ -116,6 +116,7 @@ export async function create(userData: {
   email: string
   password: string
   balance?: number
+  points?: number
   concurrency?: number
   allowed_groups?: number[] | null
 }): Promise<AdminUser> {
@@ -145,21 +146,21 @@ export async function deleteUser(id: number): Promise<{ message: string }> {
 }
 
 /**
- * Update user balance
+ * Update user points.
  * @param id - User ID
- * @param balance - New balance
+ * @param points - Points delta or value
  * @param operation - Operation type ('set', 'add', 'subtract')
  * @param notes - Optional notes for the balance adjustment
  * @returns Updated user
  */
 export async function updateBalance(
   id: number,
-  balance: number,
+  points: number,
   operation: 'set' | 'add' | 'subtract' = 'set',
   notes?: string
 ): Promise<AdminUser> {
-  const { data } = await apiClient.post<AdminUser>(`/admin/users/${id}/balance`, {
-    balance,
+  const { data } = await apiClient.post<AdminUser>(`/admin/users/${id}/points`, {
+    points,
     operation,
     notes: notes || ''
   })

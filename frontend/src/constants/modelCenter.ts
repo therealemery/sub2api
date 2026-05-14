@@ -43,7 +43,7 @@ const DEFAULT_MODEL_COPY: Record<string, { description: string; highlights: stri
     highlights: ['长文本友好', '复杂任务稳定', '适合专业工作流'],
   },
   gemini: {
-    description: 'Gemini 已可用，适合多模态、搜索和 Google 生态相关工作流。',
+    description: 'Gemini 已纳入模型生态，适合多模态、搜索和 Google 生态相关工作流。',
     highlights: ['多模态生态', '搜索场景友好', '已接入可用'],
   },
   deepseek: {
@@ -58,6 +58,34 @@ const DEFAULT_MODEL_COPY: Record<string, { description: string; highlights: stri
     description: 'Mistral 轻量、快速，适合低延迟和工程化调用场景。',
     highlights: ['低延迟', '轻量调用', '工程化友好'],
   },
+  grok: {
+    description: 'Grok 适合实时信息、推理分析和创意探索场景，作为主流模型生态补充。',
+    highlights: ['实时信息场景', '推理分析', '创意探索'],
+  },
+  llama: {
+    description: 'Llama 适合开源生态、自部署和企业私有化场景，便于展示更多可选模型来源。',
+    highlights: ['开源生态', '企业私有化', '本地化友好'],
+  },
+  kimi: {
+    description: 'Kimi 适合长文本、中文阅读和资料整理场景，覆盖常见办公与知识处理需求。',
+    highlights: ['长文本友好', '中文阅读', '资料整理'],
+  },
+  glm: {
+    description: 'GLM 适合中文对话、工具调用和通用办公场景，可作为国内模型生态补充。',
+    highlights: ['中文对话', '工具调用', '通用办公'],
+  },
+  cohere: {
+    description: 'Cohere 适合企业检索、RAG、文本分类和向量相关工作流。',
+    highlights: ['企业检索', 'RAG 场景', '向量能力'],
+  },
+  minimax: {
+    description: 'MiniMax 适合中文内容生成、对话和多模态产品场景。',
+    highlights: ['中文生成', '对话场景', '多模态生态'],
+  },
+  baichuan: {
+    description: 'Baichuan 适合中文通用问答、企业知识处理和国产模型展示。',
+    highlights: ['中文问答', '企业知识', '国产生态'],
+  },
 }
 
 const DEFAULT_MODEL_VERSIONS: Record<string, string[]> = {
@@ -67,6 +95,13 @@ const DEFAULT_MODEL_VERSIONS: Record<string, string[]> = {
   deepseek: ['DeepSeek V3.1', 'DeepSeek R1', 'deepseek-chat'],
   qwen: ['Qwen3 Max', 'Qwen3 Coder', 'Qwen Plus'],
   mistral: ['Mistral Large', 'Codestral', 'Mixtral'],
+  grok: ['Grok 4', 'Grok 3', 'Grok Code Fast'],
+  llama: ['Llama 4 Maverick', 'Llama 3.3 70B', 'Llama 3.1 405B'],
+  kimi: ['Kimi K2', 'Moonshot v1 128K', 'Kimi Thinking'],
+  glm: ['GLM-4.5', 'GLM-4.5 Air', 'ChatGLM'],
+  cohere: ['Command A', 'Command R+', 'Embed v4'],
+  minimax: ['MiniMax M1', 'abab6.5s', 'text-01'],
+  baichuan: ['Baichuan4', 'Baichuan3 Turbo', 'Baichuan2 Turbo'],
 }
 
 function statusForLogo(option: ModelLogoOption): ModelCenterStatus {
@@ -98,7 +133,7 @@ export const DEFAULT_MODEL_CENTER_CONFIG: ModelCenterConfig = {
   eyebrow: '模型中心',
   title: '主流 AI 模型统一展示',
   description:
-    '当前主推 GPT-5.5、GPT-5.4、Claude 4.7 和 Claude 4.6，Gemini 等主流模型也已纳入统一展示。用户可先在 API 密钥页面完成配置，再按同一入口使用更多模型生态。',
+    '当前主推 GPT-5.5、GPT-5.4、Claude 4.7 和 Claude 4.6，Gemini、DeepSeek、Qwen、Mistral 等模型也纳入统一展示。实际可用范围由管理员配置的渠道、分组和密钥决定。',
   featuredTitle: '主推模型',
   featuredDescription:
     '新手可以直接从常用模型开始，熟练用户也能保留更细的模型选择空间。',

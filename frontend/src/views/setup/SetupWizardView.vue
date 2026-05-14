@@ -10,7 +10,7 @@
         >
           <Icon name="cog" size="xl" class="text-[var(--text-inverse)]" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('setup.title') }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900">{{ t('setup.title') }}</h1>
         <p class="mt-2 text-gray-500 text-[var(--text-muted)]">{{ t('setup.description') }}</p>
       </div>
 
@@ -41,7 +41,7 @@
                 class="ml-2 text-sm font-medium"
                 :class="
                   currentStep >= index
-                    ? 'text-gray-900 dark:text-[var(--text-inverse)]'
+                    ? 'text-gray-900'
                     : 'text-gray-400 text-[var(--text-muted)]'
                 "
               >
@@ -62,7 +62,7 @@
         <!-- Step 1: Database -->
         <div v-if="currentStep === 0" class="space-y-6">
           <div class="mb-6 text-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ t('setup.database.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -93,7 +93,7 @@
 
           <div class="flex items-center justify-between rounded-lg border border-gray-200 p-3 border-[var(--border-default)]">
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-sm font-medium text-gray-900">
                 {{ t("setup.redis.enableTls") }}
               </p>
               <p class="text-xs text-gray-500 text-[var(--text-muted)]">
@@ -187,7 +187,7 @@
         <!-- Step 2: Redis -->
         <div v-if="currentStep === 1" class="space-y-6">
           <div class="mb-6 text-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ t('setup.redis.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -239,7 +239,7 @@
 
           <div class="flex items-center justify-between rounded-lg border border-gray-200 p-3 border-[var(--border-default)]">
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-sm font-medium text-gray-900">
                 {{ t("setup.redis.enableTls") }}
               </p>
               <p class="text-xs text-gray-500 text-[var(--text-muted)]">
@@ -294,7 +294,7 @@
         <!-- Step 3: Admin -->
         <div v-if="currentStep === 2" class="space-y-6">
           <div class="mb-6 text-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ t('setup.admin.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -342,7 +342,7 @@
         <!-- Step 4: Complete -->
         <div v-if="currentStep === 3" class="space-y-6">
           <div class="mb-6 text-center">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ t('setup.ready.title') }}
             </h2>
             <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -355,7 +355,7 @@
               <h3 class="mb-2 text-sm font-medium text-gray-500 text-[var(--text-muted)]">
                 {{ t('setup.ready.database') }}
               </h3>
-              <p class="text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-gray-900">
                 {{ formData.database.user }}@{{ formData.database.host }}:{{
                   formData.database.port
                 }}/{{ formData.database.dbname }}
@@ -366,7 +366,7 @@
               <h3 class="mb-2 text-sm font-medium text-gray-500 text-[var(--text-muted)]">
                 {{ t('setup.ready.redis') }}
               </h3>
-              <p class="text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-gray-900">
                 {{ formData.redis.host }}:{{ formData.redis.port }}
               </p>
             </div>
@@ -375,7 +375,7 @@
               <h3 class="mb-2 text-sm font-medium text-gray-500 text-[var(--text-muted)]">
                 {{ t('setup.ready.adminEmail') }}
               </h3>
-              <p class="text-gray-900 dark:text-[var(--text-inverse)]">{{ formData.admin.email }}</p>
+              <p class="text-gray-900">{{ formData.admin.email }}</p>
             </div>
           </div>
         </div>
@@ -383,18 +383,18 @@
         <!-- Error Message -->
         <div
           v-if="errorMessage"
-          class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800/50 dark:bg-red-900/20"
+          class="mt-6 rounded-lg border border-red-200 bg-red-50 p-4"
         >
           <div class="flex items-start gap-3">
             <Icon name="exclamationCircle" size="md" class="flex-shrink-0 text-red-500" />
-            <p class="text-sm text-red-700 dark:text-red-400">{{ errorMessage }}</p>
+            <p class="text-sm text-red-700">{{ errorMessage }}</p>
           </div>
         </div>
 
         <!-- Success Message -->
         <div
           v-if="installSuccess"
-          class="mt-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800/50 dark:bg-green-900/20"
+          class="mt-6 rounded-lg border border-green-200 bg-green-50 p-4"
         >
           <div class="flex items-start gap-3">
             <svg
@@ -419,10 +419,10 @@
             </svg>
             <Icon v-else name="checkCircle" size="md" class="flex-shrink-0 text-green-500" />
             <div>
-              <p class="text-sm font-medium text-green-700 dark:text-green-400">
+              <p class="text-sm font-medium text-green-700">
                 {{ t('setup.status.completed') }}
               </p>
-              <p class="mt-1 text-sm text-green-600 dark:text-green-500">
+              <p class="mt-1 text-sm text-green-600">
                 {{
                   serviceReady
                     ? t('setup.status.redirecting')

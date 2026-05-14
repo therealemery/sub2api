@@ -137,6 +137,7 @@ func (h *PaymentHandler) GetCheckoutInfo(c *gin.Context) {
 		Plans:                     planList,
 		BalanceDisabled:           cfg.BalanceDisabled,
 		BalanceRechargeMultiplier: cfg.BalanceRechargeMultiplier,
+		PointsPerRMB:              cfg.PointsPerRMB,
 		RechargeFeeRate:           cfg.RechargeFeeRate,
 		HelpText:                  cfg.HelpText,
 		HelpImageURL:              cfg.HelpImageURL,
@@ -151,6 +152,7 @@ type checkoutInfoResponse struct {
 	Plans                     []checkoutPlan                  `json:"plans"`
 	BalanceDisabled           bool                            `json:"balance_disabled"`
 	BalanceRechargeMultiplier float64                         `json:"balance_recharge_multiplier"`
+	PointsPerRMB              float64                         `json:"points_per_rmb"`
 	RechargeFeeRate           float64                         `json:"recharge_fee_rate"`
 	HelpText                  string                          `json:"help_text"`
 	HelpImageURL              string                          `json:"help_image_url"`
@@ -233,6 +235,9 @@ func (h *PaymentHandler) CreateOrder(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid request: "+err.Error())
 		return
+	}
+	if strings.TrimSpace(req.OrderType) == payment.OrderTypePoints {
+		req.OrderType = payment.OrderTypeBalance
 	}
 	if strings.TrimSpace(req.WechatResumeToken) != "" {
 		claims, err := h.paymentService.ParseWeChatPaymentResumeToken(req.WechatResumeToken)

@@ -53,6 +53,7 @@ type PaymentConfig struct {
 	EnabledTypes              []string `json:"enabled_payment_types"`
 	BalanceDisabled           bool     `json:"balance_disabled"`
 	BalanceRechargeMultiplier float64  `json:"balance_recharge_multiplier"`
+	PointsPerRMB              float64  `json:"points_per_rmb"`
 	RechargeFeeRate           float64  `json:"recharge_fee_rate"`
 	LoadBalanceStrategy       string   `json:"load_balance_strategy"`
 	ProductNamePrefix         string   `json:"product_name_prefix"`
@@ -80,6 +81,7 @@ type UpdatePaymentConfigRequest struct {
 	EnabledTypes              []string `json:"enabled_payment_types"`
 	BalanceDisabled           *bool    `json:"balance_disabled"`
 	BalanceRechargeMultiplier *float64 `json:"balance_recharge_multiplier"`
+	PointsPerRMB              *float64 `json:"points_per_rmb"`
 	RechargeFeeRate           *float64 `json:"recharge_fee_rate"`
 	LoadBalanceStrategy       *string  `json:"load_balance_strategy"`
 	ProductNamePrefix         *string  `json:"product_name_prefix"`
@@ -215,15 +217,17 @@ func (s *PaymentConfigService) GetPaymentConfig(ctx context.Context) (*PaymentCo
 }
 
 func (s *PaymentConfigService) parsePaymentConfig(vals map[string]string) *PaymentConfig {
+	pointsPerRMB := normalizePointsPerRMB(pcParseFloat(vals[SettingBalanceRechargeMult], defaultPointsPerRMB))
 	cfg := &PaymentConfig{
 		Enabled:                   vals[SettingPaymentEnabled] == "true",
-		MinAmount:                 pcParseFloat(vals[SettingMinRechargeAmount], 1),
+		MinAmount:                 pcParseFloat(vals[SettingMinRechargeAmount], 10),
 		MaxAmount:                 pcParseFloat(vals[SettingMaxRechargeAmount], 0),
 		DailyLimit:                pcParseFloat(vals[SettingDailyRechargeLimit], 0),
 		OrderTimeoutMin:           pcParseInt(vals[SettingOrderTimeoutMinutes], defaultOrderTimeoutMin),
 		MaxPendingOrders:          pcParseInt(vals[SettingMaxPendingOrders], defaultMaxPendingOrders),
 		BalanceDisabled:           vals[SettingBalancePayDisabled] == "true",
-		BalanceRechargeMultiplier: normalizeBalanceRechargeMultiplier(pcParseFloat(vals[SettingBalanceRechargeMult], defaultBalanceRechargeMultiplier)),
+		BalanceRechargeMultiplier: pointsPerRMB,
+		PointsPerRMB:              pointsPerRMB,
 		RechargeFeeRate:           pcParseFloat(vals[SettingRechargeFeeRate], 0),
 		LoadBalanceStrategy:       vals[SettingLoadBalanceStrategy],
 		ProductNamePrefix:         vals[SettingProductNamePrefix],
@@ -278,9 +282,13 @@ func (s *PaymentConfigService) getStripePublishableKey(ctx context.Context) stri
 // nil-check before serialisation — this is inherent to patch-style update patterns
 // and cannot be meaningfully decomposed without introducing unnecessary abstraction.
 func (s *PaymentConfigService) UpdatePaymentConfig(ctx context.Context, req UpdatePaymentConfigRequest) error {
-	if req.BalanceRechargeMultiplier != nil {
-		if math.IsNaN(*req.BalanceRechargeMultiplier) || math.IsInf(*req.BalanceRechargeMultiplier, 0) || *req.BalanceRechargeMultiplier <= 0 {
-			return infraerrors.BadRequest("INVALID_BALANCE_RECHARGE_MULTIPLIER", "balance recharge multiplier must be greater than 0")
+	pointsPerRMB := req.BalanceRechargeMultiplier
+	if req.PointsPerRMB != nil {
+		pointsPerRMB = req.PointsPerRMB
+	}
+	if pointsPerRMB != nil {
+		if math.IsNaN(*pointsPerRMB) || math.IsInf(*pointsPerRMB, 0) || *pointsPerRMB <= 0 {
+			return infraerrors.BadRequest("INVALID_POINTS_PER_RMB", "points per RMB must be greater than 0")
 		}
 	}
 	if req.RechargeFeeRate != nil {
@@ -301,7 +309,7 @@ func (s *PaymentConfigService) UpdatePaymentConfig(ctx context.Context, req Upda
 		SettingOrderTimeoutMinutes:               formatPositiveInt(req.OrderTimeoutMin),
 		SettingMaxPendingOrders:                  formatPositiveInt(req.MaxPendingOrders),
 		SettingBalancePayDisabled:                formatBoolOrEmpty(req.BalanceDisabled),
-		SettingBalanceRechargeMult:               formatPositiveFloat(req.BalanceRechargeMultiplier),
+		SettingBalanceRechargeMult:               formatPositiveFloat(pointsPerRMB),
 		SettingRechargeFeeRate:                   formatNonNegativeFloat(req.RechargeFeeRate),
 		SettingLoadBalanceStrategy:               derefStr(req.LoadBalanceStrategy),
 		SettingProductNamePrefix:                 derefStr(req.ProductNamePrefix),

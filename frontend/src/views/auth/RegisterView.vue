@@ -3,7 +3,7 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h2 class="text-2xl font-bold text-gray-900">
           {{ t('auth.createAccount') }}
         </h2>
         <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -43,13 +43,13 @@
       <!-- Registration Disabled Message -->
       <div
         v-if="!registrationEnabled && settingsLoaded"
-        class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20"
+        class="rounded-lg border border-amber-200 bg-amber-50 p-4"
       >
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
             <Icon name="exclamationCircle" size="md" class="text-amber-500" />
           </div>
-          <p class="text-sm text-amber-700 dark:text-amber-400">
+          <p class="text-sm text-amber-700">
             {{ t('auth.registrationDisabled') }}
           </p>
         </div>
@@ -104,7 +104,7 @@
             <button
               type="button"
               @click="showPassword = !showPassword"
-              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-dark-300"
+              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
             >
               <Icon v-if="showPassword" name="eyeOff" size="md" />
               <Icon v-else name="eye" size="md" />
@@ -153,9 +153,9 @@
           </div>
           <!-- Invitation code validation result -->
           <transition name="fade">
-            <div v-if="invitationValidation.valid" class="mt-2 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 dark:bg-green-900/20">
-              <Icon name="checkCircle" size="sm" class="text-green-600 dark:text-green-400" />
-              <span class="text-sm text-green-700 dark:text-green-400">
+            <div v-if="invitationValidation.valid" class="mt-2 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2">
+              <Icon name="checkCircle" size="sm" class="text-green-600" />
+              <span class="text-sm text-green-700">
                 {{ t('auth.invitationCodeValid') }}
               </span>
             </div>
@@ -201,9 +201,9 @@
           </div>
           <!-- Promo code validation result -->
           <transition name="fade">
-            <div v-if="promoValidation.valid" class="mt-2 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 dark:bg-green-900/20">
-              <Icon name="gift" size="sm" class="text-green-600 dark:text-green-400" />
-              <span class="text-sm text-green-700 dark:text-green-400">
+            <div v-if="promoValidation.valid" class="mt-2 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2">
+              <Icon name="gift" size="sm" class="text-green-600" />
+              <span class="text-sm text-green-700">
                 {{ t('auth.promoCodeValid', { amount: promoValidation.bonusAmount?.toFixed(2) }) }}
               </span>
             </div>
@@ -265,7 +265,7 @@
         {{ t('auth.alreadyHaveAccount') }}
         <router-link
           to="/login"
-          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)]"
         >
           {{ t('auth.signIn') }}
         </router-link>

@@ -58,7 +58,7 @@
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ tpl.name }}</span>
+              <span class="font-medium text-gray-900">{{ tpl.name }}</span>
               <span
                 class="inline-flex items-center rounded-md px-1.5 py-0.5 text-xs"
                 :class="modeBadgeClass(tpl.body_override_mode)"
@@ -67,12 +67,12 @@
               </span>
               <span
                 v-if="tpl.associated_monitors > 0"
-                class="text-xs text-gray-500 dark:text-gray-400"
+                class="text-xs text-gray-500"
               >
                 {{ t('admin.channelMonitor.template.associatedCount', { n: tpl.associated_monitors }) }}
               </span>
             </div>
-            <p v-if="tpl.description" class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+            <p v-if="tpl.description" class="mt-0.5 text-xs text-gray-500">
               {{ tpl.description }}
             </p>
             <p class="mt-1 text-xs text-gray-400">
@@ -427,17 +427,17 @@ async function doDelete() {
 function tabClass(value: Provider): string {
   return activeProvider.value === value
     ? 'border-b-2 border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
-    : 'border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+    : 'border-b-2 border-transparent text-gray-500 hover:text-gray-700'
 }
 
 function modeBadgeClass(mode: BodyOverrideMode): string {
   switch (mode) {
     case 'merge':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
+      return 'bg-amber-100 text-amber-700'
     case 'replace':
-      return 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300'
+      return 'bg-purple-100 text-purple-700'
     default:
-      return 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300'
+      return 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)]'
   }
 }
 

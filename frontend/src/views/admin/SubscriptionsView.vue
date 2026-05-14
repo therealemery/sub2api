@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="table-page-with-intro">
       <PageIntro
-        title="订阅管理"
-        description="查看用户订阅、所属分组、额度使用和到期状态。这里不改变订阅业务规则，只把筛选、分配和操作放在同一张管理表里。"
+        title="套餐管理"
+        description="查看用户套餐、所属权限组、额度使用和到期状态。这里不改变套餐业务规则，只把筛选、分配和操作放在同一张管理表里。"
         compact
       />
       <TablePageLayout>
@@ -34,7 +34,7 @@
                 v-if="selectedFilterUser"
                 @click="clearFilterUser"
                 type="button"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 :title="t('common.clear')"
               >
                 <Icon name="x" size="sm" :stroke-width="2" />
@@ -43,17 +43,17 @@
               <!-- User Dropdown -->
               <div
                 v-if="showFilterUserDropdown && (filterUserResults.length > 0 || filterUserKeyword)"
-                class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-[var(--bg-surface)]"
               >
                 <div
                   v-if="filterUserLoading"
-                  class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                  class="px-4 py-3 text-sm text-gray-500"
                 >
                   {{ t('common.loading') }}
                 </div>
                 <div
                   v-else-if="filterUserResults.length === 0 && filterUserKeyword"
-                  class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                  class="px-4 py-3 text-sm text-gray-500"
                 >
                   {{ t('common.noOptionsFound') }}
                 </div>
@@ -62,10 +62,10 @@
                   :key="user.id"
                   type="button"
                   @click="selectFilterUser(user)"
-                  class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
                 >
-                  <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ user.email }}</span>
-                  <span class="ml-2 text-gray-500 dark:text-gray-400">#{{ user.id }}</span>
+                  <span class="font-medium text-gray-900">{{ user.email }}</span>
+                  <span class="ml-2 text-gray-500">#{{ user.id }}</span>
                 </button>
               </div>
             </div>
@@ -122,24 +122,24 @@
               <!-- Dropdown menu -->
               <div
                 v-if="showColumnDropdown"
-                class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)]"
               >
                 <div class="p-2">
                   <!-- User column mode selection -->
-                  <div class="mb-2 border-b border-gray-200 pb-2 dark:border-gray-700">
-                    <div class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <div class="mb-2 border-b border-gray-200 pb-2">
+                    <div class="px-3 py-1 text-xs font-medium text-gray-500">
                       {{ t('admin.subscriptions.columns.user') }}
                     </div>
                     <button
                       @click="setUserColumnMode('email')"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <span>{{ t('admin.users.columns.email') }}</span>
                       <Icon v-if="userColumnMode === 'email'" name="check" size="sm" class="text-[var(--accent)]" />
                     </button>
                     <button
                       @click="setUserColumnMode('username')"
-                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                      class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <span>{{ t('admin.users.columns.username') }}</span>
                       <Icon v-if="userColumnMode === 'username'" name="check" size="sm" class="text-[var(--accent)]" />
@@ -150,7 +150,7 @@
                     v-for="col in toggleableColumns"
                     :key="col.key"
                     @click="toggleColumn(col.key)"
-                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <span>{{ col.label }}</span>
                     <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-[var(--accent)]" />
@@ -190,14 +190,14 @@
               <div
                 class="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100 bg-[var(--bg-surface-alt)]"
               >
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                <span class="text-sm font-medium text-gray-700">
                   {{ userColumnMode === 'email'
                     ? (row.user?.email?.charAt(0).toUpperCase() || '?')
                     : (row.user?.username?.charAt(0).toUpperCase() || '?')
                   }}
                 </span>
               </div>
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <span class="font-medium text-gray-900">
                 {{ userColumnMode === 'email'
                   ? (row.user?.email || t('admin.redeem.userPrefix', { id: row.user_id }))
                   : (row.user?.username || '-')
@@ -340,8 +340,8 @@
                 "
                 class="flex items-center gap-2 rounded-lg bg-[var(--bg-surface-alt)] px-3 py-2"
               >
-                <span class="text-lg text-emerald-600 dark:text-emerald-400">∞</span>
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span class="text-lg text-emerald-600">∞</span>
+                <span class="text-xs font-medium text-emerald-700">
                   {{ t('admin.subscriptions.unlimited') }}
                 </span>
               </div>
@@ -354,8 +354,8 @@
                 class="text-sm"
                 :class="
                   isExpiringSoon(value)
-                    ? 'text-orange-600 dark:text-orange-400'
-                    : 'text-gray-700 dark:text-gray-300'
+                    ? 'text-orange-600'
+                    : 'text-gray-700'
                 "
               >
                 {{ formatDateOnly(value) }}
@@ -389,7 +389,7 @@
               <button
                 v-if="row.status === 'active' || row.status === 'expired'"
                 @click="handleExtend(row)"
-                class="admin-subscription-action text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-[var(--text-inverse)]"
+                class="admin-subscription-action text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
               >
                 <Icon name="calendar" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.adjust') }}</span>
@@ -398,7 +398,7 @@
                 v-if="row.status === 'active'"
                 @click="handleResetQuota(row)"
                 :disabled="resettingQuota && resettingSubscription?.id === row.id"
-                class="admin-subscription-action text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-[var(--text-inverse)] disabled:cursor-not-allowed disabled:opacity-50"
+                class="admin-subscription-action text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Icon name="refresh" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.resetQuota') }}</span>
@@ -406,7 +406,7 @@
               <button
                 v-if="row.status === 'active'"
                 @click="handleRevoke(row)"
-                class="admin-subscription-action text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="admin-subscription-action text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <Icon name="ban" size="sm" />
                 <span class="text-xs">{{ t('admin.subscriptions.revoke') }}</span>
@@ -453,7 +453,7 @@
       >
         <div class="admin-config-impact-note">
           <strong>分配影响：</strong>
-          这里会把用户绑定到一个订阅分组，并设置有效期。可用模型、费率和调用容量仍以所选分组配置为准。
+          这里会把用户绑定到一个套餐权限组，并设置有效期。可用模型、费率和调用容量仍以所选权限组配置为准。
         </div>
         <div>
           <label class="input-label">{{ t('admin.subscriptions.form.user') }}</label>
@@ -470,24 +470,24 @@
               v-if="selectedUser"
               @click="clearUserSelection"
               type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               <Icon name="x" size="sm" :stroke-width="2" />
             </button>
             <!-- User Dropdown -->
             <div
               v-if="showUserDropdown && (userSearchResults.length > 0 || userSearchKeyword)"
-              class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+              class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-[var(--bg-surface)]"
             >
               <div
                 v-if="userSearchLoading"
-                class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                class="px-4 py-3 text-sm text-gray-500"
               >
                 {{ t('common.loading') }}
               </div>
               <div
                 v-else-if="userSearchResults.length === 0 && userSearchKeyword"
-                class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                class="px-4 py-3 text-sm text-gray-500"
               >
                 {{ t('common.noOptionsFound') }}
               </div>
@@ -496,10 +496,10 @@
                 :key="user.id"
                 type="button"
                 @click="selectUser(user)"
-                class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
               >
-                <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ user.email }}</span>
-                <span class="ml-2 text-gray-500 dark:text-gray-400">#{{ user.id }}</span>
+                <span class="font-medium text-gray-900">{{ user.email }}</span>
+                <span class="ml-2 text-gray-500">#{{ user.id }}</span>
               </button>
             </div>
           </div>
@@ -544,7 +544,7 @@
         <div class="flex justify-end gap-3">
           <div class="config-save-note mr-auto hidden max-w-md text-left lg:block">
             <strong>保存区：</strong>
-            提交后只创建订阅绑定，不会修改渠道价格、分组规则或用户密钥。
+            提交后只创建套餐绑定，不会修改模型接入价格、权限组规则或用户密钥。
           </div>
           <button @click="closeAssignModal" type="button" class="btn btn-secondary">
             {{ t('common.cancel') }}
@@ -595,15 +595,15 @@
         class="space-y-5"
       >
         <div class="rounded-lg bg-gray-50 p-4 bg-[var(--bg-surface-alt)]">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
+          <p class="text-sm text-gray-600">
             {{ t('admin.subscriptions.adjustingFor') }}
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+            <span class="font-medium text-gray-900">{{
               extendingSubscription.user?.email
             }}</span>
           </p>
-          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p class="mt-1 text-sm text-gray-600">
             {{ t('admin.subscriptions.currentExpiration') }}:
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <span class="font-medium text-gray-900">
               {{
                 extendingSubscription.expires_at
                   ? formatDateOnly(extendingSubscription.expires_at)
@@ -611,9 +611,9 @@
               }}
             </span>
           </p>
-          <p v-if="extendingSubscription.expires_at" class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p v-if="extendingSubscription.expires_at" class="mt-1 text-sm text-gray-600">
             {{ t('admin.subscriptions.remainingDays') }}:
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <span class="font-medium text-gray-900">
               {{ getDaysRemaining(extendingSubscription.expires_at) ?? 0 }}
             </span>
           </p>
@@ -677,20 +677,20 @@
         <div v-if="showGuideModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="showGuideModal = false">
           <div class="fixed inset-0 bg-black/50" @click="showGuideModal = false"></div>
           <div class="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]">
-            <button type="button" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" @click="showGuideModal = false">
+            <button type="button" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600" @click="showGuideModal = false">
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
-            <h2 class="mb-4 text-lg font-bold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('admin.subscriptions.guide.title') }}</h2>
-            <p class="mb-5 text-sm text-gray-500 dark:text-gray-400">{{ t('admin.subscriptions.guide.subtitle') }}</p>
+            <h2 class="mb-4 text-lg font-bold text-gray-900">{{ t('admin.subscriptions.guide.title') }}</h2>
+            <p class="mb-5 text-sm text-gray-500">{{ t('admin.subscriptions.guide.subtitle') }}</p>
 
             <!-- Step 1 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
                 <span class="guide-step-index">1</span>
                 {{ t('admin.subscriptions.guide.step1.title') }}
               </h3>
-              <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600">
                 <li>{{ t('admin.subscriptions.guide.step1.line1') }}</li>
                 <li>{{ t('admin.subscriptions.guide.step1.line2') }}</li>
                 <li>{{ t('admin.subscriptions.guide.step1.line3') }}</li>
@@ -699,7 +699,7 @@
                 <router-link
                   to="/admin/groups"
                   @click="showGuideModal = false"
-                  class="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+                  class="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)]"
                 >
                   {{ t('admin.subscriptions.guide.step1.link') }}
                   <Icon name="arrowRight" size="xs" />
@@ -709,11 +709,11 @@
 
             <!-- Step 2 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
                 <span class="guide-step-index">2</span>
                 {{ t('admin.subscriptions.guide.step2.title') }}
               </h3>
-              <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <ol class="ml-8 list-decimal space-y-1 text-sm text-gray-600">
                 <li>{{ t('admin.subscriptions.guide.step2.line1') }}</li>
                 <li>{{ t('admin.subscriptions.guide.step2.line2') }}</li>
                 <li>{{ t('admin.subscriptions.guide.step2.line3') }}</li>
@@ -722,7 +722,7 @@
 
             <!-- Step 3 -->
             <div class="mb-5">
-              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+              <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
                 <span class="guide-step-index">3</span>
                 {{ t('admin.subscriptions.guide.step3.title') }}
               </h3>
@@ -730,8 +730,8 @@
                 <table class="w-full text-sm">
                   <tbody>
                     <tr v-for="(row, i) in guideActionRows" :key="i" class="border-b border-gray-100 border-[var(--border-default)] last:border-0">
-                      <td class="whitespace-nowrap bg-gray-50 px-3 py-2 font-medium text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300">{{ row.action }}</td>
-                      <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{{ row.desc }}</td>
+                      <td class="whitespace-nowrap bg-gray-50 px-3 py-2 font-medium text-gray-700 bg-[var(--bg-surface-alt)]">{{ row.action }}</td>
+                      <td class="px-3 py-2 text-gray-600">{{ row.desc }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1403,7 +1403,7 @@ onUnmounted(() => {
 }
 
 .usage-label {
-  @apply w-12 flex-shrink-0 text-xs font-semibold text-gray-600 dark:text-gray-300;
+  @apply w-12 flex-shrink-0 text-xs font-semibold text-gray-600;
 }
 
 .usage-amount {
@@ -1451,7 +1451,4 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-:global(.dark) .admin-subscription-progress-track {
-  background: #2f2d29 !important;
-}
 </style>

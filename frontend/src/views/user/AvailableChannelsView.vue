@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="table-page-with-intro">
       <PageIntro
-        title="可用渠道"
-        description="查看当前账号可使用的模型渠道、分组费率和支持模型，方便判断密钥能调用哪些能力。"
+        title="可用模型"
+        description="查看当前账号可使用的模型、权限组费率和支持平台，方便判断密钥能调用哪些能力。"
       />
 
       <TablePageLayout>
@@ -14,7 +14,7 @@
               <Icon
                 name="search"
                 size="md"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
                 v-model="searchQuery"

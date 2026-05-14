@@ -17,6 +17,14 @@ export interface SetupStatus {
   step: string
 }
 
+function isLocalDevHost(): boolean {
+  return (
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)
+  )
+}
+
 export interface DatabaseConfig {
   host: string
   port: number
@@ -61,6 +69,10 @@ export interface InstallResponse {
  * Get setup status
  */
 export async function getSetupStatus(): Promise<SetupStatus> {
+  if (isLocalDevHost()) {
+    return { needs_setup: false, step: 'ready' }
+  }
+
   const response = await setupClient.get('/setup/status')
   return response.data.data
 }

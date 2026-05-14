@@ -20,20 +20,13 @@
         <!-- Logo -->
         <div class="brand-mark">
           <div class="brand-logo">
-            <img :src="siteLogoPaths.light" alt="Logo" class="theme-logo-light" />
-            <img :src="siteLogoPaths.dark" alt="Logo" class="theme-logo-dark" />
+            <img :src="siteLogoPath" alt="Logo" class="site-logo-img" />
           </div>
           <span class="brand-name">{{ siteName }}</span>
         </div>
 
         <!-- Nav Actions -->
         <div class="nav-actions">
-          <LocaleSwitcher />
-
-          <router-link to="/agent-recruitment" class="nav-doc-link">
-            {{ t('home.agentRecruitment') }}
-          </router-link>
-
           <a
             :href="usageGuideUrl"
             target="_blank"
@@ -43,25 +36,9 @@
             {{ t('home.usageGuide') }}
           </a>
 
-          <a
-            v-if="docUrl"
-            :href="docUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="icon-action"
-            :title="t('home.viewDocs')"
-          >
-            <Icon name="book" size="md" />
-          </a>
-
-          <button
-            @click="toggleTheme"
-            class="icon-action"
-            :title="isDark ? t('home.switchToLight') : t('home.switchToDark')"
-          >
-            <Icon v-if="isDark" name="sun" size="md" />
-            <Icon v-else name="moon" size="md" />
-          </button>
+          <router-link to="/agent-recruitment" class="nav-doc-link">
+            {{ t('home.agentRecruitment') }}
+          </router-link>
 
           <router-link v-if="isAuthenticated" :to="dashboardPath" class="account-button">
             <span class="account-initial">{{ userInitial }}</span>
@@ -79,8 +56,7 @@
     <main class="landing-main">
       <section class="hero-section">
         <div class="hero-logo" aria-hidden="true">
-          <img :src="heroLogoPaths.light" alt="" class="theme-logo-light" />
-          <img :src="heroLogoPaths.dark" alt="" class="theme-logo-dark" />
+          <img :src="heroLogoPath" alt="" class="site-logo-img" />
         </div>
 
         <div class="hero-copy">
@@ -107,77 +83,109 @@
           <a :href="usageGuideUrl" target="_blank" rel="noopener noreferrer" class="secondary-cta">
             {{ t('home.usageGuide') }}
           </a>
-          <a v-if="docUrl" :href="docUrl" target="_blank" rel="noopener noreferrer" class="secondary-cta">
-            {{ t('home.docs') }}
-          </a>
         </div>
 
-        <div class="tag-row">
-          <div class="landing-tag">
-            <Icon name="swap" size="sm" />
-            <span>{{ t('home.tags.beginnerFriendly') }}</span>
+        <div class="trust-panel" aria-label="OwnAPI trust commitments">
+          <div class="trust-panel-copy">
+            <strong>{{ t('home.trust.title') }}</strong>
+            <span>{{ t('home.trust.description') }}</span>
           </div>
-          <div class="landing-tag">
-            <Icon name="shield" size="sm" />
-            <span>{{ t('home.tags.proFriendly') }}</span>
+          <div class="trust-commitments">
+            <article>
+              <strong>{{ t('home.trust.longTermTitle') }}</strong>
+              <span>{{ t('home.trust.longTermDescription') }}</span>
+            </article>
+            <article>
+              <strong>{{ t('home.trust.transparentTitle') }}</strong>
+              <span>{{ t('home.trust.transparentDescription') }}</span>
+            </article>
+            <article>
+              <strong>{{ t('home.trust.modelQualityTitle') }}</strong>
+              <span>{{ t('home.trust.modelQualityDescription') }}</span>
+            </article>
           </div>
-          <div class="landing-tag">
-            <Icon name="chart" size="sm" />
-            <span>{{ t('home.tags.oneKeyAccess') }}</span>
-          </div>
-        </div>
-
-        <div class="trust-note">
-          <strong>{{ t('home.trust.title') }}</strong>
-          <span>{{ t('home.trust.description') }}</span>
-        </div>
-
-        <div class="trust-grid" aria-label="OwnAPI trust commitments">
-          <article>
-            <strong>{{ t('home.trust.longTermTitle') }}</strong>
-            <span>{{ t('home.trust.longTermDescription') }}</span>
-          </article>
-          <article>
-            <strong>{{ t('home.trust.transparentTitle') }}</strong>
-            <span>{{ t('home.trust.transparentDescription') }}</span>
-          </article>
-          <article>
-            <strong>{{ t('home.trust.modelQualityTitle') }}</strong>
-            <span>{{ t('home.trust.modelQualityDescription') }}</span>
-          </article>
         </div>
       </section>
 
-      <section class="feature-section">
-        <div class="section-heading">
-          <h2>{{ t('home.solutions.title') }}</h2>
-          <p>{{ t('home.solutions.subtitle') }}</p>
+      <section class="business-section" aria-label="B 端大用量 Token 方案">
+        <div class="business-panel">
+          <div class="business-copy">
+            <span class="section-kicker">B 端大用量方案</span>
+            <h2>
+              <span>面向高频调用和团队</span>
+              <span class="business-title-accent">专属批量使用</span>
+            </h2>
+            <p>
+              如果你的业务需要长期、大量、稳定地消耗 AI Token，OwnAPI 可以提供更适合团队和工具服务商的用量方案，在价格、稳定性和模型体验之间保持更好的平衡。
+            </p>
+          </div>
+          <div class="business-points">
+            <article>
+              <strong>更高性价比</strong>
+              <span>适合批量任务、自动化工具、研发团队和内部系统长期接入。</span>
+            </article>
+            <article>
+              <strong>稳定供给</strong>
+              <span>围绕主流模型持续维护通道，不做低质量模型替换和体验注水。</span>
+            </article>
+            <article>
+              <strong>长期合作</strong>
+              <span>大用量客户可按实际使用规模配置更合适的额度和调用策略。</span>
+            </article>
+          </div>
+          <button
+            type="button"
+            class="business-cta"
+            :aria-label="`复制联系邮箱 ${contactEmail}`"
+            @click="copyContactEmail"
+          >
+            {{ copiedContactEmail ? '已复制邮箱' : '粘贴联系邮箱' }}
+            <Icon :name="copiedContactEmail ? 'check' : 'copy'" size="sm" />
+          </button>
         </div>
+      </section>
 
-        <div class="feature-grid">
-          <article class="feature-card">
-            <div class="feature-icon">
-              <Icon name="server" size="lg" />
-            </div>
-            <h3>{{ t('home.features.unifiedGateway') }}</h3>
-            <p>{{ t('home.features.unifiedGatewayDesc') }}</p>
-          </article>
+      <section class="agent-recruitment-section" aria-label="中转站代理招募">
+        <div class="agent-recruitment-panel">
+          <div class="agent-recruitment-copy">
+            <span class="section-kicker">中转站代理招募</span>
+            <h2>AI 时代的长期副业入口</h2>
+            <p>
+              AI Token 需求正在持续增长。成为 OwnAPI 代理后，可以围绕身边的开发者、团队和 AI 工具用户推广服务，并获得其他用户消费最高可达 40% 的分成。
+            </p>
+          </div>
+          <div class="agent-recruitment-aside">
+            <strong>最高 40%</strong>
+            <span>用户消费分成</span>
+            <router-link to="/agent-recruitment" class="agent-recruitment-cta">
+              了解代理规则
+              <Icon name="arrowRight" size="sm" />
+            </router-link>
+          </div>
+        </div>
+      </section>
 
-          <article class="feature-card">
-            <div class="feature-icon">
-              <Icon name="shield" size="lg" />
-            </div>
-            <h3>{{ t('home.features.multiAccount') }}</h3>
-            <p>{{ t('home.features.multiAccountDesc') }}</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon">
-              <Icon name="dollar" size="lg" />
-            </div>
-            <h3>{{ t('home.features.balanceQuota') }}</h3>
-            <p>{{ t('home.features.balanceQuotaDesc') }}</p>
-          </article>
+      <section class="advantage-section">
+        <div class="advantage-panel">
+          <div class="advantage-copy">
+            <span class="section-kicker">{{ t('home.solutions.title') }}</span>
+            <h2>{{ t('home.solutions.subtitle') }}</h2>
+            <p>{{ t('home.heroDescription') }}</p>
+          </div>
+          <div class="advantage-list">
+            <article>
+              <strong>{{ t('home.features.unifiedGateway') }}</strong>
+              <span>{{ t('home.features.unifiedGatewayDesc') }}</span>
+            </article>
+            <article>
+              <strong>{{ t('home.features.multiAccount') }}</strong>
+              <span>{{ t('home.features.multiAccountDesc') }}</span>
+            </article>
+            <article>
+              <strong>{{ t('home.features.balanceQuota') }}</strong>
+              <span>{{ t('home.features.balanceQuotaDesc') }}</span>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -229,22 +237,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore, useAppStore } from '@/stores'
-import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
 import {
   DEFAULT_SITE_HERO_LOGO,
-  DEFAULT_SITE_HERO_LOGO_DARK,
-  DEFAULT_SITE_HERO_LOGO_LIGHT,
   DEFAULT_REPOSITORY_URL,
   DEFAULT_SITE_LOGO,
   DEFAULT_SITE_NAME,
   DEFAULT_SITE_SUBTITLE,
   isDefaultOwnApiLogo,
-  resolveSiteLogoPath,
-  resolveThemedSiteLogoPaths
+  resolveSiteLogoPath
 } from '@/constants/branding'
 
 const { t } = useI18n()
@@ -255,11 +259,11 @@ const appStore = useAppStore()
 // Site settings - directly from appStore (already initialized from injected config)
 const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || DEFAULT_SITE_NAME)
 const siteLogo = computed(() => resolveSiteLogoPath(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || DEFAULT_SITE_LOGO))
-const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(siteLogo.value))
-const heroLogoPaths = computed(() =>
+const siteLogoPath = computed(() => siteLogo.value)
+const heroLogoPath = computed(() =>
   isDefaultOwnApiLogo(siteLogo.value)
-    ? { light: DEFAULT_SITE_HERO_LOGO_LIGHT || DEFAULT_SITE_HERO_LOGO, dark: DEFAULT_SITE_HERO_LOGO_DARK }
-    : siteLogoPaths.value
+    ? DEFAULT_SITE_HERO_LOGO
+    : siteLogo.value
 )
 const siteSubtitle = computed(() => appStore.cachedPublicSettings?.site_subtitle || DEFAULT_SITE_SUBTITLE)
 const heroDescription = computed(() => {
@@ -269,15 +273,51 @@ const heroDescription = computed(() => {
 const docUrl = computed(() => appStore.cachedPublicSettings?.doc_url || appStore.docUrl || '')
 const homeContent = computed(() => appStore.cachedPublicSettings?.home_content || '')
 const usageGuideUrl = '/docs/ownapi-usage-guide.html'
+const fallbackContactEmail = 'support@ownapi.dev'
+const copiedContactEmail = ref(false)
+const contactEmail = computed(() => {
+  const rawContact = appStore.cachedPublicSettings?.contact_info || appStore.contactInfo || ''
+  const email = rawContact.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]
+  return email || fallbackContactEmail
+})
+
+function copyTextFallback(value: string) {
+  const textarea = document.createElement('textarea')
+  textarea.value = value
+  textarea.setAttribute('readonly', '')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
+async function copyContactEmail() {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(contactEmail.value)
+    } else {
+      copyTextFallback(contactEmail.value)
+    }
+    copiedContactEmail.value = true
+    window.setTimeout(() => {
+      copiedContactEmail.value = false
+    }, 1600)
+  } catch {
+    copyTextFallback(contactEmail.value)
+    copiedContactEmail.value = true
+    window.setTimeout(() => {
+      copiedContactEmail.value = false
+    }, 1600)
+  }
+}
 
 // Check if homeContent is a URL (for iframe display)
 const isHomeContentUrl = computed(() => {
   const content = homeContent.value.trim()
   return content.startsWith('http://') || content.startsWith('https://')
 })
-
-// Theme
-const isDark = ref(document.documentElement.classList.contains('dark'))
 
 // GitHub URL
 const githubUrl = DEFAULT_REPOSITORY_URL
@@ -304,38 +344,13 @@ const upcomingProviders = [
 ]
 const heroSubtitleLines = computed(() => {
   const subtitle = t('home.heroSubtitle')
-  if (subtitle.includes('，')) {
-    const [first, ...rest] = subtitle.split('，')
-    return [`${first}，`, rest.join('，').trim()].filter(Boolean)
-  }
   return [subtitle]
 })
 // Current year for footer
 const currentYear = computed(() => new Date().getFullYear())
 
-// Toggle theme
-function toggleTheme() {
-  isDark.value = !isDark.value
-  const nextTheme = isDark.value ? 'dark' : 'light'
-  document.documentElement.classList.toggle('dark', isDark.value)
-  document.documentElement.dataset.theme = nextTheme
-  localStorage.setItem('theme', nextTheme)
-}
-
-// Initialize theme
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme')
-  if (
-    savedTheme === 'dark' ||
-    (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  ) {
-    isDark.value = true
-    document.documentElement.classList.add('dark')
-  }
-}
-
 onMounted(() => {
-  initTheme()
+  document.documentElement.classList.remove('dark')
 
   // Check auth state
   authStore.checkAuth()
@@ -352,8 +367,21 @@ onMounted(() => {
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
+  --bg-page: #f8f5f2;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f1ebe4;
+  --bg-subtle: #ebe2d8;
+  --text-primary: #22201c;
+  --text-secondary: #5f574e;
+  --text-muted: #7d746a;
+  --border-default: #ddd7ce;
+  --border-strong: #c9bfb2;
+  --accent: #d96941;
+  --accent-hover: #bf5731;
+  --accent-soft: #f5ded1;
+  --accent-contrast: #ffffff;
   background: var(--bg-page);
-  color: rgb(15 23 42);
+  color: var(--text-primary);
 }
 
 .landing-page,
@@ -367,8 +395,8 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 30;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.72);
-  background: rgba(248, 250, 252, 0.82);
+  border-bottom: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
   backdrop-filter: none;
 }
 
@@ -385,8 +413,7 @@ onMounted(() => {
 .brand-mark,
 .nav-actions,
 .footer-links,
-.hero-actions,
-.tag-row {
+.hero-actions {
   display: flex;
   align-items: center;
 }
@@ -415,6 +442,7 @@ onMounted(() => {
   height: 100%;
   object-fit: contain;
   object-position: center;
+  mix-blend-mode: multiply;
 }
 
 .brand-name {
@@ -431,19 +459,6 @@ onMounted(() => {
   gap: 10px;
 }
 
-.landing-header :deep(.relative > button) {
-  color: rgb(71 85 105);
-}
-
-.landing-header :deep(.relative > button:hover) {
-  background: rgb(241 245 249);
-  color: rgb(15 23 42);
-}
-
-.landing-header :deep(.relative svg) {
-  color: rgb(148 163 184);
-}
-
 .icon-action {
   display: inline-flex;
   height: 36px;
@@ -451,8 +466,10 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  color: rgb(100 116 139);
-  transition: background-color 0.16s ease, color 0.16s ease;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: none;
 }
 
 .nav-doc-link {
@@ -460,25 +477,25 @@ onMounted(() => {
   min-height: 36px;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  border: 1px solid transparent;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 0 14px;
-  color: rgb(71 85 105);
+  background: transparent;
+  padding: 0 10px;
+  color: var(--text-secondary);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
-  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  transition: none;
 }
 
 .icon-action:hover {
-  background: rgb(241 245 249);
-  color: rgb(15 23 42);
+  background: var(--bg-surface-alt);
+  color: var(--accent);
 }
 
 .nav-doc-link:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-subtle);
+  border-color: transparent;
+  background: transparent;
   color: var(--accent);
 }
 
@@ -488,21 +505,21 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 999px;
-  background: rgb(15 23 42);
+  border-radius: var(--radius-md);
+  background: var(--accent);
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 700;
-  color: white;
-  transition: background-color 0.16s ease, transform 0.16s ease;
+  color: var(--accent-contrast);
+  transition: none;
 }
 
 .account-button:hover {
-  background: rgb(30 41 59);
+  background: var(--accent-hover);
 }
 
 .account-button:active {
-  transform: translateY(1px);
+  transform: none;
 }
 
 .account-initial {
@@ -511,8 +528,8 @@ onMounted(() => {
   width: 20px;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-contrast) 18%, transparent);
   font-size: 11px;
 }
 
@@ -529,14 +546,14 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 44px 0 36px;
+  gap: 24px;
+  padding: 72px 0 52px;
   text-align: center;
 }
 
 .hero-logo {
   display: block;
-  width: min(360px, 68vw);
+  width: min(270px, 44vw);
   filter: none;
   line-height: 0;
   aspect-ratio: 1 / 1;
@@ -548,19 +565,20 @@ onMounted(() => {
   width: 100%;
   object-fit: contain;
   object-position: center;
+  mix-blend-mode: multiply;
 }
 
 .hero-copy {
-  max-width: 920px;
+  max-width: 900px;
 }
 
 .hero-copy h1 {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: clamp(36px, 5vw, 58px);
-  font-weight: 900;
-  line-height: 1.04;
+  gap: 8px;
+  font-size: clamp(38px, 4.6vw, 60px);
+  font-weight: 700;
+  line-height: 1.08;
   letter-spacing: 0;
   overflow-wrap: anywhere;
 }
@@ -584,10 +602,10 @@ onMounted(() => {
 
 .hero-copy p {
   max-width: 720px;
-  margin: 14px auto 0;
-  color: rgb(71 85 105);
+  margin: 18px auto 0;
+  color: var(--text-secondary);
   font-size: clamp(15px, 1.7vw, 18px);
-  line-height: 1.65;
+  line-height: 1.72;
   overflow-wrap: anywhere;
 }
 
@@ -636,187 +654,394 @@ onMounted(() => {
   transform: none;
 }
 
-.tag-row {
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.landing-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.76);
-  padding: 10px 16px;
-  color: rgb(71 85 105);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.landing-tag svg {
-  color: var(--accent);
-}
-
-.trust-note {
+.trust-panel {
   display: grid;
-  gap: 6px;
-  width: min(100%, 760px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  width: min(100%, 1020px);
+  gap: 22px;
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  padding: 18px 22px;
-  color: rgb(51 65 85);
-  text-align: center;
+  padding: 34px 38px;
+  text-align: left;
 }
 
-.trust-note strong {
-  color: rgb(15 23 42);
-  font-size: 16px;
+.trust-panel-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.trust-panel-copy strong {
+  color: var(--accent);
+  font-size: 18px;
   font-weight: 900;
+  line-height: 1.35;
 }
 
-.trust-note span {
-  color: rgb(100 116 139);
+.trust-panel-copy span {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.trust-commitments {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--border-default);
+  padding-top: 22px;
+}
+
+.trust-commitments article {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  padding: 4px 22px 4px 0;
+}
+
+.trust-commitments article + article {
+  border-left: 1px solid var(--border-default);
+  padding-right: 22px;
+  padding-left: 22px;
+}
+
+.trust-commitments article strong {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.trust-commitments article span {
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.65;
 }
 
-.trust-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  width: min(100%, 860px);
+.business-section {
+  width: min(100% - 32px, 1120px);
+  margin: 0 auto;
+  padding: 4px 0 34px;
 }
 
-.trust-grid article {
+.business-panel {
   display: grid;
-  gap: 7px;
-  min-width: 0;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: var(--radius-md);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr) auto;
+  gap: 30px;
+  align-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  padding: 16px;
-  text-align: left;
+  padding: 34px 38px;
 }
 
-.trust-grid strong {
-  color: rgb(15 23 42);
+.business-copy {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.business-copy h2 {
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.8vw, 36px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+.business-copy h2 span {
+  display: block;
+}
+
+.business-title-accent {
+  color: var(--accent);
+}
+
+.business-copy p {
+  max-width: 520px;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.78;
+}
+
+.business-points {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.business-points article {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+}
+
+.business-points article + article {
+  border-top: 1px solid var(--border-default);
+}
+
+.business-points strong {
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 900;
   line-height: 1.35;
 }
 
-.trust-grid span {
-  color: rgb(100 116 139);
+.business-points span {
+  color: var(--text-secondary);
   font-size: 13px;
+  line-height: 1.6;
+}
+
+.business-cta {
+  appearance: none;
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  padding: 0 18px;
+  color: var(--accent-contrast);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+  transition: none;
+}
+
+.business-cta:hover {
+  background: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+.agent-recruitment-section {
+  width: min(100% - 32px, 1120px);
+  margin: 0 auto;
+  padding: 4px 0 34px;
+}
+
+.agent-recruitment-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 34px;
+  align-items: center;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent-soft) 42%, var(--bg-surface));
+  padding: 34px 38px;
+}
+
+.agent-recruitment-copy {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.agent-recruitment-copy h2 {
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+.agent-recruitment-copy p {
+  max-width: 760px;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.78;
+}
+
+.agent-recruitment-aside {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+  border-left: 1px solid var(--border-default);
+  padding-left: 30px;
+}
+
+.agent-recruitment-aside strong {
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-size: clamp(42px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.agent-recruitment-aside span {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.agent-recruitment-cta {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  padding: 0 18px;
+  color: var(--accent-contrast);
+  font-size: 14px;
+  font-weight: 900;
+  transition: none;
+}
+
+.agent-recruitment-cta:hover {
+  background: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+.advantage-section {
+  width: min(100% - 32px, 1120px);
+  margin: 0 auto;
+  padding: 6px 0 34px;
+}
+
+.advantage-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 40px;
+  align-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: 38px;
+}
+
+.advantage-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.section-kicker {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.advantage-copy h2 {
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.advantage-copy p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.advantage-list {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.advantage-list article {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+}
+
+.advantage-list article + article {
+  border-top: 1px solid var(--border-default);
+}
+
+.advantage-list strong {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.advantage-list span {
+  color: var(--text-secondary);
+  font-size: 14px;
   line-height: 1.65;
 }
 
-.feature-section,
 .providers-section {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;
-  padding: 54px 0;
+  padding: 34px 0 74px;
 }
 
 .section-heading {
   max-width: 720px;
-  margin: 0 auto 22px;
+  margin: 0 auto 30px;
   text-align: center;
 }
 
 .section-heading h2 {
   font-size: clamp(26px, 3vw, 36px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.16;
   letter-spacing: 0;
 }
 
 .section-heading p {
   margin-top: 10px;
-  color: rgb(100 116 139);
+  color: var(--text-secondary);
   font-size: 16px;
-  line-height: 1.7;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.feature-card {
-  min-width: 0;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 20px;
-  box-shadow: none;
-}
-
-.feature-icon {
-  display: flex;
-  height: 44px;
-  width: 44px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
-.feature-card h3 {
-  margin-top: 14px;
-  font-size: 17px;
-  font-weight: 800;
-}
-
-.feature-card p {
-  margin-top: 8px;
-  color: rgb(100 116 139);
-  font-size: 14px;
   line-height: 1.7;
 }
 
 .provider-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 340px));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
 }
 
 .provider-chip {
   display: flex;
+  min-height: 188px;
   min-width: 0;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  justify-content: flex-start;
+  gap: 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 26px 24px;
-  color: rgb(51 65 85);
-  text-align: center;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  padding: 34px;
+  color: var(--text-primary);
+  text-align: left;
 }
 
 .provider-logo {
   display: inline-flex;
-  height: 96px;
-  width: 96px;
+  height: 112px;
+  width: 112px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: 24px;
-  background: rgb(248 250 252);
-  color: rgb(15 23 42);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
 }
 
 .provider-logo img {
-  height: 58px;
-  width: 58px;
+  height: 68px;
+  width: 68px;
 }
 
 .provider-content {
@@ -827,25 +1052,25 @@ onMounted(() => {
 }
 
 .provider-content strong {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 900;
   line-height: 1.2;
 }
 
 .provider-content span {
-  color: rgb(100 116 139);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.55;
 }
 
 .upcoming-models {
-  margin: 22px auto 0;
-  max-width: 780px;
+  margin: 24px auto 0;
+  max-width: 880px;
   text-align: center;
 }
 
 .upcoming-models p {
-  color: rgb(100 116 139);
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 700;
 }
@@ -853,7 +1078,7 @@ onMounted(() => {
 .upcoming-grid {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 18px;
   flex-wrap: wrap;
   margin-top: 16px;
 }
@@ -861,19 +1086,20 @@ onMounted(() => {
 .upcoming-chip {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.78);
-  padding: 12px 18px;
-  color: rgb(71 85 105);
-  font-size: 15px;
+  border: 0;
+  background: transparent;
+  padding: 6px 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
   font-weight: 800;
 }
 
 .upcoming-chip img {
-  height: 26px;
-  width: 26px;
+  height: 24px;
+  width: 24px;
+  opacity: 0.82;
 }
 
 .landing-footer {
@@ -890,7 +1116,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  color: rgb(100 116 139);
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -934,8 +1160,8 @@ onMounted(() => {
 
   .hero-section {
     width: min(100% - 24px, 1120px);
-    gap: 20px;
-    padding: 36px 0 32px;
+    gap: 22px;
+    padding: 48px 0 36px;
   }
 
   .hero-copy h1 {
@@ -943,15 +1169,72 @@ onMounted(() => {
     line-height: 1.12;
   }
 
-  .feature-section,
+  .business-section,
+  .agent-recruitment-section,
+  .advantage-section,
   .providers-section {
     width: min(100% - 24px, 1120px);
     padding: 38px 0;
   }
 
-  .feature-grid,
-  .provider-grid {
+  .business-panel {
     grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+
+  .business-copy p {
+    max-width: none;
+  }
+
+  .business-cta {
+    justify-self: start;
+  }
+
+  .agent-recruitment-panel {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+
+  .agent-recruitment-aside {
+    border-top: 1px solid var(--border-default);
+    border-left: 0;
+    padding-top: 22px;
+    padding-left: 0;
+  }
+
+  .advantage-panel {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+
+  .provider-grid,
+  .trust-commitments {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-panel {
+    padding: 28px 24px;
+  }
+
+  .trust-commitments article,
+  .trust-commitments article + article {
+    border-left: 0;
+    padding: 16px 0;
+  }
+
+  .trust-commitments article + article {
+    border-top: 1px solid var(--border-default);
+  }
+
+  .provider-chip {
+    min-height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 28px 24px;
+    text-align: left;
   }
 
   .provider-logo {
@@ -1029,17 +1312,8 @@ onMounted(() => {
     max-width: 100%;
   }
 
-  .tag-row {
-    align-items: stretch;
-    flex-direction: column;
-    width: 100%;
-    max-width: 340px;
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .landing-tag {
-    justify-content: center;
+  .nav-doc-link {
+    display: none;
   }
 }
 
@@ -1061,7 +1335,6 @@ onMounted(() => {
 
 .brand-logo,
 .icon-action,
-.feature-icon,
 .provider-logo,
 .account-initial {
   border: 1px solid var(--border-default);
@@ -1081,8 +1354,16 @@ onMounted(() => {
 .section-heading h2 {
   color: var(--text-primary);
   font-family: var(--font-serif);
-  font-weight: 400;
   letter-spacing: 0;
+}
+
+.brand-name {
+  font-weight: 700;
+}
+
+.hero-copy h1,
+.section-heading h2 {
+  font-weight: 700;
 }
 
 .hero-logo {
@@ -1098,13 +1379,23 @@ onMounted(() => {
 
 .hero-copy p,
 .section-heading p,
-.feature-card p,
-.provider-content p,
+.provider-content span,
 .upcoming-models p,
-.trust-note span,
+.trust-panel-copy span,
+.trust-commitments span,
+.business-copy p,
+.business-points span,
 .landing-footer,
 .footer-links a {
   color: var(--text-muted);
+}
+
+.trust-commitments strong,
+.business-points strong,
+.advantage-list strong,
+.provider-content strong,
+.section-kicker {
+  color: var(--text-primary);
 }
 
 .primary-cta,
@@ -1122,12 +1413,10 @@ onMounted(() => {
 }
 
 .secondary-cta,
-.nav-doc-link,
-.landing-tag,
-.trust-note,
-.feature-card,
-.provider-chip,
-.upcoming-chip {
+.trust-panel,
+.business-panel,
+.advantage-panel,
+.provider-chip {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
@@ -1137,28 +1426,31 @@ onMounted(() => {
 
 .secondary-cta:hover,
 .icon-action:hover,
-.footer-links a:hover {
+.footer-links a:hover,
+.nav-doc-link:hover {
   border-color: var(--border-strong);
   background: var(--bg-subtle);
   color: var(--accent);
 }
 
-.feature-icon,
 .provider-logo {
   background: var(--bg-surface-alt);
 }
 
-.trust-note strong {
+.trust-panel-copy strong,
+.section-kicker {
   color: var(--accent);
 }
 
-.landing-tag svg,
-.feature-icon,
 .footer-links a:hover {
   color: var(--accent);
 }
 
 .landing-footer {
   border-top: 1px solid var(--border-default);
+}
+
+.landing-page :is(.provider-logo img, .upcoming-chip img) {
+  filter: none;
 }
 </style>

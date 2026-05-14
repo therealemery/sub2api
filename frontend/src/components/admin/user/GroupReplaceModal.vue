@@ -2,7 +2,7 @@
   <BaseDialog :show="show" :title="t('admin.users.replaceGroupTitle')" width="narrow" @close="$emit('close')">
     <div v-if="oldGroup" class="space-y-4">
       <!-- 提示信息 -->
-      <p class="text-sm text-gray-600 dark:text-gray-400">
+      <p class="text-sm text-gray-600">
         {{ t('admin.users.replaceGroupHint', { old: oldGroup.name }) }}
       </p>
 
@@ -10,7 +10,7 @@
       <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
         <div class="flex items-center gap-2">
           <Icon name="shield" size="sm" class="text-purple-500" />
-          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ oldGroup.name }}</span>
+          <span class="font-medium text-gray-900">{{ oldGroup.name }}</span>
           <Icon name="arrowRight" size="sm" class="ml-auto text-gray-400" />
           <span v-if="selectedGroupId" class="font-medium text-[var(--accent)] text-[var(--accent)]">
             {{ availableGroups.find(g => g.id === selectedGroupId)?.name }}
@@ -27,7 +27,7 @@
           class="flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-colors"
           :class="selectedGroupId === group.id
             ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]'
-            : 'border-gray-200 hover:border-gray-300 border-[var(--border-default)] dark:hover:border-dark-500'"
+            : 'border-gray-200 hover:border-gray-300 border-[var(--border-default)]'"
         >
           <input
             type="radio"
@@ -44,7 +44,7 @@
             <div v-if="selectedGroupId === group.id" class="h-2 w-2 rounded-full bg-[var(--bg-surface)]"></div>
           </div>
           <div class="flex-1">
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ group.name }}</span>
+            <span class="font-medium text-gray-900">{{ group.name }}</span>
             <span class="ml-2 text-xs text-gray-400">{{ group.platform }}</span>
           </div>
         </label>

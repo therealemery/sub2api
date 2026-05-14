@@ -1,5 +1,11 @@
 <template>
   <AppLayout>
+    <div class="admin-list-page">
+    <PageIntro
+      title="代理管理"
+      description="维护代理地址、协议、状态、账号关联和质量检测结果。批量测试、导入导出和删除入口保持原有行为。"
+    />
+
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -8,7 +14,7 @@
             <Icon
               name="search"
               size="md"
-              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               v-model="searchQuery"
@@ -119,7 +125,7 @@
           </template>
 
           <template #cell-name="{ value }">
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+            <span class="font-medium text-gray-900">{{ value }}</span>
           </template>
 
           <template #cell-protocol="{ value }">
@@ -138,7 +144,7 @@
               <div class="relative">
                 <button
                   type="button"
-                  class="rounded p-0.5 text-gray-400 hover:text-[var(--accent-hover)] dark:hover:text-[var(--accent-hover)]"
+                  class="rounded p-0.5 text-gray-400 hover:text-[var(--accent-hover)]"
                   :title="t('admin.proxies.copyProxyUrl')"
                   @click.stop="copyProxyUrl(row)"
                   @contextmenu.prevent="toggleCopyMenu(row.id)"
@@ -153,10 +159,10 @@
                   <button
                     v-for="fmt in getCopyFormats(row)"
                     :key="fmt.label"
-                    class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-gray-100 dark:hover:bg-dark-600"
+                    class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-gray-100"
                     @click.stop="copyFormat(fmt.value)"
                   >
-                    <span class="truncate font-mono text-gray-600 dark:text-gray-300">{{ fmt.label }}</span>
+                    <span class="truncate font-mono text-gray-600">{{ fmt.label }}</span>
                   </button>
                 </div>
               </div>
@@ -166,15 +172,15 @@
           <template #cell-auth="{ row }">
             <div v-if="row.username || row.password" class="flex items-center gap-1.5">
               <div class="flex flex-col text-xs">
-                <span v-if="row.username" class="text-gray-700 dark:text-gray-200">{{ row.username }}</span>
-                <span v-if="row.password" class="font-mono text-gray-500 dark:text-gray-400">
+                <span v-if="row.username" class="text-gray-700">{{ row.username }}</span>
+                <span v-if="row.password" class="font-mono text-gray-500">
                   {{ visiblePasswordIds.has(row.id) ? row.password : '••••••' }}
                 </span>
               </div>
               <button
                 v-if="row.password"
                 type="button"
-                class="ml-1 rounded p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                class="ml-1 rounded p-0.5 text-gray-400 hover:text-gray-600"
                 @click.stop="visiblePasswordIds.has(row.id) ? visiblePasswordIds.delete(row.id) : visiblePasswordIds.add(row.id)"
               >
                 <Icon :name="visiblePasswordIds.has(row.id) ? 'eyeOff' : 'eye'" size="sm" />
@@ -191,7 +197,7 @@
                 :alt="row.country || row.country_code"
                 class="h-4 w-6 rounded-sm"
               />
-              <span v-if="formatLocation(row)" class="text-sm text-gray-700 dark:text-gray-200">
+              <span v-if="formatLocation(row)" class="text-sm text-gray-700">
                 {{ formatLocation(row) }}
               </span>
               <span v-else class="text-sm text-gray-400">-</span>
@@ -202,14 +208,14 @@
             <button
               v-if="(value || 0) > 0"
               type="button"
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-[var(--accent)] hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:bg-dark-500"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-[var(--accent)] hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--accent)]"
               @click="openAccountsModal(row)"
             >
               {{ t('admin.groups.accountsCount', { count: value || 0 }) }}
             </button>
             <span
               v-else
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)]"
             >
               {{ t('admin.groups.accountsCount', { count: 0 }) }}
             </span>
@@ -233,7 +239,7 @@
               <span v-else class="text-sm text-gray-400">-</span>
               <div
                 v-if="typeof row.quality_checked === 'number'"
-                class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400"
+                class="flex items-center gap-1 text-xs text-gray-500"
                 :title="row.quality_summary || undefined"
               >
                 <span>{{ t('admin.proxies.qualityInline', { grade: row.quality_grade || '-', score: row.quality_score ?? '-' }) }}</span>
@@ -255,7 +261,7 @@
               <button
                 @click="handleTestConnection(row)"
                 :disabled="testingProxyIds.has(row.id)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <svg
                   v-if="testingProxyIds.has(row.id)"
@@ -283,7 +289,7 @@
               <button
                 @click="handleQualityCheck(row)"
                 :disabled="qualityCheckingProxyIds.has(row.id)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <svg
                   v-if="qualityCheckingProxyIds.has(row.id)"
@@ -310,14 +316,14 @@
               </button>
               <button
                 @click="handleEdit(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t('common.edit') }}</span>
               </button>
               <button
                 @click="handleDelete(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <Icon name="trash" size="sm" />
                 <span class="text-xs">{{ t('common.delete') }}</span>
@@ -348,6 +354,7 @@
         />
       </template>
     </TablePageLayout>
+    </div>
 
     <!-- Create Proxy Modal -->
     <BaseDialog
@@ -365,7 +372,7 @@
             '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
             createMode === 'standard'
               ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
           ]"
         >
           <Icon name="plus" size="sm" class="mr-1.5 inline" />
@@ -378,7 +385,7 @@
             '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
             createMode === 'batch'
               ? 'border-[var(--border-focus)] text-[var(--accent)] text-[var(--accent)]'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
           ]"
         >
           <svg
@@ -463,7 +470,7 @@
             />
             <button
               type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               @click="createPasswordVisible = !createPasswordVisible"
             >
               <Icon :name="createPasswordVisible ? 'eyeOff' : 'eye'" size="md" />
@@ -494,7 +501,7 @@
             <div class="flex items-center gap-4 text-sm">
               <div class="flex items-center gap-1.5">
               <Icon name="checkCircle" size="sm" :stroke-width="2" class="text-[var(--accent)]" />
-              <span class="text-gray-700 dark:text-gray-300">
+              <span class="text-gray-700">
                 {{ t('admin.proxies.parsedCount', { count: batchParseResult.valid }) }}
               </span>
             </div>
@@ -505,7 +512,7 @@
                 :stroke-width="2"
                 class="text-amber-500"
               />
-              <span class="text-amber-600 dark:text-amber-400">
+              <span class="text-amber-600">
                 {{ t('admin.proxies.invalidCount', { count: batchParseResult.invalid }) }}
               </span>
             </div>
@@ -523,7 +530,7 @@
                   d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
                 />
               </svg>
-              <span class="text-gray-500 dark:text-gray-400">
+              <span class="text-gray-500">
                 {{ t('admin.proxies.duplicateCount', { count: batchParseResult.duplicate }) }}
               </span>
             </div>
@@ -657,7 +664,7 @@
             />
             <button
               type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               @click="editPasswordVisible = !editPasswordVisible"
             >
               <Icon :name="editPasswordVisible ? 'eyeOff' : 'eye'" size="md" />
@@ -758,23 +765,23 @@
         <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
           <div class="flex items-center justify-between gap-4">
             <div>
-              <div class="text-sm text-gray-500 dark:text-gray-400">
+              <div class="text-sm text-gray-500">
                 {{ qualityReportProxy?.name || '-' }}
               </div>
-              <div class="mt-1 text-sm text-gray-700 dark:text-gray-200">
+              <div class="mt-1 text-sm text-gray-700">
                 {{ qualityReport.summary }}
               </div>
             </div>
             <div class="text-right">
-              <div class="text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+              <div class="text-2xl font-semibold text-gray-900">
                 {{ qualityReport.score }}
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400">
+              <div class="text-xs text-gray-500">
                 {{ t('admin.proxies.qualityGrade', { grade: qualityReport.grade }) }}
               </div>
             </div>
           </div>
-          <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-300">
+          <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600">
             <div>{{ t('admin.proxies.qualityExitIP') }}: {{ qualityReport.exit_ip || '-' }}</div>
             <div>{{ t('admin.proxies.qualityCountry') }}: {{ qualityReport.country || '-' }}</div>
             <div>
@@ -786,7 +793,7 @@
         </div>
 
         <div class="max-h-80 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
-          <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-dark-700">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-xs uppercase text-gray-500 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]">
               <tr>
                 <th class="px-3 py-2 text-left">{{ t('admin.proxies.qualityTableTarget') }}</th>
@@ -796,17 +803,17 @@
                 <th class="px-3 py-2 text-left">{{ t('admin.proxies.qualityTableMessage') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
+            <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)]">
               <tr v-for="item in qualityReport.items" :key="item.target">
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">{{ qualityTargetLabel(item.target) }}</td>
+                <td class="px-3 py-2 text-gray-900">{{ qualityTargetLabel(item.target) }}</td>
                 <td class="px-3 py-2">
                   <span class="badge" :class="qualityStatusClass(item.status)">{{ qualityStatusLabel(item.status) }}</span>
                 </td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-300">{{ item.http_status ?? '-' }}</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-300">
+                <td class="px-3 py-2 text-gray-600">{{ item.http_status ?? '-' }}</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ typeof item.latency_ms === 'number' ? `${item.latency_ms}ms` : '-' }}
                 </td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-300">
+                <td class="px-3 py-2 text-gray-600">
                   <span>{{ item.message || '-' }}</span>
                   <span v-if="item.cf_ray" class="ml-1 text-xs text-gray-400">(cf-ray: {{ item.cf_ray }})</span>
                 </td>
@@ -839,7 +846,7 @@
         {{ t('admin.proxies.accountsEmpty') }}
       </div>
       <div v-else class="max-h-80 overflow-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-dark-700">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-gray-50 text-xs uppercase text-gray-500 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]">
             <tr>
               <th class="px-4 py-2 text-left">{{ t('admin.proxies.accountName') }}</th>
@@ -847,13 +854,13 @@
               <th class="px-4 py-2 text-left">{{ t('admin.proxies.accountNotes') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] dark:divide-dark-700 bg-[var(--bg-surface-alt)]">
+          <tbody class="divide-y divide-gray-200 bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)]">
             <tr v-for="account in proxyAccounts" :key="account.id">
-              <td class="px-4 py-2 font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ account.name }}</td>
+              <td class="px-4 py-2 font-medium text-gray-900">{{ account.name }}</td>
               <td class="px-4 py-2">
                 <PlatformTypeBadge :platform="account.platform" :type="account.type" />
               </td>
-              <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+              <td class="px-4 py-2 text-gray-600">
                 {{ account.notes || '-' }}
               </td>
             </tr>
@@ -881,6 +888,7 @@ import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'

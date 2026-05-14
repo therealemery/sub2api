@@ -8,7 +8,7 @@
   }
 
   html {
-    @apply scroll-smooth antialiased;
+    @apply antialiased;
     overflow-x: hidden;
   }
 
@@ -18,11 +18,6 @@
     background: var(--bg-page);
     color: var(--text-primary);
   }
-
-  .dark body {
-    background: var(--bg-page);
-  }
-
 
   @supports (-moz-appearance:none) {
     * {
@@ -35,10 +30,6 @@
       scrollbar-color: var(--border-default) transparent;
     }
 
-    .dark *:hover,
-    .dark *:focus-within {
-      scrollbar-color: var(--border-default) transparent;
-    }
   }
 
   ::-webkit-scrollbar {
@@ -63,7 +54,7 @@
     background: var(--border-strong);
   }
 
-  /* 闁鑵戦弬鍥ㄦ拱閺嶅嘲绱?*/
+  /* Text selection follows the single light UI token set. */
   ::selection {
     background: var(--accent-soft);
     color: var(--accent);
@@ -864,9 +855,17 @@
   }
 
   .data-table {
+    width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
     background: var(--bg-surface);
+  }
+
+  .data-table th,
+  .data-table td {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .data-table th {
@@ -1055,9 +1054,8 @@
   }
 }
 
-/* ============ RELAY-UI-SPEC v2.0 Final Lock ============ */
-:root,
-html[data-theme='light'] {
+/* ============ RELAY-UI-SPEC v2.0 Base Tokens ============ */
+:root {
   --palette-paper: #fafaf7;
   --palette-paper-warm: #f5f3ec;
   --palette-paper-card: #ffffff;
@@ -1152,41 +1150,6 @@ html[data-theme='light'] {
   --color-money-soft: var(--status-success-soft);
 }
 
-html.dark,
-html[data-theme='dark'] {
-  --bg-page: #1c1b17;
-  --bg-surface: #252420;
-  --bg-surface-alt: #2a2925;
-  --bg-subtle: #302e29;
-  --bg-inverse: #e8e6df;
-  --text-primary: #e8e6df;
-  --text-secondary: #c7c2b8;
-  --text-muted: #a6a097;
-  --text-faint: #7f786e;
-  --text-inverse: #e8e6df;
-  --text-link: #d96941;
-  --border-default: #3a3833;
-  --border-soft: #302e29;
-  --border-strong: #5f5b52;
-  --border-focus: #d96941;
-  --accent: #d96941;
-  --accent-hover: #bf5731;
-  --accent-contrast: #ffffff;
-  --accent-soft: #4a2a1f;
-  --accent-wash: #2a1f1a;
-  --status-success: #6fa052;
-  --status-success-soft: #2a3a22;
-  --status-warn: #d4a84a;
-  --status-warn-soft: #3a2d17;
-  --status-danger: #d36a5a;
-  --status-danger-soft: #3a211d;
-  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
-  --backdrop-bg: rgba(0, 0, 0, 0.52);
-  --input-bg: #2a2925;
-  --input-bg-hover: #302e29;
-}
-
 html,
 body,
 #app {
@@ -1200,8 +1163,7 @@ body {
   background-image: none !important;
 }
 
-.app-shell,
-.dark .app-shell {
+.app-shell {
   background: var(--bg-page) !important;
   color: var(--text-primary) !important;
 }
@@ -1216,10 +1178,7 @@ body {
 
 .app-header,
 .sidebar,
-.sidebar-footer,
-.dark .app-header,
-.dark .sidebar,
-.dark .sidebar-footer {
+.sidebar-footer {
   border-color: var(--border-default) !important;
   background: var(--bg-surface) !important;
   color: var(--text-primary) !important;
@@ -1327,22 +1286,14 @@ body {
 .app-shell .text-gray-400,
 .app-shell .text-gray-500,
 .app-shell .text-gray-600,
-.app-shell .text-gray-700,
-.dark .app-shell .dark\:text-gray-400,
-.dark .app-shell .dark\:text-gray-300,
-.dark .app-shell .dark\:text-dark-300,
-.dark .app-shell .dark\:text-dark-400 {
+.app-shell .text-gray-700 {
   color: var(--text-muted) !important;
 }
 
 .app-shell .text-gray-800,
 .app-shell .text-gray-900,
-.app-shell .text-black,
-.dark .app-shell .dark\:text-white,
-.dark .app-shell .dark\:text-gray-100,
 .modal-content .text-gray-800,
-.modal-content .text-gray-900,
-.dark .modal-content .dark\:text-white {
+.modal-content .text-gray-900 {
   color: var(--text-primary) !important;
 }
 
@@ -1575,8 +1526,7 @@ body {
   color: var(--text-primary) !important;
 }
 
-.app-shell .sidebar-link-active,
-.dark .app-shell .sidebar-link-active {
+.app-shell .sidebar-link-active {
   background: var(--accent-soft) !important;
   color: var(--accent) !important;
 }
@@ -1671,16 +1621,10 @@ body {
 .app-shell .bg-gray-50,
 .app-shell .bg-gray-100,
 .app-shell .bg-gray-200,
-.app-shell .bg-white,
 .app-shell .bg-cyan-50,
 .app-shell .bg-teal-50,
 .app-shell .bg-sky-50,
-.app-shell .bg-indigo-50,
-.dark .app-shell .dark\:bg-dark-500,
-.dark .app-shell .dark\:bg-dark-600,
-.dark .app-shell .dark\:bg-dark-700,
-.dark .app-shell .dark\:bg-dark-800,
-.dark .app-shell .dark\:bg-dark-900 {
+.app-shell .bg-indigo-50 {
   background-color: var(--bg-surface-alt) !important;
 }
 
@@ -1688,10 +1632,6 @@ body {
 .app-shell .border-gray-200,
 .app-shell .border-gray-300,
 .app-shell .border-gray-400,
-.dark .app-shell .dark\:border-dark-500,
-.dark .app-shell .dark\:border-dark-600,
-.dark .app-shell .dark\:border-dark-700,
-.dark .app-shell .dark\:border-dark-800,
 .modal-content .border-gray-100,
 .modal-content .border-gray-200,
 .modal-content .border-gray-300 {
@@ -1825,20 +1765,14 @@ body {
   color: var(--text-primary) !important;
 }
 
-.modal-content [class~='bg-white'],
 .modal-content [class~='bg-gray-50'],
 .modal-content [class~='bg-gray-100'],
 .modal-content [class~='bg-amber-50'],
 .modal-content [class~='bg-green-50'],
-.dialog-container [class~='bg-white'],
 .dialog-container [class~='bg-gray-50'],
 .dialog-container [class~='bg-gray-100'],
 .dialog-container [class~='bg-amber-50'],
-.dialog-container [class~='bg-green-50'],
-.dark .modal-content [class~='dark:bg-dark-700'],
-.dark .modal-content [class~='dark:bg-dark-800'],
-.dark .modal-content [class~='dark:bg-amber-900/20'],
-.dark .modal-content [class~='dark:bg-green-900/20'] {
+.dialog-container [class~='bg-green-50'] {
   background: var(--bg-surface-alt) !important;
 }
 
@@ -1921,50 +1855,6 @@ body {
   --duration-modal: 200ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 
-}
-
-.dark {
-  --palette-paper: #1c1b17;
-  --palette-surface: #252420;
-  --palette-surface-alt: #2f2d28;
-  --palette-subtle: #343129;
-  --palette-line: #444037;
-  --palette-line-strong: #5b554b;
-  --palette-text: #f0eee7;
-  --palette-text-secondary: #d5d1c6;
-  --palette-muted: #a29c90;
-  --palette-accent: #d96941;
-  --palette-accent-hover: #e27a56;
-  --palette-accent-pressed: #bf5731;
-  --palette-accent-soft: #4a2a1f;
-  --palette-accent-wash: #31241e;
-  --palette-success: #75c594;
-  --palette-danger: #ed8a7d;
-  --palette-warning: #e4be6c;
-  --bg-page: var(--palette-paper);
-  --bg-surface: var(--palette-surface);
-  --bg-surface-alt: var(--palette-surface-alt);
-  --bg-subtle: var(--palette-subtle);
-  --text-primary: var(--palette-text);
-  --text-secondary: var(--palette-text-secondary);
-  --text-muted: var(--palette-muted);
-  --text-inverse: var(--palette-text);
-  --border-default: var(--palette-line);
-  --border-strong: var(--palette-line-strong);
-  --border-focus: var(--palette-accent);
-  --accent: var(--palette-accent);
-  --accent-hover: var(--palette-accent-hover);
-  --accent-pressed: var(--palette-accent-pressed);
-  --accent-contrast: #ffffff;
-  --accent-soft: var(--palette-accent-soft);
-  --accent-wash: var(--palette-accent-wash);
-  --success: var(--palette-success);
-  --danger: var(--palette-danger);
-  --warning: var(--palette-warning);
-  --backdrop-bg: rgb(13 12 10 / 62%);
-  --shadow-overlay: 0 20px 54px rgb(0 0 0 / 42%);
-  --input-bg: var(--bg-surface);
-  --input-bg-hover: var(--bg-surface-alt);
 }
 
 html,
@@ -2110,7 +2000,9 @@ body,
 .app-shell button[class*='bg-blue'],
 .app-shell button[class*='bg-sky'],
 .app-shell button[class*='bg-cyan'],
-.app-shell button[class*='bg-teal'] {
+.app-shell button[class*='bg-teal'],
+.app-shell button[class*='bg-emerald'],
+.app-shell button[class*='bg-green'] {
   border-color: var(--accent) !important;
   background: var(--accent) !important;
   color: var(--accent-contrast) !important;
@@ -2122,7 +2014,9 @@ body,
 .app-shell button[class*='bg-blue']:hover,
 .app-shell button[class*='bg-sky']:hover,
 .app-shell button[class*='bg-cyan']:hover,
-.app-shell button[class*='bg-teal']:hover {
+.app-shell button[class*='bg-teal']:hover,
+.app-shell button[class*='bg-emerald']:hover,
+.app-shell button[class*='bg-green']:hover {
   border-color: var(--accent-hover) !important;
   background: var(--accent-hover) !important;
   color: var(--accent-contrast) !important;
@@ -2219,29 +2113,6 @@ body,
   background: var(--bg-surface-alt) !important;
 }
 
-.modal-content [class*='bg-blue-'],
-.modal-content [class*='bg-sky-'],
-.modal-content [class*='bg-cyan-'],
-.modal-content [class*='bg-teal-'],
-.modal-content [class*='bg-primary-'],
-.dialog-container [class*='bg-blue-'],
-.dialog-container [class*='bg-sky-'],
-.dialog-container [class*='bg-cyan-'],
-.dialog-container [class*='bg-teal-'],
-.dialog-container [class*='bg-primary-'] {
-  background: var(--bg-surface-alt) !important;
-  color: var(--text-primary) !important;
-}
-
-.app-shell [class*='bg-blue-'],
-.app-shell [class*='bg-sky-'],
-.app-shell [class*='bg-cyan-'],
-.app-shell [class*='bg-teal-'],
-.app-shell [class*='bg-primary-'] {
-  background-color: var(--accent-soft) !important;
-  color: var(--accent) !important;
-}
-
 .app-shell [class*='bg-gray-'],
 .app-shell [class*='bg-slate-'],
 .app-shell [class*='bg-zinc-'],
@@ -2251,27 +2122,11 @@ body,
   color: var(--text-primary) !important;
 }
 
-.app-shell [class*='text-blue-'],
-.app-shell [class*='text-sky-'],
-.app-shell [class*='text-cyan-'],
-.app-shell [class*='text-teal-'],
-.app-shell [class*='text-primary-'] {
-  color: var(--accent) !important;
-}
-
 .app-shell [class*='text-gray-'],
 .app-shell [class*='text-slate-'],
 .app-shell [class*='text-zinc-'],
 .app-shell [class*='text-neutral-'] {
   color: var(--text-muted) !important;
-}
-
-.app-shell [class*='border-blue-'],
-.app-shell [class*='border-sky-'],
-.app-shell [class*='border-cyan-'],
-.app-shell [class*='border-teal-'],
-.app-shell [class*='border-primary-'] {
-  border-color: var(--border-focus) !important;
 }
 
 .app-shell [class*='border-gray-'],
@@ -2286,12 +2141,6 @@ body,
 .app-shell [class*='to-'],
 .app-shell [class*='bg-gradient'] {
   background-image: none !important;
-}
-
-.app-shell [class~='transition-all'] {
-  transition-property: background-color, border-color, color, opacity, transform !important;
-  transition-duration: var(--duration-base) !important;
-  transition-timing-function: var(--ease-standard) !important;
 }
 
 .app-shell input,
@@ -2376,8 +2225,7 @@ body,
 
 /* Final UI cleanup: remove decorative left rails and stabilize dense admin pages. */
 .app-shell .sidebar-link::before,
-.app-shell .sidebar-link-active::before,
-.dark .app-shell .sidebar-link-active::before {
+.app-shell .sidebar-link-active::before {
   content: none !important;
   display: none !important;
 }
@@ -2782,493 +2630,14 @@ body,
   stroke-width: 2.8 !important;
 }
 
-/* Dark contrast guard: old Tailwind text utilities must not leak dark ink into dark surfaces. */
-.dark .app-shell,
-.dark .modal-content,
-.dark .dialog-container,
-.dark .popover-content,
-.dark .dropdown-menu {
-  color: var(--text-primary) !important;
-}
-
-.dark .app-shell :is(
-  .text-black,
-  .text-gray-950,
-  .text-gray-900,
-  .text-gray-800,
-  .text-gray-700,
-  .text-slate-950,
-  .text-slate-900,
-  .text-slate-800,
-  .text-slate-700,
-  .text-zinc-950,
-  .text-zinc-900,
-  .text-zinc-800,
-  .text-zinc-700,
-  .text-neutral-950,
-  .text-neutral-900,
-  .text-neutral-800,
-  .text-neutral-700,
-  .dark\:text-white,
-  .dark\:text-gray-50,
-  .dark\:text-gray-100,
-  .dark\:text-gray-200,
-  .dark\:text-slate-50,
-  .dark\:text-slate-100,
-  .dark\:text-slate-200,
-  .dark\:text-zinc-50,
-  .dark\:text-zinc-100,
-  .dark\:text-zinc-200,
-  .dark\:text-neutral-50,
-  .dark\:text-neutral-100,
-  .dark\:text-neutral-200,
-  .dark\:text-dark-50,
-  .dark\:text-dark-100,
-  .dark\:text-dark-200
-),
-.dark .modal-content :is(
-  .text-black,
-  .text-gray-950,
-  .text-gray-900,
-  .text-gray-800,
-  .text-gray-700,
-  .text-slate-950,
-  .text-slate-900,
-  .text-slate-800,
-  .text-slate-700,
-  .text-zinc-950,
-  .text-zinc-900,
-  .text-zinc-800,
-  .text-zinc-700,
-  .text-neutral-950,
-  .text-neutral-900,
-  .text-neutral-800,
-  .text-neutral-700,
-  .dark\:text-white,
-  .dark\:text-gray-50,
-  .dark\:text-gray-100,
-  .dark\:text-gray-200,
-  .dark\:text-slate-50,
-  .dark\:text-slate-100,
-  .dark\:text-slate-200,
-  .dark\:text-zinc-50,
-  .dark\:text-zinc-100,
-  .dark\:text-zinc-200,
-  .dark\:text-neutral-50,
-  .dark\:text-neutral-100,
-  .dark\:text-neutral-200,
-  .dark\:text-dark-50,
-  .dark\:text-dark-100,
-  .dark\:text-dark-200
-),
-.dark .dialog-container :is(
-  .text-black,
-  .text-gray-950,
-  .text-gray-900,
-  .text-gray-800,
-  .text-gray-700,
-  .text-slate-950,
-  .text-slate-900,
-  .text-slate-800,
-  .text-slate-700,
-  .text-zinc-950,
-  .text-zinc-900,
-  .text-zinc-800,
-  .text-zinc-700,
-  .text-neutral-950,
-  .text-neutral-900,
-  .text-neutral-800,
-  .text-neutral-700,
-  .dark\:text-white,
-  .dark\:text-gray-50,
-  .dark\:text-gray-100,
-  .dark\:text-gray-200,
-  .dark\:text-slate-50,
-  .dark\:text-slate-100,
-  .dark\:text-slate-200,
-  .dark\:text-zinc-50,
-  .dark\:text-zinc-100,
-  .dark\:text-zinc-200,
-  .dark\:text-neutral-50,
-  .dark\:text-neutral-100,
-  .dark\:text-neutral-200,
-  .dark\:text-dark-50,
-  .dark\:text-dark-100,
-  .dark\:text-dark-200
-) {
-  color: var(--text-primary) !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-
-.dark .app-shell :is(
-  .text-gray-600,
-  .text-gray-500,
-  .text-slate-600,
-  .text-slate-500,
-  .text-zinc-600,
-  .text-zinc-500,
-  .text-neutral-600,
-  .text-neutral-500,
-  .dark\:text-gray-300,
-  .dark\:text-gray-400,
-  .dark\:text-slate-300,
-  .dark\:text-slate-400,
-  .dark\:text-zinc-300,
-  .dark\:text-zinc-400,
-  .dark\:text-neutral-300,
-  .dark\:text-neutral-400,
-  .dark\:text-dark-300,
-  .dark\:text-dark-400
-),
-.dark .modal-content :is(
-  .text-gray-600,
-  .text-gray-500,
-  .text-slate-600,
-  .text-slate-500,
-  .text-zinc-600,
-  .text-zinc-500,
-  .text-neutral-600,
-  .text-neutral-500,
-  .dark\:text-gray-300,
-  .dark\:text-gray-400,
-  .dark\:text-slate-300,
-  .dark\:text-slate-400,
-  .dark\:text-zinc-300,
-  .dark\:text-zinc-400,
-  .dark\:text-neutral-300,
-  .dark\:text-neutral-400,
-  .dark\:text-dark-300,
-  .dark\:text-dark-400
-),
-.dark .dialog-container :is(
-  .text-gray-600,
-  .text-gray-500,
-  .text-slate-600,
-  .text-slate-500,
-  .text-zinc-600,
-  .text-zinc-500,
-  .text-neutral-600,
-  .text-neutral-500,
-  .dark\:text-gray-300,
-  .dark\:text-gray-400,
-  .dark\:text-slate-300,
-  .dark\:text-slate-400,
-  .dark\:text-zinc-300,
-  .dark\:text-zinc-400,
-  .dark\:text-neutral-300,
-  .dark\:text-neutral-400,
-  .dark\:text-dark-300,
-  .dark\:text-dark-400
-) {
-  color: var(--text-secondary) !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-
-.dark .app-shell :is(
-  .text-gray-400,
-  .text-gray-300,
-  .text-slate-400,
-  .text-slate-300,
-  .text-zinc-400,
-  .text-zinc-300,
-  .text-neutral-400,
-  .text-neutral-300,
-  .dark\:text-gray-500,
-  .dark\:text-slate-500,
-  .dark\:text-zinc-500,
-  .dark\:text-neutral-500,
-  .dark\:text-dark-500
-),
-.dark .modal-content :is(
-  .text-gray-400,
-  .text-gray-300,
-  .text-slate-400,
-  .text-slate-300,
-  .text-zinc-400,
-  .text-zinc-300,
-  .text-neutral-400,
-  .text-neutral-300,
-  .dark\:text-gray-500,
-  .dark\:text-slate-500,
-  .dark\:text-zinc-500,
-  .dark\:text-neutral-500,
-  .dark\:text-dark-500
-),
-.dark .dialog-container :is(
-  .text-gray-400,
-  .text-gray-300,
-  .text-slate-400,
-  .text-slate-300,
-  .text-zinc-400,
-  .text-zinc-300,
-  .text-neutral-400,
-  .text-neutral-300,
-  .dark\:text-gray-500,
-  .dark\:text-slate-500,
-  .dark\:text-zinc-500,
-  .dark\:text-neutral-500,
-  .dark\:text-dark-500
-) {
-  color: var(--text-muted) !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-
-.dark .app-shell :is(input, textarea, select, .form-input, .form-select, .search-input),
-.dark .modal-content :is(input, textarea, select, .form-input, .form-select, .search-input),
-.dark .dialog-container :is(input, textarea, select, .form-input, .form-select, .search-input) {
-  color: var(--text-primary) !important;
-  -webkit-text-fill-color: currentColor !important;
-}
-
-.dark .app-shell :is(input, textarea, select)::placeholder,
-.dark .modal-content :is(input, textarea, select)::placeholder,
-.dark .dialog-container :is(input, textarea, select)::placeholder {
-  color: var(--text-muted) !important;
-  -webkit-text-fill-color: currentColor !important;
-  opacity: 1 !important;
-}
-
-/* Dark surface guard: legacy white/gray background utilities must not create white panels. */
-html.dark,
-html.dark body,
-html.dark #app {
-  color: var(--text-primary) !important;
-  background: var(--bg-page) !important;
-  color-scheme: dark;
-}
-
-.dark .app-shell :is(
-  .bg-white,
-  .dark\:bg-white,
-  .bg-\[\#fff\],
-  .bg-\[\#ffffff\],
-  .dark\:bg-\[\#fff\],
-  .dark\:bg-\[\#ffffff\]
-),
-.dark .modal-content :is(
-  .bg-white,
-  .dark\:bg-white,
-  .bg-\[\#fff\],
-  .bg-\[\#ffffff\],
-  .dark\:bg-\[\#fff\],
-  .dark\:bg-\[\#ffffff\]
-),
-.dark .dialog-container :is(
-  .bg-white,
-  .dark\:bg-white,
-  .bg-\[\#fff\],
-  .bg-\[\#ffffff\],
-  .dark\:bg-\[\#fff\],
-  .dark\:bg-\[\#ffffff\]
-) {
-  background: var(--bg-surface) !important;
-}
-
-.dark .app-shell :is(
-  .bg-gray-50,
-  .bg-gray-100,
-  .bg-gray-50\/50,
-  .bg-gray-50\/70,
-  .bg-gray-50\/90,
-  .bg-gray-100\/50,
-  .dark\:bg-gray-50,
-  .dark\:bg-gray-100,
-  .dark\:bg-gray-700,
-  .dark\:bg-gray-800,
-  .dark\:bg-gray-900,
-  .dark\:bg-dark-500,
-  .dark\:bg-dark-600,
-  .dark\:bg-dark-700,
-  .dark\:bg-dark-800,
-  .dark\:bg-dark-900
-),
-.dark .modal-content :is(
-  .bg-gray-50,
-  .bg-gray-100,
-  .bg-gray-50\/50,
-  .bg-gray-50\/70,
-  .bg-gray-50\/90,
-  .bg-gray-100\/50,
-  .dark\:bg-gray-50,
-  .dark\:bg-gray-100,
-  .dark\:bg-gray-700,
-  .dark\:bg-gray-800,
-  .dark\:bg-gray-900,
-  .dark\:bg-dark-500,
-  .dark\:bg-dark-600,
-  .dark\:bg-dark-700,
-  .dark\:bg-dark-800,
-  .dark\:bg-dark-900
-),
-.dark .dialog-container :is(
-  .bg-gray-50,
-  .bg-gray-100,
-  .bg-gray-50\/50,
-  .bg-gray-50\/70,
-  .bg-gray-50\/90,
-  .bg-gray-100\/50,
-  .dark\:bg-gray-50,
-  .dark\:bg-gray-100,
-  .dark\:bg-gray-700,
-  .dark\:bg-gray-800,
-  .dark\:bg-gray-900,
-  .dark\:bg-dark-500,
-  .dark\:bg-dark-600,
-  .dark\:bg-dark-700,
-  .dark\:bg-dark-800,
-  .dark\:bg-dark-900
-) {
-  background: var(--bg-surface-alt) !important;
-}
-
-.dark .app-shell :is(
-  .hover\:bg-white:hover,
-  .hover\:bg-gray-50:hover,
-  .hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-white:hover,
-  .dark\:hover\:bg-gray-50:hover,
-  .dark\:hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-dark-500:hover,
-  .dark\:hover\:bg-dark-600:hover,
-  .dark\:hover\:bg-dark-700:hover,
-  .dark\:hover\:bg-dark-800:hover
-),
-.dark .modal-content :is(
-  .hover\:bg-white:hover,
-  .hover\:bg-gray-50:hover,
-  .hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-white:hover,
-  .dark\:hover\:bg-gray-50:hover,
-  .dark\:hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-dark-500:hover,
-  .dark\:hover\:bg-dark-600:hover,
-  .dark\:hover\:bg-dark-700:hover,
-  .dark\:hover\:bg-dark-800:hover
-),
-.dark .dialog-container :is(
-  .hover\:bg-white:hover,
-  .hover\:bg-gray-50:hover,
-  .hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-white:hover,
-  .dark\:hover\:bg-gray-50:hover,
-  .dark\:hover\:bg-gray-100:hover,
-  .dark\:hover\:bg-dark-500:hover,
-  .dark\:hover\:bg-dark-600:hover,
-  .dark\:hover\:bg-dark-700:hover,
-  .dark\:hover\:bg-dark-800:hover
-) {
-  background: var(--bg-subtle) !important;
-}
-
-/* Dark text guard: legacy Tailwind text utilities and inverse tokens must not render as black text. */
-html.dark .app-shell,
-html.dark .modal-content,
-html.dark .dialog-container,
-.dark .app-shell,
-.dark .modal-content,
-.dark .dialog-container {
-  --text-inverse: var(--text-primary);
-}
-
-html.dark .app-shell :is(
-  [class~='text-[var(--text-inverse)]'],
-  [class~='dark:text-[var(--text-inverse)]'],
-  [class*='text-gray-9'],
-  [class*='text-gray-8'],
-  [class*='text-slate-9'],
-  [class*='text-slate-8'],
-  [class*='text-zinc-9'],
-  [class*='text-zinc-8'],
-  [class*='text-neutral-9'],
-  [class*='text-neutral-8'],
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  strong,
-  b,
-  th
-),
-html.dark .modal-content :is(
-  [class~='text-[var(--text-inverse)]'],
-  [class~='dark:text-[var(--text-inverse)]'],
-  [class*='text-gray-9'],
-  [class*='text-gray-8'],
-  [class*='text-slate-9'],
-  [class*='text-slate-8'],
-  [class*='text-zinc-9'],
-  [class*='text-zinc-8'],
-  [class*='text-neutral-9'],
-  [class*='text-neutral-8'],
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  strong,
-  b,
-  th
-),
-html.dark .dialog-container :is(
-  [class~='text-[var(--text-inverse)]'],
-  [class~='dark:text-[var(--text-inverse)]'],
-  [class*='text-gray-9'],
-  [class*='text-gray-8'],
-  [class*='text-slate-9'],
-  [class*='text-slate-8'],
-  [class*='text-zinc-9'],
-  [class*='text-zinc-8'],
-  [class*='text-neutral-9'],
-  [class*='text-neutral-8'],
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  strong,
-  b,
-  th
-) {
-  color: var(--text-primary) !important;
-  -webkit-text-fill-color: currentColor !important;
-  -webkit-text-stroke-width: 0 !important;
-  text-shadow: none !important;
-}
-
-html.dark .app-shell :is([style*='color: #111'], [style*='color:#111'], [style*='color: rgb(17']),
-html.dark .modal-content :is([style*='color: #111'], [style*='color:#111'], [style*='color: rgb(17']),
-html.dark .dialog-container :is([style*='color: #111'], [style*='color:#111'], [style*='color: rgb(17']) {
-  color: var(--text-primary) !important;
-  -webkit-text-fill-color: currentColor !important;
-  -webkit-text-stroke-width: 0 !important;
-  text-shadow: none !important;
-}
-
-/* Brand logo theme switch: use fixed light/dark image assets without filters or stretching. */
-.theme-logo-light,
-.theme-logo-dark {
+/* Brand logo: single light UI asset, no theme switching or filter distortion. */
+.site-logo-img {
   display: block;
   height: 100%;
   width: 100%;
   object-fit: contain;
   object-position: center;
   filter: none !important;
-}
-
-.theme-logo-dark {
-  display: none !important;
-}
-
-html.dark .theme-logo-light {
-  display: none !important;
-}
-
-html.dark .theme-logo-dark {
-  display: block !important;
 }
 
 /* Form control visibility guard: keep inputs readable in pages, dialogs and admin config panels. */
@@ -3419,9 +2788,7 @@ html.dark .theme-logo-dark {
 
 /* RELAY v2 final stabilizer: remove legacy bars, hover jumping, double focus rings and dark-mode white panels. */
 .app-shell,
-.app-shell :is(.app-main, .main-content, .page-content, .dashboard-page, .models-page, .monitor-page, .channel-status-page),
-html.dark .app-shell,
-html.dark .app-shell :is(.app-main, .main-content, .page-content, .dashboard-page, .models-page, .monitor-page, .channel-status-page) {
+.app-shell :is(.app-main, .main-content, .page-content, .dashboard-page, .models-page, .monitor-page, .channel-status-page) {
   background: var(--bg-page) !important;
   color: var(--text-primary) !important;
 }
@@ -3620,47 +2987,13 @@ html.dark .app-shell :is(.app-main, .main-content, .page-content, .dashboard-pag
   box-shadow: none !important;
 }
 
-html.dark .app-shell :is(
-  .bg-white,
-  [class~='bg-white'],
-  [class*='bg-gray-50'],
-  [class*='bg-gray-100'],
-  [class*='bg-slate-50'],
-  [class*='bg-zinc-50'],
-  [class*='bg-neutral-50']
-) {
-  background: var(--bg-surface) !important;
-  color: var(--text-primary) !important;
-}
-
-html.dark .app-shell :is(
-  .text-black,
-  [class~='text-black'],
-  [class*='text-gray-900'],
-  [class*='text-slate-900'],
-  [class*='text-zinc-900'],
-  [class*='text-neutral-900']
-) {
-  color: var(--text-primary) !important;
-  -webkit-text-fill-color: currentColor !important;
-  -webkit-text-stroke-width: 0 !important;
-  text-shadow: none !important;
-}
-
 /* OwnAPI RELAY v2 project lock: keep visible hierarchy stable across user and admin pages. */
 html,
 body,
-#app,
-html.dark,
-html.dark body,
-html.dark #app {
+#app {
   min-height: 100%;
   background: var(--bg-page) !important;
   color: var(--text-primary) !important;
-}
-
-.app-shell :is(.transition-all, [class*='transition-all']) {
-  transition: none !important;
 }
 
 .app-shell .page-intro {
@@ -3696,10 +3029,6 @@ html.dark #app {
   color: var(--text-primary) !important;
 }
 
-.app-shell :is(.card, .table-page, .table-card, .table-filter-bar, .table-scroll-container, .empty-state) :is(.bg-white, [class~='bg-white']) {
-  background: var(--bg-surface-alt) !important;
-}
-
 .app-shell :is(.data-table-row, .select-option, .sidebar-link, .nav-link, .model-card, .admin-model-card, .featured-model-card, .ecosystem-card):hover {
   transition: none !important;
 }
@@ -3725,9 +3054,742 @@ html.dark #app {
   stroke-width: 2.4 !important;
 }
 
-html.dark .app-shell :is(.models-page, .monitor-page, .channel-status-page, .dashboard-page, .profile-page, .keys-page),
-html.dark .app-shell :is(.models-section, .models-guide, .model-card, .featured-model-card, .ecosystem-card, .monitor-card, .channel-card) {
-  background-color: var(--bg-page) !important;
+/* Stitch review integration: keep the usable admin-list and model-card ideas without importing static HTML. */
+.app-shell :is(.models-page, .channel-status-page, .usage-page, .table-page-with-intro, .admin-model-center-page, .admin-list-page) {
+  display: grid !important;
+  gap: 26px !important;
+  width: 100% !important;
+}
+
+.app-shell .admin-list-page {
+  max-width: 1240px !important;
+  margin: 0 auto !important;
+}
+
+.app-shell .admin-list-page .table-page-layout {
+  height: auto !important;
+  min-height: 560px !important;
+}
+
+.app-shell .admin-list-page .layout-section-scrollable {
+  min-height: 420px !important;
+}
+
+.app-shell :is(.models-section, .models-guide, .model-admin-panel, .model-save-bar, .table-filter-bar, .table-scroll-container, .ops-dashboard-header) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
   color: var(--text-primary) !important;
+}
+
+.app-shell .table-filter-bar {
+  padding: 14px !important;
+}
+
+.app-shell .table-scroll-container {
+  min-height: 360px;
+}
+
+.app-shell .data-table th,
+.app-shell .table-scroll-container th {
+  height: 42px !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.app-shell .data-table td,
+.app-shell .table-scroll-container td {
+  padding-top: 13px !important;
+  padding-bottom: 13px !important;
+}
+
+.app-shell :is(.data-table-row, .data-table-row td, .table-scroll-container tbody tr, .table-scroll-container tbody td) {
+  transition: none !important;
+}
+
+.app-shell .table-scroll-container:hover {
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .table-scroll-container tbody tr.data-table-row:hover,
+.app-shell .data-table tbody tr.data-table-row:hover,
+.app-shell .table-scroll-container tbody tr.data-table-row:hover td,
+.app-shell .data-table tbody tr.data-table-row:hover td {
+  background: var(--bg-surface-alt) !important;
+}
+
+.app-shell .models-intro-wrap .page-intro,
+.app-shell .channel-status-page .page-intro,
+.app-shell .usage-page .page-intro,
+.app-shell .table-page-with-intro .page-intro,
+.app-shell .admin-model-center-page .page-intro,
+.app-shell .admin-list-page .page-intro {
+  padding: 30px 32px !important;
+}
+
+.app-shell .models-section-heading,
+.app-shell .panel-heading,
+.app-shell .ops-section > .flex:first-child {
+  padding-bottom: 16px !important;
+  border-bottom: 1px solid var(--border-default) !important;
+}
+
+.app-shell .featured-model-card,
+.app-shell .ecosystem-card,
+.app-shell .admin-model-card,
+.app-shell .monitor-card {
+  border-color: var(--border-default) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.app-shell .featured-model-card:hover,
+.app-shell .ecosystem-card:hover,
+.app-shell .admin-model-card:hover,
+.app-shell .monitor-card:hover {
+  border-color: var(--border-default) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.app-shell :is(.model-version-list span, .ecosystem-version-list span) {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.app-shell :is(.featured-model-header span, .ecosystem-title-row span, .featured-model-content li, .model-status-chip) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+}
+
+.app-shell .model-card-expand-label {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell .admin-model-grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+}
+
+.app-shell .admin-model-card.is-expanded {
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .admin-model-card .model-card-form {
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .model-form-section {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.app-shell .monitor-card {
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .monitor-card :is(.rounded-full, [class*='rounded-full']) {
+  border-radius: var(--radius-md) !important;
+}
+
+.app-shell .monitor-card .status-dot,
+.app-shell .monitor-card [class*='status-dot'] {
+  border-radius: var(--radius-full) !important;
+}
+
+.app-shell .monitor-card-model-logo,
+.app-shell .monitor-card-model-chip {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell .ops-health-card,
+.app-shell .ops-metric-card {
+  background: var(--bg-surface-alt) !important;
+  border-color: var(--border-default) !important;
+}
+
+.app-shell .ops-health-card:hover,
+.app-shell .ops-metric-card:hover {
+  background: var(--bg-surface-alt) !important;
+  border-color: var(--border-default) !important;
+}
+
+/* Phase 1 final guardrails: stable desktop UI states. */
+html,
+body,
+#app,
+.app-shell,
+.landing-page,
+.auth-page {
+  background: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.primary-cta,
+.secondary-cta,
+.account-button,
+.nav-doc-link,
+.icon-action,
+.app-shell button,
+.modal-content button,
+.dialog-container button {
+  transition: none !important;
+  transform: none !important;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.primary-cta:active,
+.secondary-cta:active,
+.account-button:active,
+.app-shell button:active,
+.modal-content button:active,
+.dialog-container button:active {
+  transform: none !important;
+}
+
+.btn-primary,
+.btn-success,
+.btn-stripe,
+.primary-cta,
+.account-button,
+.app-shell .btn-primary,
+.modal-content .btn-primary,
+.dialog-container .btn-primary,
+.app-shell [class*='bg-orange'],
+.app-shell [class*='bg-accent'] {
+  color: var(--accent-contrast) !important;
+  -webkit-text-fill-color: var(--accent-contrast) !important;
+}
+
+.app-shell input,
+.app-shell textarea,
+.app-shell select,
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.dialog-container input,
+.dialog-container textarea,
+.dialog-container select,
+.input,
+.search-input,
+.select-trigger {
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell input:focus,
+.app-shell input:focus-visible,
+.app-shell textarea:focus,
+.app-shell textarea:focus-visible,
+.app-shell select:focus,
+.app-shell select:focus-visible,
+.modal-content input:focus,
+.modal-content input:focus-visible,
+.modal-content textarea:focus,
+.modal-content textarea:focus-visible,
+.modal-content select:focus,
+.modal-content select:focus-visible,
+.dialog-container input:focus,
+.dialog-container input:focus-visible,
+.dialog-container textarea:focus,
+.dialog-container textarea:focus-visible,
+.dialog-container select:focus,
+.dialog-container select:focus-visible,
+.input:focus,
+.input:focus-visible,
+.search-input:focus,
+.search-input:focus-visible,
+.select-trigger:focus,
+.select-trigger:focus-visible {
+  border-color: var(--border-focus) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell .page-intro {
+  gap: var(--space-7) !important;
+  padding: var(--space-8) !important;
+}
+
+.app-shell .page-intro h1,
+.app-shell .page-intro h2 {
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .page-intro p {
+  color: var(--accent) !important;
+  line-height: 1.8 !important;
+}
+
+/* Phase 3 admin density pass. */
+.app-shell .admin-model-center-page,
+.app-shell .admin-settings-shell,
+.app-shell .ops-dashboard-shell,
+.app-shell .ops-fullscreen-shell {
+  display: grid !important;
+  gap: var(--space-6) !important;
+}
+
+.app-shell .admin-settings-shell {
+  max-width: 1120px !important;
+}
+
+.app-shell .admin-model-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: var(--space-4) !important;
+}
+
+.app-shell .admin-model-card {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface) !important;
+  overflow: hidden !important;
+}
+
+.app-shell .admin-model-card.is-expanded {
+  grid-column: span 2 !important;
+  border-color: var(--border-strong) !important;
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .model-card-header,
+.app-shell .model-card-form,
+.app-shell .model-card-footer {
+  padding: var(--space-4) !important;
+}
+
+.app-shell .model-card-summary {
+  transition: none !important;
+  transform: none !important;
+}
+
+.app-shell .model-card-summary:hover,
+.app-shell .model-card-summary:focus-visible {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell .model-card-title h4,
+.app-shell .model-form-section-title h5,
+.app-shell .settings-tab-summary h2,
+.app-shell .admin-settings-form .card h3,
+.app-shell .admin-settings-form .card h4 {
+  color: var(--text-primary) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .model-card-title p,
+.app-shell .model-form-section-title p,
+.app-shell .settings-tab-summary p,
+.app-shell .admin-settings-form .card p {
+  color: var(--text-secondary) !important;
+  line-height: 1.7 !important;
+}
+
+.app-shell .model-form-section,
+.app-shell .settings-tab-summary,
+.app-shell .admin-settings-form .card,
+.app-shell .settings-impact-note {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none !important;
+}
+
+.app-shell .model-form-section,
+.app-shell .settings-impact-note {
+  background: var(--bg-surface-alt) !important;
+}
+
+.app-shell .settings-tabs-scroll {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  padding: var(--space-2) !important;
+}
+
+.app-shell .settings-tab {
+  border-radius: var(--radius-md) !important;
+  color: var(--text-secondary) !important;
+  transition: none !important;
+}
+
+.app-shell .settings-tab-active {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.app-shell .ops-dashboard-content,
+.app-shell .ops-section {
+  display: grid !important;
+  gap: var(--space-6) !important;
+}
+
+.app-shell .ops-health-card,
+.app-shell .ops-metric-card,
+.app-shell .ops-panel {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none !important;
+}
+
+.app-shell .ops-health-card,
+.app-shell .ops-metric-card {
+  padding: var(--space-5) !important;
+}
+
+.app-shell .ops-panel {
+  padding: var(--space-4) !important;
+}
+
+.app-shell .ops-section-title,
+.app-shell .ops-health-card h3,
+.app-shell .ops-metric-card h3 {
+  color: var(--text-primary) !important;
+  font-weight: 900 !important;
+}
+
+.app-shell .ops-section-description,
+.app-shell .ops-health-card p,
+.app-shell .ops-metric-card p {
+  color: var(--text-secondary) !important;
+  line-height: 1.7 !important;
+}
+
+/* Keep legacy success/teal utility classes from reintroducing blue-green hover states. */
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='text-teal'],
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='text-cyan'],
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='text-emerald'],
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='text-green'] {
+  color: var(--accent) !important;
+}
+
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:bg-teal']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:bg-cyan']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:bg-emerald']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:bg-green']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:text-teal']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:text-cyan']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:text-emerald']:hover,
+.app-shell :is(button, a, [role='button'], .dropdown-item, .menu-item, .select-option)[class*='hover:text-green']:hover {
+  border-color: var(--border-strong) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.app-shell :is(button, a, [role='button'])[class*='hover:bg-teal'],
+.app-shell :is(button, a, [role='button'])[class*='hover:bg-cyan'],
+.app-shell :is(button, a, [role='button'])[class*='hover:bg-emerald'],
+.app-shell :is(button, a, [role='button'])[class*='hover:bg-green'] {
+  transition: none !important;
+}
+
+/* Unified page title block. Keep this last so every route uses one heading rhythm. */
+.app-shell .page-intro {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: var(--space-6) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface) !important;
+  padding: 28px 32px !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+}
+
+.app-shell .page-intro-compact {
+  padding: 28px 32px !important;
+}
+
+.app-shell .page-intro-main {
+  display: grid !important;
+  gap: 10px !important;
+  max-width: 920px !important;
+  min-width: 0 !important;
+}
+
+.app-shell .page-intro-title,
+.app-shell .page-intro :is(h1, h2) {
+  margin: 0 !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-serif) !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  line-height: 1.22 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .page-intro-description {
+  margin: 0 !important;
+  max-width: 880px !important;
+  color: var(--accent) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.75 !important;
+}
+
+.app-shell .page-intro-eyebrow {
+  margin: 0 !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-shell .page-intro-actions {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: var(--space-3) !important;
+  margin-left: auto !important;
+}
+
+@media (max-width: 768px) {
+  .app-shell .page-intro {
+    display: grid !important;
+    padding: 22px !important;
+  }
+
+  .app-shell .page-intro-compact {
+    padding: 22px !important;
+  }
+
+  .app-shell .page-intro-title,
+  .app-shell .page-intro :is(h1, h2) {
+    font-size: 24px !important;
+  }
+
+  .app-shell .page-intro-actions {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+  }
+}
+
+.app-shell :is(*, *::before, *::after),
+.landing-page :is(*, *::before, *::after),
+.auth-shell :is(*, *::before, *::after) {
+  transition: none !important;
+  transform-origin: center center;
+}
+
+.app-shell :is(.card, .table-scroll-container, .table-filter-bar, .page-intro, button, a, [role='button'], tr, .data-table-row):hover,
+.auth-shell :is(.card, button, a, [role='button']):hover,
+.landing-page :is(.card, button, a, [role='button']):hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(.btn, button, a, [role='button']):active,
+.auth-shell :is(.btn, button, a, [role='button']):active,
+.landing-page :is(.btn, button, a, [role='button']):active {
+  transform: none !important;
+}
+
+.app-shell :is(.btn-primary, .btn-success, .btn-stripe, button[class*='bg-[var(--accent)]'], a[class*='bg-[var(--accent)]']),
+.auth-shell :is(.btn-primary, .btn-success, .btn-stripe, button[class*='bg-[var(--accent)]'], a[class*='bg-[var(--accent)]']),
+.landing-page :is(.btn-primary, .btn-success, .btn-stripe, button[class*='bg-[var(--accent)]'], a[class*='bg-[var(--accent)]']) {
+  color: var(--accent-contrast) !important;
+}
+
+.app-shell .page-intro-description {
+  color: var(--text-secondary) !important;
+}
+
+.app-shell .admin-settings-form .card :is(h3, h4),
+.app-shell .settings-tab-summary h2,
+.app-shell :is(.settings-section-title, .settings-card-title, .setting-section-title) {
+  color: var(--accent) !important;
+}
+
+.app-shell :is(.toggle-switch, .switch):not(.toggle-switch-active):not(.switch-active) {
+  border: 1px solid var(--border-strong) !important;
+  background: var(--bg-surface-alt) !important;
+}
+
+.app-shell :is(.toggle-switch-active, .switch-active) {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+}
+
+.app-shell :is(.table-actions, .row-actions, .action-group, td:last-child > div) {
+  gap: var(--space-2) !important;
+}
+
+/* Human-eye consistency pass: keep every route on one interaction grammar. */
+.app-shell :is(button, a, [role='button'], input, textarea, select, .input, .search-input, .select-trigger, .card, .table-scroll-container, .data-table-row, .select-option, .dropdown-item, .admin-model-card, .model-card-summary),
+.auth-shell :is(button, a, [role='button'], input, textarea, select, .input, .search-input, .select-trigger, .card),
+.landing-page :is(button, a, [role='button'], .card) {
+  transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+),
+.modal-content :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+),
+.dialog-container :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+) {
+  min-height: 40px !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+):is(:focus, :focus-visible),
+.modal-content :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+):is(:focus, :focus-visible),
+.dialog-container :is(
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']):not([type='hidden']),
+  textarea,
+  select,
+  .input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .select-trigger
+):is(:focus, :focus-visible) {
+  border-color: var(--border-focus) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-shell :is([class*='text-blue'], [class*='text-sky'], [class*='text-cyan'], [class*='text-teal']) {
+  color: var(--accent) !important;
+}
+
+.app-shell :is([class*='bg-blue'], [class*='bg-sky'], [class*='bg-cyan'], [class*='bg-teal']) {
+  background: var(--accent-soft) !important;
+}
+
+.app-shell :is([class*='border-blue'], [class*='border-sky'], [class*='border-cyan'], [class*='border-teal']) {
+  border-color: var(--border-focus) !important;
+}
+
+.app-shell :is([class*='hover:bg-blue'], [class*='hover:bg-sky'], [class*='hover:bg-cyan'], [class*='hover:bg-teal']):hover,
+.app-shell :is([class*='hover:text-blue'], [class*='hover:text-sky'], [class*='hover:text-cyan'], [class*='hover:text-teal']):hover {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+.app-shell .page-intro-description,
+.app-shell .page-intro-main > p:not(.page-intro-eyebrow) {
+  color: var(--text-secondary) !important;
+}
+
+.app-shell .page-intro-eyebrow {
+  color: var(--accent) !important;
+}
+
+.app-shell .channel-tab {
+  min-height: 40px !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+}
+
+.app-shell .channel-tab::before,
+.app-shell .channel-tab::after {
+  display: none !important;
+}
+
+.app-shell .channel-tab-active {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.app-shell .channel-tab-active *,
+.app-shell .channel-tab-active svg {
+  color: inherit !important;
+  stroke: currentColor !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.app-shell :is(.admin-platform-logo, .channel-platform-logo) {
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-surface) !important;
+}
+
+.app-shell :is(.admin-platform-select-item, .select-option) {
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.app-shell :is(.admin-model-card, .model-card-summary, .model-card-state, .model-editor-panel, .model-form-section) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+}
+
+.app-shell .model-card-tags span {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-secondary) !important;
 }
 

@@ -10,8 +10,28 @@
 
       <OpsDashboardSkeleton v-if="loading && !hasLoadedOnce" :fullscreen="isFullscreen" />
 
+      <PageIntro
+        v-if="!isFullscreen && opsEnabled && !(loading && !hasLoadedOnce)"
+        title="运维监控"
+        description="查看系统健康、请求异常、上游可用性和基础设施状态。先确认健康与异常，再进入流量趋势、告警和日志排查。"
+        compact
+      >
+        <template #actions>
+          <span class="ops-refresh-note">
+            {{ loading ? t('admin.ops.loadingText') : t('admin.ops.ready') }}
+            <template v-if="lastUpdated">
+              · {{ t('common.refresh') }}:
+              {{ lastUpdated.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\//g, '-') }}
+            </template>
+            <template v-if="autoRefreshEnabled && autoRefreshCountdown !== undefined">
+              · 剩余 {{ autoRefreshCountdown }}s
+            </template>
+          </span>
+        </template>
+      </PageIntro>
+
       <OpsDashboardHeader
-        v-else-if="opsEnabled"
+        v-if="opsEnabled && !(loading && !hasLoadedOnce)"
         :overview="overview"
         :platform="platform"
         :group-id="groupId"
@@ -173,6 +193,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import {
   opsAPI,
   type OpsDashboardOverview,
@@ -879,6 +900,13 @@ watch(showSettingsDialog, async (show) => {
   color: var(--status-danger);
   font-size: 14px;
   line-height: 1.6;
+}
+
+.ops-refresh-note {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .ops-section-title {

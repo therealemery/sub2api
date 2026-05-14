@@ -7,6 +7,25 @@ import { apiClient } from '../client'
 import type { AdminUsageLog, UsageQueryParams, PaginatedResponse, UsageRequestType } from '@/types'
 import type { EndpointStat } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function emptyPage<T>(page = 1, pageSize = 20): PaginatedResponse<T> {
+  return {
+    items: [],
+    total: 0,
+    page,
+    page_size: pageSize,
+    pages: 0
+  }
+}
+
 // ==================== Types ====================
 
 export interface AdminUsageStatsResponse {
@@ -96,6 +115,10 @@ export async function list(
   params: AdminUsageQueryParams,
   options?: { signal?: AbortSignal }
 ): Promise<PaginatedResponse<AdminUsageLog>> {
+  if (isLocalPreviewSession()) {
+    return emptyPage<AdminUsageLog>(params.page ?? 1, params.page_size ?? 20)
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<AdminUsageLog>>('/admin/usage', {
     params,
     signal: options?.signal
@@ -121,6 +144,23 @@ export async function getStats(params: {
   end_date?: string
   timezone?: string
 }): Promise<AdminUsageStatsResponse> {
+  if (isLocalPreviewSession()) {
+    return {
+      total_requests: 0,
+      total_input_tokens: 0,
+      total_output_tokens: 0,
+      total_cache_tokens: 0,
+      total_tokens: 0,
+      total_cost: 0,
+      total_actual_cost: 0,
+      total_account_cost: 0,
+      average_duration_ms: 0,
+      endpoints: [],
+      upstream_endpoints: [],
+      endpoint_paths: []
+    }
+  }
+
   const { data } = await apiClient.get<AdminUsageStatsResponse>('/admin/usage/stats', {
     params
   })
@@ -133,6 +173,10 @@ export async function getStats(params: {
  * @returns List of matching users (max 30)
  */
 export async function searchUsers(keyword: string): Promise<SimpleUser[]> {
+  if (isLocalPreviewSession()) {
+    return keyword ? [{ id: 1, email: 'admin-preview@ownapi.local' }] : []
+  }
+
   const { data } = await apiClient.get<SimpleUser[]>('/admin/usage/search-users', {
     params: { q: keyword }
   })
@@ -146,6 +190,10 @@ export async function searchUsers(keyword: string): Promise<SimpleUser[]> {
  * @returns List of matching API keys (max 30)
  */
 export async function searchApiKeys(userId?: number, keyword?: string): Promise<SimpleApiKey[]> {
+  if (isLocalPreviewSession()) {
+    return []
+  }
+
   const params: Record<string, unknown> = {}
   if (userId !== undefined) {
     params.user_id = userId
@@ -168,6 +216,10 @@ export async function listCleanupTasks(
   params: { page?: number; page_size?: number },
   options?: { signal?: AbortSignal }
 ): Promise<PaginatedResponse<UsageCleanupTask>> {
+  if (isLocalPreviewSession()) {
+    return emptyPage<UsageCleanupTask>(params.page ?? 1, params.page_size ?? 20)
+  }
+
   const { data } = await apiClient.get<PaginatedResponse<UsageCleanupTask>>('/admin/usage/cleanup-tasks', {
     params,
     signal: options?.signal

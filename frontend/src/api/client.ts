@@ -23,6 +23,110 @@ function isLocalPreviewSession(): boolean {
   )
 }
 
+function localPreviewPage<T = unknown>(pageSize = 20): {
+  items: T[]
+  total: number
+  page: number
+  page_size: number
+  pages: number
+} {
+  return {
+    items: [],
+    total: 0,
+    page: 1,
+    page_size: pageSize,
+    pages: 0
+  }
+}
+
+function getLocalPreviewFallback(url: string, method?: string): unknown | undefined {
+  if ((method || 'get').toLowerCase() !== 'get') {
+    return undefined
+  }
+
+  const cleanUrl = url.split('?')[0]
+
+  if (cleanUrl === '/user/totp/status') {
+    return {
+      enabled: false,
+      enabled_at: null,
+      feature_enabled: true
+    }
+  }
+
+  if (
+    cleanUrl === '/subscriptions' ||
+    cleanUrl === '/subscriptions/active' ||
+    cleanUrl === '/subscriptions/progress' ||
+    cleanUrl === '/redeem/history' ||
+    cleanUrl === '/admin/user-attributes'
+  ) {
+    return []
+  }
+
+  if (cleanUrl === '/subscriptions/summary') {
+    return {
+      active_count: 0,
+      subscriptions: []
+    }
+  }
+
+  if (cleanUrl === '/payment/checkout-info') {
+    return {
+      methods: {
+        stripe: {
+          daily_limit: 0,
+          daily_used: 0,
+          daily_remaining: 0,
+          single_min: 10,
+          single_max: 0,
+          fee_rate: 0,
+          available: true
+        }
+      },
+      global_min: 10,
+      global_max: 0,
+      plans: [],
+      balance_disabled: false,
+      balance_recharge_multiplier: 10,
+      points_per_rmb: 10,
+      recharge_fee_rate: 0,
+      help_text: '',
+      help_image_url: '',
+      stripe_publishable_key: ''
+    }
+  }
+
+  if (cleanUrl === '/payment/orders/my') {
+    return localPreviewPage()
+  }
+
+  if (
+    cleanUrl === '/admin/users' ||
+    cleanUrl === '/admin/accounts' ||
+    cleanUrl === '/admin/channels'
+  ) {
+    return localPreviewPage()
+  }
+
+  return undefined
+}
+
+function makeLocalPreviewResponse(
+  config: InternalAxiosRequestConfig,
+  data: unknown,
+  response?: AxiosResponse
+): AxiosResponse {
+  return {
+    data,
+    status: 200,
+    statusText: 'OK',
+    headers: response?.headers ?? {},
+    config,
+    request: response?.request
+  }
+}
+
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -71,6 +175,14 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('auth_token')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+
+    if (isLocalPreviewSession()) {
+      const localPreviewFallback = getLocalPreviewFallback(String(config.url || ''), config.method)
+      if (localPreviewFallback !== undefined) {
+        config.adapter = async (adapterConfig) =>
+          makeLocalPreviewResponse(adapterConfig as InternalAxiosRequestConfig, localPreviewFallback)
+      }
     }
 
     // Attach locale for backend translations
@@ -164,6 +276,13 @@ apiClient.interceptors.response.use(
       // This handles TOKEN_EXPIRED, INVALID_TOKEN, TOKEN_REVOKED, etc.
       if (status === 401 && !originalRequest._retry) {
         if (isLocalPreviewSession()) {
+          const localPreviewFallback = getLocalPreviewFallback(url, originalRequest.method)
+          if (localPreviewFallback !== undefined) {
+            return Promise.resolve(
+              makeLocalPreviewResponse(originalRequest, localPreviewFallback, error.response)
+            )
+          }
+
           return Promise.reject({
             status,
             code: apiData.code,

@@ -115,7 +115,7 @@ describe('AccountUsageCell', () => {
     expect(wrapper.text()).toContain('admin.accounts.usageWindow.gemini3Image|70|2026-03-01T09:00:00Z')
   })
 
-  it('Antigravity 会显示 AI Credits 余额信息', async () => {
+  it('Antigravity 会显示 AI Credits 额度信息', async () => {
     getUsage.mockResolvedValue({
       ai_credits: [
         {

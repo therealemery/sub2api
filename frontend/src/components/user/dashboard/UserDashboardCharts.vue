@@ -8,14 +8,14 @@
       </div>
       <div class="flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('dashboard.timeRange') }}:</span>
+          <span class="text-sm font-medium text-gray-700">{{ t('dashboard.timeRange') }}:</span>
           <DateRangePicker :start-date="startDate" :end-date="endDate" @update:startDate="$emit('update:startDate', $event)" @update:endDate="$emit('update:endDate', $event)" @change="$emit('dateRangeChange', $event)" />
         </div>
         <button @click="$emit('refresh')" :disabled="loading" class="btn btn-secondary">
           {{ t('common.refresh') }}
         </button>
         <div class="ml-auto flex items-center gap-2">
-          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('dashboard.granularity') }}:</span>
+          <span class="text-sm font-medium text-gray-700">{{ t('dashboard.granularity') }}:</span>
           <div class="w-28">
             <Select :model-value="granularity" :options="[{value:'day', label:t('dashboard.day')}, {value:'hour', label:t('dashboard.hour')}]" @update:model-value="$emit('update:granularity', $event)" @change="$emit('granularityChange')" />
           </div>
@@ -31,18 +31,18 @@
           <LoadingSpinner size="md" />
         </div>
         <div class="mb-4">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('dashboard.modelDistribution') }}</h3>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">识别主要使用模型，避免把所有消耗都混在一起看。</p>
+          <h3 class="text-sm font-semibold text-gray-900">{{ t('dashboard.modelDistribution') }}</h3>
+          <p class="mt-1 text-xs text-gray-500">识别主要使用模型，避免把所有消耗都混在一起看。</p>
         </div>
         <div class="flex items-center gap-6">
           <div class="h-48 w-48">
             <Doughnut v-if="modelData" :data="modelData" :options="doughnutOptions" />
-            <div v-else class="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400">{{ t('dashboard.noDataAvailable') }}</div>
+            <div v-else class="flex h-full items-center justify-center text-sm text-gray-500">{{ t('dashboard.noDataAvailable') }}</div>
           </div>
           <div class="max-h-48 flex-1 overflow-y-auto">
             <table class="w-full text-xs">
               <thead>
-                <tr class="text-gray-500 dark:text-gray-400">
+                <tr class="text-gray-500">
                   <th class="pb-2 text-left">{{ t('dashboard.model') }}</th>
                   <th class="pb-2 text-right">{{ t('dashboard.requests') }}</th>
                   <th class="pb-2 text-right">{{ t('dashboard.tokens') }}</th>
@@ -51,17 +51,17 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="model in models" :key="model.model" class="border-t border-gray-100 dark:border-gray-700">
-                  <td class="py-1.5 font-medium text-gray-900 dark:text-[var(--text-inverse)]" :title="model.model">
+                <tr v-for="model in models" :key="model.model" class="border-t border-gray-100">
+                  <td class="py-1.5 font-medium text-gray-900" :title="model.model">
                     <span class="model-table-name">
                       <img v-if="getModelLogo(model.model)" :src="getModelLogo(model.model)" :alt="getModelDisplayName(model.model)" />
                       <span>{{ model.model }}</span>
                     </span>
                   </td>
-                  <td class="py-1.5 text-right text-gray-600 dark:text-gray-400">{{ formatNumber(model.requests) }}</td>
-                  <td class="py-1.5 text-right text-gray-600 dark:text-gray-400">{{ formatTokens(model.total_tokens) }}</td>
-                  <td class="py-1.5 text-right text-green-600 dark:text-green-400">${{ formatCost(model.actual_cost) }}</td>
-                  <td class="py-1.5 text-right text-gray-400 dark:text-gray-500">${{ formatCost(model.cost) }}</td>
+                  <td class="py-1.5 text-right text-gray-600">{{ formatNumber(model.requests) }}</td>
+                  <td class="py-1.5 text-right text-gray-600">{{ formatTokens(model.total_tokens) }}</td>
+                  <td class="py-1.5 text-right text-green-600">${{ formatCost(model.actual_cost) }}</td>
+                  <td class="py-1.5 text-right text-gray-400">${{ formatCost(model.cost) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -97,7 +97,21 @@ const modelData = computed(() => !props.models?.length ? null : {
   labels: props.models.map((m: ModelStat) => m.model),
   datasets: [{
     data: props.models.map((m: ModelStat) => m.total_tokens),
-    backgroundColor: ['#27251e', '#72706b', '#92918b', '#b7b2aa', '#d4cfc7', '#e5e2dc', '#9a958d', '#5f5b54']
+    backgroundColor: [
+      '#c4471a',
+      '#287a4b',
+      '#986b16',
+      '#ef4444',
+      '#9a7b63',
+      '#a73c2e',
+      '#BB4D1B',
+      '#b8851f',
+      '#6f6258',
+      '#4a7c3c',
+      '#716d64',
+      '#a855f7'
+    ].slice(0, props.models.length),
+    borderWidth: 0
   }]
 })
 

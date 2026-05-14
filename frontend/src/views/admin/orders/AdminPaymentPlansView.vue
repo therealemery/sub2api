@@ -1,6 +1,11 @@
 <template>
   <AppLayout>
     <div class="space-y-4">
+      <PageIntro
+        title="支付套餐"
+        description="管理可售积分与订阅套餐，核对价格、有效期、绑定分组和上架状态。创建、编辑和删除仍使用原有接口。"
+      />
+
       <!-- Actions -->
       <div class="flex items-center justify-end gap-2">
         <button @click="loadPlans" :disabled="plansLoading" class="btn btn-secondary" :title="t('common.refresh')">
@@ -29,7 +34,7 @@
         </template>
         <template #cell-price="{ value, row }">
           <div class="text-sm">
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">${{ (value ?? 0).toFixed(2) }}</span>
+            <span class="font-medium text-gray-900">${{ (value ?? 0).toFixed(2) }}</span>
             <span v-if="row.original_price" class="ml-1 text-xs text-gray-400 line-through">${{ row.original_price.toFixed(2) }}</span>
           </div>
         </template>
@@ -53,11 +58,11 @@
         </template>
         <template #cell-actions="{ row }">
           <div class="flex items-center gap-2">
-            <button @click="openPlanEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]">
+            <button @click="openPlanEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)]">
               <Icon name="edit" size="sm" />
               <span class="text-xs">{{ t('common.edit') }}</span>
             </button>
-            <button @click="confirmDeletePlan(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400">
+            <button @click="confirmDeletePlan(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600">
               <Icon name="trash" size="sm" />
               <span class="text-xs">{{ t('common.delete') }}</span>
             </button>
@@ -84,6 +89,7 @@ import type { SubscriptionPlan } from '@/types/payment'
 import type { AdminGroup } from '@/types'
 import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import Icon from '@/components/icons/Icon.vue'
@@ -114,7 +120,7 @@ function isGroupMissing(id: number): boolean {
 
 function getPlanNameClass(groupId: number): string {
   const group = getGroup(groupId)
-  return group ? platformTextClass(group.platform) : 'text-gray-900 dark:text-[var(--text-inverse)]'
+  return group ? platformTextClass(group.platform) : 'text-gray-900'
 }
 
 

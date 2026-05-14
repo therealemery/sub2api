@@ -4,8 +4,7 @@
       <nav class="agent-nav">
         <router-link to="/home" class="agent-brand">
           <span class="agent-logo">
-            <img :src="siteLogoPaths.light" alt="OwnAPI" class="theme-logo-light" />
-            <img :src="siteLogoPaths.dark" alt="OwnAPI" class="theme-logo-dark" />
+            <img :src="siteLogo" alt="OwnAPI" class="site-logo-img" />
           </span>
           <span>{{ siteName }}</span>
         </router-link>
@@ -30,7 +29,7 @@
 
         <div class="agent-commission-card">
           <span>代理收益</span>
-          <strong>30%</strong>
+          <strong>最高 40%</strong>
           <p>推荐用户产生消费后，代理可获得对应用户消费抽成。实际结算以平台后台记录为准。</p>
         </div>
       </section>
@@ -67,7 +66,7 @@
           <h2>代理能获得什么</h2>
           <div class="agent-benefit-list">
             <div>
-              <strong>30% 用户消费抽成</strong>
+              <strong>最高 40% 用户消费抽成</strong>
               <span>推荐用户产生有效消费后，代理可获得对应比例收益。</span>
             </div>
             <div>
@@ -112,14 +111,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore, useAppStore } from '@/stores'
-import { DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath, resolveThemedSiteLogoPaths } from '@/constants/branding'
+import { DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath } from '@/constants/branding'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
 
 const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || DEFAULT_SITE_NAME)
 const siteLogo = computed(() => resolveSiteLogoPath(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || DEFAULT_SITE_LOGO))
-const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(siteLogo.value))
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const dashboardPath = computed(() => authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
 </script>
@@ -213,14 +211,14 @@ const dashboardPath = computed(() => authStore.isAdmin ? '/admin/dashboard' : '/
 .agent-main {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;
-  padding: 58px 0 64px;
+  padding: 46px 0 64px;
 }
 
 .agent-hero {
   display: grid;
-  gap: 22px;
-  max-width: 860px;
-  margin: 0 auto 56px;
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto 48px;
   text-align: center;
 }
 
@@ -246,8 +244,8 @@ const dashboardPath = computed(() => authStore.isAdmin ? '/admin/dashboard' : '/
 }
 
 .agent-hero h1 {
-  font-size: clamp(42px, 6vw, 72px);
-  line-height: 1;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.05;
 }
 
 .agent-lead,
@@ -262,20 +260,20 @@ const dashboardPath = computed(() => authStore.isAdmin ? '/admin/dashboard' : '/
 }
 
 .agent-lead {
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .agent-commission-card {
   display: grid;
-  gap: 8px;
-  width: min(100%, 520px);
+  gap: 10px;
+  width: min(100%, 600px);
   margin: 10px auto 0;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  padding: 24px;
+  padding: 22px 26px;
 }
 
 .agent-commission-card span {
@@ -287,7 +285,7 @@ const dashboardPath = computed(() => authStore.isAdmin ? '/admin/dashboard' : '/
 .agent-commission-card strong {
   color: var(--accent);
   font-family: var(--font-serif);
-  font-size: clamp(52px, 8vw, 84px);
+  font-size: clamp(44px, 6vw, 68px);
   font-weight: 800;
   line-height: 0.95;
 }

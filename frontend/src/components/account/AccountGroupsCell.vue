@@ -17,7 +17,7 @@
         v-if="hiddenCount > 0"
         ref="moreButtonRef"
         @click.stop="showPopover = !showPopover"
-        class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500 transition-colors cursor-pointer whitespace-nowrap"
+        class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] transition-colors cursor-pointer whitespace-nowrap"
       >
         <span>+{{ hiddenCount }}</span>
       </button>
@@ -40,12 +40,12 @@
           :style="popoverStyle"
         >
           <div class="mb-2 flex items-center justify-between">
-            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <span class="text-xs font-medium text-gray-500">
               {{ t('admin.accounts.groupCountTotal', { count: groups.length }) }}
             </span>
             <button
               @click="showPopover = false"
-              class="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-dark-700 dark:hover:text-gray-300"
+              class="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             >
               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -2,7 +2,7 @@
   <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+        <div class="text-sm font-medium text-gray-900">
           {{ t('admin.announcements.form.targetingMode') }}
         </div>
         <div class="mt-1 text-xs text-gray-500 text-[var(--text-muted)]">
@@ -11,7 +11,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
           <input
             type="radio"
             name="announcement-targeting-mode"
@@ -22,7 +22,7 @@
           />
           {{ t('admin.announcements.form.targetingAll') }}
         </label>
-        <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
           <input
             type="radio"
             name="announcement-targeting-mode"
@@ -38,7 +38,7 @@
 
     <div v-if="mode === 'custom'" class="mt-4 space-y-4">
       <div class="flex items-center justify-between">
-        <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+        <div class="text-sm font-medium text-gray-900">
           OR
           <span class="ml-1 text-xs font-normal text-gray-500 text-[var(--text-muted)]">
             ({{ anyOf.length }}/50)
@@ -66,7 +66,7 @@
       >
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <div class="text-sm font-medium text-gray-900">
               {{ t('admin.announcements.form.targetingCustom') }} #{{ groupIndex + 1 }}
               <span class="ml-2 text-xs font-normal text-gray-500 text-[var(--text-muted)]">AND ({{ (group.all_of?.length || 0) }}/50)</span>
             </div>
@@ -157,7 +157,7 @@
         </div>
       </div>
 
-      <div v-if="validationError" class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-300">
+      <div v-if="validationError" class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
         {{ validationError }}
       </div>
     </div>

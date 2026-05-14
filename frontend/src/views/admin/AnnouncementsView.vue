@@ -1,5 +1,11 @@
 <template>
   <AppLayout>
+    <div class="admin-list-page">
+    <PageIntro
+      title="公告管理"
+      description="发布、编辑和查看站内公告，包含状态、推送方式、目标范围和阅读情况。这里只调整列表呈现，不改变通知逻辑。"
+    />
+
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -51,7 +57,7 @@
           <template #cell-title="{ value, row }">
             <div class="min-w-0">
               <div class="flex items-center gap-2">
-                <span class="truncate font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+                <span class="truncate font-medium text-gray-900">{{ value }}</span>
               </div>
               <div class="mt-1 flex items-center gap-2 text-xs text-gray-500 text-[var(--text-muted)]">
                 <span>#{{ row.id }}</span>
@@ -90,13 +96,13 @@
           </template>
 
           <template #cell-targeting="{ row }">
-            <span class="text-sm text-gray-600 dark:text-gray-300">
+            <span class="text-sm text-gray-600">
               {{ targetingSummary(row.targeting) }}
             </span>
           </template>
 
           <template #cell-timeRange="{ row }">
-            <div class="text-sm text-gray-600 dark:text-gray-300">
+            <div class="text-sm text-gray-600">
               <div>
                 <span class="font-medium">{{ t('admin.announcements.form.startsAt') }}:</span>
                 <span class="ml-1">{{ row.starts_at ? formatDateTime(row.starts_at) : t('admin.announcements.timeImmediate') }}</span>
@@ -116,21 +122,21 @@
             <div class="flex items-center space-x-1">
               <button
                 @click="openReadStatus(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)]"
                 :title="t('admin.announcements.readStatus')"
               >
                 <Icon name="eye" size="sm" />
               </button>
               <button
                 @click="openEditDialog(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-dark-600 dark:hover:text-gray-300"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 :title="t('common.edit')"
               >
                 <Icon name="edit" size="sm" />
               </button>
               <button
                 @click="handleDelete(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 :title="t('common.delete')"
               >
                 <Icon name="trash" size="sm" />
@@ -160,6 +166,7 @@
         />
       </template>
     </TablePageLayout>
+    </div>
 
     <!-- Create/Edit Dialog -->
     <BaseDialog
@@ -256,6 +263,7 @@ import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'

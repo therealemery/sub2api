@@ -3,10 +3,10 @@
     <!-- Mini Progress Display -->
     <button
       @click="toggleTooltip"
-      class="flex cursor-pointer items-center gap-2 rounded-lg bg-purple-50 px-3 py-1.5 transition-colors hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/30"
+      class="flex cursor-pointer items-center gap-2 rounded-lg bg-purple-50 px-3 py-1.5 transition-colors hover:bg-purple-100"
       :title="t('subscriptionProgress.viewDetails')"
     >
-      <Icon name="creditCard" size="sm" class="text-purple-600 dark:text-purple-400" />
+      <Icon name="creditCard" size="sm" class="text-purple-600" />
       <div class="flex items-center gap-1.5">
         <!-- Combined progress indicator -->
         <div class="flex items-center gap-0.5">
@@ -17,7 +17,7 @@
             :class="getProgressDotClass(sub)"
           ></div>
         </div>
-        <span class="text-xs font-medium text-purple-700 dark:text-purple-300">
+        <span class="text-xs font-medium text-purple-700">
           {{ activeSubscriptions.length }}
         </span>
       </div>
@@ -30,7 +30,7 @@
         class="absolute right-0 z-50 mt-2 w-[340px] overflow-hidden rounded-lg border border-gray-200 bg-[var(--bg-surface)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
       >
         <div class="border-b border-gray-100 p-3 border-[var(--border-default)]">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h3 class="text-sm font-semibold text-gray-900">
             {{ t('subscriptionProgress.title') }}
           </h3>
           <p class="mt-0.5 text-xs text-gray-500 text-[var(--text-muted)]">
@@ -45,7 +45,7 @@
             class="border-b border-gray-50 p-3 last:border-b-0 border-[var(--border-default)]"
           >
             <div class="mb-2 flex items-center justify-between">
-              <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <span class="text-sm font-medium text-gray-900">
                 {{ subscription.group?.name || `Group #${subscription.group_id}` }}
               </span>
               <span
@@ -64,8 +64,8 @@
                 v-if="isUnlimited(subscription)"
                 class="flex items-center gap-2 rounded-lg bg-[var(--bg-surface-alt)] px-2.5 py-1.5"
               >
-                <span class="text-lg text-emerald-600 dark:text-emerald-400">&infin;</span>
-                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span class="text-lg text-emerald-600">&infin;</span>
+                <span class="text-xs font-medium text-emerald-700">
                   {{ t('subscriptionProgress.unlimited') }}
                 </span>
               </div>
@@ -273,8 +273,8 @@ function getDaysRemainingClass(expiresAt: string): string {
   const expires = new Date(expiresAt)
   const diff = expires.getTime() - now.getTime()
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days <= 3) return 'text-red-600 dark:text-red-400'
-  if (days <= 7) return 'text-orange-600 dark:text-orange-400'
+  if (days <= 3) return 'text-red-600'
+  if (days <= 7) return 'text-orange-600'
   return 'text-gray-500 text-[var(--text-muted)]'
 }
 

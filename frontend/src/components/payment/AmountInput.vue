@@ -2,8 +2,8 @@
   <div class="space-y-4">
     <!-- Quick Amount Buttons -->
     <div>
-      <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {{ t('payment.quickAmounts') }}
+      <label class="mb-2 block text-sm font-medium text-[var(--text-primary)]">
+        快速选择
       </label>
       <div class="grid grid-cols-3 gap-2">
         <button
@@ -11,7 +11,7 @@
           :key="amt"
           type="button"
           :class="[
-            'payment-amount-choice rounded-lg border-2 px-4 py-3 text-center font-medium transition-colors',
+            'payment-amount-choice rounded-lg border px-4 py-3 text-center font-medium',
             modelValue === amt
               ? 'payment-amount-choice-selected border-gray-900 bg-gray-50 text-gray-950'
               : 'border-gray-200 bg-[var(--bg-surface)] text-gray-700 hover:border-gray-300',
@@ -25,19 +25,19 @@
 
     <!-- Custom Amount Input -->
     <div>
-      <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {{ t('payment.customAmount') }}
+      <label class="mb-2 block text-sm font-medium text-[var(--text-primary)]">
+        自定义金额
       </label>
       <div class="relative">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[var(--text-muted)]">
-          $
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+          {{ unitLabel }}
         </span>
         <input
           type="text"
           inputmode="decimal"
           :value="customText"
           :placeholder="placeholderText"
-          class="input w-full py-3 pl-8 pr-4"
+          class="input w-full py-3 pl-14 pr-4"
           @input="handleInput"
         />
       </div>
@@ -54,10 +54,12 @@ const props = withDefaults(defineProps<{
   modelValue: number | null
   min?: number
   max?: number
+  unitLabel?: string
 }>(), {
   amounts: () => [10, 20, 50, 100, 200, 500, 1000, 2000, 5000],
   min: 0,
   max: 0,
+  unitLabel: '积分',
 })
 
 const emit = defineEmits<{
@@ -127,19 +129,6 @@ watch(() => props.modelValue, (v) => {
   color: var(--text-primary);
 }
 
-:global(.dark) .payment-amount-choice {
-  background: var(--bg-page);
-  border-color: var(--border-default);
-  color: var(--bg-surface);
-}
 
-:global(.dark) .payment-amount-choice:hover {
-  border-color: var(--border-strong);
-}
 
-:global(.dark) .payment-amount-choice-selected {
-  background: var(--bg-surface);
-  border-color: var(--border-default);
-  color: var(--bg-surface);
-}
 </style>

@@ -1,13 +1,18 @@
 <template>
   <AppLayout>
     <div class="space-y-6">
+      <PageIntro
+        title="使用记录"
+        description="查看全站调用明细、模型分布、分组分布、Token 消耗和费用统计，支持筛选、导出和清理操作。"
+      />
+
       <UsageStatsCards :stats="usageStats" />
       <!-- Charts Section -->
       <div class="space-y-4">
         <div class="card p-4">
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.dashboard.timeRange') }}:</span>
+              <span class="text-sm font-medium text-gray-700">{{ t('admin.dashboard.timeRange') }}:</span>
               <DateRangePicker
                 v-model:start-date="startDate"
                 v-model:end-date="endDate"
@@ -15,7 +20,7 @@
               />
             </div>
             <div class="ml-auto flex items-center gap-2">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.dashboard.granularity') }}:</span>
+              <span class="text-sm font-medium text-gray-700">{{ t('admin.dashboard.granularity') }}:</span>
               <div class="w-28">
                 <Select v-model="granularity" :options="granularityOptions" @change="loadChartData" />
               </div>
@@ -85,7 +90,7 @@
                 v-for="col in toggleableColumns"
                 :key="col.key"
                 @click="toggleColumn(col.key)"
-                class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+                class="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
               >
                 <span>{{ col.label }}</span>
                 <Icon
@@ -139,7 +144,7 @@ import { useAppStore } from '@/stores/app'; import { adminAPI } from '@/api/admi
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 import { formatReasoningEffort } from '@/utils/format'
 import { resolveUsageRequestType, requestTypeToLegacyStream } from '@/utils/usageRequestType'
-import AppLayout from '@/components/layout/AppLayout.vue'; import Pagination from '@/components/common/Pagination.vue'; import Select from '@/components/common/Select.vue'; import DateRangePicker from '@/components/common/DateRangePicker.vue'
+import AppLayout from '@/components/layout/AppLayout.vue'; import PageIntro from '@/components/common/PageIntro.vue'; import Pagination from '@/components/common/Pagination.vue'; import Select from '@/components/common/Select.vue'; import DateRangePicker from '@/components/common/DateRangePicker.vue'
 import UsageStatsCards from '@/components/admin/usage/UsageStatsCards.vue'; import UsageFilters from '@/components/admin/usage/UsageFilters.vue'
 import UsageTable from '@/components/admin/usage/UsageTable.vue'; import UsageExportProgress from '@/components/admin/usage/UsageExportProgress.vue'
 import UsageCleanupDialog from '@/components/admin/usage/UsageCleanupDialog.vue'

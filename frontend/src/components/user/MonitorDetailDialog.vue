@@ -14,7 +14,7 @@
     <div v-else class="overflow-x-auto">
       <table class="w-full text-left text-sm">
         <thead class="border-b border-gray-200 border-[var(--border-default)]">
-          <tr class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <tr class="text-xs uppercase tracking-wider text-gray-500">
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.model') }}</th>
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.latestStatus') }}</th>
             <th class="py-2 pr-3">{{ t('channelStatus.detailColumns.latestLatency') }}</th>
@@ -30,7 +30,7 @@
             :key="m.model"
             class="border-b border-gray-100 border-[var(--border-default)]"
           >
-            <td class="py-2 pr-3 font-medium text-gray-900 dark:text-gray-100">
+            <td class="py-2 pr-3 font-medium text-gray-900">
               <span class="monitor-detail-model">
                 <span class="monitor-detail-logo">
                   <img v-if="getModelLogo(m.model)" :src="getModelLogo(m.model)" :alt="getModelDisplayName(m.model)" />
@@ -46,11 +46,11 @@
                 {{ statusLabel(m.latest_status) }}
               </span>
             </td>
-            <td class="py-2 pr-3 text-gray-700 dark:text-gray-300">{{ formatLatency(m.latest_latency_ms) }}</td>
-            <td class="py-2 pr-3 text-gray-700 dark:text-gray-300">{{ formatPercent(m.availability_7d) }}</td>
-            <td class="py-2 pr-3 text-gray-700 dark:text-gray-300">{{ formatPercent(m.availability_15d) }}</td>
-            <td class="py-2 pr-3 text-gray-700 dark:text-gray-300">{{ formatPercent(m.availability_30d) }}</td>
-            <td class="py-2 pr-3 text-gray-700 dark:text-gray-300">{{ formatLatency(m.avg_latency_7d_ms) }}</td>
+            <td class="py-2 pr-3 text-gray-700">{{ formatLatency(m.latest_latency_ms) }}</td>
+            <td class="py-2 pr-3 text-gray-700">{{ formatPercent(m.availability_7d) }}</td>
+            <td class="py-2 pr-3 text-gray-700">{{ formatPercent(m.availability_15d) }}</td>
+            <td class="py-2 pr-3 text-gray-700">{{ formatPercent(m.availability_30d) }}</td>
+            <td class="py-2 pr-3 text-gray-700">{{ formatLatency(m.avg_latency_7d_ms) }}</td>
           </tr>
         </tbody>
       </table>
@@ -153,11 +153,5 @@ watch(
   white-space: nowrap;
 }
 
-:global(.dark) .monitor-detail-logo {
-  background: rgba(255, 255, 255, 0.06);
-}
 
-:global(.dark) .monitor-detail-logo img {
-  filter: none;
-}
 </style>

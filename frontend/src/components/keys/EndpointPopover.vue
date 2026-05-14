@@ -68,9 +68,9 @@ onBeforeUnmount(() => {
     <div
       v-for="(item, index) in allEndpoints"
       :key="index"
-      class="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2.5 py-1.5 text-xs transition-colors hover:border-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-[var(--border-focus)]"
+      class="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2.5 py-1.5 text-xs transition-colors hover:border-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
     >
-      <span class="font-medium text-gray-600 dark:text-gray-300">{{ item.name }}</span>
+      <span class="font-medium text-gray-600">{{ item.name }}</span>
       <span
         v-if="item.isDefault"
         class="rounded bg-[var(--bg-surface-alt)] px-1 py-px text-[10px] font-medium leading-tight text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
@@ -80,11 +80,11 @@ onBeforeUnmount(() => {
 
       <div class="group/endpoint relative flex items-center gap-1.5">
         <div
-          class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-[24rem] -translate-x-1/2 translate-y-1 rounded-lg border border-slate-200 bg-[var(--bg-surface)] px-3 py-2.5 text-left opacity-0 shadow-none ring-1 ring-slate-200/80 transition-colors duration-150 group-hover/endpoint:translate-y-0 group-hover/endpoint:opacity-100 group-focus-within/endpoint:translate-y-0 group-focus-within/endpoint:opacity-100 dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700/70"
+          class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-[24rem] -translate-x-1/2 translate-y-1 rounded-lg border border-slate-200 bg-[var(--bg-surface)] px-3 py-2.5 text-left opacity-0 shadow-none ring-1 ring-slate-200/80 transition-colors duration-150 group-hover/endpoint:translate-y-0 group-hover/endpoint:opacity-100 group-focus-within/endpoint:translate-y-0 group-focus-within/endpoint:opacity-100"
         >
           <p
             v-if="item.description"
-            class="max-w-[24rem] break-words text-xs leading-5 text-slate-600 dark:text-slate-200"
+            class="max-w-[24rem] break-words text-xs leading-5 text-slate-600"
           >
             {{ item.description }}
           </p>
@@ -95,11 +95,11 @@ onBeforeUnmount(() => {
             <span class="h-1.5 w-1.5 rounded-full bg-[var(--accent)] bg-[var(--bg-surface-alt)]"></span>
             {{ tooltipHint(item.endpoint) }}
           </p>
-          <div class="absolute left-1/2 top-full h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-[var(--bg-surface)] dark:border-slate-700 dark:bg-slate-900"></div>
+          <div class="absolute left-1/2 top-full h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-slate-200 bg-[var(--bg-surface)]"></div>
         </div>
 
         <code
-          class="cursor-pointer font-mono text-gray-500 decoration-gray-400 decoration-dashed underline-offset-2 hover:text-[var(--accent-hover)] hover:underline focus:text-[var(--accent)] focus:underline focus:outline-none dark:text-gray-400 dark:decoration-gray-500 dark:hover:text-[var(--accent-hover)] dark:focus:text-[var(--accent)]"
+          class="cursor-pointer font-mono text-gray-500 decoration-gray-400 decoration-dashed underline-offset-2 hover:text-[var(--accent-hover)] hover:underline focus:text-[var(--accent)] focus:underline focus:outline-none"
           role="button"
           tabindex="0"
           @click="copy(item.endpoint)"
@@ -111,8 +111,8 @@ onBeforeUnmount(() => {
           type="button"
           class="rounded p-0.5 transition-colors"
           :class="copiedEndpoint === item.endpoint
-            ? 'text-emerald-500 dark:text-emerald-400'
-            : 'text-gray-400 hover:text-[var(--accent-hover)] dark:text-gray-500 dark:hover:text-[var(--accent-hover)]'"
+            ? 'text-emerald-500'
+            : 'text-gray-400 hover:text-[var(--accent-hover)]'"
           :aria-label="tooltipHint(item.endpoint)"
           @click="copy(item.endpoint)"
         >
@@ -128,7 +128,7 @@ onBeforeUnmount(() => {
           :href="speedTestUrl(item.endpoint)"
           target="_blank"
           rel="noopener noreferrer"
-          class="rounded p-0.5 text-gray-400 transition-colors hover:text-amber-500 dark:text-gray-500 dark:hover:text-amber-400"
+          class="rounded p-0.5 text-gray-400 transition-colors hover:text-amber-500"
           :title="t('keys.endpoints.speedTest')"
         >
           <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

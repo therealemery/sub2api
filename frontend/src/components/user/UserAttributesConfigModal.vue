@@ -42,14 +42,14 @@
           class="flex items-center gap-3 rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-3 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         >
           <!-- Drag Handle -->
-          <div class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" :title="t('admin.users.attributes.dragToReorder')">
+          <div class="cursor-move text-gray-400 hover:text-gray-600" :title="t('admin.users.attributes.dragToReorder')">
             <Icon name="menu" size="md" />
           </div>
 
           <!-- Attribute Info -->
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ attr.name }}</span>
+              <span class="font-medium text-gray-900">{{ attr.name }}</span>
               <span class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]">
                 {{ attr.key }}
               </span>
@@ -70,14 +70,14 @@
           <div class="flex items-center gap-1">
             <button
               @click="openEditModal(attr)"
-              class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
+              class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-[var(--accent-hover)]"
               :title="t('common.edit')"
             >
               <Icon name="edit" size="sm" />
             </button>
             <button
               @click="confirmDelete(attr)"
-              class="rounded-lg p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+              class="rounded-lg p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600"
               :title="t('common.delete')"
             >
               <Icon name="trash" size="sm" />
@@ -198,11 +198,11 @@
       <div class="flex items-center gap-6">
         <label class="flex items-center gap-2">
           <input v-model="form.required" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[var(--accent)]" />
-          <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.users.attributes.required') }}</span>
+          <span class="text-sm text-gray-700">{{ t('admin.users.attributes.required') }}</span>
         </label>
         <label class="flex items-center gap-2">
           <input v-model="form.enabled" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[var(--accent)]" />
-          <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.users.attributes.enabled') }}</span>
+          <span class="text-sm text-gray-700">{{ t('admin.users.attributes.enabled') }}</span>
         </label>
       </div>
     </form>

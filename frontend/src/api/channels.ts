@@ -1,20 +1,22 @@
 /**
- * User Channels API endpoints (non-admin)
- * 用户侧「可用渠道」聚合查询：渠道 + 用户可访问的分组 + 支持模型（含定价）。
+ * User Channels API endpoints.
+ * Aggregates available model channels, groups, and model pricing for user-facing pages.
  */
 
 import { apiClient } from './client'
 import type { BillingMode } from '@/constants/channel'
+import {
+  isLocalPreviewSession,
+  PREVIEW_GROUPS,
+  readPreviewChannels,
+} from '@/api/localPreviewData'
 
 export interface UserAvailableGroup {
   id: number
   name: string
   platform: string
-  /** 'standard' | 'subscription' — 订阅分组视觉加深，和 API 密钥页保持一致。 */
   subscription_type: string
-  /** 分组默认倍率。用户专属倍率（若有）通过 /groups/rates 获取后在前端 join。 */
   rate_multiplier: number
-  /** true = 专属分组（小范围授权）；false = 公开分组。 */
   is_exclusive: boolean
 }
 
@@ -46,11 +48,6 @@ export interface UserSupportedModel {
   pricing: UserSupportedModelPricing | null
 }
 
-/**
- * 渠道下单个平台的子视图：用户可访问的分组 + 该平台支持的模型。
- * 后端把一个渠道按平台聚合成 sections，前端可以把渠道名作为 row-group
- * 一次渲染，后面按 sections 顺序用 rowspan 铺开。
- */
 export interface UserChannelPlatformSection {
   platform: string
   groups: UserAvailableGroup[]
@@ -63,8 +60,65 @@ export interface UserAvailableChannel {
   platforms: UserChannelPlatformSection[]
 }
 
-/** 列出当前用户可见的「可用渠道」（与 /groups/available 保持一致，返回平数组）。 */
+function previewAvailableChannels(): UserAvailableChannel[] {
+  return readPreviewChannels()
+    .filter((channel) => channel.status === 'active')
+    .map((channel) => {
+      const platformMap = new Map<string, UserChannelPlatformSection>()
+
+      channel.model_pricing.forEach((pricingItem) => {
+        const section =
+          platformMap.get(pricingItem.platform) ??
+          {
+            platform: pricingItem.platform,
+            groups: PREVIEW_GROUPS.filter((group) =>
+              channel.group_ids.includes(group.id) && group.platform === pricingItem.platform
+            ),
+            supported_models: []
+          }
+
+        pricingItem.models.forEach((model) => {
+          section.supported_models.push({
+            name: model,
+            platform: pricingItem.platform,
+            pricing: {
+              billing_mode: pricingItem.billing_mode,
+              input_price: pricingItem.input_price,
+              output_price: pricingItem.output_price,
+              cache_write_price: pricingItem.cache_write_price,
+              cache_read_price: pricingItem.cache_read_price,
+              image_output_price: pricingItem.image_output_price,
+              per_request_price: pricingItem.per_request_price,
+              intervals: pricingItem.intervals.map((interval) => ({
+                min_tokens: interval.min_tokens,
+                max_tokens: interval.max_tokens,
+                tier_label: interval.tier_label,
+                input_price: interval.input_price,
+                output_price: interval.output_price,
+                cache_write_price: interval.cache_write_price,
+                cache_read_price: interval.cache_read_price,
+                per_request_price: interval.per_request_price,
+              })),
+            },
+          })
+        })
+
+        platformMap.set(pricingItem.platform, section)
+      })
+
+      return {
+        name: channel.name,
+        description: channel.description,
+        platforms: Array.from(platformMap.values()),
+      }
+    })
+}
+
 export async function getAvailable(options?: { signal?: AbortSignal }): Promise<UserAvailableChannel[]> {
+  if (isLocalPreviewSession()) {
+    return previewAvailableChannels()
+  }
+
   const { data } = await apiClient.get<UserAvailableChannel[]>('/channels/available', {
     signal: options?.signal
   })

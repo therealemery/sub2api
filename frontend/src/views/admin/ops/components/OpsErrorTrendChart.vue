@@ -155,9 +155,9 @@ const options = computed(() => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col rounded-lg bg-[var(--bg-surface)] p-6 ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700">
+  <div class="flex h-full flex-col rounded-lg bg-[var(--bg-surface)] p-6 ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)]">
     <div class="mb-4 flex shrink-0 items-center justify-between">
-      <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+      <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900">
         <svg class="h-4 w-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
@@ -172,7 +172,7 @@ const options = computed(() => {
       <div class="flex items-center gap-2">
         <button
           type="button"
-          class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-800"
+          class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           :disabled="!hasRequestErrors"
           @click="emit('openRequestErrors')"
         >
@@ -180,7 +180,7 @@ const options = computed(() => {
         </button>
         <button
           type="button"
-          class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-800"
+          class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
           :disabled="!hasUpstreamErrors"
           @click="emit('openUpstreamErrors')"
         >

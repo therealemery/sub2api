@@ -31,11 +31,11 @@
         @sort="handleSort"
       >
         <template #cell-email="{ value }">
-          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+          <span class="font-medium text-gray-900">{{ value }}</span>
         </template>
 
         <template #cell-balance="{ value }">
-          <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">${{ Number(value ?? 0).toFixed(2) }}</span>
+          <span class="font-medium text-gray-900">${{ Number(value ?? 0).toFixed(2) }}</span>
         </template>
 
         <template #cell-eligible="{ value }">

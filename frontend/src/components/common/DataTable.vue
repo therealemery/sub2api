@@ -65,7 +65,7 @@
       'is-scrollable': isScrollable
     }"
   >
-    <table class="data-table w-full min-w-max">
+    <table class="data-table w-full">
       <thead class="table-header">
         <tr>
           <th
@@ -117,7 +117,7 @@
       <tbody class="table-body">
         <!-- Loading skeleton -->
         <tr v-if="loading" v-for="i in 5" :key="i">
-          <td v-for="column in columns" :key="column.key" :class="['whitespace-nowrap py-4', getAdaptivePaddingClass()]">
+          <td v-for="column in columns" :key="column.key" :class="['py-4', getAdaptivePaddingClass()]">
             <div class="animate-pulse">
               <div class="skeleton h-4 w-3/4"></div>
             </div>
@@ -164,7 +164,7 @@
               v-for="(column, colIndex) in columns"
               :key="column.key"
               :class="[
-                'whitespace-nowrap py-4 text-sm text-primary',
+                'align-top py-4 text-sm text-primary',
                 getAdaptivePaddingClass(),
                 getStickyColumnClass(column, colIndex),
                 column.class
@@ -720,9 +720,6 @@ defineExpose({
   background-color: var(--bg-surface-alt);
 }
 
-.dark .table-wrapper .table-header {
-  background-color: var(--bg-surface-alt);
-}
 
 /* 表体保持在表头下方 */
 .table-body {
@@ -738,9 +735,6 @@ defineExpose({
   background-color: var(--bg-surface-alt);
 }
 
-.dark .sticky-header-cell {
-  background-color: var(--bg-surface-alt);
-}
 
 /* Sticky 列基础样式 */
 .sticky-col {
@@ -778,18 +772,12 @@ tbody .sticky-col {
   background-color: var(--bg-surface);
 }
 
-.dark tbody .sticky-col {
-  background-color: var(--bg-surface);
-}
 
 /* hover 状态保持 */
 tbody tr:hover .sticky-col {
   background-color: var(--bg-surface-alt);
 }
 
-.dark tbody tr:hover .sticky-col {
-  background-color: var(--bg-surface-alt);
-}
 
 /* 阴影只在可滚动时显示 */
 /* 单列固定右侧阴影 */
@@ -832,14 +820,7 @@ tbody tr:hover .sticky-col {
 }
 
 /* 暗色模式阴影 */
-.dark .is-scrollable .sticky-col-left::after,
-.dark .is-scrollable .sticky-col-left-second::after {
-  background: transparent;
-}
 
-.dark .is-scrollable .sticky-col-right::before {
-  background: transparent;
-}
 
 .data-mobile-card {
   border: 1px solid var(--border-default);
@@ -850,10 +831,6 @@ tbody tr:hover .sticky-col {
   backdrop-filter: none;
 }
 
-.dark .data-mobile-card {
-  border-color: var(--border-default);
-  background: var(--bg-surface);
-}
 
 .data-table {
   border-collapse: separate;
@@ -871,19 +848,12 @@ tbody tr:hover .sticky-col {
   background: var(--bg-surface) !important;
 }
 
-.dark .table-body {
-  background: var(--bg-surface) !important;
-}
 
 .table-wrapper .table-header,
 .sticky-header-cell {
   background-color: var(--bg-surface-alt) !important;
 }
 
-.dark .table-wrapper .table-header,
-.dark .sticky-header-cell {
-  background-color: var(--bg-surface-alt) !important;
-}
 
 .sticky-header-cell {
   color: var(--text-secondary) !important;
@@ -899,9 +869,6 @@ tbody tr:hover .sticky-col {
   background-color: var(--bg-surface-alt) !important;
 }
 
-.dark tbody tr:hover .sticky-col {
-  background-color: var(--bg-surface-alt) !important;
-}
 
 .data-mobile-card {
   border-color: var(--border-default) !important;
@@ -943,16 +910,7 @@ tbody tr:hover .sticky-col {
   background-color: var(--bg-surface-alt) !important;
 }
 
-:global(.dark) .table-body,
-:global(.dark) tbody .sticky-col {
-  background: var(--bg-surface) !important;
-}
 
-:global(.dark) .table-wrapper .table-header,
-:global(.dark) .sticky-header-cell,
-:global(.dark) tbody tr:hover .sticky-col {
-  background-color: var(--bg-surface-alt) !important;
-}
 </style>
 
 <style>
@@ -979,9 +937,6 @@ tbody tr:hover .sticky-col {
   border-radius: 6px !important;
   margin: 0 4px !important;
 }
-.dark .table-wrapper::-webkit-scrollbar-track {
-  background-color: var(--bg-surface-alt) !important;
-}
 
 /* 常驻、不透明的滑块，无视鼠标是否 hover 都在那！ */
 .table-wrapper::-webkit-scrollbar-thumb {
@@ -992,23 +947,14 @@ tbody tr:hover .sticky-col {
   -webkit-appearance: none !important;
 }
 .table-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-mutedd) !important;
+  background-color: var(--text-muted) !important;
 }
 
-.dark .table-wrapper::-webkit-scrollbar-thumb {
-  background-color: var(--border-strong) !important;
-}
-.dark .table-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-mutedd) !important;
-}
 
 /* 3. 仅给真正的 Firefox 留的后路 */
 @supports (-moz-appearance:none) {
   .table-wrapper {
     scrollbar-width: thin !important;
-    scrollbar-color: var(--border-strong) var(--bg-surface-alt) !important;
-  }
-  .dark .table-wrapper {
     scrollbar-color: var(--border-strong) var(--bg-surface-alt) !important;
   }
 }

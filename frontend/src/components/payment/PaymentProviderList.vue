@@ -4,10 +4,10 @@
     <div class="border-b border-gray-100 px-4 py-3 border-[var(--border-default)]">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h2 class="text-base font-semibold text-gray-900">
             {{ t('admin.settings.payment.providerManagement') }}
           </h2>
-          <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+          <p class="mt-0.5 text-xs text-gray-500">
             {{ t('admin.settings.payment.providerManagementDesc') }}
           </p>
         </div>
@@ -52,7 +52,7 @@
         @end="onDragEnd"
       >
         <div v-for="p in localProviders" :key="p.id" class="flex items-start gap-2">
-          <div class="drag-handle mt-3 flex cursor-grab items-center text-gray-300 hover:text-gray-500 active:cursor-grabbing text-[var(--text-muted)] dark:hover:text-dark-400">
+          <div class="drag-handle mt-3 flex cursor-grab items-center text-gray-300 hover:text-gray-500 active:cursor-grabbing text-[var(--text-muted)]">
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
             </svg>
@@ -73,7 +73,7 @@
 
       <!-- Empty -->
       <div v-else-if="!loading" class="py-6 text-center">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-gray-500">
           {{ canCreate
             ? t('admin.settings.payment.noProviders')
             : t('admin.settings.payment.enableTypesFirst') }}

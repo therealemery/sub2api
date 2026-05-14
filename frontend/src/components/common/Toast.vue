@@ -35,15 +35,15 @@
 
               <!-- Content -->
               <div class="min-w-0 flex-1">
-                <p v-if="toast.title" class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p v-if="toast.title" class="text-sm font-semibold text-gray-900">
                   {{ toast.title }}
                 </p>
                 <p
                   :class="[
                     'text-sm leading-relaxed',
                     toast.title
-                      ? 'mt-1 text-gray-600 dark:text-gray-300'
-                      : 'text-gray-900 dark:text-[var(--text-inverse)]'
+                      ? 'mt-1 text-gray-600'
+                      : 'text-gray-900'
                   ]"
                 >
                   {{ toast.message }}
@@ -53,7 +53,7 @@
               <!-- Close button -->
               <button
                 @click="removeToast(toast.id)"
-                class="-m-1 flex-shrink-0 rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-dark-700 dark:hover:text-gray-300"
+                class="-m-1 flex-shrink-0 rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
                 aria-label="Close notification"
               >
                 <Icon name="x" size="sm" />
@@ -131,10 +131,6 @@ const removeToast = (id: string) => {
   border-bottom-color: var(--border-default);
 }
 
-.dark .app-toast {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-}
 
 .toast-progress {
   width: 100%;

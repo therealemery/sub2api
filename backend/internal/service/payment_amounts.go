@@ -6,20 +6,29 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-const defaultBalanceRechargeMultiplier = 1.0
+const defaultPointsPerRMB = 10.0
+const defaultBalanceRechargeMultiplier = defaultPointsPerRMB
+
+func normalizePointsPerRMB(pointsPerRMB float64) float64 {
+	if math.IsNaN(pointsPerRMB) || math.IsInf(pointsPerRMB, 0) || pointsPerRMB <= 0 {
+		return defaultPointsPerRMB
+	}
+	return pointsPerRMB
+}
 
 func normalizeBalanceRechargeMultiplier(multiplier float64) float64 {
-	if math.IsNaN(multiplier) || math.IsInf(multiplier, 0) || multiplier <= 0 {
-		return defaultBalanceRechargeMultiplier
-	}
-	return multiplier
+	return normalizePointsPerRMB(multiplier)
+}
+
+func calculateCreditedPoints(paymentAmount, pointsPerRMB float64) float64 {
+	return decimal.NewFromFloat(paymentAmount).
+		Mul(decimal.NewFromFloat(normalizePointsPerRMB(pointsPerRMB))).
+		Round(2).
+		InexactFloat64()
 }
 
 func calculateCreditedBalance(paymentAmount, multiplier float64) float64 {
-	return decimal.NewFromFloat(paymentAmount).
-		Mul(decimal.NewFromFloat(normalizeBalanceRechargeMultiplier(multiplier))).
-		Round(2).
-		InexactFloat64()
+	return calculateCreditedPoints(paymentAmount, multiplier)
 }
 
 func calculateGatewayRefundAmount(orderAmount, payAmount, refundAmount float64) float64 {

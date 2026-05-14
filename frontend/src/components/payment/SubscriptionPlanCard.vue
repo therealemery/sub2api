@@ -20,10 +20,10 @@
         <div>
           <div class="flex items-baseline gap-2">
             <span class="money-value text-3xl font-bold">¥{{ plan.price }}</span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">/ {{ validitySuffix }}</span>
+            <span class="text-sm text-gray-500">/ {{ validitySuffix }}</span>
           </div>
           <div v-if="plan.original_price" class="mt-1 flex items-center gap-2 text-sm">
-            <span class="text-gray-400 line-through dark:text-gray-500">¥{{ plan.original_price }}</span>
+            <span class="text-gray-400 line-through">¥{{ plan.original_price }}</span>
             <span v-if="discountText" class="subscription-plan-card__discount">{{ discountText }}</span>
           </div>
         </div>
@@ -32,7 +32,7 @@
       <div class="subscription-plan-card__metrics">
         <div class="subscription-plan-card__metric">
           <span>{{ t('payment.planCard.rate') }}</span>
-          <strong>{{ rateDisplay }}</strong>
+          <strong>{{ rateDisplay.replace(/^./, '') }}x</strong>
         </div>
         <div v-for="item in quotaItems" :key="item.label" class="subscription-plan-card__metric">
           <span>{{ item.label }}</span>
@@ -89,13 +89,13 @@ const rateDisplay = computed(() => {
 const quotaItems = computed(() => {
   const items: Array<{ label: string; value: string }> = []
   if (props.plan.daily_limit_usd != null) {
-    items.push({ label: t('payment.planCard.dailyLimit'), value: `$${props.plan.daily_limit_usd}` })
+    items.push({ label: t('payment.planCard.dailyLimit'), value: `${props.plan.daily_limit_usd} 积分` })
   }
   if (props.plan.weekly_limit_usd != null) {
-    items.push({ label: t('payment.planCard.weeklyLimit'), value: `$${props.plan.weekly_limit_usd}` })
+    items.push({ label: t('payment.planCard.weeklyLimit'), value: `${props.plan.weekly_limit_usd} 积分` })
   }
   if (props.plan.monthly_limit_usd != null) {
-    items.push({ label: t('payment.planCard.monthlyLimit'), value: `$${props.plan.monthly_limit_usd}` })
+    items.push({ label: t('payment.planCard.monthlyLimit'), value: `${props.plan.monthly_limit_usd} 积分` })
   }
   if (items.length === 0) {
     items.push({ label: t('payment.planCard.quota'), value: t('payment.planCard.unlimited') })
@@ -131,12 +131,12 @@ const validitySuffix = computed(() => {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  transition: border-color 0.16s ease, transform 0.16s ease;
+  transition: none;
 }
 
 .subscription-plan-card:hover {
   border-color: var(--border-strong);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .subscription-plan-card__body {

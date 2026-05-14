@@ -43,7 +43,7 @@
 
       <!-- Text Content -->
       <div class="mb-8">
-        <h1 class="mb-3 text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h1 class="mb-3 text-2xl font-bold text-gray-900">
           {{ t('errors.pageNotFound') }}
         </h1>
         <p class="text-gray-500 text-[var(--text-muted)]">
@@ -68,7 +68,7 @@
         Need help?
         <a
           href="#"
-          class="text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+          class="text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)]"
         >
           Contact support
         </a>

@@ -7,8 +7,8 @@
           <span class="text-2xl font-semibold text-[var(--accent)] text-[var(--accent)]">{{ user.email.charAt(0).toUpperCase() }}</span>
         </div>
         <div class="flex-1">
-          <p class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ user.email }}</p>
-          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ t('admin.users.groupConfigHint', { email: user.email }) }}</p>
+          <p class="text-lg font-semibold text-gray-900">{{ user.email }}</p>
+          <p class="mt-1 text-sm text-gray-600">{{ t('admin.users.groupConfigHint', { email: user.email }) }}</p>
         </div>
       </div>
 
@@ -25,7 +25,7 @@
         <div v-if="exclusiveGroups.length > 0">
           <div class="mb-3 flex items-center gap-2">
             <div class="h-1.5 w-1.5 rounded-md bg-[var(--accent)]"></div>
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.users.exclusiveGroups') }}</h4>
+            <h4 class="text-sm font-semibold text-gray-700">{{ t('admin.users.exclusiveGroups') }}</h4>
             <span class="text-xs text-gray-400">({{ exclusiveGroupConfigs.filter(c => c.isSelected).length }}/{{ exclusiveGroupConfigs.length }})</span>
           </div>
           <div class="grid gap-3">
@@ -35,7 +35,7 @@
               class="group relative overflow-hidden rounded-lg border-2 p-4 transition-colors duration-200"
               :class="config.isSelected
                 ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]'
-                : 'border-gray-200 bg-[var(--bg-surface)] hover:border-gray-300 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-dark-500'"
+                : 'border-gray-200 bg-[var(--bg-surface)] hover:border-gray-300 border-[var(--border-default)] bg-[var(--bg-surface-alt)]'"
             >
               <div class="flex items-center gap-4">
                 <!-- 复选框 -->
@@ -58,26 +58,26 @@
                 <!-- 分组信息 -->
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ config.groupName }}</span>
+                    <span class="text-base font-semibold text-gray-900">{{ config.groupName }}</span>
                     <span class="inline-flex items-center rounded-md bg-[var(--accent-soft)] px-2 py-0.5 text-xs font-medium text-[var(--accent)]">
                       {{ t('admin.groups.exclusive') }}
                     </span>
                   </div>
                   <div class="mt-1.5 flex items-center gap-3 text-sm">
-                    <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                    <span class="inline-flex items-center gap-1 text-gray-500">
                       <PlatformIcon :platform="config.platform" size="xs" />
                       <span>{{ config.platform }}</span>
                     </span>
                     <span class="text-gray-300 text-[var(--text-muted)]">•</span>
-                    <span class="text-gray-500 dark:text-gray-400">
-                      {{ t('admin.users.defaultRate') }}: <span class="font-medium text-gray-700 dark:text-gray-300">{{ config.defaultRate }}x</span>
+                    <span class="text-gray-500">
+                      {{ t('admin.users.defaultRate') }}: <span class="font-medium text-gray-700">{{ config.defaultRate }}x</span>
                     </span>
                   </div>
                 </div>
 
                 <!-- 专属倍率输入 -->
                 <div class="flex flex-shrink-0 items-center gap-3">
-                  <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ t('admin.users.customRate') }}</label>
+                  <label class="text-sm font-medium text-gray-600">{{ t('admin.users.customRate') }}</label>
                   <input
                     type="number"
                     step="0.001"
@@ -97,7 +97,7 @@
         <div v-if="publicGroups.length > 0">
           <div class="mb-3 flex items-center gap-2">
             <div class="h-1.5 w-1.5 rounded-md bg-[var(--status-success)]"></div>
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.users.publicGroups') }}</h4>
+            <h4 class="text-sm font-semibold text-gray-700">{{ t('admin.users.publicGroups') }}</h4>
             <span class="text-xs text-gray-400">({{ publicGroupConfigs.length }})</span>
           </div>
           <div class="grid gap-3">
@@ -109,7 +109,7 @@
               <div class="flex items-center gap-4">
                 <!-- 复选框（禁用状态） -->
                 <div class="flex-shrink-0">
-                  <div class="flex h-5 w-5 items-center justify-center rounded-md border-2 border-green-400 bg-green-500 dark:border-green-600 dark:bg-green-600">
+                  <div class="flex h-5 w-5 items-center justify-center rounded-md border-2 border-green-400 bg-green-500">
                     <svg class="h-full w-full text-[var(--text-inverse)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -119,23 +119,23 @@
                 <!-- 分组信息 -->
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ config.groupName }}</span>
+                    <span class="text-base font-semibold text-gray-900">{{ config.groupName }}</span>
                   </div>
                   <div class="mt-1.5 flex items-center gap-3 text-sm">
-                    <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                    <span class="inline-flex items-center gap-1 text-gray-500">
                       <PlatformIcon :platform="config.platform" size="xs" />
                       <span>{{ config.platform }}</span>
                     </span>
                     <span class="text-gray-300 text-[var(--text-muted)]">•</span>
-                    <span class="text-gray-500 dark:text-gray-400">
-                      {{ t('admin.users.defaultRate') }}: <span class="font-medium text-gray-700 dark:text-gray-300">{{ config.defaultRate }}x</span>
+                    <span class="text-gray-500">
+                      {{ t('admin.users.defaultRate') }}: <span class="font-medium text-gray-700">{{ config.defaultRate }}x</span>
                     </span>
                   </div>
                 </div>
 
                 <!-- 专属倍率输入 -->
                 <div class="flex flex-shrink-0 items-center gap-3">
-                  <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ t('admin.users.customRate') }}</label>
+                  <label class="text-sm font-medium text-gray-600">{{ t('admin.users.customRate') }}</label>
                   <input
                     type="number"
                     step="0.001"
@@ -158,7 +158,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <p class="text-gray-500 dark:text-gray-400">{{ t('common.noGroupsAvailable') }}</p>
+          <p class="text-gray-500">{{ t('common.noGroupsAvailable') }}</p>
         </div>
       </div>
     </div>

@@ -5,10 +5,9 @@
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
           <div class="h-10 w-10 overflow-hidden rounded-lg">
-            <img :src="siteLogoPaths.light" alt="Logo" class="theme-logo-light" />
-            <img :src="siteLogoPaths.dark" alt="Logo" class="theme-logo-dark" />
+            <img :src="siteLogo" alt="Logo" class="site-logo-img" />
           </div>
-          <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-[var(--text-inverse)]">{{ siteName }}</span>
+          <span class="text-lg font-semibold tracking-tight text-gray-900">{{ siteName }}</span>
         </router-link>
         <div class="flex items-center gap-3">
           <LocaleSwitcher />
@@ -17,19 +16,11 @@
             :href="docUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 text-[var(--text-muted)] dark:hover:bg-dark-800 dark:hover:text-[var(--text-inverse)]"
+            class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 text-[var(--text-muted)]"
             :title="t('home.viewDocs')"
           >
             <Icon name="book" size="md" />
           </a>
-          <button
-            @click="toggleTheme"
-            class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 text-[var(--text-muted)] dark:hover:bg-dark-800 dark:hover:text-[var(--text-inverse)]"
-            :title="isDark ? t('home.switchToLight') : t('home.switchToDark')"
-          >
-            <Icon v-if="isDark" name="sun" size="md" />
-            <Icon v-else name="moon" size="md" />
-          </button>
         </div>
       </nav>
     </header>
@@ -38,7 +29,7 @@
     <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12">
       <!-- Hero -->
       <div class="text-center mb-12">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-gray-900 dark:text-[var(--text-inverse)]">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-gray-900">
           {{ t('keyUsage.title') }}
         </h1>
         <p class="text-gray-500 text-[var(--text-muted)] text-base max-w-md mx-auto">
@@ -59,12 +50,12 @@
               v-model="apiKey"
               :type="keyVisible ? 'text' : 'password'"
               :placeholder="t('keyUsage.placeholder')"
-              class="input-ring w-full h-12 pl-12 pr-12 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-sm text-gray-900 placeholder:text-gray-400 transition-colors border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)] dark:placeholder:text-dark-500"
+              class="input-ring w-full h-12 pl-12 pr-12 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-sm text-gray-900 placeholder:text-gray-400 transition-colors border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               @keydown.enter="queryKey"
             />
             <button
               @click="keyVisible = !keyVisible"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-[var(--text-inverse)] transition-colors"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-[var(--text-muted)] transition-colors"
             >
               <svg v-if="!keyVisible" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -105,19 +96,19 @@
               class="text-xs px-3 py-1.5 rounded-lg border transition-colors"
               :class="currentRange === range.key
                 ? 'bg-[var(--accent)] text-[var(--text-inverse)] border-[var(--border-focus)]'
-                : 'border-gray-200 bg-[var(--bg-surface)] text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)] text-[var(--text-muted)] hover:border-[var(--border-focus)] dark:hover:border-dark-600'"
+                : 'border-gray-200 bg-[var(--bg-surface)] text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)] text-[var(--text-muted)] hover:border-[var(--border-focus)]'"
             >{{ range.label }}</button>
             <div v-if="currentRange === 'custom'" class="flex items-center gap-2 ml-1">
               <input
                 v-model="customStartDate"
                 type="date"
-                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-gray-900 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]"
+                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-gray-900 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <span class="text-xs text-gray-400">-</span>
               <input
                 v-model="customEndDate"
                 type="date"
-                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-gray-900 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]"
+                class="input-ring text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-[var(--bg-surface)] text-gray-900 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               />
               <button
                 @click="queryKey"
@@ -162,7 +153,7 @@
                 class="w-2.5 h-2.5 rounded-full pulse-dot"
                 :class="statusInfo.isActive ? 'bg-emerald-500' : 'bg-rose-500'"
               ></span>
-              <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ statusInfo.label }}</span>
+              <span class="text-sm font-medium text-gray-900">{{ statusInfo.label }}</span>
               <span class="text-xs text-gray-400 text-[var(--text-muted)]">|</span>
               <span class="text-xs text-gray-500 text-[var(--text-muted)]">{{ statusInfo.statusText }}</span>
             </div>
@@ -219,7 +210,7 @@
                       </span>
                     </template>
                     <template v-else>
-                      <span class="text-3xl font-bold tabular-nums text-gray-900 dark:text-[var(--text-inverse)]">
+                      <span class="text-3xl font-bold tabular-nums text-gray-900">
                         {{ displayPcts[i] ?? 0 }}%
                       </span>
                       <span class="text-xs text-gray-500 text-[var(--text-muted)] mt-0.5">{{ t('keyUsage.used') }}</span>
@@ -227,7 +218,7 @@
                         class="text-sm font-semibold mt-1 tabular-nums"
                         :style="{ color: RING_GRADIENTS[i % 4].from }"
                       >{{ ring.amount }}</span>
-                      <p v-if="ring.resetAt && formatResetTime(ring.resetAt)" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 tabular-nums">
+                      <p v-if="ring.resetAt && formatResetTime(ring.resetAt)" class="text-xs text-gray-400 mt-0.5 tabular-nums">
                         ⟳ {{ formatResetTime(ring.resetAt) }}
                       </p>
                     </template>
@@ -245,7 +236,7 @@
             <div class="px-8 py-5 border-b border-gray-200 border-[var(--border-default)]">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 text-[var(--text-muted)]">{{ t('keyUsage.detailInfo') }}</h3>
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-dark-800">
+            <div class="divide-y divide-gray-100">
               <div
                 v-for="(row, i) in detailRows"
                 :key="i"
@@ -263,7 +254,7 @@
                   </div>
                   <span class="text-sm text-gray-700 text-[var(--text-muted)]">{{ row.label }}</span>
                 </div>
-                <span class="text-sm font-semibold tabular-nums" :class="row.valueClass || 'text-gray-900 dark:text-[var(--text-inverse)]'">
+                <span class="text-sm font-semibold tabular-nums" :class="row.valueClass || 'text-gray-900'">
                   {{ row.value }}
                 </span>
               </div>
@@ -285,7 +276,7 @@
                 class="bg-[var(--bg-surface)] px-6 py-4 bg-[var(--bg-surface-alt)]"
               >
                 <div class="text-xs text-gray-500 text-[var(--text-muted)] mb-1">{{ cell.label }}</div>
-                <div class="text-sm font-semibold tabular-nums text-gray-900 dark:text-[var(--text-inverse)]">{{ cell.value }}</div>
+                <div class="text-sm font-semibold tabular-nums text-gray-900">{{ cell.value }}</div>
               </div>
             </div>
           </div>
@@ -318,14 +309,14 @@
                     :key="i"
                     class="border-b border-gray-100 last:border-b-0 border-[var(--border-default)]"
                   >
-                    <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-[var(--text-inverse)]">{{ m.model || '-' }}</td>
+                    <td class="px-4 py-3 text-sm font-medium whitespace-nowrap text-gray-900">{{ m.model || '-' }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.requests) }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.input_tokens) }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.output_tokens) }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.cache_creation_tokens) }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.cache_read_tokens) }}</td>
                     <td class="px-4 py-3 text-sm tabular-nums text-right text-gray-700 text-[var(--text-muted)]">{{ fmtNum(m.total_tokens) }}</td>
-                    <td class="px-4 py-3 text-sm tabular-nums text-right font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ usd(m.actual_cost != null ? m.actual_cost : m.cost) }}</td>
+                    <td class="px-4 py-3 text-sm tabular-nums text-right font-medium text-gray-900">{{ usd(m.actual_cost != null ? m.actual_cost : m.cost) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -347,14 +338,14 @@
             :href="docUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-[var(--text-inverse)]"
+            class="text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)]"
           >{{ t('home.docs') }}</a>
           <a
             v-if="githubUrl"
             :href="githubUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-[var(--text-inverse)]"
+            class="text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)]"
           >GitHub</a>
         </div>
       </div>
@@ -368,7 +359,7 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
-import { DEFAULT_REPOSITORY_URL, DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath, resolveThemedSiteLogoPaths } from '@/constants/branding'
+import { DEFAULT_REPOSITORY_URL, DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath } from '@/constants/branding'
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
@@ -377,21 +368,8 @@ const appStore = useAppStore()
 
 const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || DEFAULT_SITE_NAME)
 const siteLogo = computed(() => resolveSiteLogoPath(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || DEFAULT_SITE_LOGO))
-const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(siteLogo.value))
 const docUrl = computed(() => appStore.cachedPublicSettings?.doc_url || appStore.docUrl || '')
 const githubUrl = DEFAULT_REPOSITORY_URL
-
-// ==================== Theme (same as HomeView) ====================
-
-const isDark = ref(document.documentElement.classList.contains('dark'))
-
-function toggleTheme() {
-  isDark.value = !isDark.value
-  const nextTheme = isDark.value ? 'dark' : 'light'
-  document.documentElement.classList.toggle('dark', isDark.value)
-  document.documentElement.dataset.theme = nextTheme
-  localStorage.setItem('theme', nextTheme)
-}
 
 const currentYear = computed(() => new Date().getFullYear())
 
@@ -464,7 +442,7 @@ const RING_GRADIENTS = [
 const ringAnimated = ref(false)
 const displayPcts = ref<number[]>([])
 
-const ringTrackColor = computed(() => isDark.value ? '#222222' : '#F0F0EE')
+const ringTrackColor = computed(() => '#F0F0EE')
 
 interface RingItem {
   title: string
@@ -808,14 +786,6 @@ async function queryKey() {
 
 // ==================== Lifecycle ====================
 
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    isDark.value = true
-    document.documentElement.classList.add('dark')
-  }
-}
-
 function formatResetTime(resetAt: string | null | undefined): string {
   if (!resetAt) return ''
   const diff = new Date(resetAt).getTime() - now.value.getTime()
@@ -829,7 +799,7 @@ function formatResetTime(resetAt: string | null | undefined): string {
 }
 
 onMounted(() => {
-  initTheme()
+  document.documentElement.classList.remove('dark')
   if (!appStore.publicSettingsLoaded) {
     appStore.fetchPublicSettings()
   }
@@ -869,10 +839,6 @@ onUnmounted(() => {
   background-size: 200% 100%;
   animation: none;
   border-radius: 8px;
-}
-:global(.dark) .skeleton {
-  background: var(--bg-surface-alt);
-  background-size: 200% 100%;
 }
 
 /* Fade up animation */

@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="table-page-with-intro admin-accounts-page">
       <PageIntro
-        title="账号管理"
-        description="管理真实参与调度的上游账号资源，检查账号状态、分组绑定、可调度性、容量和用量。这里不改变渠道或分组规则，只负责账号资源本身。"
+        title="上游账号"
+        description="管理真实参与调度的上游账号资源，检查账号状态、权限组绑定、可调度性、容量和用量。这里不改变模型接入或权限组规则，只负责账号资源本身。"
         compact
       />
       <TablePageLayout>
@@ -11,8 +11,8 @@
           <div class="admin-accounts-toolbar">
             <div class="admin-accounts-toolbar-head">
               <div>
-                <h3>筛选账号资源</h3>
-                <p>先按平台、类型、状态和分组缩小范围，再执行创建、同步或批量维护。</p>
+                <h3>筛选上游账号</h3>
+                <p>先按平台、类型、状态和权限组缩小范围，再执行创建、同步或批量维护。</p>
               </div>
               <div class="admin-accounts-primary-actions">
                 <button @click="handleManualRefresh" :disabled="loading" class="btn btn-secondary">
@@ -68,22 +68,22 @@
                   </button>
                   <div
                     v-if="showAutoRefreshDropdown"
-                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)]"
                   >
                     <div class="p-2">
                       <button
                         @click="setAutoRefreshEnabled(!autoRefreshEnabled)"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         <span>{{ t('admin.accounts.enableAutoRefresh') }}</span>
                         <Icon v-if="autoRefreshEnabled" name="check" size="sm" class="text-[var(--accent)]" />
                       </button>
-                      <div class="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+                      <div class="my-1 border-t border-gray-100"></div>
                       <button
                         v-for="sec in autoRefreshIntervals"
                         :key="sec"
                         @click="setAutoRefreshInterval(sec)"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         <span>{{ autoRefreshIntervalLabel(sec) }}</span>
                         <Icon v-if="autoRefreshIntervalSeconds === sec" name="check" size="sm" class="text-[var(--accent)]" />
@@ -127,14 +127,14 @@
                   </button>
                   <div
                     v-if="showColumnDropdown"
-                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)] dark:border-gray-700 dark:bg-gray-800"
+                    class="toolbar-dropdown absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-[var(--bg-surface)]"
                   >
                     <div class="max-h-80 overflow-y-auto p-2">
                       <button
                         v-for="col in toggleableColumns"
                         :key="col.key"
                         @click="toggleColumn(col.key)"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         <span>{{ col.label }}</span>
                         <Icon v-if="isColumnVisible(col.key)" name="check" size="sm" class="text-[var(--accent)]" />
@@ -148,7 +148,7 @@
 
           <div
             v-if="hasPendingListSync"
-            class="admin-accounts-sync-hint mt-2 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-700/40 dark:bg-amber-900/20 dark:text-amber-200"
+            class="admin-accounts-sync-hint mt-2 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
           >
             <span>{{ t('admin.accounts.listPendingSyncHint') }}</span>
             <button
@@ -214,10 +214,10 @@
           </template>
           <template #cell-name="{ row, value }">
             <div class="flex flex-col">
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+              <span class="font-medium text-gray-900">{{ value }}</span>
               <span
                 v-if="row.extra?.email_address"
-                class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]"
+                class="text-xs text-gray-500 truncate max-w-[200px]"
                 :title="row.extra.email_address"
               >
                 {{ row.extra.email_address }}
@@ -225,7 +225,7 @@
             </div>
           </template>
           <template #cell-notes="{ value }">
-            <span v-if="value" :title="value" class="block max-w-xs truncate text-sm text-gray-600 dark:text-gray-300">{{ value }}</span>
+            <span v-if="value" :title="value" class="block max-w-xs truncate text-sm text-gray-600">{{ value }}</span>
             <span v-else class="text-sm text-gray-400 text-[var(--text-muted)]">-</span>
           </template>
           <template #cell-platform_type="{ row }">
@@ -255,7 +255,7 @@
             </div>
           </template>
           <template #cell-schedulable="{ row }">
-            <button @click="handleToggleSchedulable(row)" :disabled="togglingSchedulable === row.id" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-dark-800" :class="[row.schedulable ? 'bg-[var(--accent)] hover:bg-[var(--bg-subtle)]' : 'bg-gray-200 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:hover:bg-dark-500']" :title="row.schedulable ? t('admin.accounts.schedulableEnabled') : t('admin.accounts.schedulableDisabled')">
+            <button @click="handleToggleSchedulable(row)" :disabled="togglingSchedulable === row.id" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" :class="[row.schedulable ? 'bg-[var(--accent)] hover:bg-[var(--bg-subtle)]' : 'bg-gray-200 hover:bg-gray-300 bg-[var(--bg-surface-alt)]']" :title="row.schedulable ? t('admin.accounts.schedulableEnabled') : t('admin.accounts.schedulableDisabled')">
               <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out" :class="[row.schedulable ? 'translate-x-4' : 'translate-x-0']" />
             </button>
           </template>
@@ -279,20 +279,20 @@
           </template>
           <template #cell-proxy="{ row }">
             <div v-if="row.proxy" class="flex items-center gap-2">
-              <span class="text-sm text-gray-700 dark:text-gray-300">{{ row.proxy.name }}</span>
-              <span v-if="row.proxy.country_code" class="text-xs text-gray-500 dark:text-gray-400">
+              <span class="text-sm text-gray-700">{{ row.proxy.name }}</span>
+              <span v-if="row.proxy.country_code" class="text-xs text-gray-500">
                 ({{ row.proxy.country_code }})
               </span>
             </div>
             <span v-else class="text-sm text-gray-400 text-[var(--text-muted)]">-</span>
           </template>
           <template #cell-rate_multiplier="{ row }">
-            <span class="text-sm font-mono text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-mono text-gray-700">
               {{ (row.rate_multiplier ?? 1).toFixed(2) }}x
             </span>
           </template>
           <template #cell-priority="{ value }">
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ value }}</span>
+            <span class="text-sm text-gray-700">{{ value }}</span>
           </template>
           <template #cell-last_used_at="{ value }">
             <span class="text-sm text-gray-500 text-[var(--text-muted)]">{{ formatRelativeTime(value) }}</span>
@@ -303,13 +303,13 @@
               <div v-if="isExpired(value) || (row.auto_pause_on_expired && value)" class="flex items-center gap-1">
                 <span
                   v-if="isExpired(value)"
-                  class="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                  class="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700"
                 >
                   {{ t('admin.accounts.expired') }}
                 </span>
                 <span
                   v-if="row.auto_pause_on_expired && value"
-                  class="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                  class="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"
                 >
                   {{ t('admin.accounts.autoPauseOnExpired') }}
                 </span>
@@ -318,15 +318,15 @@
           </template>
           <template #cell-actions="{ row }">
             <div class="flex items-center gap-1">
-              <button @click="handleEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]">
+              <button @click="handleEdit(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)]">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                 <span class="text-xs">{{ t('common.edit') }}</span>
               </button>
-              <button @click="handleDelete(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400">
+              <button @click="handleDelete(row)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
                 <span class="text-xs">{{ t('common.delete') }}</span>
               </button>
-              <button @click="openMenu(row, $event)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-dark-700 dark:hover:text-[var(--text-inverse)]">
+              <button @click="openMenu(row, $event)" class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
                 <span class="text-xs">{{ t('common.more') }}</span>
               </button>
@@ -361,7 +361,7 @@
     <TempUnschedStatusModal :show="showTempUnsched" :account="tempUnschedAcc" @close="showTempUnsched = false" @reset="handleTempUnschedReset" />
     <ConfirmDialog :show="showDeleteDialog" :title="t('admin.accounts.deleteAccount')" :message="t('admin.accounts.deleteConfirm', { name: deletingAcc?.name })" :confirm-text="t('common.delete')" :cancel-text="t('common.cancel')" :danger="true" @confirm="confirmDelete" @cancel="showDeleteDialog = false" />
     <ConfirmDialog :show="showExportDataDialog" :title="t('admin.accounts.dataExport')" :message="t('admin.accounts.dataExportConfirmMessage')" :confirm-text="t('admin.accounts.dataExportConfirm')" :cancel-text="t('common.cancel')" @confirm="handleExportData" @cancel="showExportDataDialog = false">
-      <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+      <label class="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]" v-model="includeProxyOnExport" />
         <span>{{ t('admin.accounts.dataExportIncludeProxies') }}</span>
       </label>
@@ -743,13 +743,13 @@ const hasActiveAccountFilters = computed(() => {
 })
 
 const accountsEmptyTitle = computed(() =>
-  hasActiveAccountFilters.value ? '没有匹配的账号' : '还没有接入账号资源'
+  hasActiveAccountFilters.value ? '没有匹配的上游账号' : '还没有接入上游账号'
 )
 
 const accountsEmptyDescription = computed(() =>
   hasActiveAccountFilters.value
-    ? '当前筛选条件下没有账号。可以清空筛选后重新查看，或确认账号是否已接入对应平台、类型和分组。'
-    : '账号是实际调度资源。建议先确认渠道和分组，再添加可用账号并绑定到对应分组。'
+    ? '当前筛选条件下没有上游账号。可以清空筛选后重新查看，或确认账号是否已接入对应平台、类型和权限组。'
+    : '上游账号是实际调度资源。建议先确认模型接入和权限组，再添加可用账号并绑定到对应权限组。'
 )
 
 const {
@@ -1075,9 +1075,9 @@ function getOpenAICompactLabel(row: any): string | null {
 
 function getOpenAICompactClass(row: any): string {
   switch (getOpenAICompactState(row)) {
-    case 'supported': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-    case 'unsupported': return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
-    case 'unknown': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+    case 'supported': return 'bg-emerald-100 text-emerald-700'
+    case 'unsupported': return 'bg-rose-100 text-rose-700'
+    case 'unknown': return 'bg-amber-100 text-amber-700'
     default: return ''
   }
 }
@@ -1092,9 +1092,9 @@ function getOpenAICompactTitle(row: any): string {
 function getAntigravityTierClass(row: any): string {
   const tier = getAntigravityTierFromRow(row)
   switch (tier) {
-    case 'free-tier': return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+    case 'free-tier': return 'bg-gray-100 text-gray-600'
     case 'g1-pro-tier': return 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-    case 'g1-ultra-tier': return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
+    case 'g1-ultra-tier': return 'bg-purple-100 text-purple-600'
     default: return ''
   }
 }
@@ -1706,7 +1706,7 @@ onUnmounted(() => {
 
 .admin-accounts-filters {
   display: grid !important;
-  grid-template-columns: minmax(260px, 1.3fr) repeat(3, minmax(176px, 0.8fr)) repeat(2, minmax(212px, 1fr));
+  grid-template-columns: minmax(220px, 1.2fr) repeat(3, minmax(140px, 0.8fr)) repeat(2, minmax(160px, 1fr));
   align-items: center !important;
   gap: 10px !important;
   width: 100%;
@@ -1771,7 +1771,7 @@ onUnmounted(() => {
   min-height: 220px;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1536px) {
   .admin-accounts-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

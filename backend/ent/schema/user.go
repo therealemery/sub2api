@@ -48,6 +48,7 @@ func (User) Fields() []ent.Field {
 			Default(domain.RoleUser),
 		field.Float("balance").
 			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
+			Comment("Compatibility storage for user points. Public APIs expose points while old balance fields remain readable during migration.").
 			Default(0),
 		field.Int("concurrency").
 			Default(5),

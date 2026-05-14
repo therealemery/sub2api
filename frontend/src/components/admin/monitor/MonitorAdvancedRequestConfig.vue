@@ -27,7 +27,7 @@
           />
           <button
             type="button"
-            class="flex-none rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+            class="flex-none rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
             :title="t('common.delete')"
             @click="removeRow(i)"
           >
@@ -38,7 +38,7 @@
         </div>
         <button
           type="button"
-          class="inline-flex items-center gap-1 rounded border border-dashed border-gray-300 px-2 py-1 text-xs text-gray-500 hover:border-[var(--border-focus)] hover:text-[var(--accent-hover)] border-[var(--border-default)] dark:text-gray-400 dark:hover:border-[var(--border-focus)] dark:hover:text-[var(--accent-hover)]"
+          class="inline-flex items-center gap-1 rounded border border-dashed border-gray-300 px-2 py-1 text-xs text-gray-500 hover:border-[var(--border-focus)] hover:text-[var(--accent-hover)] border-[var(--border-default)]"
           @click="addRow"
         >
           <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,7 +278,7 @@ function bodyModeButtonClass(mode: BodyOverrideMode): string {
   if (active) {
     return 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)] border-[var(--border-focus)]'
   }
-  return 'border-gray-200 bg-[var(--bg-surface)] text-gray-600 hover:border-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-400'
+  return 'border-gray-200 bg-[var(--bg-surface)] text-gray-600 hover:border-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]'
 }
 
 const bodyModeHint = computed(() => {

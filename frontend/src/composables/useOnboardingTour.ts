@@ -144,7 +144,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
     driverInstance = driver({
       showProgress: true,
       steps,
-      animate: true,
+      animate: false,
       allowClose: false, // 禁止点击遮罩关闭
       allowKeyboardControl: false,
       overlayClickBehavior: () => {
@@ -182,7 +182,11 @@ export function useOnboardingTour(options: OnboardingOptions) {
           driverInstance?.moveNext()
         }
       },
-      onPrevClick: () => {
+      onPrevClick: (_el, _step, { state }) => {
+        if ((state.activeIndex ?? 0) <= 0) {
+          finishTour()
+          return
+        }
         driverInstance?.movePrevious()
       },
       onCloseClick: () => {
@@ -256,16 +260,6 @@ export function useOnboardingTour(options: OnboardingOptions) {
 
             if (progressEl) leftContainer.appendChild(progressEl)
 
-            const skipBtn = document.createElement('button')
-            skipBtn.type = 'button'
-            skipBtn.className = 'driver-popover-skip-btn'
-            skipBtn.textContent = t('common.skip', '跳过')
-            skipBtn.addEventListener('click', (event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              finishTour()
-            })
-
             const shortcutsEl = document.createElement('div')
             shortcutsEl.className = 'footer-shortcuts'
 
@@ -284,7 +278,6 @@ export function useOnboardingTour(options: OnboardingOptions) {
             shortcutsEl.appendChild(shortcut1)
             leftContainer.appendChild(shortcutsEl)
 
-            rightContainer.appendChild(skipBtn)
             if (prevBtnEl) rightContainer.appendChild(prevBtnEl)
             if (nextBtnEl) rightContainer.appendChild(nextBtnEl)
 
@@ -296,8 +289,6 @@ export function useOnboardingTour(options: OnboardingOptions) {
           // 3. 状态更新
           const isLastStep = state.activeIndex === (config.steps?.length ?? 0) - 1
           const activeNextBtn = nextButton || footerEl.querySelector(`.${CLASS_NEXT_BTN}`)
-          const activeSkipBtn = footerEl.querySelector('.driver-popover-skip-btn') as HTMLButtonElement | null
-
           if (activeNextBtn) {
              if (isLastStep) {
                activeNextBtn.classList.add(CLASS_DONE_BTN)
@@ -306,9 +297,6 @@ export function useOnboardingTour(options: OnboardingOptions) {
              }
           }
 
-          if (activeSkipBtn) {
-            activeSkipBtn.hidden = isLastStep
-          }
         } catch (e) {
           console.error('Onboarding Tour Render Error:', e)
         }
@@ -574,7 +562,7 @@ export function useOnboardingTour(options: OnboardingOptions) {
     }
 
     // 简易模式下禁用新手引导
-    if (userStore.isSimpleMode || !userStore.user || userStore.user.role === 'admin') {
+    if (userStore.isSimpleMode || userStore.isLocalPreview || !userStore.user || userStore.user.role === 'admin') {
       return
     }
 

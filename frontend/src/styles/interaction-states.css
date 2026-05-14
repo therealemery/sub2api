@@ -6,13 +6,6 @@
   --interaction-pressed-bg: var(--accent-soft);
 }
 
-.dark {
-  --interaction-bg: var(--accent-soft);
-  --interaction-bg-strong: var(--accent-wash);
-  --interaction-border: var(--border-focus);
-  --interaction-text: var(--accent);
-  --interaction-pressed-bg: var(--accent-soft);
-}
 
 .app-shell button:not(:disabled):active,
 .app-shell .btn:not(:disabled):active,
@@ -56,19 +49,8 @@
 }
 
 .app-shell .sidebar-link-active,
-.dark .app-shell .sidebar-link-active {
-  border-color: var(--interaction-border) !important;
-  background: var(--interaction-bg) !important;
-  color: var(--interaction-text) !important;
-  font-weight: 650 !important;
-  box-shadow: none !important;
-}
 
 .app-shell .sidebar-link-active::before,
-.dark .app-shell .sidebar-link-active::before {
-  content: none !important;
-  display: none !important;
-}
 
 .select-trigger-open,
 .select-trigger[aria-expanded='true'] {

@@ -18,6 +18,7 @@ func UserFromServiceShallow(u *service.User) *User {
 		Username:                   u.Username,
 		Role:                       u.Role,
 		Balance:                    u.Balance,
+		Points:                     u.Balance,
 		Concurrency:                u.Concurrency,
 		Status:                     u.Status,
 		AllowedGroups:              u.AllowedGroups,
@@ -29,6 +30,7 @@ func UserFromServiceShallow(u *service.User) *User {
 		BalanceNotifyThreshold:     u.BalanceNotifyThreshold,
 		BalanceNotifyExtraEmails:   NotifyEmailEntriesFromService(u.BalanceNotifyExtraEmails),
 		TotalRecharged:             u.TotalRecharged,
+		TotalRechargedPoints:       u.TotalRecharged,
 		RPMLimit:                   u.RPMLimit,
 	}
 }

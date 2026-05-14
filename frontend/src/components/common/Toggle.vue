@@ -2,14 +2,14 @@
   <button
     type="button"
     @click="toggle"
-    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-offset-2 dark:focus:ring-offset-dark-800"
-    :class="[modelValue ? 'bg-[var(--accent)]' : 'bg-gray-200 bg-[var(--bg-surface-alt)]']"
+    class="toggle-switch"
+    :class="{ 'toggle-switch-active': modelValue }"
     role="switch"
     :aria-checked="modelValue"
   >
     <span
-      class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--bg-surface)] shadow-none ring-0 transition duration-200 ease-in-out"
-      :class="[modelValue ? 'translate-x-5' : 'translate-x-0']"
+      class="toggle-knob"
+      :class="{ 'toggle-knob-active': modelValue }"
     />
   </button>
 </template>
@@ -27,3 +27,62 @@ function toggle() {
   emit('update:modelValue', !props.modelValue)
 }
 </script>
+
+<style scoped>
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg-surface-alt);
+  cursor: pointer;
+  outline: none;
+  transition: none;
+}
+
+.toggle-switch:hover {
+  border-color: var(--accent);
+  background: var(--bg-surface-alt);
+}
+
+.toggle-switch:focus-visible {
+  border-color: var(--border-focus);
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+}
+
+.toggle-switch-active {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.toggle-switch-active:hover {
+  background: var(--accent);
+}
+
+.toggle-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.toggle-knob {
+  position: absolute;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  transition: none;
+}
+
+.toggle-knob-active {
+  left: 21px;
+  border-color: var(--accent-contrast);
+  background: var(--accent-contrast);
+}
+</style>

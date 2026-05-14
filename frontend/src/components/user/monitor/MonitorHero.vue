@@ -13,8 +13,8 @@
           :aria-selected="window === opt.value"
           class="px-3 py-1 rounded-lg transition-colors"
           :class="window === opt.value
-            ? 'monitor-window-tab-active text-gray-900 dark:text-[var(--text-inverse)] font-semibold'
-            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            ? 'monitor-window-tab-active text-gray-900 font-semibold'
+            : 'text-gray-500 hover:text-gray-700'"
           @click="emit('update:window', opt.value)"
         >
           {{ opt.label }}
@@ -34,7 +34,7 @@
 
       <button
         type="button"
-        class="h-8 w-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-dark-700 transition-colors disabled:opacity-50"
+        class="h-8 w-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
         :disabled="loading"
         :title="t('common.refresh')"
         @click="emit('refresh')"
@@ -96,10 +96,10 @@ const overallLabel = computed(() => t(`channelStatus.overall.${props.overallStat
 const overallChipClass = computed(() => {
   switch (props.overallStatus) {
     case 'operational':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+      return 'bg-emerald-100 text-emerald-700'
     case 'degraded':
     default:
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
+      return 'bg-amber-100 text-amber-700'
   }
 })
 

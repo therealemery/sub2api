@@ -48,7 +48,7 @@
       </div>
 
       <!-- Expanded: show the label "Pricing Entry" or similar -->
-      <div v-else class="flex-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <div v-else class="flex-1 text-xs font-medium text-gray-500">
         {{ t('admin.channels.form.pricingEntry', '定价配置') }}
       </div>
 
@@ -71,7 +71,7 @@
         <!-- Header: Models + Billing Mode -->
         <div class="mt-3 flex items-start gap-2">
           <div class="flex-1">
-            <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <label class="text-xs font-medium text-gray-500">
               {{ t('admin.channels.form.models', '模型列表') }} <span class="text-red-500">*</span>
             </label>
             <ModelTagInput
@@ -83,7 +83,7 @@
             />
           </div>
           <div class="w-40">
-            <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <label class="text-xs font-medium text-gray-500">
               {{ t('admin.channels.form.billingMode', '计费模式') }}
             </label>
             <Select
@@ -98,7 +98,7 @@
         <!-- Token mode -->
         <div v-if="entry.billing_mode === 'token'">
           <!-- Default prices (fallback when no interval matches) -->
-          <label class="mt-3 block text-xs font-medium text-gray-500 dark:text-gray-400">
+          <label class="mt-3 block text-xs font-medium text-gray-500">
             {{ t('admin.channels.form.defaultPrices', '默认价格（未命中区间时使用）') }}
             <span class="ml-1 font-normal text-gray-400">$/MTok</span>
           </label>
@@ -133,7 +133,7 @@
           <!-- Token intervals -->
           <div class="mt-3">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <label class="text-xs font-medium text-gray-500">
                 {{ t('admin.channels.form.intervals', '上下文区间定价（可选）') }}
                 <span class="ml-1 font-normal text-gray-400">(min, max]</span>
               </label>
@@ -157,7 +157,7 @@
         <!-- Per-request mode -->
         <div v-else-if="entry.billing_mode === 'per_request'">
           <!-- Default per-request price -->
-          <label class="mt-3 block text-xs font-medium text-gray-500 dark:text-gray-400">
+          <label class="mt-3 block text-xs font-medium text-gray-500">
             {{ t('admin.channels.form.defaultPerRequestPrice', '默认单次价格（未命中层级时使用）') }}
             <span class="ml-1 font-normal text-gray-400">$</span>
           </label>
@@ -168,7 +168,7 @@
 
           <!-- Tiers -->
           <div class="mt-3 flex items-center justify-between">
-            <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <label class="text-xs font-medium text-gray-500">
               {{ t('admin.channels.form.requestTiers', '按次计费层级') }}
             </label>
             <button type="button" @click="addInterval" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
@@ -193,7 +193,7 @@
         <!-- Image mode -->
         <div v-else-if="entry.billing_mode === 'image'">
           <!-- Default image price (per-request, same as per_request mode) -->
-          <label class="mt-3 block text-xs font-medium text-gray-500 dark:text-gray-400">
+          <label class="mt-3 block text-xs font-medium text-gray-500">
             {{ t('admin.channels.form.defaultImagePrice', '默认图片价格（未命中层级时使用）') }}
             <span class="ml-1 font-normal text-gray-400">$</span>
           </label>
@@ -204,7 +204,7 @@
 
           <!-- Image tiers -->
           <div class="mt-3 flex items-center justify-between">
-            <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <label class="text-xs font-medium text-gray-500">
               {{ t('admin.channels.form.imageTiers', '图片计费层级（按次）') }}
             </label>
             <button type="button" @click="addImageTier" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">

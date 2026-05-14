@@ -20,7 +20,7 @@ export type OrderStatus =
 
 export type PaymentType = 'alipay' | 'wxpay' | 'alipay_direct' | 'wxpay_direct' | 'stripe' | 'easypay'
 
-export type OrderType = 'balance' | 'subscription'
+export type OrderType = 'balance' | 'points' | 'subscription'
 
 // ==================== Configuration ====================
 
@@ -33,6 +33,7 @@ export interface PaymentConfig {
   order_timeout_minutes: number
   balance_disabled: boolean
   balance_recharge_multiplier: number
+  points_per_rmb?: number
   enabled_payment_types: PaymentType[]
   help_image_url: string
   help_text: string
@@ -64,6 +65,7 @@ export interface CheckoutInfoResponse {
   plans: SubscriptionPlan[]
   balance_disabled: boolean
   balance_recharge_multiplier: number
+  points_per_rmb?: number
   recharge_fee_rate: number
   help_text: string
   help_image_url: string
@@ -184,6 +186,8 @@ export interface WechatJSAPIPayload {
 export interface CreateOrderResult {
   order_id: number
   amount: number
+  credited_points?: number
+  points_amount?: number
   pay_url?: string
   qr_code?: string
   client_secret?: string

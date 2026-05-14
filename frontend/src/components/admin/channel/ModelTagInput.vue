@@ -13,7 +13,7 @@
         <button
           type="button"
           @click="removeModel(idx)"
-          class="ml-0.5 rounded-full p-0.5 hover:bg-[var(--bg-subtle)] dark:hover:bg-[var(--bg-subtle)]"
+          class="ml-0.5 rounded-full p-0.5 hover:bg-[var(--bg-subtle)]"
         >
           <Icon name="x" size="xs" />
         </button>
@@ -22,7 +22,7 @@
         ref="inputRef"
         v-model="inputValue"
         type="text"
-        class="flex-1 min-w-[120px] border-none bg-transparent text-sm outline-none placeholder:text-gray-400 dark:text-[var(--text-inverse)]"
+        class="flex-1 min-w-[120px] border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
         :placeholder="models.length === 0 ? placeholder : ''"
         @keydown.enter.prevent="addModel"
         @keydown.tab.prevent="addModel"

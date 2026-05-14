@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="space-y-6">
       <PageIntro
-        title="我的订阅"
-        description="查看当前订阅、可用额度、到期时间和续费入口。额度金额统一用绿色突出，方便快速确认剩余额度压力。"
+        title="套餐权益"
+      description="查看当前套餐、可用额度、到期时间和续费入口。套餐额度统一用绿色突出，方便快速确认剩余额度压力。"
         compact
       />
 
@@ -21,7 +21,7 @@
         >
           <Icon name="creditCard" size="xl" class="text-gray-400" />
         </div>
-        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h3 class="mb-2 text-lg font-semibold text-gray-900">
           {{ t('userSubscriptions.noActiveSubscriptions') }}
         </h3>
         <p class="text-gray-500 text-[var(--text-muted)]">
@@ -52,7 +52,7 @@
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                  <h3 class="truncate text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                  <h3 class="truncate text-base font-semibold text-gray-900">
                     {{ subscription.group?.name || `Group #${subscription.group_id}` }}
                   </h3>
                   <span :class="['rounded-md border px-2 py-0.5 text-[11px] font-medium', platformBadgeClass(subscription.group?.platform || '')]">
@@ -69,10 +69,10 @@
                 :class="[
                   'rounded-md px-2 py-0.5 text-xs font-medium',
                   subscription.status === 'active'
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                    ? 'bg-emerald-100 text-emerald-700'
                     : subscription.status === 'expired'
-                      ? 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-400'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                      ? 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)]'
+                      : 'bg-red-100 text-red-700'
                 ]"
               >
                 {{ t(`userSubscriptions.status.${subscription.status}`) }}
@@ -102,7 +102,7 @@
               <span class="text-gray-500 text-[var(--text-muted)]">{{
                 t('userSubscriptions.expires')
               }}</span>
-              <span class="text-gray-700 dark:text-gray-300">{{
+              <span class="text-gray-700">{{
                 t('userSubscriptions.noExpiration')
               }}</span>
             </div>
@@ -110,7 +110,7 @@
             <!-- Daily Usage -->
             <div v-if="subscription.group?.daily_limit_usd" class="space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="text-sm font-medium text-gray-700">
                   {{ t('userSubscriptions.daily') }}
                 </span>
                 <span class="money-value text-sm font-semibold">
@@ -151,7 +151,7 @@
             <!-- Weekly Usage -->
             <div v-if="subscription.group?.weekly_limit_usd" class="space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="text-sm font-medium text-gray-700">
                   {{ t('userSubscriptions.weekly') }}
                 </span>
                 <span class="money-value text-sm font-semibold">
@@ -192,7 +192,7 @@
             <!-- Monthly Usage -->
             <div v-if="subscription.group?.monthly_limit_usd" class="space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="text-sm font-medium text-gray-700">
                   {{ t('userSubscriptions.monthly') }}
                 </span>
                 <span class="money-value text-sm font-semibold">
@@ -240,12 +240,12 @@
               class="flex items-center justify-center rounded-lg bg-[var(--bg-surface-alt)] py-6"
             >
               <div class="flex items-center gap-3">
-                <span class="text-4xl text-emerald-600 dark:text-emerald-400">∞</span>
+                <span class="text-4xl text-emerald-600">∞</span>
                 <div>
-                  <p class="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  <p class="text-sm font-medium text-emerald-700">
                     {{ t('userSubscriptions.unlimited') }}
                   </p>
-                  <p class="text-xs text-emerald-600/70 dark:text-emerald-400/70">
+                  <p class="text-xs text-emerald-600/70">
                     {{ t('userSubscriptions.unlimitedDesc') }}
                   </p>
                 </div>
@@ -346,10 +346,10 @@ function getExpirationClass(expiresAt: string): string {
   const diff = expires.getTime() - now.getTime()
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
 
-  if (days <= 0) return 'text-red-600 dark:text-red-400 font-medium'
-  if (days <= 3) return 'text-red-600 dark:text-red-400'
-  if (days <= 7) return 'text-orange-600 dark:text-orange-400'
-  return 'text-gray-700 dark:text-gray-300'
+  if (days <= 0) return 'text-red-600 font-medium'
+  if (days <= 3) return 'text-red-600'
+  if (days <= 7) return 'text-orange-600'
+  return 'text-gray-700'
 }
 
 function formatResetTime(windowStart: string | null, windowHours: number): string {
@@ -429,18 +429,6 @@ onMounted(() => {
   color: var(--bg-surface) !important;
 }
 
-:global(.dark) .subscription-card-header {
-  background: var(--bg-surface-alt);
-}
 
-:global(.dark) .subscription-progress-track {
-  background: var(--bg-surface-alt) !important;
-}
 
-:global(.dark) .subscription-renew-button,
-:global(.dark) .subscription-renew-button:hover {
-  background: var(--text-primary) !important;
-  color: var(--bg-surface) !important;
-  border-color: var(--border-default) !important;
-}
 </style>

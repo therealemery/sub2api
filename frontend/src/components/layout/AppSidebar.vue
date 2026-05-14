@@ -1,20 +1,16 @@
 <template>
   <aside
-    class="sidebar"
-    :class="[
-      sidebarCollapsed ? 'w-[72px]' : 'w-64',
-      { '-translate-x-full lg:translate-x-0': !mobileOpen }
-    ]"
+    class="sidebar w-64"
+    :class="{ '-translate-x-full lg:translate-x-0': !mobileOpen }"
   >
     <!-- Logo/Brand -->
     <div class="sidebar-header" :class="{ 'sidebar-header-collapsed': sidebarCollapsed }">
       <!-- Custom Logo or Default Logo -->
       <div class="sidebar-logo flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg">
-        <img :src="siteLogoPaths.light" alt="Logo" class="theme-logo-light" />
-        <img :src="siteLogoPaths.dark" alt="Logo" class="theme-logo-dark" />
+        <img :src="siteLogoPath" alt="Logo" class="site-logo-img" />
       </div>
       <div class="sidebar-brand" :class="{ 'sidebar-brand-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">
-        <span class="sidebar-brand-title text-lg font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+        <span class="sidebar-brand-title text-lg font-bold text-gray-900">
           {{ siteName }}
         </span>
         <!-- Version Badge -->
@@ -143,31 +139,15 @@
 
     <!-- Bottom Section -->
     <div class="sidebar-footer mt-auto border-t border-gray-100 p-3 border-[var(--border-default)]">
-      <!-- Theme Toggle -->
-      <button
-        @click="toggleTheme"
-        class="sidebar-link mb-2 w-full"
-        :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
-        :title="sidebarCollapsed ? (isDark ? t('nav.lightMode') : t('nav.darkMode')) : undefined"
+      <router-link
+        to="/docs"
+        class="sidebar-link sidebar-doc-link w-full"
+        :class="{ 'sidebar-link-active': isActive('/docs') }"
+        @click="handleMenuItemClick('/docs')"
       >
-        <SunIcon v-if="isDark" class="h-5 w-5 flex-shrink-0 text-amber-500" />
-        <MoonIcon v-else class="h-5 w-5 flex-shrink-0" />
-        <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{
-          isDark ? t('nav.lightMode') : t('nav.darkMode')
-        }}</span>
-      </button>
-
-      <!-- Collapse Button -->
-      <button
-        @click="toggleSidebar"
-        class="sidebar-link w-full"
-        :class="{ 'sidebar-link-collapsed': sidebarCollapsed }"
-        :title="sidebarCollapsed ? t('nav.expand') : t('nav.collapse')"
-      >
-        <ChevronDoubleLeftIcon v-if="!sidebarCollapsed" class="h-5 w-5 flex-shrink-0" />
-        <ChevronDoubleRightIcon v-else class="h-5 w-5 flex-shrink-0" />
-        <span class="sidebar-label" :class="{ 'sidebar-label-collapsed': sidebarCollapsed }" :aria-hidden="sidebarCollapsed ? 'true' : 'false'">{{ t('nav.collapse') }}</span>
-      </button>
+        <component :is="SidebarDocsIcon" class="h-5 w-5 flex-shrink-0" />
+        <span class="sidebar-label">{{ t('nav.docs') }}</span>
+      </router-link>
     </div>
   </aside>
 
@@ -188,8 +168,7 @@ import { useI18n } from 'vue-i18n'
 import { useAdminSettingsStore, useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
 import VersionBadge from '@/components/common/VersionBadge.vue'
 import { sanitizeSvg } from '@/utils/sanitize'
-import { FeatureFlags, makeSidebarFlag } from '@/utils/featureFlags'
-import { resolveThemedSiteLogoPaths } from '@/constants/branding'
+import { resolveSiteLogoPath } from '@/constants/branding'
 
 interface NavItem {
   path: string
@@ -203,28 +182,6 @@ interface NavItem {
    * does NOT navigate to its `path`. The `path` is purely a stable key.
    */
   expandOnly?: boolean
-  /**
-   * 可选的功能开关 getter。返回 false 时菜单项被隐藏；返回 undefined/true 时显示。
-   * 宽容策略（undefined → 显示）避免 public settings 未加载完成时菜单闪烁消失。
-   * Getter 里访问的 reactive 来源（store / composable）会被 computed 自动追踪，
-   * 开关切换时菜单自动更新。
-   */
-  featureFlag?: () => boolean | undefined
-}
-
-// applyFeatureFlags 递归过滤掉 featureFlag() === false 的节点（含子节点）。
-// 使用 `!== false` 宽容语义：undefined（设置未加载）或 true 都视为显示。
-function applyFeatureFlags(items: NavItem[]): NavItem[] {
-  const out: NavItem[] = []
-  for (const item of items) {
-    if (item.featureFlag && item.featureFlag() === false) continue
-    if (item.children) {
-      out.push({ ...item, children: applyFeatureFlags(item.children) })
-    } else {
-      out.push(item)
-    }
-  }
-  return out
 }
 
 const { t } = useI18n()
@@ -236,17 +193,16 @@ const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 const adminSettingsStore = useAdminSettingsStore()
 
-const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
+const sidebarCollapsed = computed(() => false)
 const mobileOpen = computed(() => appStore.mobileOpen)
 const isAdmin = computed(() => authStore.isAdmin)
-const isDark = ref(document.documentElement.classList.contains('dark'))
 
 // Track which parent nav groups are expanded
 const expandedGroups = ref<Set<string>>(new Set())
 
 // Site settings from appStore (cached, no flicker)
 const siteName = computed(() => appStore.siteName)
-const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(appStore.siteLogo))
+const siteLogoPath = computed(() => resolveSiteLogoPath(appStore.siteLogo))
 const siteVersion = computed(() => appStore.siteVersion)
 
 const SIDEBAR_ICON_MAIN = 'var(--sidebar-icon-main)'
@@ -366,6 +322,11 @@ const SidebarKeyIcon = makeSidebarIcon([
   { d: 'M16.3 7.1h.1', accent: true },
 ])
 
+const SidebarDocsIcon = makeSidebarIcon([
+  { d: 'M5.4 4.2h9.8c1.9 0 3.4 1.5 3.4 3.4v12.2H8.8a3.4 3.4 0 0 1-3.4-3.4V4.2zM8.8 19.8a3.4 3.4 0 0 1 0-6.8h9.8' },
+  { d: 'M9 8.1h5.8M9 10.9h4.2', accent: true },
+])
+
 const SidebarSignalIcon = makeSidebarIcon([
   { d: 'M7.5 16.8a6.8 6.8 0 0 1 0-9.6M16.5 7.2a6.8 6.8 0 0 1 0 9.6M5 19.2a10.3 10.3 0 0 1 0-14.4M19 4.8a10.3 10.3 0 0 1 0 14.4' },
   { d: 'M12 12h.1', accent: true },
@@ -391,67 +352,6 @@ const SidebarPriceTagIcon = makeSidebarIcon([
   { d: 'M8.2 8.2h.1', accent: true },
 ])
 
-// Footer and group-control SVG icons
-const SunIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z'
-        })
-      ]
-    )
-}
-
-const MoonIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z'
-        })
-      ]
-    )
-}
-
-const ChevronDoubleLeftIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'm18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5'
-        })
-      ]
-    )
-}
-
-const ChevronDoubleRightIcon = {
-  render: () =>
-    h(
-      'svg',
-      { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' },
-      [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          d: 'm5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5'
-        })
-      ]
-    )
-}
-
 const ChevronDownIcon = {
   render: () =>
     h(
@@ -467,37 +367,27 @@ const ChevronDownIcon = {
     )
 }
 
-// Public-settings flags go through the registry in utils/featureFlags.ts,
-// which handles the opt-in vs opt-out fallback when settings haven't loaded
-// yet. Admin-only flags (not in public settings) stay inline below.
-const flagChannelMonitor = makeSidebarFlag(FeatureFlags.channelMonitor)
-const flagPayment = makeSidebarFlag(FeatureFlags.payment)
-const flagAvailableChannels = makeSidebarFlag(FeatureFlags.availableChannels)
-const flagAffiliate = makeSidebarFlag(FeatureFlags.affiliate)
-const flagOpsMonitoring = () => adminSettingsStore.opsMonitoringEnabled
-const flagAdminPayment = () => adminSettingsStore.paymentEnabled
-
 // buildSelfNavItems 构造用户自己的导航项（用户端主菜单和管理员的"我的账户"子菜单共享这组声明）。
-// withDashboard=true 时包含仪表盘（用户端），false 时不含（管理员的个人区已经有独立仪表盘入口）。
+// withDashboard=true 时包含用户仪表盘。管理员也是用户，所以个人区同样显示完整用户入口。
 //
-// 条目顺序：密钥 → 用量 → 可用渠道 → 渠道状态 → 订阅/支付 → 兑换/资料。
-// 可用渠道紧挨渠道状态之上，让用户"先看自己能用什么、再看对应状态"。
+// 条目顺序：模型 → 密钥 → 用量 → 可用模型 → 模型状态 → 套餐/积分 → 兑换/资料。
+// 可用模型紧挨模型状态之上，让用户先看自己能用什么，再看对应状态。
 function buildSelfNavItems(withDashboard: boolean): NavItem[] {
   const items: NavItem[] = []
   if (withDashboard) {
     items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: SidebarDashboardIcon })
   }
   items.push(
-    { path: '/models', label: '模型中心', icon: SidebarModelIcon, hideInSimpleMode: true },
+    { path: '/models', label: t('nav.modelCenter'), icon: SidebarModelIcon, hideInSimpleMode: true },
     { path: '/keys', label: t('nav.apiKeys'), icon: SidebarKeyIcon },
     { path: '/usage', label: t('nav.usage'), icon: SidebarUsageIcon, hideInSimpleMode: true },
-    { path: '/available-channels', label: t('nav.availableChannels'), icon: SidebarChannelIcon, hideInSimpleMode: true, featureFlag: flagAvailableChannels },
-    { path: '/monitor', label: t('nav.channelStatus'), icon: SidebarSignalIcon, featureFlag: flagChannelMonitor },
+    { path: '/available-channels', label: t('nav.availableChannels'), icon: SidebarChannelIcon, hideInSimpleMode: true },
+    { path: '/monitor', label: t('nav.channelStatus'), icon: SidebarSignalIcon },
     { path: '/subscriptions', label: t('nav.mySubscriptions'), icon: SidebarSubscriptionIcon, hideInSimpleMode: true },
-    { path: '/purchase', label: t('nav.buySubscription'), icon: SidebarRechargeIcon, hideInSimpleMode: true, featureFlag: flagPayment },
-    { path: '/orders', label: t('nav.myOrders'), icon: SidebarOrderIcon, hideInSimpleMode: true, featureFlag: flagPayment },
+    { path: '/purchase', label: t('nav.buySubscription'), icon: SidebarRechargeIcon, hideInSimpleMode: true },
+    { path: '/orders', label: t('nav.myOrders'), icon: SidebarOrderIcon, hideInSimpleMode: true },
     { path: '/redeem', label: t('nav.redeem'), icon: SidebarGiftIcon, hideInSimpleMode: true },
-    { path: '/affiliate', label: t('nav.affiliate'), icon: SidebarAffiliateIcon, hideInSimpleMode: true, featureFlag: flagAffiliate },
+    { path: '/affiliate', label: t('nav.affiliate'), icon: SidebarAffiliateIcon },
     { path: '/profile', label: t('nav.profile'), icon: SidebarProfileIcon },
     ...customMenuItemsForUser.value.map((item): NavItem => ({
       path: `/custom/${item.id}`,
@@ -509,19 +399,17 @@ function buildSelfNavItems(withDashboard: boolean): NavItem[] {
   return items
 }
 
-// finalizeNav 合并三重过滤：featureFlag 过滤 + simple 模式过滤。
+// finalizeNav 只保留 simple 模式过滤。关键入口不再被功能开关隐藏，避免用户找不到页面。
 function finalizeNav(items: NavItem[]): NavItem[] {
-  const visible = applyFeatureFlags(items)
-  return authStore.isSimpleMode ? visible.filter(item => !item.hideInSimpleMode) : visible
+  return authStore.isSimpleMode ? items.filter(item => !item.hideInSimpleMode) : items
 }
 
 // User navigation items (for regular users)
 const userNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(true)))
 
-// Personal navigation items (for admin's "My Account" section, without Dashboard).
-// Admins access 可用渠道 from this section just like regular users — there is no
-// separate admin entry, since the page is purely a user-facing view.
-const personalNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(false)))
+// Personal navigation items (for admin's "My Account" section).
+// Admins are also users, so this mirrors the full user menu.
+const personalNavItems = computed((): NavItem[] => finalizeNav(buildSelfNavItems(true)))
 
 // Custom menu items filtered by visibility
 const customMenuItemsForUser = computed(() => {
@@ -540,8 +428,8 @@ const customMenuItemsForAdmin = computed(() => {
 // Admin navigation items
 const adminNavItems = computed((): NavItem[] => {
   const baseItems: NavItem[] = [
-    { path: '/admin/dashboard', label: t('nav.dashboard'), icon: SidebarDashboardIcon },
-    { path: '/admin/ops', label: t('nav.ops'), icon: SidebarOpsIcon, featureFlag: flagOpsMonitoring },
+    { path: '/admin/dashboard', label: t('nav.adminDashboard'), icon: SidebarDashboardIcon },
+    { path: '/admin/ops', label: t('nav.ops'), icon: SidebarOpsIcon },
     { path: '/admin/users', label: t('nav.users'), icon: SidebarUsersIcon, hideInSimpleMode: true },
     { path: '/admin/groups', label: t('nav.groups'), icon: SidebarGroupIcon, hideInSimpleMode: true },
     {
@@ -552,10 +440,10 @@ const adminNavItems = computed((): NavItem[] => {
       expandOnly: true,
       children: [
         { path: '/admin/channels/pricing', label: t('nav.channelPricing'), icon: SidebarPriceTagIcon },
-        { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SidebarSignalIcon, featureFlag: flagChannelMonitor },
+        { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SidebarSignalIcon },
       ],
     },
-    { path: '/admin/models', label: '模型中心', icon: SidebarModelIcon, hideInSimpleMode: true },
+    { path: '/admin/models', label: t('nav.adminModelCenter'), icon: SidebarModelIcon, hideInSimpleMode: true },
     { path: '/admin/subscriptions', label: t('nav.subscriptions'), icon: SidebarSubscriptionIcon, hideInSimpleMode: true },
     { path: '/admin/accounts', label: t('nav.accounts'), icon: SidebarAccountIcon },
     { path: '/admin/announcements', label: t('nav.announcements'), icon: SidebarBellIcon },
@@ -568,7 +456,6 @@ const adminNavItems = computed((): NavItem[] => {
       icon: SidebarAffiliateIcon,
       hideInSimpleMode: true,
       expandOnly: true,
-      featureFlag: flagAffiliate,
       children: [
         { path: '/admin/affiliates/invites', label: t('nav.affiliateInviteRecords'), icon: SidebarAffiliateIcon },
         { path: '/admin/affiliates/rebates', label: t('nav.affiliateRebateRecords'), icon: SidebarOrderIcon },
@@ -581,7 +468,6 @@ const adminNavItems = computed((): NavItem[] => {
       icon: SidebarOrderIcon,
       hideInSimpleMode: true,
       expandOnly: true,
-      featureFlag: flagAdminPayment,
       children: [
         { path: '/admin/orders/dashboard', label: t('nav.paymentDashboard'), icon: SidebarDashboardIcon },
         { path: '/admin/orders', label: t('nav.orderManagement'), icon: SidebarOrderIcon },
@@ -591,7 +477,7 @@ const adminNavItems = computed((): NavItem[] => {
     { path: '/admin/usage', label: t('nav.usage'), icon: SidebarUsageIcon }
   ]
 
-  const visible = applyFeatureFlags(baseItems)
+  const visible = [...baseItems]
 
   // 简单模式下，在系统设置前插入 API密钥
   if (authStore.isSimpleMode) {
@@ -620,18 +506,6 @@ const sidebarTourIds: Record<string, string> = {
 
 function getSidebarTourId(path: string): string | undefined {
   return sidebarTourIds[path]
-}
-
-function toggleSidebar() {
-  appStore.toggleSidebar()
-}
-
-function toggleTheme() {
-  isDark.value = !isDark.value
-  const nextTheme = isDark.value ? 'dark' : 'light'
-  document.documentElement.classList.toggle('dark', isDark.value)
-  document.documentElement.dataset.theme = nextTheme
-  localStorage.setItem('theme', nextTheme)
 }
 
 function closeMobile() {
@@ -698,15 +572,7 @@ function handleGroupClick(item: NavItem) {
   }
 }
 
-// Initialize theme
-const savedTheme = localStorage.getItem('theme')
-if (
-  savedTheme === 'dark' ||
-  (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-) {
-  isDark.value = true
-  document.documentElement.classList.add('dark')
-}
+document.documentElement.classList.remove('dark')
 
 // Fetch admin settings (for feature-gated nav items like Ops).
 watch(
@@ -802,9 +668,6 @@ onMounted(() => {
   transition: opacity 0.18s ease;
 }
 
-.dark .sidebar-section-title::after {
-  background: var(--bg-surface-alt);
-}
 
 .sidebar-section-title-text-collapsed {
   opacity: 0;
@@ -903,9 +766,6 @@ onMounted(() => {
   background: var(--bg-surface);
 }
 
-.dark .sidebar-footer {
-  background: var(--bg-surface);
-}
 
 .sidebar {
   --sidebar-icon-main: #5A5148;
@@ -916,10 +776,6 @@ onMounted(() => {
   box-shadow: none;
 }
 
-.dark .sidebar {
-  --sidebar-icon-main: #F3E9DD;
-  --sidebar-icon-accent: #BB4D1B;
-}
 
 .sidebar-header {
   min-height: 72px !important;
@@ -950,8 +806,9 @@ onMounted(() => {
   max-height: none !important;
   object-fit: contain !important;
   object-position: center !important;
-  transform: scale(1.58) !important;
+  transform: scale(1.18) !important;
   transform-origin: center center !important;
+  mix-blend-mode: multiply;
 }
 
 .sidebar-brand-title {
@@ -1026,10 +883,6 @@ onMounted(() => {
 }
 
 .sidebar-footer,
-.dark .sidebar-footer {
-  border-color: var(--border-default) !important;
-  background: var(--bg-surface) !important;
-}
 
 .sidebar .sidebar-link-active,
 .sidebar .sidebar-link-active.router-link-active,
@@ -1040,18 +893,32 @@ onMounted(() => {
   font-weight: 500 !important;
 }
 
-.dark .sidebar .sidebar-link-active,
-.dark .sidebar .sidebar-link-active.router-link-active,
-.dark .sidebar .sidebar-link-active.router-link-exact-active {
-  border: 0 !important;
-  background: var(--accent) !important;
-  color: var(--accent-soft) !important;
-}
 
 .sidebar .sidebar-link-active::before,
 .sidebar .sidebar-link-active.router-link-active::before,
 .sidebar .sidebar-link-active.router-link-exact-active::before {
   content: none !important;
   display: none !important;
+}
+
+.sidebar-footer .sidebar-doc-link,
+.sidebar-footer .sidebar-doc-link.router-link-active,
+.sidebar-footer .sidebar-doc-link.router-link-exact-active {
+  --sidebar-icon-main: var(--accent-contrast);
+  --sidebar-icon-accent: var(--accent-contrast);
+  border: 1px solid var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-footer .sidebar-doc-link:hover {
+  background: var(--accent-hover) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.sidebar-footer .sidebar-doc-link svg,
+.sidebar-footer .sidebar-doc-link .sidebar-svg-icon {
+  color: var(--accent-contrast) !important;
 }
 </style>

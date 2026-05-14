@@ -86,7 +86,7 @@
             <button
               type="button"
               @click="showPassword = !showPassword"
-              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-dark-300"
+              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
             >
               <Icon v-if="showPassword" name="eyeOff" size="md" />
               <Icon v-else name="eye" size="md" />
@@ -147,28 +147,6 @@
 
       </form>
 
-      <div v-if="localPreviewEnabled" class="local-preview-panel">
-        <div>
-          <p class="local-preview-title">本地预览入口</p>
-          <p class="local-preview-text">仅开发环境显示，用于免登录检查用户端和管理员端界面。</p>
-        </div>
-        <div class="local-preview-actions">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="handleLocalPreview('user')"
-          >
-            进入用户端
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            @click="handleLocalPreview('admin')"
-          >
-            进入管理员后台
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Footer -->
@@ -235,7 +213,6 @@ const backendModeEnabled = ref<boolean>(false)
 const oidcOAuthEnabled = ref<boolean>(false)
 const oidcOAuthProviderName = ref<string>('OIDC')
 const passwordResetEnabled = ref<boolean>(false)
-const localPreviewEnabled = import.meta.env.DEV
 
 // Turnstile
 const turnstileRef = ref<InstanceType<typeof TurnstileWidget> | null>(null)
@@ -412,14 +389,6 @@ async function handleLogin(): Promise<void> {
   }
 }
 
-function handleLocalPreview(role: 'user' | 'admin'): void {
-  sessionStorage.removeItem('auth_expired')
-  errorMessage.value = ''
-  authStore.enterLocalPreview(role)
-  appStore.showInfo(role === 'admin' ? '已进入管理员本地预览' : '已进入用户端本地预览')
-  router.push(role === 'admin' ? '/admin/dashboard' : '/dashboard')
-}
-
 // ==================== 2FA Handlers ====================
 
 async function handle2FAVerify(code: string): Promise<void> {
@@ -468,7 +437,7 @@ function handle2FACancel(): void {
 }
 
 .login-copy h2 {
-  color: rgb(15 23 42);
+  color: var(--text-primary);
   font-size: 26px;
   font-weight: 900;
   line-height: 1.2;
@@ -477,7 +446,7 @@ function handle2FACancel(): void {
 
 .login-copy p {
   margin-top: 8px;
-  color: rgb(100 116 139);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -492,24 +461,24 @@ function handle2FACancel(): void {
 .login-divider {
   height: 1px;
   flex: 1;
-  background: rgba(203, 213, 225, 0.82);
+  background: var(--border-subtle);
 }
 
 .login-divider-text {
-  color: rgb(100 116 139);
+  color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
 }
 
 .auth-link {
-  color: #1d7ec9;
+  color: var(--accent);
   font-size: 14px;
   font-weight: 800;
-  transition: color 0.16s ease;
+  transition: none;
 }
 
 .auth-link:hover {
-  color: #2563eb;
+  color: var(--accent-hover);
 }
 
 .login-submit {
@@ -517,59 +486,19 @@ function handle2FACancel(): void {
   font-weight: 900;
 }
 
-.local-preview-panel {
-  display: grid;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-alt);
-}
-
-.local-preview-title {
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.local-preview-text {
-  margin-top: 4px;
-  color: var(--text-mutedd);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.local-preview-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.local-preview-actions .btn {
-  width: 100%;
-}
-
-.login-panel :deep(.text-gray-400),
-.login-panel :deep(.dark\:text-dark-500) {
-  color: rgb(148 163 184);
+.login-panel :deep(.text-gray-400) {
+  color: var(--text-muted);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+  transition: opacity var(--duration-fast) var(--ease-standard);
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
-}
-
-@media (max-width: 520px) {
-  .local-preview-actions {
-    grid-template-columns: 1fr;
-  }
+  transform: none;
 }
 
 </style>

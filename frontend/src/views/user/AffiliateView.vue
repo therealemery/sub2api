@@ -1,6 +1,12 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
+    <div class="mx-auto max-w-6xl space-y-6">
+      <PageIntro
+        :title="t('affiliate.title')"
+        :description="t('affiliate.description')"
+        compact
+      />
+
       <div v-if="loading" class="flex justify-center py-12">
         <div
           class="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border-focus)] border-t-transparent"
@@ -23,36 +29,58 @@
           </div>
           <div class="card p-5">
             <p class="text-sm text-gray-500 text-[var(--text-muted)]">{{ t('affiliate.stats.invitedUsers') }}</p>
-            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <p class="mt-2 text-2xl font-semibold text-gray-900">
               {{ formatCount(detail.aff_count) }}
             </p>
           </div>
           <div class="card p-5">
             <p class="text-sm text-gray-500 text-[var(--text-muted)]">{{ t('affiliate.stats.availableQuota') }}</p>
-            <p class="mt-2 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
-              {{ formatCurrency(detail.aff_quota) }}
+            <p class="mt-2 text-2xl font-semibold text-emerald-600">
+              {{ formatPoints(detail.aff_quota) }}
             </p>
           </div>
           <div class="card p-5">
             <p class="text-sm text-gray-500 text-[var(--text-muted)]">{{ t('affiliate.stats.totalQuota') }}</p>
-            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
-              {{ formatCurrency(detail.aff_history_quota) }}
+            <p class="mt-2 text-2xl font-semibold text-gray-900">
+              {{ formatPoints(detail.aff_history_quota) }}
             </p>
-            <p v-if="detail.aff_frozen_quota > 0" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
-              {{ t('affiliate.stats.frozenQuota') }}: {{ formatCurrency(detail.aff_frozen_quota) }}
+            <p v-if="detail.aff_frozen_quota > 0" class="mt-1 text-xs text-amber-600">
+              {{ t('affiliate.stats.frozenQuota') }}: {{ formatPoints(detail.aff_frozen_quota) }}
             </p>
           </div>
         </div>
 
+        <div class="card p-5">
+          <h3 class="text-base font-semibold text-[var(--text-primary)]">积分返利闭环</h3>
+          <div class="mt-3 grid gap-3 md:grid-cols-4">
+            <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3">
+              <p class="text-sm font-bold text-[var(--text-primary)]">分享邀请码</p>
+              <p class="mt-1 text-sm text-[var(--text-secondary)]">将专属邀请码或链接发送给新用户。</p>
+            </div>
+            <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3">
+              <p class="text-sm font-bold text-[var(--text-primary)]">新用户充值</p>
+              <p class="mt-1 text-sm text-[var(--text-secondary)]">对方完成积分购买后，系统记录邀请关系。</p>
+            </div>
+            <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3">
+              <p class="text-sm font-bold text-[var(--text-primary)]">获得返利积分</p>
+              <p class="mt-1 text-sm text-[var(--text-secondary)]">返利比例按后台配置计算，默认展示为当前比例。</p>
+            </div>
+            <div class="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-alt)] p-3">
+              <p class="text-sm font-bold text-[var(--text-primary)]">转入账户</p>
+              <p class="mt-1 text-sm text-[var(--text-secondary)]">可用返利积分可转入账户积分，用于后续调用。</p>
+            </div>
+          </div>
+        </div>
+
         <div class="card p-6">
-          <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('affiliate.title') }}</h3>
+          <h3 class="text-base font-semibold text-gray-900">{{ t('affiliate.title') }}</h3>
           <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">{{ t('affiliate.description') }}</p>
 
           <div class="mt-5 grid gap-4 md:grid-cols-2">
             <div class="space-y-2">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('affiliate.yourCode') }}</p>
+              <p class="text-sm font-medium text-gray-700">{{ t('affiliate.yourCode') }}</p>
               <div class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
-                <code class="flex-1 truncate text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ detail.aff_code }}</code>
+                <code class="flex-1 truncate text-sm font-semibold text-gray-900">{{ detail.aff_code }}</code>
                 <button class="btn btn-secondary btn-sm" @click="copyCode">
                   <Icon name="copy" size="sm" />
                   <span>{{ t('affiliate.copyCode') }}</span>
@@ -61,9 +89,9 @@
             </div>
 
             <div class="space-y-2">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('affiliate.inviteLink') }}</p>
+              <p class="text-sm font-medium text-gray-700">{{ t('affiliate.inviteLink') }}</p>
               <div class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
-                <code class="flex-1 truncate text-sm text-gray-700 dark:text-gray-300">{{ inviteLink }}</code>
+                <code class="flex-1 truncate text-sm text-gray-700">{{ inviteLink }}</code>
                 <button class="btn btn-secondary btn-sm" @click="copyInviteLink">
                   <Icon name="copy" size="sm" />
                   <span>{{ t('affiliate.copyLink') }}</span>
@@ -86,7 +114,7 @@
         <div class="card p-6">
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('affiliate.transfer.title') }}</h3>
+              <h3 class="text-base font-semibold text-gray-900">{{ t('affiliate.transfer.title') }}</h3>
               <p class="mt-1 text-sm text-gray-500 text-[var(--text-muted)]">{{ t('affiliate.transfer.description') }}</p>
             </div>
             <button
@@ -99,13 +127,13 @@
               <span>{{ transferring ? t('affiliate.transfer.transferring') : t('affiliate.transfer.button') }}</span>
             </button>
           </div>
-          <p v-if="detail.aff_quota <= 0" class="mt-3 text-sm text-amber-600 dark:text-amber-400">
+          <p v-if="detail.aff_quota <= 0" class="mt-3 text-sm text-amber-600">
             {{ t('affiliate.transfer.empty') }}
           </p>
         </div>
 
         <div class="card p-6">
-          <h3 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ t('affiliate.invitees.title') }}</h3>
+          <h3 class="text-base font-semibold text-gray-900">{{ t('affiliate.invitees.title') }}</h3>
           <div v-if="detail.invitees.length === 0" class="mt-4 rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500 border-[var(--border-default)] text-[var(--text-muted)]">
             {{ t('affiliate.invitees.empty') }}
           </div>
@@ -125,10 +153,10 @@
                   :key="item.user_id"
                   class="border-b border-gray-100 last:border-b-0 border-[var(--border-default)]"
                 >
-                  <td class="px-3 py-3 text-gray-900 dark:text-[var(--text-inverse)]">{{ item.email || '-' }}</td>
-                  <td class="px-3 py-3 text-gray-700 dark:text-gray-300">{{ item.username || '-' }}</td>
-                  <td class="px-3 py-3 text-right font-medium text-emerald-600 dark:text-emerald-400">{{ formatCurrency(item.total_rebate) }}</td>
-                  <td class="px-3 py-3 text-gray-700 dark:text-gray-300">{{ formatDateTime(item.created_at) || '-' }}</td>
+                  <td class="px-3 py-3 text-gray-900">{{ item.email || '-' }}</td>
+                  <td class="px-3 py-3 text-gray-700">{{ item.username || '-' }}</td>
+                  <td class="px-3 py-3 text-right font-medium text-emerald-600">{{ formatPoints(item.total_rebate) }}</td>
+                  <td class="px-3 py-3 text-gray-700">{{ formatDateTime(item.created_at) || '-' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -143,13 +171,14 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Icon from '@/components/icons/Icon.vue'
 import userAPI from '@/api/user'
 import type { UserAffiliateDetail } from '@/types'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 import { useClipboard } from '@/composables/useClipboard'
-import { formatCurrency, formatDateTime } from '@/utils/format'
+import { formatDateTime } from '@/utils/format'
 import { extractApiErrorMessage } from '@/utils/apiError'
 
 const { t } = useI18n()
@@ -168,7 +197,7 @@ const inviteLink = computed(() => {
 })
 
 // Rebate rate is a percentage in the range [0, 100]; backend already clamps it.
-// We trim trailing zeros (e.g. 20.00 → "20", 12.50 → "12.5") for a cleaner UI.
+// Trim trailing zeros so values like 20.00 and 12.50 render as 20 and 12.5.
 const formattedRebateRate = computed(() => {
   const v = detail.value?.effective_rebate_rate_percent ?? 0
   const rounded = Math.round(v * 100) / 100
@@ -177,6 +206,14 @@ const formattedRebateRate = computed(() => {
 
 function formatCount(value: number): string {
   return value.toLocaleString()
+}
+
+function formatPoints(value: number | null | undefined): string {
+  const amount = Number(value ?? 0)
+  return `${amount.toLocaleString(undefined, {
+    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2
+  })} 积分`
 }
 
 async function loadAffiliateDetail(silent = false): Promise<void> {
@@ -209,7 +246,7 @@ async function transferQuota(): Promise<void> {
   transferring.value = true
   try {
     const resp = await userAPI.transferAffiliateQuota()
-    appStore.showSuccess(t('affiliate.transfer.success', { amount: formatCurrency(resp.transferred_quota) }))
+    appStore.showSuccess(t('affiliate.transfer.success', { amount: formatPoints(resp.transferred_quota) }))
     await Promise.all([
       loadAffiliateDetail(true),
       authStore.refreshUser().catch(() => undefined),

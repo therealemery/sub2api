@@ -60,8 +60,7 @@ describe('embedded-url', () => {
     expect(buildEmbeddedUrl('not a url', 1, 'token')).toBe('not a url')
   })
 
-  it('detects dark mode from document root class', () => {
-    document.documentElement.classList.add('dark')
-    expect(detectTheme()).toBe('dark')
+  it('always returns the supported light theme', () => {
+    expect(detectTheme()).toBe('light')
   })
 })

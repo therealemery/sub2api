@@ -3,7 +3,7 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h2 class="text-2xl font-bold text-gray-900">
           {{ t('auth.forgotPasswordTitle') }}
         </h2>
         <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -13,16 +13,16 @@
 
       <!-- Success State -->
       <div v-if="isSubmitted" class="space-y-6">
-        <div class="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-800/50 dark:bg-green-900/20">
+        <div class="rounded-lg border border-green-200 bg-green-50 p-6">
           <div class="flex flex-col items-center gap-4 text-center">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50">
-              <Icon name="checkCircle" size="lg" class="text-green-600 dark:text-green-400" />
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+              <Icon name="checkCircle" size="lg" class="text-green-600" />
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-green-800 dark:text-green-200">
+              <h3 class="text-lg font-semibold text-green-800">
                 {{ t('auth.resetEmailSent') }}
               </h3>
-              <p class="mt-2 text-sm text-green-700 dark:text-green-300">
+              <p class="mt-2 text-sm text-green-700">
                 {{ t('auth.resetEmailSentHint') }}
               </p>
             </div>
@@ -32,7 +32,7 @@
         <div class="text-center">
           <router-link
             to="/login"
-            class="inline-flex items-center gap-2 font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+            class="inline-flex items-center gap-2 font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)]"
           >
             <Icon name="arrowLeft" size="sm" />
             {{ t('auth.backToLogin') }}
@@ -115,7 +115,7 @@
         {{ t('auth.rememberedPassword') }}
         <router-link
           to="/login"
-          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+          class="font-medium text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] text-[var(--accent)]"
         >
           {{ t('auth.signIn') }}
         </router-link>

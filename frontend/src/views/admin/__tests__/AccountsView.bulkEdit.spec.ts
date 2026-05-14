@@ -115,7 +115,6 @@ describe('admin AccountsView bulk edit scope', () => {
           DataTable: DataTableStub,
           Pagination: true,
           ConfirmDialog: true,
-          AccountTableActions: { template: '<div><slot name="beforeCreate" /><slot name="after" /></div>' },
           AccountTableFilters: { template: '<div></div>' },
           AccountBulkActionsBar: AccountBulkActionsBarStub,
           AccountActionMenu: true,

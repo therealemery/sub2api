@@ -7,7 +7,7 @@
       <div class="px-6 py-6 md:px-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
           <div
-            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gray-900 text-2xl font-bold text-[var(--text-inverse)] shadow-none dark:bg-gray-100 dark:text-gray-900"
+            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gray-900 text-2xl font-bold text-[var(--text-inverse)] shadow-none"
           >
             <img
               v-if="avatarUrl"
@@ -21,7 +21,7 @@
           <div class="min-w-0 flex-1 space-y-5">
             <div class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <h2 class="truncate text-2xl font-semibold text-gray-900">
                   {{ displayName }}
                 </h2>
                 <span :class="['badge', user?.role === 'admin' ? 'badge-primary' : 'badge-gray']">
@@ -39,12 +39,12 @@
               </div>
 
               <div class="space-y-1">
-                <p class="truncate text-sm text-gray-600 dark:text-gray-300">
+                <p class="truncate text-sm text-gray-600">
                   {{ primaryEmailDisplay }}
                 </p>
                 <div
                   v-if="sourceHints.length"
-                  class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400"
+                  class="flex flex-wrap gap-2 text-xs text-gray-500"
                 >
                   <span
                     v-for="hint in sourceHints"
@@ -63,7 +63,7 @@
                 data-testid="profile-overview-metric-balance"
                 class="rounded-lg px-4 py-3"
               >
-                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
+                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400">
                   {{ t('profile.accountBalance') }}
                 </p>
                 <p class="money-value mt-1 text-lg font-semibold">
@@ -74,10 +74,10 @@
                 data-testid="profile-overview-metric-concurrency"
                 class="rounded-lg px-4 py-3"
               >
-                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
+                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400">
                   {{ t('profile.concurrencyLimit') }}
                 </p>
-                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="mt-1 text-lg font-semibold text-gray-900">
                   {{ user?.concurrency || 0 }}
                 </p>
               </div>
@@ -85,10 +85,10 @@
                 data-testid="profile-overview-metric-member-since"
                 class="rounded-lg px-4 py-3"
               >
-                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
+                <p class="text-xs font-medium uppercase tracking-[0.16em] text-gray-400">
                   {{ t('profile.memberSince') }}
                 </p>
-                <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="mt-1 text-lg font-semibold text-gray-900">
                   {{ memberSinceLabel }}
                 </p>
               </div>
@@ -106,10 +106,10 @@
         >
           <div class="mb-5 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+              <h3 class="text-lg font-semibold text-gray-900">
                 {{ t('profile.basicsTitle') }}
               </h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-sm text-gray-500">
                 {{ t('profile.basicsDescription') }}
               </p>
             </div>
@@ -155,10 +155,10 @@
           v-if="sourceHints.length"
           class="card p-6"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h3 class="text-lg font-semibold text-gray-900">
             {{ t('profile.linkedProfileSources') }}
           </h3>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-sm text-gray-500">
             {{ t('profile.linkedProfileSourcesDescription') }}
           </p>
 
@@ -166,9 +166,9 @@
             <div
               v-for="hint in sourceHints"
               :key="hint.key"
-              class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm text-gray-600 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300"
+              class="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm text-gray-600 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
-              <Icon name="link" size="sm" class="mt-0.5 text-gray-400 dark:text-gray-500" />
+              <Icon name="link" size="sm" class="mt-0.5 text-gray-400" />
               <span>{{ hint.text }}</span>
             </div>
           </div>

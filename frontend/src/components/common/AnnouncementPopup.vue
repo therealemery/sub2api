@@ -6,7 +6,7 @@
         class="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-black/70 p-4 pt-[8vh]"
       >
         <div
-          class="w-full max-w-[680px] overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 bg-[var(--bg-surface-alt)] dark:ring-white/10"
+          class="w-full max-w-[680px] overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 bg-[var(--bg-surface-alt)]"
           @click.stop
         >
           <!-- Header with warm gradient -->
@@ -34,12 +34,12 @@
               </div>
 
               <!-- Title -->
-              <h2 class="mb-2 text-2xl font-bold leading-tight text-gray-900 dark:text-[var(--text-inverse)]">
+              <h2 class="mb-2 text-2xl font-bold leading-tight text-gray-900">
                 {{ announcementStore.currentPopup.title }}
               </h2>
 
               <!-- Time -->
-              <div class="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex items-center gap-1.5 text-sm text-gray-600">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -54,7 +54,7 @@
               <div class="absolute left-0 top-0 bottom-0 w-1 rounded-md bg-[var(--accent)]"></div>
               <div class="pl-6">
                 <div
-                  class="markdown-body prose prose-sm max-w-none dark:prose-invert"
+                  class="markdown-body prose prose-sm max-w-none"
                   v-html="renderedContent"
                 ></div>
               </div>
@@ -159,7 +159,4 @@ watch(
   border-radius: 4px;
 }
 
-.dark .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-}
 </style>

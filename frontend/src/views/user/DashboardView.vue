@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="space-y-6">
       <PageIntro
-        title="仪表盘"
-        description="查看余额、今日调用、成本、近期用量和模型分布。优先关注第一行主指标，详细记录仍然保留在下方表格和图表里。"
+        title="我的概览"
+      description="查看积分、今日调用、成本、近期用量和模型分布。优先关注第一行主指标，详细记录仍然保留在下方表格和图表里。"
       />
       <div v-if="loading" class="flex items-center justify-center py-12"><LoadingSpinner /></div>
       <template v-else-if="stats">

@@ -16,13 +16,13 @@
               <Icon name="document" size="md" class="text-current" />
             </div>
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <p class="text-xs font-medium text-gray-500">
                 {{ t('usage.totalRequests') }}
               </p>
-              <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-xl font-bold text-gray-900">
                 {{ usageStats?.total_requests?.toLocaleString() || '0' }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500">
                 {{ t('usage.inSelectedRange') }}
               </p>
             </div>
@@ -38,13 +38,13 @@
               <Icon name="cube" size="md" class="text-current" />
             </div>
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <p class="text-xs font-medium text-gray-500">
                 {{ t('usage.totalTokens') }}
               </p>
-              <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-xl font-bold text-gray-900">
                 {{ formatTokens(usageStats?.total_tokens || 0) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500">
                 {{ t('usage.in') }}: {{ formatTokens(usageStats?.total_input_tokens || 0) }} /
                 {{ t('usage.out') }}: {{ formatTokens(usageStats?.total_output_tokens || 0) }}
               </p>
@@ -56,18 +56,18 @@
         <div class="card p-4">
           <div class="flex items-center gap-3">
             <div
-              class="rounded-lg bg-green-50 p-2 text-green-600 dark:bg-green-500/10 dark:text-green-400"
+              class="rounded-lg bg-green-50 p-2 text-green-600"
             >
               <Icon name="dollar" size="md" class="text-current" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <p class="text-xs font-medium text-gray-500">
                 {{ t('usage.totalCost') }}
               </p>
-              <p class="text-xl font-bold text-green-600 dark:text-green-400">
+              <p class="text-xl font-bold text-green-600">
                 ${{ (usageStats?.total_actual_cost || 0).toFixed(4) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500">
                 {{ t('usage.actualCost') }} /
                 <span class="line-through">${{ (usageStats?.total_cost || 0).toFixed(4) }}</span>
                 {{ t('usage.standardCost') }}
@@ -85,13 +85,13 @@
               <Icon name="clock" size="md" class="text-current" />
             </div>
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <p class="text-xs font-medium text-gray-500">
                 {{ t('usage.avgDuration') }}
               </p>
-              <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-xl font-bold text-gray-900">
                 {{ formatDuration(usageStats?.average_duration_ms || 0) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('usage.perRequest') }}</p>
+              <p class="text-xs text-gray-500">{{ t('usage.perRequest') }}</p>
             </div>
           </div>
         </div>
@@ -167,23 +167,23 @@
             @sort="handleSort"
           >
           <template #cell-api_key="{ row }">
-            <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">{{
+            <span class="text-sm text-gray-900">{{
               row.api_key?.name || '-'
             }}</span>
           </template>
 
           <template #cell-model="{ value }">
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+            <span class="font-medium text-gray-900">{{ value }}</span>
           </template>
 
           <template #cell-reasoning_effort="{ row }">
-            <span class="text-sm text-gray-900 dark:text-[var(--text-inverse)]">
+            <span class="text-sm text-gray-900">
               {{ formatReasoningEffort(row.reasoning_effort) }}
             </span>
           </template>
 
           <template #cell-endpoint="{ row }">
-            <span class="text-sm text-gray-600 dark:text-gray-300 block max-w-[320px] whitespace-normal break-all">
+            <span class="text-sm text-gray-600 block max-w-[320px] whitespace-normal break-all">
               {{ formatUsageEndpoints(row) }}
             </span>
           </template>
@@ -220,7 +220,7 @@
                   d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ row.image_count }}{{ $t('usage.imageUnit') }}</span>
+              <span class="font-medium text-gray-900">{{ row.image_count }}{{ $t('usage.imageUnit') }}</span>
               <span class="text-gray-400">({{ row.image_size || '2K' }})</span>
             </div>
             <!-- Token 请求 -->
@@ -231,14 +231,14 @@
                   <!-- Input -->
                   <div class="inline-flex items-center gap-1">
                     <Icon name="arrowDown" size="sm" class="text-emerald-500" />
-                    <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+                    <span class="font-medium text-gray-900">{{
                       row.input_tokens.toLocaleString()
                     }}</span>
                   </div>
                   <!-- Output -->
                   <div class="inline-flex items-center gap-1">
                     <Icon name="arrowUp" size="sm" class="text-violet-500" />
-                    <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+                    <span class="font-medium text-gray-900">{{
                       row.output_tokens.toLocaleString()
                     }}</span>
                   </div>
@@ -251,18 +251,18 @@
                   <!-- Cache Read -->
                   <div v-if="row.cache_read_tokens > 0" class="inline-flex items-center gap-1">
                     <Icon name="inbox" size="sm" class="text-sky-500" />
-                    <span class="font-medium text-sky-600 dark:text-sky-400">{{
+                    <span class="font-medium text-sky-600">{{
                       formatCacheTokens(row.cache_read_tokens)
                     }}</span>
                   </div>
                   <!-- Cache Write -->
                   <div v-if="row.cache_creation_tokens > 0" class="inline-flex items-center gap-1">
                     <Icon name="edit" size="sm" class="text-amber-500" />
-                    <span class="font-medium text-amber-600 dark:text-amber-400">{{
+                    <span class="font-medium text-amber-600">{{
                       formatCacheTokens(row.cache_creation_tokens)
                     }}</span>
-                    <span v-if="row.cache_creation_1h_tokens > 0" class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-200 dark:bg-orange-500/20 dark:text-orange-400 dark:ring-orange-500/30">1h</span>
-                    <span v-if="row.cache_ttl_overridden" :title="t('usage.cacheTtlOverriddenHint')" class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-rose-100 text-rose-600 ring-1 ring-inset ring-rose-200 dark:bg-rose-500/20 dark:text-rose-400 dark:ring-rose-500/30 cursor-help">R</span>
+                    <span v-if="row.cache_creation_1h_tokens > 0" class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-200">1h</span>
+                    <span v-if="row.cache_ttl_overridden" :title="t('usage.cacheTtlOverriddenHint')" class="inline-flex items-center rounded px-1 py-px text-[10px] font-medium leading-tight bg-rose-100 text-rose-600 ring-1 ring-inset ring-rose-200 cursor-help">R</span>
                   </div>
                 </div>
               </div>
@@ -273,12 +273,12 @@
                 @mouseleave="hideTokenTooltip"
               >
                 <div
-                  class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-gray-200 dark:bg-gray-700 dark:group-hover:bg-gray-600/60"
+                  class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-gray-200"
                 >
                   <Icon
                     name="infoCircle"
                     size="xs"
-                    class="text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-200"
+                    class="text-gray-400 group-hover:text-gray-700"
                   />
                 </div>
               </div>
@@ -287,7 +287,7 @@
 
           <template #cell-cost="{ row }">
             <div class="flex items-center gap-1.5 text-sm">
-              <span class="font-medium text-green-600 dark:text-green-400">
+              <span class="font-medium text-green-600">
                 ${{ row.actual_cost.toFixed(6) }}
               </span>
               <!-- Cost Detail Tooltip -->
@@ -297,12 +297,12 @@
                 @mouseleave="hideTooltip"
               >
                 <div
-                  class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-gray-200 dark:bg-gray-700 dark:group-hover:bg-gray-600/60"
+                  class="flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-gray-200"
                 >
                   <Icon
                     name="infoCircle"
                     size="xs"
-                    class="text-gray-400 group-hover:text-gray-700 dark:text-gray-500 dark:group-hover:text-gray-200"
+                    class="text-gray-400 group-hover:text-gray-700"
                   />
                 </div>
               </div>
@@ -312,28 +312,28 @@
           <template #cell-first_token="{ row }">
             <span
               v-if="row.first_token_ms != null"
-              class="text-sm text-gray-600 dark:text-gray-400"
+              class="text-sm text-gray-600"
             >
               {{ formatDuration(row.first_token_ms) }}
             </span>
-            <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
+            <span v-else class="text-sm text-gray-400">-</span>
           </template>
 
           <template #cell-duration="{ row }">
-            <span class="text-sm text-gray-600 dark:text-gray-400">{{
+            <span class="text-sm text-gray-600">{{
               formatDuration(row.duration_ms)
             }}</span>
           </template>
 
           <template #cell-created_at="{ value }">
-            <span class="text-sm text-gray-600 dark:text-gray-400">{{
+            <span class="text-sm text-gray-600">{{
               formatDateTime(value)
             }}</span>
           </template>
 
           <template #cell-user_agent="{ row }">
-            <span v-if="row.user_agent" class="text-sm text-gray-600 dark:text-gray-400 block max-w-[320px] whitespace-normal break-all" :title="row.user_agent">{{ formatUserAgent(row.user_agent) }}</span>
-            <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
+            <span v-if="row.user_agent" class="text-sm text-gray-600 block max-w-[320px] whitespace-normal break-all" :title="row.user_agent">{{ formatUserAgent(row.user_agent) }}</span>
+            <span v-else class="text-sm text-gray-400">-</span>
           </template>
 
           <template #empty>
@@ -367,7 +367,7 @@
       }"
     >
       <div
-        class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)] dark:border-gray-600 dark:bg-gray-800"
+        class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)]"
       >
         <div class="space-y-1.5">
           <!-- Token Breakdown -->
@@ -425,7 +425,7 @@
         </div>
         <!-- Tooltip Arrow (left side) -->
         <div
-          class="absolute right-full top-1/2 h-0 w-0 -translate-y-1/2 border-b-[6px] border-r-[6px] border-t-[6px] border-b-transparent border-r-gray-900 border-t-transparent dark:border-r-gray-800"
+          class="absolute right-full top-1/2 h-0 w-0 -translate-y-1/2 border-b-[6px] border-r-[6px] border-t-[6px] border-b-transparent border-r-gray-900 border-t-transparent"
         ></div>
       </div>
     </div>
@@ -442,7 +442,7 @@
       }"
     >
       <div
-        class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)] dark:border-gray-600 dark:bg-gray-800"
+        class="whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-xs text-[var(--text-inverse)]"
       >
         <div class="space-y-1.5">
           <!-- Cost Breakdown -->
@@ -519,7 +519,7 @@
         </div>
         <!-- Tooltip Arrow (left side) -->
         <div
-          class="absolute right-full top-1/2 h-0 w-0 -translate-y-1/2 border-b-[6px] border-r-[6px] border-t-[6px] border-b-transparent border-r-gray-900 border-t-transparent dark:border-r-gray-800"
+          class="absolute right-full top-1/2 h-0 w-0 -translate-y-1/2 border-b-[6px] border-r-[6px] border-t-[6px] border-b-transparent border-r-gray-900 border-t-transparent"
         ></div>
       </div>
     </div>
@@ -670,10 +670,10 @@ const getRequestTypeLabel = (log: UsageLog): string => {
 
 const getRequestTypeBadgeClass = (log: UsageLog): string => {
   const requestType = resolveUsageRequestType(log)
-  if (requestType === 'ws_v2') return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-  if (requestType === 'stream') return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-  if (requestType === 'sync') return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-  return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+  if (requestType === 'ws_v2') return 'bg-gray-100 text-gray-800'
+  if (requestType === 'stream') return 'bg-gray-100 text-gray-800'
+  if (requestType === 'sync') return 'bg-gray-100 text-gray-800'
+  return 'bg-amber-100 text-amber-800'
 }
 
 

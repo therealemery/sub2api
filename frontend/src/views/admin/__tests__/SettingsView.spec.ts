@@ -48,6 +48,18 @@ const {
 
 const localeRef = vi.hoisted(() => ({ value: "zh-CN" }));
 
+const RouterLinkStub = defineComponent({
+  props: {
+    to: {
+      type: [String, Object],
+      required: false,
+    },
+  },
+  setup(_, { slots }) {
+    return () => h("a", slots.default?.());
+  },
+});
+
 vi.mock("@/api", () => ({
   adminAPI: {
     settings: {
@@ -129,7 +141,7 @@ vi.mock("vue-i18n", async () => {
     "admin.settings.wechatConnect.frontendRedirectUrlPlaceholder": "/auth/wechat/callback",
     "admin.settings.wechatConnect.frontendRedirectUrlHint": "通常用于前端路由回调地址，需与后端配置保持一致。",
     "admin.settings.authSourceDefaults.title": "认证来源默认值",
-    "admin.settings.authSourceDefaults.description": "按注册来源配置新用户默认余额、并发、订阅与授权策略。",
+    "admin.settings.authSourceDefaults.description": "按注册来源配置新用户默认积分、并发、订阅与授权策略。",
     "admin.settings.authSourceDefaults.requireEmailLabel": "第三方注册强制补充邮箱",
     "admin.settings.authSourceDefaults.requireEmailHint": "启用后，Linux DO、OIDC、微信注册缺少邮箱时必须先补充邮箱地址。",
     "admin.settings.authSourceDefaults.enabledHint": "以下默认值会在该来源注册新用户时发放；首次绑定时授权仅作用于已有账号绑定该来源。",
@@ -411,6 +423,8 @@ function mountView() {
         ProxySelector: true,
         ImageUpload: ImageUploadStub,
         BackupSettings: true,
+        RouterLink: RouterLinkStub,
+        "router-link": RouterLinkStub,
       },
     },
   });
@@ -638,6 +652,8 @@ describe("admin SettingsView payment visible method controls", () => {
           ProxySelector: true,
           ImageUpload: ImageUploadStub,
           BackupSettings: true,
+          RouterLink: RouterLinkStub,
+          "router-link": RouterLinkStub,
         },
       },
     });

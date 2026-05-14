@@ -1,7 +1,7 @@
 <template>
   <div>
-    <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-      {{ t('payment.paymentMethod') }}
+    <label class="mb-2 block text-sm font-medium text-[var(--text-primary)]">
+      支付方式
     </label>
     <div class="grid grid-cols-2 gap-3 sm:flex">
       <button
@@ -10,7 +10,7 @@
         type="button"
         :disabled="!method.available"
         :class="[
-          'payment-method-option relative flex h-[60px] flex-col items-center justify-center rounded-lg border px-3 transition-colors sm:flex-1',
+          'payment-method-option relative flex h-[60px] flex-col items-center justify-center rounded-lg border px-3 sm:flex-1',
           !method.available
             ? 'payment-method-option-disabled cursor-not-allowed opacity-50'
             : selected === method.type
@@ -103,24 +103,7 @@ function methodSelectedClass(_type: string): string {
   border-color: var(--border-default);
 }
 
-:global(.dark) .payment-method-option {
-  background: var(--bg-page);
-  border-color: var(--border-default);
-  color: var(--bg-surface);
-}
 
-:global(.dark) .payment-method-option-idle:hover {
-  border-color: var(--border-strong);
-}
 
-:global(.dark) .payment-method-option-selected {
-  background: var(--bg-surface);
-  border-color: var(--border-default);
-  color: var(--bg-surface);
-}
 
-:global(.dark) .payment-method-option-disabled {
-  background: var(--bg-page);
-  border-color: var(--border-default);
-}
 </style>

@@ -53,6 +53,7 @@ function createLocalPreviewUser(role: LocalPreviewRole): User {
     avatar_url: null,
     role,
     balance: 100,
+    points: 100,
     concurrency: 10,
     rpm_limit: 0,
     status: 'active',
@@ -64,6 +65,23 @@ function createLocalPreviewUser(role: LocalPreviewRole): User {
     last_active_at: now,
     created_at: now,
     updated_at: now
+  }
+}
+
+function readLocalPreviewUser(role: LocalPreviewRole): User | null {
+  try {
+    const raw = localStorage.getItem(AUTH_USER_KEY)
+    if (!raw) return null
+
+    const parsed = JSON.parse(raw) as Partial<User>
+    if (parsed.role !== role) return null
+
+    return {
+      ...createLocalPreviewUser(role),
+      ...parsed
+    }
+  } catch {
+    return null
   }
 }
 
@@ -475,7 +493,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (isLocalPreview.value) {
       const previewRole: LocalPreviewRole = token.value.includes('admin') ? 'admin' : 'user'
-      const previewUser = user.value ?? createLocalPreviewUser(previewRole)
+      const previewUser = readLocalPreviewUser(previewRole) ?? user.value ?? createLocalPreviewUser(previewRole)
       user.value = previewUser
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(previewUser))
       return previewUser

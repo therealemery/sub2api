@@ -11,7 +11,7 @@
         {{ t('admin.proxies.dataImportHint') }}
       </div>
       <div
-        class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-600 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+        class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-600"
       >
         {{ t('admin.proxies.dataImportWarning') }}
       </div>
@@ -44,7 +44,7 @@
         v-if="result"
         class="space-y-2 rounded-lg border border-gray-200 p-4 border-[var(--border-default)]"
       >
-        <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+        <div class="text-sm font-medium text-gray-900">
           {{ t('admin.proxies.dataImportResult') }}
         </div>
         <div class="text-sm text-gray-700 text-[var(--text-muted)]">
@@ -52,7 +52,7 @@
         </div>
 
         <div v-if="errorItems.length" class="mt-2">
-          <div class="text-sm font-medium text-red-600 dark:text-red-400">
+          <div class="text-sm font-medium text-red-600">
             {{ t('admin.proxies.dataImportErrors') }}
           </div>
           <div

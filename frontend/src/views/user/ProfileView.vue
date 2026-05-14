@@ -6,7 +6,7 @@
     >
       <PageIntro
         title="个人资料"
-        description="管理账户资料、登录绑定、安全验证和余额提醒。这里的设置只影响当前账户，不会改变 API 密钥或管理员配置。"
+      description="管理账户资料、登录绑定、安全验证和积分提醒。这里的设置只影响当前账户，不会改变 API 密钥或管理员配置。"
       />
 
       <ProfileInfoCard
@@ -24,11 +24,11 @@
         class="card p-6"
       >
         <div class="flex items-center gap-4">
-          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200">
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
             <Icon name="chat" size="lg" />
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h3 class="font-semibold text-gray-900">
               {{ t('common.contactSupport') }}
             </h3>
             <p class="text-sm font-medium">{{ contactInfo }}</p>

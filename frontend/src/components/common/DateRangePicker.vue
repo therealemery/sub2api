@@ -373,8 +373,8 @@ onUnmounted(() => {
 
 .date-picker-preset {
   @apply rounded-md px-3 py-1.5 text-xs font-medium;
-  @apply text-gray-600 dark:text-gray-400;
-  @apply hover:bg-gray-100 dark:hover:bg-dark-700;
+  @apply text-gray-600;
+  @apply hover:bg-gray-100;
   @apply transition-colors duration-150;
 }
 
@@ -396,7 +396,7 @@ onUnmounted(() => {
 }
 
 .date-picker-label {
-  @apply mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400;
+  @apply mb-1 block text-xs font-medium text-gray-500;
 }
 
 .date-picker-input {
@@ -413,9 +413,6 @@ onUnmounted(() => {
   filter: invert(0.5);
 }
 
-.dark .date-picker-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
-}
 
 .date-picker-separator {
   @apply flex items-center justify-center pb-1;

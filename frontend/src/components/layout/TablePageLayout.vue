@@ -89,7 +89,7 @@ onUnmounted(() => {
 }
 
 .table-scroll-container :deep(td) {
-  @apply px-5 py-4 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 border-[var(--border-default)];
+  @apply px-5 py-4 text-sm text-gray-700 border-b border-gray-100 border-[var(--border-default)];
 }
 
 .table-scroll-container :deep(tbody tr) {
@@ -145,15 +145,7 @@ onUnmounted(() => {
   backdrop-filter: none;
 }
 
-.dark .table-action-bar,
-.dark .table-filter-bar {
-  border-color: var(--border-default);
-  background: var(--bg-surface);
-}
 
-.dark .table-action-bar {
-  background: transparent;
-}
 
 .table-scroll-container {
   border-color: var(--border-default);
@@ -162,10 +154,6 @@ onUnmounted(() => {
   backdrop-filter: none;
 }
 
-.dark .table-scroll-container {
-  border-color: var(--border-default);
-  background: var(--bg-surface);
-}
 
 .table-scroll-container :deep(thead) {
   background: var(--bg-surface-alt);
@@ -262,11 +250,6 @@ onUnmounted(() => {
   background: transparent !important;
 }
 
-:global(.dark) .table-filter-bar,
-:global(.dark) .table-scroll-container {
-  border-color: var(--border-default) !important;
-  background: var(--bg-surface) !important;
-}
 
 .table-page-layout,
 .layout-section-fixed,

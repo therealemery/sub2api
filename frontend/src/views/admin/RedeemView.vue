@@ -1,5 +1,11 @@
 <template>
   <AppLayout>
+    <div class="admin-list-page">
+    <PageIntro
+      title="兑换码管理"
+      description="生成、筛选、导出和查看兑换码使用状态。这里不改变兑换规则，只让额度、类型和有效状态更容易核对。"
+    />
+
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -58,14 +64,14 @@
         >
           <template #cell-code="{ value }">
             <div class="flex items-center space-x-2">
-              <code class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ value }}</code>
+              <code class="font-mono text-sm text-gray-900">{{ value }}</code>
               <button
                 @click="copyToClipboard(value)"
                 :class="[
                   'flex items-center transition-colors',
                   copiedCode === value
                     ? 'text-green-500'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                    : 'text-gray-400 hover:text-gray-600'
                 ]"
                 :title="copiedCode === value ? t('admin.redeem.copied') : t('keys.copyToClipboard')"
               >
@@ -98,11 +104,11 @@
           </template>
 
           <template #cell-value="{ value, row }">
-            <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <span class="text-sm font-medium text-gray-900">
               <template v-if="row.type === 'balance'">${{ value.toFixed(2) }}</template>
               <template v-else-if="row.type === 'subscription'">
                 {{ row.validity_days || 30 }} {{ t('admin.redeem.days') }}
-                <span v-if="row.group" class="ml-1 text-xs text-gray-500 dark:text-gray-400"
+                <span v-if="row.group" class="ml-1 text-xs text-gray-500"
                   >({{ row.group.name }})</span
                 >
               </template>
@@ -142,7 +148,7 @@
               <button
                 v-if="row.status === 'unused'"
                 @click="handleDelete(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -178,6 +184,7 @@
         </div>
       </template>
     </TablePageLayout>
+    </div>
 
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
@@ -210,7 +217,7 @@
         <div
           class="relative z-10 w-full max-w-md rounded-lg bg-[var(--bg-surface)] p-6 bg-[var(--bg-surface-alt)]"
         >
-          <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h2 class="mb-4 text-lg font-semibold text-gray-900">
             {{ t('admin.redeem.generateCodesTitle') }}
           </h2>
           <form @submit.prevent="handleGenerateCodes" class="space-y-4">
@@ -218,7 +225,7 @@
               <label class="input-label">{{ t('admin.redeem.codeType') }}</label>
               <Select v-model="generateForm.type" :options="typeOptions" />
             </div>
-            <!-- 余额/并发类型：显示数值输入 -->
+            <!-- 积分/并发类型：显示数值输入 -->
             <div v-if="generateForm.type !== 'subscription' && generateForm.type !== 'invitation'">
               <label class="input-label">
                 {{
@@ -322,10 +329,10 @@
           >
             <div class="flex items-center gap-3">
               <div
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30"
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
               >
                 <svg
-                  class="h-5 w-5 text-green-600 dark:text-green-400"
+                  class="h-5 w-5 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -339,17 +346,17 @@
                 </svg>
               </div>
               <div>
-                <h2 class="text-base font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+                <h2 class="text-base font-semibold text-gray-900">
                   {{ t('admin.redeem.generatedSuccessfully') }}
                 </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-gray-500">
                   {{ t('admin.redeem.codesCreated', { count: generatedCodes.length }) }}
                 </p>
               </div>
             </div>
             <button
               @click="closeResultDialog"
-              class="modal-close-button text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              class="modal-close-button text-gray-400 hover:text-gray-600"
               aria-label="关闭弹窗"
             >
               <Icon name="x" size="xl" :stroke-width="2.8" />
@@ -362,7 +369,7 @@
                 readonly
                 :value="generatedCodesText"
                 :style="{ height: textareaHeight }"
-                class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 font-mono text-sm text-gray-800 focus:outline-none border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200"
+                class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 font-mono text-sm text-gray-800 focus:outline-none border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               ></textarea>
             </div>
           </div>
@@ -412,6 +419,7 @@ import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import Select from '@/components/common/Select.vue'

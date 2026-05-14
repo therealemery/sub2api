@@ -39,6 +39,7 @@ type CreateUserRequest struct {
 	Username      string  `json:"username"`
 	Notes         string  `json:"notes"`
 	Balance       float64 `json:"balance"`
+	Points        float64 `json:"points"`
 	Concurrency   int     `json:"concurrency"`
 	RPMLimit      int     `json:"rpm_limit"`
 	AllowedGroups []int64 `json:"allowed_groups"`
@@ -52,6 +53,7 @@ type UpdateUserRequest struct {
 	Username      *string  `json:"username"`
 	Notes         *string  `json:"notes"`
 	Balance       *float64 `json:"balance"`
+	Points        *float64 `json:"points"`
 	Concurrency   *int     `json:"concurrency"`
 	RPMLimit      *int     `json:"rpm_limit"`
 	Status        string   `json:"status" binding:"omitempty,oneof=active disabled"`
@@ -63,9 +65,10 @@ type UpdateUserRequest struct {
 
 // UpdateBalanceRequest represents balance update request
 type UpdateBalanceRequest struct {
-	Balance   float64 `json:"balance" binding:"required,gt=0"`
-	Operation string  `json:"operation" binding:"required,oneof=set add subtract"`
-	Notes     string  `json:"notes"`
+	Balance   float64  `json:"balance"`
+	Points    *float64 `json:"points"`
+	Operation string   `json:"operation" binding:"required,oneof=set add subtract"`
+	Notes     string   `json:"notes"`
 }
 
 type BindUserAuthIdentityRequest struct {
@@ -238,12 +241,16 @@ func (h *UserHandler) Create(c *gin.Context) {
 		return
 	}
 
+	initialPoints := req.Balance
+	if req.Points > 0 {
+		initialPoints = req.Points
+	}
 	user, err := h.adminService.CreateUser(c.Request.Context(), &service.CreateUserInput{
 		Email:         req.Email,
 		Password:      req.Password,
 		Username:      req.Username,
 		Notes:         req.Notes,
-		Balance:       req.Balance,
+		Balance:       initialPoints,
 		Concurrency:   req.Concurrency,
 		RPMLimit:      req.RPMLimit,
 		AllowedGroups: req.AllowedGroups,
@@ -272,12 +279,16 @@ func (h *UserHandler) Update(c *gin.Context) {
 	}
 
 	// 使用指针类型直接传递，nil 表示未提供该字段
+	points := req.Balance
+	if req.Points != nil {
+		points = req.Points
+	}
 	user, err := h.adminService.UpdateUser(c.Request.Context(), userID, &service.UpdateUserInput{
 		Email:         req.Email,
 		Password:      req.Password,
 		Username:      req.Username,
 		Notes:         req.Notes,
-		Balance:       req.Balance,
+		Balance:       points,
 		Concurrency:   req.Concurrency,
 		RPMLimit:      req.RPMLimit,
 		Status:        req.Status,
@@ -322,6 +333,13 @@ func (h *UserHandler) UpdateBalance(c *gin.Context) {
 	var req UpdateBalanceRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+	if req.Points != nil {
+		req.Balance = *req.Points
+	}
+	if req.Balance <= 0 {
+		response.BadRequest(c, "points must be greater than 0")
 		return
 	}
 

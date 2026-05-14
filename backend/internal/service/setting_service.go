@@ -1919,8 +1919,8 @@ func (s *SettingService) InitializeDefaultSettings(ctx context.Context) error {
 		// Available channels feature (default disabled; opt-in)
 		SettingKeyAvailableChannelsEnabled: "false",
 
-		// Affiliate (邀请返利) feature (default disabled; opt-in)
-		SettingKeyAffiliateEnabled: "false",
+		// Affiliate (邀请返利) feature
+		SettingKeyAffiliateEnabled: strconv.FormatBool(AffiliateEnabledDefault),
 
 		// Claude Code version check (default: empty = disabled)
 		SettingKeyMinClaudeCodeVersion: "",

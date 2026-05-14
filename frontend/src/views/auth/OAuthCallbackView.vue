@@ -2,10 +2,10 @@
   <div class="min-h-screen bg-gray-50 px-4 py-10 bg-[var(--bg-surface-alt)]">
     <div class="mx-auto max-w-2xl">
       <div class="card p-6">
-        <h1 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h1 class="text-lg font-semibold text-gray-900">
           {{ t('auth.oauth.callbackTitle') }}
         </h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p class="mt-2 text-sm text-gray-600">
           {{ t('auth.oauth.callbackHint') }}
         </p>
 

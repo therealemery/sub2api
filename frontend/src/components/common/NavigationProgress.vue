@@ -47,9 +47,6 @@ const isVisible = computed(() => isLoading.value)
 }
 
 /* 暗色模式下的进度条颜色 */
-:root.dark .navigation-progress-bar {
-  background: var(--accent);
-}
 
 /* 进度条滑动动画 */
 @keyframes progress-slide {

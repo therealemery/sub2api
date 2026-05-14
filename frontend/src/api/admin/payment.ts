@@ -26,6 +26,16 @@ function previewResponse<T>(data: T) {
   return Promise.resolve({ data })
 }
 
+function previewPage<T>(page = 1, pageSize = 20): BasePaginationResponse<T> {
+  return {
+    items: [],
+    total: 0,
+    page,
+    page_size: pageSize,
+    pages: 0
+  }
+}
+
 /** Admin-facing payment config returned by GET /admin/payment/config */
 export interface AdminPaymentConfig {
   enabled: boolean
@@ -37,6 +47,7 @@ export interface AdminPaymentConfig {
   enabled_payment_types: string[]
   balance_disabled: boolean
   balance_recharge_multiplier: number
+  points_per_rmb?: number
   load_balance_strategy: string
   product_name_prefix: string
   product_name_suffix: string
@@ -55,6 +66,7 @@ export interface UpdatePaymentConfigRequest {
   enabled_payment_types?: string[]
   balance_disabled?: boolean
   balance_recharge_multiplier?: number
+  points_per_rmb?: number
   load_balance_strategy?: string
   product_name_prefix?: string
   product_name_suffix?: string
@@ -77,7 +89,8 @@ export const adminPaymentAPI = {
         max_pending_orders: 3,
         enabled_payment_types: ['stripe'],
         balance_disabled: false,
-        balance_recharge_multiplier: 1,
+        balance_recharge_multiplier: 10,
+        points_per_rmb: 10,
         load_balance_strategy: 'round_robin',
         product_name_prefix: 'OwnAPI',
         product_name_suffix: '',
@@ -98,6 +111,19 @@ export const adminPaymentAPI = {
 
   /** Get payment dashboard statistics */
   getDashboard(days?: number) {
+    if (isLocalPreviewSession()) {
+      return previewResponse<DashboardStats>({
+        today_amount: 0,
+        total_amount: 0,
+        today_count: 0,
+        total_count: 0,
+        avg_amount: 0,
+        daily_series: [],
+        payment_methods: [],
+        top_users: []
+      })
+    }
+
     return apiClient.get<DashboardStats>('/admin/payment/dashboard', {
       params: days ? { days } : undefined
     })
@@ -117,6 +143,12 @@ export const adminPaymentAPI = {
     end_date?: string
     order_type?: string
   }) {
+    if (isLocalPreviewSession()) {
+      return previewResponse<BasePaginationResponse<PaymentOrder>>(
+        previewPage<PaymentOrder>(params?.page ?? 1, params?.page_size ?? 20)
+      )
+    }
+
     return apiClient.get<BasePaginationResponse<PaymentOrder>>('/admin/payment/orders', { params })
   },
 
@@ -144,6 +176,10 @@ export const adminPaymentAPI = {
 
   /** Get all payment channels */
   getChannels() {
+    if (isLocalPreviewSession()) {
+      return previewResponse<PaymentChannel[]>([])
+    }
+
     return apiClient.get<PaymentChannel[]>('/admin/payment/channels')
   },
 
@@ -166,6 +202,10 @@ export const adminPaymentAPI = {
 
   /** Get all subscription plans */
   getPlans() {
+    if (isLocalPreviewSession()) {
+      return previewResponse<SubscriptionPlan[]>([])
+    }
+
     return apiClient.get<SubscriptionPlan[]>('/admin/payment/plans')
   },
 

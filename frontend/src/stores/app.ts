@@ -14,6 +14,7 @@ import {
 } from '@/api/admin/system'
 import { getPublicSettings as fetchPublicSettingsAPI } from '@/api/auth'
 import { DEFAULT_SITE_LOGO, DEFAULT_SITE_NAME, resolveSiteLogoPath } from '@/constants/branding'
+import { readPreviewModelCenterConfig } from '@/api/localPreviewData'
 
 const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
 
@@ -22,6 +23,59 @@ function isLocalPreviewSession(): boolean {
     (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
     !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
   )
+}
+
+function isLocalDevHost(): boolean {
+  return (
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)
+  )
+}
+
+function buildFallbackPublicSettings(overrides: Partial<PublicSettings> = {}): PublicSettings {
+  return {
+    registration_enabled: true,
+    email_verify_enabled: false,
+    force_email_on_third_party_signup: false,
+    registration_email_suffix_whitelist: [],
+    promo_code_enabled: true,
+    password_reset_enabled: true,
+    invitation_code_enabled: false,
+    turnstile_enabled: false,
+    turnstile_site_key: '',
+    site_name: DEFAULT_SITE_NAME,
+    site_logo: DEFAULT_SITE_LOGO,
+    site_subtitle: '',
+    api_base_url: '',
+    contact_info: '',
+    doc_url: '/docs',
+    home_content: '',
+    hide_ccs_import_button: false,
+    payment_enabled: true,
+    table_default_page_size: 20,
+    table_page_size_options: [10, 20, 50, 100],
+    custom_menu_items: [],
+    custom_endpoints: [],
+    model_center_config: readPreviewModelCenterConfig(),
+    linuxdo_oauth_enabled: false,
+    wechat_oauth_enabled: false,
+    wechat_oauth_open_enabled: false,
+    wechat_oauth_mp_enabled: false,
+    wechat_oauth_mobile_enabled: false,
+    oidc_oauth_enabled: false,
+    oidc_oauth_provider_name: 'OIDC',
+    backend_mode_enabled: false,
+    version: '',
+    balance_low_notify_enabled: false,
+    account_quota_notify_enabled: false,
+    balance_low_notify_threshold: 0,
+    channel_monitor_enabled: true,
+    channel_monitor_default_interval_seconds: 60,
+    available_channels_enabled: true,
+    affiliate_enabled: true,
+    ...overrides
+  }
 }
 
 export const useAppStore = defineStore('app', () => {
@@ -354,46 +408,14 @@ export const useAppStore = defineStore('app', () => {
       if (cachedPublicSettings.value) {
         return { ...cachedPublicSettings.value }
       }
-      return {
-        registration_enabled: false,
-        email_verify_enabled: false,
-        force_email_on_third_party_signup: false,
-        registration_email_suffix_whitelist: [],
-        promo_code_enabled: true,
-        password_reset_enabled: false,
-        invitation_code_enabled: false,
-        turnstile_enabled: false,
-        turnstile_site_key: '',
+      return buildFallbackPublicSettings({
         site_name: siteName.value,
         site_logo: siteLogo.value,
-        site_subtitle: '',
         api_base_url: apiBaseUrl.value,
         contact_info: contactInfo.value,
         doc_url: docUrl.value,
-        home_content: '',
-        hide_ccs_import_button: false,
-        payment_enabled: false,
-        table_default_page_size: 20,
-        table_page_size_options: [10, 20, 50, 100],
-        custom_menu_items: [],
-        custom_endpoints: [],
-        linuxdo_oauth_enabled: false,
-        wechat_oauth_enabled: false,
-        wechat_oauth_open_enabled: false,
-        wechat_oauth_mp_enabled: false,
-        wechat_oauth_mobile_enabled: false,
-        oidc_oauth_enabled: false,
-        oidc_oauth_provider_name: 'OIDC',
-        backend_mode_enabled: false,
-        version: siteVersion.value,
-        balance_low_notify_enabled: false,
-        account_quota_notify_enabled: false,
-        balance_low_notify_threshold: 0,
-        channel_monitor_enabled: true,
-        channel_monitor_default_interval_seconds: 60,
-        available_channels_enabled: false,
-        affiliate_enabled: false,
-      }
+        version: siteVersion.value
+      })
     }
 
     // Prevent duplicate requests
@@ -401,14 +423,24 @@ export const useAppStore = defineStore('app', () => {
       return null
     }
 
+    if (!force && (isLocalDevHost() || isLocalPreviewSession())) {
+      const fallback = buildFallbackPublicSettings()
+      applySettings(fallback)
+      return fallback
+    }
+
     publicSettingsLoading.value = true
     try {
       const data = await fetchPublicSettingsAPI()
       applySettings(data)
       return data
-    } catch (error) {
-      console.error('Failed to fetch public settings:', error)
-      return null
+    } catch {
+      if (import.meta.env.DEV) {
+        console.warn('Public settings unavailable, using local defaults.')
+      }
+      const fallback = buildFallbackPublicSettings()
+      applySettings(fallback)
+      return fallback
     } finally {
       publicSettingsLoading.value = false
     }

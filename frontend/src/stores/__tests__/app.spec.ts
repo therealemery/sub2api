@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAppStore } from '@/stores/app'
 import { getPublicSettings } from '@/api/auth'
+import { DEFAULT_SITE_LOGO } from '@/constants/branding'
 
 // Mock API 模块
 vi.mock('@/api/admin/system', () => ({
@@ -268,7 +269,7 @@ describe('useAppStore', () => {
 
       expect(result).toBe(true)
       expect(store.siteName).toBe('TestSite')
-      expect(store.siteLogo).toBe('/brand/ownapi-logo-light.png?v=20260512-logo-final')
+      expect(store.siteLogo).toBe(DEFAULT_SITE_LOGO)
       expect(store.siteVersion).toBe('1.0.0')
       expect(store.publicSettingsLoaded).toBe(true)
     })

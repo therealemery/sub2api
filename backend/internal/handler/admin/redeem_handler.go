@@ -31,24 +31,23 @@ func NewRedeemHandler(adminService service.AdminService, redeemService *service.
 	}
 }
 
-// GenerateRedeemCodesRequest represents generate redeem codes request
+// GenerateRedeemCodesRequest represents generate redeem codes request.
 type GenerateRedeemCodesRequest struct {
 	Count        int     `json:"count" binding:"required,min=1,max=100"`
-	Type         string  `json:"type" binding:"required,oneof=balance concurrency subscription invitation"`
+	Type         string  `json:"type" binding:"required,oneof=balance points concurrency subscription invitation"`
 	Value        float64 `json:"value"`
-	GroupID      *int64  `json:"group_id"`      // 订阅类型必填
-	ValidityDays int     `json:"validity_days"` // 订阅类型使用，正数增加/负数退款扣减
+	GroupID      *int64  `json:"group_id"`
+	ValidityDays int     `json:"validity_days"`
 }
 
 // CreateAndRedeemCodeRequest represents creating a fixed code and redeeming it for a target user.
-// Type 为 omitempty 而非 required 是为了向后兼容旧版调用方（不传 type 时默认 balance）。
 type CreateAndRedeemCodeRequest struct {
 	Code         string  `json:"code" binding:"required,min=3,max=128"`
-	Type         string  `json:"type" binding:"omitempty,oneof=balance concurrency subscription invitation"` // 不传时默认 balance（向后兼容）
+	Type         string  `json:"type" binding:"omitempty,oneof=balance points concurrency subscription invitation"`
 	Value        float64 `json:"value" binding:"required"`
 	UserID       int64   `json:"user_id" binding:"required,gt=0"`
-	GroupID      *int64  `json:"group_id"`      // subscription 类型必填
-	ValidityDays int     `json:"validity_days"` // subscription 类型：正数增加，负数退款扣减
+	GroupID      *int64  `json:"group_id"`
+	ValidityDays int     `json:"validity_days"`
 	Notes        string  `json:"notes"`
 }
 
@@ -61,7 +60,6 @@ func (h *RedeemHandler) List(c *gin.Context) {
 	search := c.Query("search")
 	sortBy := c.DefaultQuery("sort_by", "id")
 	sortOrder := c.DefaultQuery("sort_order", "desc")
-	// 标准化和验证 search 参数
 	search = strings.TrimSpace(search)
 	if len(search) > 100 {
 		search = search[:100]
@@ -106,6 +104,7 @@ func (h *RedeemHandler) Generate(c *gin.Context) {
 		response.BadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
+	req.Type = normalizeRedeemPointType(req.Type)
 
 	executeAdminIdempotentJSON(c, "admin.redeem_codes.generate", req, service.DefaultWriteIdempotencyTTL(), func(ctx context.Context) (any, error) {
 		codes, execErr := h.adminService.GenerateRedeemCodes(ctx, &service.GenerateRedeemCodesInput{
@@ -141,11 +140,11 @@ func (h *RedeemHandler) CreateAndRedeem(c *gin.Context) {
 		return
 	}
 	req.Code = strings.TrimSpace(req.Code)
-	// 向后兼容：旧版调用方（如 Sub2ApiPay）不传 type 字段，默认当作 balance 充值处理。
-	// 请勿删除此默认值逻辑，否则会导致旧版调用方 400 报错。
+	// Backward compatibility: old callers omit type and should default to balance.
 	if req.Type == "" {
 		req.Type = "balance"
 	}
+	req.Type = normalizeRedeemPointType(req.Type)
 
 	if req.Type == "subscription" {
 		if req.GroupID == nil {
@@ -191,6 +190,13 @@ func (h *RedeemHandler) CreateAndRedeem(c *gin.Context) {
 		}
 		return gin.H{"redeem_code": dto.RedeemCodeFromServiceAdmin(redeemed)}, nil
 	})
+}
+
+func normalizeRedeemPointType(codeType string) string {
+	if strings.TrimSpace(codeType) == "points" {
+		return "balance"
+	}
+	return codeType
 }
 
 func (h *RedeemHandler) resolveCreateAndRedeemExisting(ctx context.Context, existing *service.RedeemCode, userID int64) (any, error) {

@@ -1,17 +1,17 @@
 <template>
   <div class="card">
     <div class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]">
-      <h2 class="text-lg font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+      <h2 class="text-lg font-medium text-gray-900">
         {{ t('profile.totp.title') }}
       </h2>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      <p class="mt-1 text-sm text-gray-500">
         {{ t('profile.totp.description') }}
       </p>
     </div>
     <div class="px-6 py-6">
       <!-- Loading state -->
       <div v-if="loading" class="flex items-center justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700 dark:border-gray-200"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700"></div>
       </div>
 
       <!-- Feature disabled globally -->
@@ -22,10 +22,10 @@
           </svg>
         </div>
         <div>
-          <p class="font-medium text-gray-700 dark:text-gray-300">
+          <p class="font-medium text-gray-700">
             {{ t('profile.totp.featureDisabled') }}
           </p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
+          <p class="text-sm text-gray-500">
             {{ t('profile.totp.featureDisabledHint') }}
           </p>
         </div>
@@ -34,16 +34,16 @@
       <!-- 2FA Enabled -->
       <div v-else-if="status?.enabled" class="flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="flex-shrink-0 rounded-full bg-green-100 p-3 dark:bg-green-900/30">
-            <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <div class="flex-shrink-0 rounded-full bg-green-100 p-3">
+            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <p class="font-medium text-gray-900">
               {{ t('profile.totp.enabled') }}
             </p>
-            <p v-if="status.enabled_at" class="text-sm text-gray-500 dark:text-gray-400">
+            <p v-if="status.enabled_at" class="text-sm text-gray-500">
               {{ t('profile.totp.enabledAt') }}: {{ formatDate(status.enabled_at) }}
             </p>
           </div>
@@ -66,10 +66,10 @@
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-700 dark:text-gray-300">
+            <p class="font-medium text-gray-700">
               {{ t('profile.totp.notEnabled') }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-sm text-gray-500">
               {{ t('profile.totp.notEnabledHint') }}
             </p>
           </div>

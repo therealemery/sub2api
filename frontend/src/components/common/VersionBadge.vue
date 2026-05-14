@@ -7,8 +7,8 @@
         class="flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs transition-colors"
         :class="[
           hasUpdate
-            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--text-muted)] dark:hover:bg-dark-700'
+            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] text-[var(--text-muted)]'
         ]"
         :title="hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
       >
@@ -42,7 +42,7 @@
             }}</span>
             <button
               @click="refreshVersion(true)"
-              class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-dark-700 dark:hover:text-dark-200"
+              class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
               :disabled="loading"
               :title="t('version.refresh')"
             >
@@ -82,17 +82,17 @@
                 <div class="inline-flex items-center gap-2">
                   <span
                     v-if="currentVersion"
-                    class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]"
+                    class="text-2xl font-bold text-gray-900"
                     >v{{ currentVersion }}</span
                   >
                   <span v-else class="text-2xl font-bold text-gray-400 text-[var(--text-muted)]">--</span>
                   <!-- Show check mark when up to date -->
                   <span
                     v-if="!hasUpdate"
-                    class="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30"
+                    class="flex h-5 w-5 items-center justify-center rounded-full bg-green-100"
                   >
                     <svg
-                      class="h-3 w-3 text-green-600 dark:text-green-400"
+                      class="h-3 w-3 text-green-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -116,23 +116,23 @@
               <!-- Priority 1: Update error (must check before hasUpdate) -->
               <div v-if="updateError" class="space-y-2">
                 <div
-                  class="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800/50 dark:bg-red-900/20"
+                  class="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-3"
                 >
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50"
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100"
                   >
                     <Icon
                       name="x"
                       size="sm"
                       :stroke-width="2"
-                      class="text-red-600 dark:text-red-400"
+                      class="text-red-600"
                     />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-red-700 dark:text-red-300">
+                    <p class="text-sm font-medium text-red-700">
                       {{ t('version.updateFailed') }}
                     </p>
-                    <p class="truncate text-xs text-red-600/70 dark:text-red-400/70">
+                    <p class="truncate text-xs text-red-600/70">
                       {{ updateError }}
                     </p>
                   </div>
@@ -151,13 +151,13 @@
               <!-- Priority 2: Update success - need restart -->
               <div v-else-if="updateSuccess && needRestart" class="space-y-2">
                 <div
-                  class="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800/50 dark:bg-green-900/20"
+                  class="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3"
                 >
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50"
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-green-100"
                   >
                     <svg
-                      class="h-4 w-4 text-green-600 dark:text-green-400"
+                      class="h-4 w-4 text-green-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -167,10 +167,10 @@
                     </svg>
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-green-700 dark:text-green-300">
+                    <p class="text-sm font-medium text-green-700">
                       {{ t('version.updateComplete') }}
                     </p>
-                    <p class="text-xs text-green-600/70 dark:text-green-400/70">
+                    <p class="text-xs text-green-600/70">
                       {{ t('version.restartRequired') }}
                     </p>
                   </div>
@@ -233,28 +233,28 @@
                   :href="releaseInfo.html_url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 transition-colors hover:bg-amber-100 dark:border-amber-800/50 dark:bg-amber-900/20 dark:hover:bg-amber-900/30"
+                  class="group flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 transition-colors hover:bg-amber-100"
                 >
                   <div
-                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50"
+                    class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100"
                   >
                     <Icon
                       name="download"
                       size="sm"
                       :stroke-width="2"
-                      class="text-amber-600 dark:text-amber-400"
+                      class="text-amber-600"
                     />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-amber-700 dark:text-amber-300">
+                    <p class="text-sm font-medium text-amber-700">
                       {{ t('version.updateAvailable') }}
                     </p>
-                    <p class="text-xs text-amber-600/70 dark:text-amber-400/70">
+                    <p class="text-xs text-amber-600/70">
                       v{{ latestVersion }}
                     </p>
                   </div>
                   <svg
-                    class="h-4 w-4 text-amber-500 transition-transform group-hover:translate-x-0.5 dark:text-amber-400"
+                    class="h-4 w-4 text-amber-500 transition-transform group-hover:translate-x-0.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -290,23 +290,23 @@
               <div v-else-if="hasUpdate && isReleaseBuild" class="space-y-2">
                 <!-- Update info card -->
                 <div
-                  class="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/50 dark:bg-amber-900/20"
+                  class="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3"
                 >
                 <div
-                  class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50"
+                  class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-100"
                 >
                   <Icon
                     name="download"
                     size="sm"
                     :stroke-width="2"
-                    class="text-amber-600 dark:text-amber-400"
+                    class="text-amber-600"
                   />
                 </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-sm font-medium text-amber-700 dark:text-amber-300">
+                    <p class="text-sm font-medium text-amber-700">
                       {{ t('version.updateAvailable') }}
                     </p>
-                    <p class="text-xs text-amber-600/70 dark:text-amber-400/70">
+                    <p class="text-xs text-amber-600/70">
                       v{{ latestVersion }}
                     </p>
                   </div>
@@ -343,7 +343,7 @@
                   :href="releaseInfo.html_url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex items-center justify-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-dark-200"
+                  class="flex items-center justify-center gap-1 text-xs text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)]"
                 >
                   {{ t('version.viewChangelog') }}
                   <Icon name="externalLink" size="xs" :stroke-width="2" />
@@ -356,7 +356,7 @@
                 :href="releaseInfo.html_url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-dark-200"
+                class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)]"
               >
                 <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -471,7 +471,6 @@ async function handleRestart() {
     // Service will restart, page will reload automatically or show disconnected
   } catch (error) {
     // Expected - connection will be lost during restart
-    console.log('Service restarting...')
   }
 
   // Start countdown

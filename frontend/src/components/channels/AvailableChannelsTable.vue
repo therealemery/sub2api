@@ -3,7 +3,7 @@
     <div class="table-wrapper">
       <table class="w-full min-w-[760px] table-fixed border-collapse text-sm">
       <thead>
-        <tr class="border-b border-gray-100 bg-gray-50/50 text-xs font-medium uppercase tracking-wide text-gray-500 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-400">
+        <tr class="border-b border-gray-100 bg-gray-50/50 text-xs font-medium uppercase tracking-wide text-gray-500 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
           <th class="w-[180px] px-4 py-3 text-center">{{ columns.name }}</th>
           <th class="w-[200px] px-4 py-3 text-left">{{ columns.description }}</th>
           <th class="w-[140px] px-4 py-3 text-left">{{ columns.platform }}</th>
@@ -22,7 +22,7 @@
         <tr>
           <td colspan="5" class="py-12 text-center">
             <Icon name="inbox" size="xl" class="mx-auto mb-3 h-12 w-12 text-gray-400" />
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ emptyLabel }}</p>
+            <p class="text-sm text-gray-500">{{ emptyLabel }}</p>
           </td>
         </tr>
       </tbody>
@@ -37,14 +37,14 @@
         <tr
           v-for="(section, secIdx) in channel.platforms"
           :key="`${channel.name}-${section.platform}`"
-          class="transition-colors hover:bg-gray-50/40 dark:hover:bg-dark-800/40"
+          class="transition-colors hover:bg-gray-50/40"
           :class="{ 'border-t border-gray-100/70 border-[var(--border-default)]': secIdx > 0 }"
         >
           <!-- 渠道名：只在第一行渲染并用 rowspan 纵向合并 -->
           <td
             v-if="secIdx === 0"
             :rowspan="channel.platforms.length"
-            class="px-4 py-3 text-center align-middle font-medium text-gray-900 dark:text-[var(--text-inverse)]"
+            class="px-4 py-3 text-center align-middle font-medium text-gray-900"
           >
             {{ channel.name }}
           </td>
@@ -53,7 +53,7 @@
           <td
             v-if="secIdx === 0"
             :rowspan="channel.platforms.length"
-            class="px-4 py-3 align-middle text-xs text-gray-500 dark:text-gray-400"
+            class="px-4 py-3 align-middle text-xs text-gray-500"
           >
             <template v-if="channel.description">{{ channel.description }}</template>
             <span v-else class="text-gray-400">-</span>
@@ -80,7 +80,7 @@
                 class="flex flex-wrap items-center gap-1.5"
               >
                 <span
-                  class="inline-flex items-center gap-0.5 text-[10px] font-medium uppercase text-purple-600 dark:text-purple-400"
+                  class="inline-flex items-center gap-0.5 text-[10px] font-medium uppercase text-purple-600"
                   :title="t('availableChannels.exclusiveTooltip')"
                 >
                   <Icon name="shield" size="xs" class="h-3 w-3" />
@@ -102,7 +102,7 @@
                 class="flex flex-wrap items-center gap-1.5"
               >
                 <span
-                  class="inline-flex items-center gap-0.5 text-[10px] font-medium uppercase text-gray-500 dark:text-gray-400"
+                  class="inline-flex items-center gap-0.5 text-[10px] font-medium uppercase text-gray-500"
                   :title="t('availableChannels.publicTooltip')"
                 >
                   <Icon name="globe" size="xs" class="h-3 w-3" />

@@ -175,14 +175,14 @@ const options = computed(() => {
     <div class="mb-4 flex shrink-0 flex-col gap-3">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-900">
         <svg class="h-4 w-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 12h6m-6 5h3" />
         </svg>
         {{ t('admin.ops.switchRateTrend') }}
         <HelpTooltip v-if="!props.fullscreen" :content="t('admin.ops.tooltips.switchRateTrend')" />
       </h3>
-          <p class="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-xs leading-5 text-gray-500">
             观察账号切换是否异常升高，用于判断上游账号池是否稳定。
           </p>
         </div>
@@ -191,7 +191,7 @@ const options = computed(() => {
       <div class="grid grid-cols-3 gap-2">
         <div class="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2">
           <div class="text-[10px] font-medium uppercase tracking-wide text-gray-400">当前</div>
-          <div class="mt-1 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ formatRate(latestSwitchRate) }}</div>
+          <div class="mt-1 text-sm font-semibold text-gray-900">{{ formatRate(latestSwitchRate) }}</div>
         </div>
         <div class="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2">
           <div class="text-[10px] font-medium uppercase tracking-wide text-gray-400">平均</div>
@@ -199,7 +199,7 @@ const options = computed(() => {
         </div>
         <div class="rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2">
           <div class="text-[10px] font-medium uppercase tracking-wide text-gray-400">峰值</div>
-          <div class="mt-1 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">{{ formatRate(peakSwitchRate) }}</div>
+          <div class="mt-1 text-sm font-semibold text-gray-900">{{ formatRate(peakSwitchRate) }}</div>
         </div>
       </div>
     </div>
@@ -212,7 +212,7 @@ const options = computed(() => {
       </div>
     </div>
 
-    <div v-if="state === 'ready'" class="mt-3 text-[11px] text-gray-500 dark:text-gray-400">
+    <div v-if="state === 'ready'" class="mt-3 text-[11px] text-gray-500">
       已统计 {{ activeBucketCount }} 个有效时间段，数值越高表示账号池切换越频繁。
     </div>
   </div>

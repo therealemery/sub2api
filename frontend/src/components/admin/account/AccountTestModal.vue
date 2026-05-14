@@ -18,8 +18,8 @@
             <Icon name="play" size="md" class="text-[var(--text-inverse)]" :stroke-width="2" />
           </div>
           <div>
-            <div class="font-semibold text-gray-900 dark:text-gray-100">{{ account.name }}</div>
-            <div class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <div class="font-semibold text-gray-900">{{ account.name }}</div>
+            <div class="flex items-center gap-1.5 text-xs text-gray-500">
               <span
                 class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium uppercase bg-[var(--bg-surface-alt)]"
               >
@@ -33,8 +33,8 @@
           :class="[
             'rounded-md px-2.5 py-1 text-xs font-semibold',
             account.status === 'active'
-              ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
-              : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-gray-100 text-gray-600'
           ]"
         >
           {{ account.status }}
@@ -42,7 +42,7 @@
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label class="text-sm font-medium text-gray-700">
           {{ t('admin.accounts.selectTestModel') }}
         </label>
         <Select
@@ -70,7 +70,7 @@
       <div class="group relative">
         <div
           ref="terminalRef"
-          class="max-h-[240px] min-h-[120px] overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-4 font-mono text-sm dark:border-gray-800 dark:bg-black"
+          class="max-h-[240px] min-h-[120px] overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-4 font-mono text-sm"
         >
           <!-- Status Line -->
           <div v-if="status === 'idle'" class="flex items-center gap-2 text-gray-500">
@@ -121,7 +121,7 @@
       </div>
 
       <div v-if="generatedImages.length > 0" class="space-y-2">
-        <div class="text-xs font-medium text-gray-600 dark:text-gray-300">
+        <div class="text-xs font-medium text-gray-600">
           {{ t('admin.accounts.imagePreview') }}
         </div>
         <div class="flex flex-wrap justify-center gap-3">
@@ -135,7 +135,7 @@
             <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover/img:bg-black/20">
               <Icon name="eye" size="lg" class="text-[var(--text-inverse)] opacity-0  transition-opacity group-hover/img:opacity-100" :stroke-width="2" />
             </div>
-            <div class="border-t border-gray-100 px-3 py-1.5 text-xs text-gray-500 border-[var(--border-default)] dark:text-gray-300">
+            <div class="border-t border-gray-100 px-3 py-1.5 text-xs text-gray-500 border-[var(--border-default)]">
               {{ image.mimeType || 'image/*' }}
             </div>
           </div>
@@ -166,7 +166,7 @@
       </Teleport>
 
       <!-- Test Info -->
-      <div class="flex items-center justify-between px-1 text-xs text-gray-500 dark:text-gray-400">
+      <div class="flex items-center justify-between px-1 text-xs text-gray-500">
         <div class="flex items-center gap-3">
           <span class="flex items-center gap-1">
             <Icon name="grid" size="sm" :stroke-width="2" />
@@ -188,7 +188,7 @@
       <div class="flex justify-end gap-3">
         <button
           @click="handleClose"
-          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500"
+          class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)]"
         >
           {{ t('common.close') }}
         </button>

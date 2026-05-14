@@ -10,7 +10,7 @@
           <span
             v-for="model in modelValue"
             :key="model"
-            class="inline-flex items-center justify-between gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300"
+            class="inline-flex items-center justify-between gap-1 rounded bg-gray-100 px-2 py-1 text-xs text-gray-700 bg-[var(--bg-surface-alt)]"
           >
             <span class="flex items-center gap-1 truncate">
               <ModelIcon :model="model" size="14px" />
@@ -19,7 +19,7 @@
             <button
               type="button"
               @click.stop="removeModel(model)"
-              class="shrink-0 rounded-full hover:bg-gray-200 dark:hover:bg-dark-500"
+              class="shrink-0 rounded-full hover:bg-gray-200"
             >
               <Icon name="x" size="xs" class="h-3.5 w-3.5" :stroke-width="2" />
             </button>
@@ -52,7 +52,7 @@
             :key="model.value"
             type="button"
             @click="toggleModel(model.value)"
-            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-600"
+            class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-100"
           >
             <span
               :class="[
@@ -67,7 +67,7 @@
               </svg>
             </span>
             <ModelIcon :model="model.value" size="18px" />
-            <span class="truncate text-gray-900 dark:text-[var(--text-inverse)]">{{ model.value }}</span>
+            <span class="truncate text-gray-900">{{ model.value }}</span>
           </button>
           <div v-if="filteredModels.length === 0" class="px-3 py-4 text-center text-sm text-gray-500">
             {{ t('admin.accounts.noMatchingModels') }}
@@ -81,14 +81,14 @@
       <button
         type="button"
         @click="fillRelated"
-        class="rounded-lg border border-[var(--border-focus)] px-3 py-1.5 text-sm text-[var(--accent)] hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
+        class="rounded-lg border border-[var(--border-focus)] px-3 py-1.5 text-sm text-[var(--accent)] hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] text-[var(--accent)]"
       >
         {{ t('admin.accounts.fillRelatedModels') }}
       </button>
       <button
         type="button"
         @click="clearAll"
-        class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
+        class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
       >
         {{ t('admin.accounts.clearAllModels') }}
       </button>
@@ -96,7 +96,7 @@
 
     <!-- Custom Model Input -->
     <div class="mb-3">
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.accounts.customModelName') }}</label>
+      <label class="mb-1.5 block text-sm font-medium text-gray-700">{{ t('admin.accounts.customModelName') }}</label>
       <div class="flex gap-2">
         <input
           v-model="customModel"
@@ -110,7 +110,7 @@
         <button
           type="button"
           @click="addCustom"
-          class="rounded-lg bg-[var(--bg-surface-alt)] px-4 py-2 text-sm font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] bg-[var(--bg-surface-alt)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
+          class="rounded-lg bg-[var(--bg-surface-alt)] px-4 py-2 text-sm font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
         >
           {{ t('admin.accounts.addModel') }}
         </button>

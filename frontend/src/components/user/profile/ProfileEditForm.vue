@@ -4,14 +4,14 @@
       v-if="!props.embedded"
       class="border-b border-gray-100 px-6 py-4 border-[var(--border-default)]"
     >
-      <h2 class="text-lg font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+      <h2 class="text-lg font-medium text-gray-900">
         {{ t('profile.editProfile') }}
       </h2>
     </div>
     <div :class="props.embedded ? '' : 'px-6 py-6'">
       <form @submit.prevent="handleUpdateProfile" class="space-y-4">
         <div v-if="props.embedded">
-          <p class="text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <p class="text-sm font-semibold text-gray-900">
             {{ t('profile.editProfile') }}
           </p>
         </div>

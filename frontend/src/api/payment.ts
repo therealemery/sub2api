@@ -16,6 +16,15 @@ import type {
 } from '@/types/payment'
 import type { BasePaginationResponse } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
 export const paymentAPI = {
   /** Get payment configuration (enabled types, limits, etc.) */
   getConfig() {
@@ -84,6 +93,10 @@ export const paymentAPI = {
 
   /** Get provider instance IDs that allow user refund */
   getRefundEligibleProviders() {
+    if (isLocalPreviewSession()) {
+      return Promise.resolve({ data: { provider_instance_ids: [] } })
+    }
+
     return apiClient.get<{ provider_instance_ids: string[] }>('/payment/orders/refund-eligible-providers')
   }
 }

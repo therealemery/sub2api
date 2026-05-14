@@ -5,8 +5,7 @@
     <main class="auth-frame">
       <section class="auth-brand" aria-label="Brand">
         <div class="auth-logo">
-          <img :src="authLogoPaths.light" alt="Logo" class="theme-logo-light" />
-          <img :src="authLogoPaths.dark" alt="Logo" class="theme-logo-dark" />
+          <img :src="authLogo" alt="Logo" class="site-logo-img" />
         </div>
         <h1>{{ siteName }}</h1>
         <p v-if="showSubtitle">{{ siteSubtitle }}</p>
@@ -34,25 +33,21 @@ import { useAppStore } from '@/stores'
 import { sanitizeUrl } from '@/utils/url'
 import {
   DEFAULT_SITE_HERO_LOGO,
-  DEFAULT_SITE_HERO_LOGO_DARK,
-  DEFAULT_SITE_HERO_LOGO_LIGHT,
   DEFAULT_SITE_LOGO,
   DEFAULT_SITE_NAME,
   DEFAULT_SITE_SUBTITLE,
   isDefaultOwnApiLogo,
-  resolveSiteLogoPath,
-  resolveThemedSiteLogoPaths
+  resolveSiteLogoPath
 } from '@/constants/branding'
 
 const appStore = useAppStore()
 
 const siteName = computed(() => appStore.siteName || DEFAULT_SITE_NAME)
 const siteLogo = computed(() => sanitizeUrl(resolveSiteLogoPath(appStore.siteLogo || DEFAULT_SITE_LOGO), { allowRelative: true, allowDataUrl: true }))
-const siteLogoPaths = computed(() => resolveThemedSiteLogoPaths(siteLogo.value))
-const authLogoPaths = computed(() =>
+const authLogo = computed(() =>
   isDefaultOwnApiLogo(siteLogo.value)
-    ? { light: DEFAULT_SITE_HERO_LOGO_LIGHT || DEFAULT_SITE_HERO_LOGO, dark: DEFAULT_SITE_HERO_LOGO_DARK }
-    : siteLogoPaths.value
+    ? DEFAULT_SITE_HERO_LOGO
+    : siteLogo.value
 )
 const siteSubtitle = computed(() => appStore.cachedPublicSettings?.site_subtitle || DEFAULT_SITE_SUBTITLE)
 const showSubtitle = computed(() => {
@@ -109,6 +104,7 @@ onMounted(() => {
   width: 100%;
   object-fit: contain;
   object-position: center;
+  mix-blend-mode: multiply;
 }
 
 .auth-brand h1 {

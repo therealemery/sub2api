@@ -1,5 +1,11 @@
 <template>
   <AppLayout>
+    <div class="admin-list-page">
+    <PageIntro
+      title="优惠码管理"
+      description="创建和查看优惠码、奖励金额、使用次数与过期状态。所有创建、复制和删除动作仍使用原有接口。"
+    />
+
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -50,14 +56,14 @@
         >
           <template #cell-code="{ value }">
             <div class="flex items-center space-x-2">
-              <code class="font-mono text-sm text-gray-900 dark:text-gray-100">{{ value }}</code>
+              <code class="font-mono text-sm text-gray-900">{{ value }}</code>
               <button
                 @click="copyToClipboard(value)"
                 :class="[
                   'flex items-center transition-colors',
                   copiedCode === value
                     ? 'text-green-500'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                    : 'text-gray-400 hover:text-gray-600'
                 ]"
                 :title="copiedCode === value ? t('admin.promo.copied') : t('keys.copyToClipboard')"
               >
@@ -75,13 +81,13 @@
           </template>
 
           <template #cell-bonus_amount="{ value }">
-            <span class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+            <span class="text-sm font-medium text-gray-900">
               ${{ value.toFixed(2) }}
             </span>
           </template>
 
           <template #cell-usage="{ row }">
-            <span class="text-sm text-gray-600 dark:text-gray-300">
+            <span class="text-sm text-gray-600">
               {{ row.used_count }} / {{ row.max_uses === 0 ? '∞' : row.max_uses }}
             </span>
           </template>
@@ -113,28 +119,28 @@
             <div class="flex items-center space-x-1">
               <button
                 @click="copyRegisterLink(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-green-50 hover:text-green-600"
                 :title="t('admin.promo.copyRegisterLink')"
               >
                 <Icon name="link" size="sm" />
               </button>
               <button
                 @click="handleViewUsages(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)] dark:hover:bg-[var(--bg-subtle)] dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--accent-hover)]"
                 :title="t('admin.promo.viewUsages')"
               >
                 <Icon name="eye" size="sm" />
               </button>
               <button
                 @click="handleEdit(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-dark-600 dark:hover:text-gray-300"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 :title="t('common.edit')"
               >
                 <Icon name="edit" size="sm" />
               </button>
               <button
                 @click="handleDelete(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 :title="t('common.delete')"
               >
                 <Icon name="trash" size="sm" />
@@ -155,6 +161,7 @@
         />
       </template>
     </TablePageLayout>
+    </div>
 
     <!-- Create Dialog -->
     <BaseDialog
@@ -323,7 +330,7 @@
       <div v-if="usagesLoading" class="flex items-center justify-center py-8">
         <Icon name="refresh" size="lg" class="animate-spin text-gray-400" />
       </div>
-      <div v-else-if="usages.length === 0" class="py-8 text-center text-gray-500 dark:text-gray-400">
+      <div v-else-if="usages.length === 0" class="py-8 text-center text-gray-500">
         {{ t('admin.promo.noUsages') }}
       </div>
       <div v-else class="space-y-3">
@@ -333,20 +340,20 @@
           class="flex items-center justify-between rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
         >
           <div class="flex items-center gap-3">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-              <Icon name="user" size="sm" class="text-green-600 dark:text-green-400" />
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+              <Icon name="user" size="sm" class="text-green-600" />
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <p class="text-sm font-medium text-gray-900">
                 {{ usage.user?.email || t('admin.promo.userPrefix', { id: usage.user_id }) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500">
                 {{ formatDateTime(usage.used_at) }}
               </p>
             </div>
           </div>
           <div class="text-right">
-            <span class="text-sm font-medium text-green-600 dark:text-green-400">
+            <span class="text-sm font-medium text-green-600">
               +${{ usage.bonus_amount.toFixed(2) }}
             </span>
           </div>
@@ -398,6 +405,7 @@ import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
+import PageIntro from '@/components/common/PageIntro.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'

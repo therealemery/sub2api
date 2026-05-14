@@ -5,7 +5,7 @@
         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]">
           <span class="text-lg font-medium text-[var(--accent)] text-[var(--accent)]">{{ user.email.charAt(0).toUpperCase() }}</span>
         </div>
-        <div><p class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ user.email }}</p><p class="text-sm text-gray-500 text-[var(--text-muted)]">{{ user.username }}</p></div>
+        <div><p class="font-medium text-gray-900">{{ user.email }}</p><p class="text-sm text-gray-500 text-[var(--text-muted)]">{{ user.username }}</p></div>
       </div>
       <div v-if="loading" class="flex justify-center py-8"><svg class="h-8 w-8 animate-spin text-[var(--accent)]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
       <div v-else-if="apiKeys.length === 0" class="py-8 text-center"><p class="text-sm text-gray-500">{{ t('admin.users.noApiKeys') }}</p></div>
@@ -13,7 +13,7 @@
         <div v-for="key in apiKeys" :key="key.id" class="rounded-lg border border-gray-200 bg-[var(--bg-surface)] p-4 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
           <div class="flex items-start justify-between">
             <div class="min-w-0 flex-1">
-              <div class="mb-1 flex items-center gap-2"><span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ key.name }}</span><span :class="['badge text-xs', key.status === 'active' ? 'badge-success' : 'badge-danger']">{{ key.status }}</span></div>
+              <div class="mb-1 flex items-center gap-2"><span class="font-medium text-gray-900">{{ key.name }}</span><span :class="['badge text-xs', key.status === 'active' ? 'badge-success' : 'badge-danger']">{{ key.status }}</span></div>
               <p class="truncate font-mono text-sm text-gray-500">{{ key.key.substring(0, 20) }}...{{ key.key.substring(key.key.length - 8) }}</p>
             </div>
           </div>
@@ -23,7 +23,7 @@
               <button
                 :ref="(el) => setGroupButtonRef(key.id, el)"
                 @click="openGroupSelector(key)"
-                class="-mx-1 -my-0.5 flex cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 transition-colors hover:bg-gray-100 dark:hover:bg-dark-700"
+                class="-mx-1 -my-0.5 flex cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 transition-colors hover:bg-gray-100"
                 :disabled="updatingKeyIds.has(key.id)"
               >
                 <GroupBadge
@@ -50,7 +50,7 @@
     <div
       v-if="groupSelectorKeyId !== null && dropdownPosition"
       ref="dropdownRef"
-      class="animate-in fade-in slide-in-from-top-2 fixed z-[100000020] w-64 overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 duration-200 bg-[var(--bg-surface-alt)] dark:ring-white/10"
+      class="animate-in fade-in slide-in-from-top-2 fixed z-[100000020] w-64 overflow-hidden rounded-lg bg-[var(--bg-surface)] ring-1 ring-black/5 duration-200 bg-[var(--bg-surface-alt)]"
       :style="{ top: dropdownPosition.top + 'px', left: dropdownPosition.left + 'px' }"
     >
       <div class="max-h-64 overflow-y-auto p-1.5">
@@ -61,7 +61,7 @@
             'flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors',
             !selectedKeyForGroup?.group_id
               ? 'bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
-              : 'hover:bg-gray-100 dark:hover:bg-dark-700'
+              : 'hover:bg-gray-100'
           ]"
         >
           <span class="text-gray-500 italic">{{ t('admin.users.none') }}</span>
@@ -80,7 +80,7 @@
             'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
             selectedKeyForGroup?.group_id === group.id
               ? 'bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
-              : 'hover:bg-gray-100 dark:hover:bg-dark-700'
+              : 'hover:bg-gray-100'
           ]"
         >
           <GroupOptionItem

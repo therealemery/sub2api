@@ -17,7 +17,7 @@
           >
             1
           </div>
-          <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">{{
+          <span class="ml-2 text-sm font-medium text-gray-700">{{
             t('admin.accounts.oauth.authMethod')
           }}</span>
         </div>
@@ -31,7 +31,7 @@
           >
             2
           </div>
-          <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">{{
+          <span class="ml-2 text-sm font-medium text-gray-700">{{
             oauthStepTitle
           }}</span>
         </div>
@@ -77,8 +77,8 @@
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'anthropic'
-                ? 'bg-[var(--bg-surface)] text-orange-600 bg-[var(--bg-surface-alt)] dark:text-orange-400'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                ? 'bg-[var(--bg-surface)] text-orange-600 bg-[var(--bg-surface-alt)]'
+                : 'text-gray-600 hover:text-gray-900'
             ]"
           >
             <Icon name="sparkles" size="sm" />
@@ -90,8 +90,8 @@
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'openai'
-                ? 'bg-[var(--bg-surface)] text-green-600 bg-[var(--bg-surface-alt)] dark:text-green-400'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                ? 'bg-[var(--bg-surface)] text-green-600 bg-[var(--bg-surface-alt)]'
+                : 'text-gray-600 hover:text-gray-900'
             ]"
           >
             <svg
@@ -116,7 +116,7 @@
               'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'gemini'
                 ? 'bg-[var(--bg-surface)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                : 'text-gray-600 hover:text-gray-900'
             ]"
           >
             <svg
@@ -140,8 +140,8 @@
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors',
               form.platform === 'antigravity'
-                ? 'bg-[var(--bg-surface)] text-purple-600 bg-[var(--bg-surface-alt)] dark:text-purple-400'
-                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                ? 'bg-[var(--bg-surface)] text-purple-600 bg-[var(--bg-surface-alt)]'
+                : 'text-gray-600 hover:text-gray-900'
             ]"
           >
             <Icon name="cloud" size="sm" />
@@ -160,8 +160,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
-                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                : 'border-gray-200 hover:border-orange-300 border-[var(--border-default)] dark:hover:border-orange-700'
+                ? 'border-orange-500 bg-orange-50'
+                : 'border-gray-200 hover:border-orange-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -169,16 +169,16 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
                   ? 'bg-orange-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="sparkles" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+              <span class="block text-sm font-medium text-gray-900">{{
                 t('admin.accounts.claudeCode')
               }}</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              <span class="text-xs text-gray-500">{{
                 t('admin.accounts.oauthSetupToken')
               }}</span>
             </div>
@@ -190,8 +190,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -199,16 +199,16 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
                   ? 'bg-purple-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+              <span class="block text-sm font-medium text-gray-900">{{
                 t('admin.accounts.claudeConsole')
               }}</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              <span class="text-xs text-gray-500">{{
                 t('admin.accounts.apiKey')
               }}</span>
             </div>
@@ -220,8 +220,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'bedrock'
-                ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)] dark:hover:border-amber-700'
+                ? 'border-amber-500 bg-amber-50'
+                : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -229,16 +229,16 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'bedrock'
                   ? 'bg-amber-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{
+              <span class="block text-sm font-medium text-gray-900">{{
                 t('admin.accounts.bedrockLabel')
               }}</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+              <span class="text-xs text-gray-500">{{
                 t('admin.accounts.bedrockDesc')
               }}</span>
             </div>
@@ -250,8 +250,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'service_account'
-                ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)] dark:hover:border-sky-700'
+                ? 'border-sky-500 bg-sky-50'
+                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -259,14 +259,14 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'service_account'
                   ? 'bg-sky-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">Vertex</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">Service Account</span>
+              <span class="block text-sm font-medium text-gray-900">Vertex</span>
+              <span class="text-xs text-gray-500">Service Account</span>
             </div>
           </button>
 
@@ -274,7 +274,7 @@
 
         <div
           v-if="accountCategory === 'service_account'"
-          class="mt-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800 dark:border-sky-800/40 dark:bg-sky-900/20 dark:text-sky-200"
+          class="mt-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800"
         >
           <p>{{ t('admin.accounts.vertexAnthropicHint') }}</p>
         </div>
@@ -290,8 +290,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
-                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                : 'border-gray-200 hover:border-green-300 border-[var(--border-default)] dark:hover:border-green-700'
+                ? 'border-green-500 bg-green-50'
+                : 'border-gray-200 hover:border-green-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -299,14 +299,14 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
                   ? 'bg-green-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">OAuth</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.chatgptOauth') }}</span>
+              <span class="block text-sm font-medium text-gray-900">OAuth</span>
+              <span class="text-xs text-gray-500">{{ t('admin.accounts.types.chatgptOauth') }}</span>
             </div>
           </button>
 
@@ -316,8 +316,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -325,14 +325,14 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
                   ? 'bg-purple-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">API Key</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.responsesApi') }}</span>
+              <span class="block text-sm font-medium text-gray-900">API Key</span>
+              <span class="text-xs text-gray-500">{{ t('admin.accounts.types.responsesApi') }}</span>
             </div>
           </button>
 
@@ -346,7 +346,7 @@
           <button
             type="button"
             @click="showGeminiHelpDialog = true"
-            class="flex items-center gap-1 rounded px-2 py-1 text-xs text-[var(--accent)] hover:bg-[var(--bg-subtle)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
+            class="flex items-center gap-1 rounded px-2 py-1 text-xs text-[var(--accent)] hover:bg-[var(--bg-subtle)] text-[var(--accent)]"
           >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
@@ -362,7 +362,7 @@
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'oauth-based'
                 ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
-                : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)] dark:hover:border-[var(--border-focus)]'
+                : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)]'
             ]"
           >
             <div
@@ -370,16 +370,16 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'oauth-based'
                   ? 'bg-[var(--accent)] text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <span class="block text-sm font-medium text-gray-900">
                 {{ t('admin.accounts.gemini.accountType.oauthTitle') }}
               </span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">
+              <span class="text-xs text-gray-500">
                 {{ t('admin.accounts.gemini.accountType.oauthDesc') }}
               </span>
             </div>
@@ -391,8 +391,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'apikey'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -400,7 +400,7 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'apikey'
                   ? 'bg-purple-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <svg
@@ -418,10 +418,10 @@
               </svg>
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <span class="block text-sm font-medium text-gray-900">
                 {{ t('admin.accounts.gemini.accountType.apiKeyTitle') }}
               </span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">
+              <span class="text-xs text-gray-500">
                 {{ t('admin.accounts.gemini.accountType.apiKeyDesc') }}
               </span>
             </div>
@@ -433,8 +433,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               accountCategory === 'service_account'
-                ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)] dark:hover:border-sky-700'
+                ? 'border-sky-500 bg-sky-50'
+                : 'border-gray-200 hover:border-sky-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -442,16 +442,16 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 accountCategory === 'service_account'
                   ? 'bg-sky-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <span class="block text-sm font-medium text-gray-900">
                 Vertex
               </span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">
+              <span class="text-xs text-gray-500">
                 Service Account
               </span>
             </div>
@@ -460,7 +460,7 @@
 
         <div
           v-if="accountCategory === 'apikey'"
-          class="mt-3 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-800 dark:border-purple-800/40 dark:bg-purple-900/20 dark:text-purple-200"
+          class="mt-3 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-800"
         >
           <p>{{ t('admin.accounts.gemini.accountType.apiKeyNote') }}</p>
           <div class="mt-2 flex flex-wrap gap-2">
@@ -477,7 +477,7 @@
 
         <div
           v-if="accountCategory === 'service_account'"
-          class="mt-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800 dark:border-sky-800/40 dark:bg-sky-900/20 dark:text-sky-200"
+          class="mt-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-800"
         >
           <p>{{ t('admin.accounts.vertexGeminiHint') }}</p>
         </div>
@@ -493,8 +493,8 @@
               :class="[
                 'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 geminiOAuthType === 'google_one'
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                  : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                  ? 'border-purple-500 bg-purple-50'
+                  : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
               ]"
             >
               <div
@@ -502,26 +502,26 @@
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'google_one'
                     ? 'bg-purple-500 text-[var(--text-inverse)]'
-                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 <Icon name="user" size="sm" />
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="block text-sm font-medium text-gray-900">
                   Google One
                 </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
+                <span class="text-xs text-gray-500">
                   个人账号，享受 Google One 订阅配额
                 </span>
                 <div class="mt-2 flex flex-wrap gap-1">
                   <span
-                    class="rounded bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-900/40 dark:text-purple-300"
+                    class="rounded bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700"
                   >
                     推荐个人用户
                   </span>
                   <span
-                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
                   >
                     无需 GCP
                   </span>
@@ -537,7 +537,7 @@
                 'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 geminiOAuthType === 'code_assist'
                   ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
-                  : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)] dark:hover:border-[var(--border-focus)]'
+                  : 'border-gray-200 hover:border-[var(--border-focus)] border-[var(--border-default)]'
               ]"
             >
               <div
@@ -545,19 +545,19 @@
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'code_assist'
                     ? 'bg-[var(--accent)] text-[var(--text-inverse)]'
-                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 <Icon name="cloud" size="sm" />
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="block text-sm font-medium text-gray-900">
                   GCP Code Assist
                 </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
+                <span class="text-xs text-gray-500">
                   企业级，需要 GCP 项目
                 </span>
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <div class="mt-1 text-xs text-gray-500">
                   需要激活 GCP 项目并绑定信用卡
                   <a
                     :href="geminiHelpLinks.gcpProject"
@@ -575,7 +575,7 @@
                     企业用户
                   </span>
                   <span
-                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    class="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"
                   >
                     高并发
                   </span>
@@ -589,7 +589,7 @@
             <button
               type="button"
               @click="showAdvancedOAuth = !showAdvancedOAuth"
-              class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+              class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
             >
               <svg
                 :class="['h-4 w-4 transition-transform', showAdvancedOAuth ? 'rotate-90' : '']"
@@ -614,8 +614,8 @@
                 'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
                 !geminiAIStudioOAuthEnabled ? 'cursor-not-allowed opacity-60' : '',
                 geminiOAuthType === 'ai_studio'
-                  ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                  : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)] dark:hover:border-amber-700'
+                  ? 'border-amber-500 bg-amber-50'
+                  : 'border-gray-200 hover:border-amber-300 border-[var(--border-default)]'
               ]"
             >
               <div
@@ -623,7 +623,7 @@
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                   geminiOAuthType === 'ai_studio'
                     ? 'bg-amber-500 text-[var(--text-inverse)]'
-                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                    : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 <svg
@@ -641,23 +641,23 @@
                 </svg>
               </div>
               <div class="min-w-0">
-                <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <span class="block text-sm font-medium text-gray-900">
                   {{ t('admin.accounts.gemini.oauthType.customTitle') }}
                 </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
+                <span class="text-xs text-gray-500">
                   {{ t('admin.accounts.gemini.oauthType.customDesc') }}
                 </span>
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <div class="mt-1 text-xs text-gray-500">
                   {{ t('admin.accounts.gemini.oauthType.customRequirement') }}
                 </div>
                 <div class="mt-2 flex flex-wrap gap-1">
                   <span
-                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.orgManaged') }}
                   </span>
                   <span
-                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                    class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
                   >
                     {{ t('admin.accounts.gemini.oauthType.badges.adminRequired') }}
                   </span>
@@ -665,7 +665,7 @@
               </div>
               <span
                 v-if="!geminiAIStudioOAuthEnabled"
-                class="ml-auto shrink-0 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                class="ml-auto shrink-0 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-700"
               >
                 {{ t('admin.accounts.oauth.gemini.aiStudioNotConfiguredShort') }}
               </span>
@@ -673,7 +673,7 @@
 
             <div
               v-if="!geminiAIStudioOAuthEnabled"
-              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 opacity-0 transition-opacity group-hover:opacity-100 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+              class="pointer-events-none absolute right-0 top-full z-50 mt-2 w-80 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 opacity-0 transition-opacity group-hover:opacity-100"
             >
               {{ t('admin.accounts.oauth.gemini.aiStudioNotConfiguredTip') }}
             </div>
@@ -726,8 +726,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               antigravityAccountType === 'oauth'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -735,14 +735,14 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 antigravityAccountType === 'oauth'
                   ? 'bg-purple-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="key" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">OAuth</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.antigravityOauth') }}</span>
+              <span class="block text-sm font-medium text-gray-900">OAuth</span>
+              <span class="text-xs text-gray-500">{{ t('admin.accounts.types.antigravityOauth') }}</span>
             </div>
           </button>
 
@@ -752,8 +752,8 @@
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-colors',
               antigravityAccountType === 'upstream'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)] dark:hover:border-purple-700'
+                ? 'border-purple-500 bg-purple-50'
+                : 'border-gray-200 hover:border-purple-300 border-[var(--border-default)]'
             ]"
           >
             <div
@@ -761,14 +761,14 @@
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                 antigravityAccountType === 'upstream'
                   ? 'bg-purple-500 text-[var(--text-inverse)]'
-                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                  : 'bg-gray-100 text-gray-500 bg-[var(--bg-surface-alt)]'
               ]"
             >
               <Icon name="cloud" size="sm" />
             </div>
             <div>
-              <span class="block text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">API Key</span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.types.antigravityApikey') }}</span>
+              <span class="block text-sm font-medium text-gray-900">API Key</span>
+              <span class="text-xs text-gray-500">{{ t('admin.accounts.types.antigravityApikey') }}</span>
             </div>
           </button>
         </div>
@@ -815,8 +815,8 @@
             :class="[
               'rounded-lg border-2 border-dashed px-4 py-5 transition-colors',
               vertexServiceAccountDragActive
-                ? 'border-sky-500 bg-sky-50 dark:border-sky-500 dark:bg-sky-900/20'
-                : 'border-gray-300 bg-gray-50 hover:border-sky-400 hover:bg-sky-50/60 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:hover:border-sky-600 dark:hover:bg-sky-900/10'
+                ? 'border-sky-500 bg-sky-50'
+                : 'border-gray-300 bg-gray-50 hover:border-sky-400 hover:bg-sky-50/60 border-[var(--border-default)] bg-[var(--bg-surface-alt)]'
             ]"
             @dragenter.prevent="vertexServiceAccountDragActive = true"
             @dragover.prevent="vertexServiceAccountDragActive = true"
@@ -825,11 +825,11 @@
           >
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div class="min-w-0">
-                <div class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <div class="flex items-center gap-2 text-sm font-medium text-gray-900">
                   <Icon name="upload" size="sm" />
                   <span>{{ vertexClientEmail ? t('admin.accounts.vertexSaJsonLoaded') : t('admin.accounts.vertexSaJsonDrop') }}</span>
                 </div>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-xs text-gray-500">
                   {{ vertexClientEmail ? t('admin.accounts.vertexSaJsonKeyHidden') : t('admin.accounts.vertexSaJsonDropHint') }}
                 </p>
               </div>
@@ -844,7 +844,7 @@
             </div>
             <div
               v-if="vertexClientEmail"
-              class="mt-3 rounded-md border border-sky-200 bg-[var(--bg-surface)] px-3 py-2 text-xs text-sky-900 dark:border-sky-800/50 bg-[var(--bg-surface-alt)] dark:text-sky-200"
+              class="mt-3 rounded-md border border-sky-200 bg-[var(--bg-surface)] px-3 py-2 text-xs text-sky-900 bg-[var(--bg-surface-alt)]"
             >
               <div class="truncate">Project ID: <span class="font-mono">{{ vertexProjectId }}</span></div>
               <div class="truncate">Client Email: <span class="font-mono">{{ vertexClientEmail }}</span></div>
@@ -897,8 +897,8 @@
 
         <!-- Mapping Mode Only (no toggle for Antigravity) -->
         <div>
-          <div class="mb-3 rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
-            <p class="text-xs text-purple-700 dark:text-purple-400">
+          <div class="mb-3 rounded-lg bg-purple-50 p-3">
+            <p class="text-xs text-purple-700">
               {{ t('admin.accounts.mapRequestModels') }}
             </p>
           </div>
@@ -915,7 +915,7 @@
                   type="text"
                   :class="[
                     'input flex-1',
-                    !isValidWildcardPattern(mapping.from) ? 'border-red-500 dark:border-red-500' : ''
+                    !isValidWildcardPattern(mapping.from) ? 'border-red-500' : ''
                   ]"
                   :placeholder="t('admin.accounts.requestModel')"
                 />
@@ -927,14 +927,14 @@
                   type="text"
                   :class="[
                     'input flex-1',
-                    mapping.to.includes('*') ? 'border-red-500 dark:border-red-500' : ''
+                    mapping.to.includes('*') ? 'border-red-500' : ''
                   ]"
                   :placeholder="t('admin.accounts.actualModel')"
                 />
                 <button
                   type="button"
                   @click="removeAntigravityModelMapping(index)"
-                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
@@ -959,7 +959,7 @@
           <button
             type="button"
             @click="addAntigravityModelMapping"
-            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+            class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)]"
           >
             <svg class="mr-1 inline h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -992,7 +992,7 @@
               value="oauth"
               class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.types.oauth') }}</span>
+            <span class="text-sm text-gray-700">{{ t('admin.accounts.types.oauth') }}</span>
           </label>
           <label class="flex cursor-pointer items-center">
             <input
@@ -1001,7 +1001,7 @@
               value="setup-token"
               class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
             />
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{
+            <span class="text-sm text-gray-700">{{
               t('admin.accounts.setupTokenLongLived')
             }}</span>
           </label>
@@ -1060,9 +1060,9 @@
 
           <div
             v-if="isOpenAIModelRestrictionDisabled"
-            class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+            class="mb-3 rounded-lg bg-amber-50 p-3"
           >
-            <p class="text-xs text-amber-700 dark:text-amber-400">
+            <p class="text-xs text-amber-700">
               {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
             </p>
           </div>
@@ -1077,7 +1077,7 @@
                   'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'whitelist'
                     ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 <svg
@@ -1101,8 +1101,8 @@
                 :class="[
                   'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   modelRestrictionMode === 'mapping'
-                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 <svg
@@ -1125,7 +1125,7 @@
             <!-- Whitelist Mode -->
             <div v-if="modelRestrictionMode === 'whitelist'">
               <ModelWhitelistSelector v-model="allowedModels" :platform="form.platform" />
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-xs text-gray-500">
                 {{ t('admin.accounts.selectedModels', { count: allowedModels.length }) }}
                 <span v-if="allowedModels.length === 0">{{
                   t('admin.accounts.supportsAllModels')
@@ -1135,8 +1135,8 @@
 
             <!-- Mapping Mode -->
             <div v-else>
-              <div class="mb-3 rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
-                <p class="text-xs text-purple-700 dark:text-purple-400">
+              <div class="mb-3 rounded-lg bg-purple-50 p-3">
+                <p class="text-xs text-purple-700">
                   <svg
                     class="mr-1 inline h-4 w-4"
                     fill="none"
@@ -1189,7 +1189,7 @@
                 <button
                   type="button"
                   @click="removeModelMapping(index)"
-                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
@@ -1206,7 +1206,7 @@
             <button
               type="button"
               @click="addModelMapping"
-              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)]"
             >
               <svg
                 class="mr-1 inline h-4 w-4"
@@ -1245,7 +1245,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.poolModeHint') }}
               </p>
             </div>
@@ -1281,7 +1281,7 @@
               step="1"
               class="input"
             />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{
                 t('admin.accounts.poolModeRetryCountHint', {
                   default: DEFAULT_POOL_MODE_RETRY_COUNT,
@@ -1297,7 +1297,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.customErrorCodes') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.customErrorCodesHint') }}
               </p>
             </div>
@@ -1319,8 +1319,8 @@
           </div>
 
           <div v-if="customErrorCodesEnabled" class="space-y-3">
-            <div class="rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20">
-              <p class="text-xs text-amber-700 dark:text-amber-400">
+            <div class="rounded-lg bg-amber-50 p-3">
+              <p class="text-xs text-amber-700">
                 <Icon name="exclamationTriangle" size="sm" class="mr-1 inline" :stroke-width="2" />
                 {{ t('admin.accounts.customErrorCodesWarning') }}
               </p>
@@ -1336,8 +1336,8 @@
                 :class="[
                   'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                   selectedErrorCodes.includes(code.value)
-                    ? 'bg-red-100 text-red-700 ring-1 ring-red-500 dark:bg-red-900/30 dark:text-red-400'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                    ? 'bg-red-100 text-red-700 ring-1 ring-red-500'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
                 ]"
               >
                 {{ code.value }} {{ code.label }}
@@ -1372,13 +1372,13 @@
               <span
                 v-for="code in selectedErrorCodes.sort((a, b) => a - b)"
                 :key="code"
-                class="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                class="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-700"
               >
                 {{ code }}
                 <button
                   type="button"
                   @click="removeErrorCode(code)"
-                  class="hover:text-red-900 dark:hover:text-red-300"
+                  class="hover:text-red-900"
                 >
                   <Icon name="x" size="sm" :stroke-width="2" />
                 </button>
@@ -1405,7 +1405,7 @@
                 value="sigv4"
                 class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
-              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockAuthModeSigv4') }}</span>
+              <span class="text-sm text-gray-700">{{ t('admin.accounts.bedrockAuthModeSigv4') }}</span>
             </label>
             <label class="flex cursor-pointer items-center">
               <input
@@ -1414,7 +1414,7 @@
                 value="apikey"
                 class="mr-2 text-[var(--accent)] focus:ring-[var(--border-focus)]"
               />
-              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockAuthModeApikey') }}</span>
+              <span class="text-sm text-gray-700">{{ t('admin.accounts.bedrockAuthModeApikey') }}</span>
             </label>
           </div>
         </div>
@@ -1511,7 +1511,7 @@
               type="checkbox"
               class="rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.accounts.bedrockForceGlobal') }}</span>
+            <span class="text-sm text-gray-700">{{ t('admin.accounts.bedrockForceGlobal') }}</span>
           </label>
           <p class="input-hint mt-1">{{ t('admin.accounts.bedrockForceGlobalHint') }}</p>
         </div>
@@ -1529,7 +1529,7 @@
                 'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'whitelist'
                   ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               {{ t('admin.accounts.modelWhitelist') }}
@@ -1540,8 +1540,8 @@
               :class="[
                 'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'mapping'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                  ? 'bg-purple-100 text-purple-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               {{ t('admin.accounts.modelMapping') }}
@@ -1551,7 +1551,7 @@
           <!-- Whitelist Mode -->
           <div v-if="modelRestrictionMode === 'whitelist'">
             <ModelWhitelistSelector v-model="allowedModels" platform="anthropic" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-gray-500">
               {{ t('admin.accounts.selectedModels', { count: allowedModels.length }) }}
               <span v-if="allowedModels.length === 0">{{ t('admin.accounts.supportsAllModels') }}</span>
             </p>
@@ -1590,7 +1590,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.poolModeHint') }}
               </p>
             </div>
@@ -1626,7 +1626,7 @@
               step="1"
               class="input"
             />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{
                 t('admin.accounts.poolModeRetryCountHint', {
                   default: DEFAULT_POOL_MODE_RETRY_COUNT,
@@ -1645,7 +1645,7 @@
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-xs text-gray-500">
             {{ t('admin.accounts.quotaControl.hint') }}
           </p>
         </div>
@@ -1697,7 +1697,7 @@
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-xs text-gray-500">
             {{ t('admin.accounts.quotaLimitHint') }}
           </p>
         </div>
@@ -1751,9 +1751,9 @@
 
         <div
           v-if="isOpenAIModelRestrictionDisabled"
-          class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
+          class="mb-3 rounded-lg bg-amber-50 p-3"
         >
-          <p class="text-xs text-amber-700 dark:text-amber-400">
+          <p class="text-xs text-amber-700">
             {{ t('admin.accounts.openai.modelRestrictionDisabledByPassthrough') }}
           </p>
         </div>
@@ -1768,7 +1768,7 @@
                 'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'whitelist'
                   ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               {{ t('admin.accounts.modelWhitelist') }}
@@ -1779,8 +1779,8 @@
               :class="[
                 'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                 modelRestrictionMode === 'mapping'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                  ? 'bg-purple-100 text-purple-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
               ]"
             >
               {{ t('admin.accounts.modelMapping') }}
@@ -1790,7 +1790,7 @@
           <!-- Whitelist Mode -->
           <div v-if="modelRestrictionMode === 'whitelist'">
             <ModelWhitelistSelector v-model="allowedModels" :platform="form.platform" />
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-gray-500">
               {{ t('admin.accounts.selectedModels', { count: allowedModels.length }) }}
               <span v-if="allowedModels.length === 0">{{
                 t('admin.accounts.supportsAllModels')
@@ -1800,8 +1800,8 @@
 
           <!-- Mapping Mode -->
           <div v-else>
-            <div class="mb-3 rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
-              <p class="text-xs text-purple-700 dark:text-purple-400">
+            <div class="mb-3 rounded-lg bg-purple-50 p-3">
+              <p class="text-xs text-purple-700">
                 {{ t('admin.accounts.mapRequestModels') }}
               </p>
             </div>
@@ -1840,7 +1840,7 @@
                 <button
                   type="button"
                   @click="removeModelMapping(index)"
-                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                  class="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
@@ -1857,7 +1857,7 @@
             <button
               type="button"
               @click="addModelMapping"
-              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+              class="mb-3 w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)]"
             >
               + {{ t('admin.accounts.addMapping') }}
             </button>
@@ -1883,7 +1883,7 @@
         <div class="mb-3 flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.tempUnschedulable.title') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.tempUnschedulable.hint') }}
             </p>
           </div>
@@ -1918,7 +1918,7 @@
               :key="preset.label"
               type="button"
               @click="addTempUnschedRule(preset.rule)"
-              class="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-500"
+              class="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 bg-[var(--bg-surface-alt)]"
             >
               + {{ preset.label }}
             </button>
@@ -1931,7 +1931,7 @@
               class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]"
             >
               <div class="mb-2 flex items-center justify-between">
-                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <span class="text-xs font-medium text-gray-500">
                   {{ t('admin.accounts.tempUnschedulable.ruleIndex', { index: index + 1 }) }}
                 </span>
                 <div class="flex items-center gap-2">
@@ -1939,7 +1939,7 @@
                     type="button"
                     :disabled="index === 0"
                     @click="moveTempUnschedRule(index, -1)"
-                    class="rounded p-1 text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:text-gray-200"
+                    class="rounded p-1 text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Icon name="chevronUp" size="sm" :stroke-width="2" />
                   </button>
@@ -1947,7 +1947,7 @@
                     type="button"
                     :disabled="index === tempUnschedRules.length - 1"
                     @click="moveTempUnschedRule(index, 1)"
-                    class="rounded p-1 text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:text-gray-200"
+                    class="rounded p-1 text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -2011,7 +2011,7 @@
           <button
             type="button"
             @click="addTempUnschedRule()"
-            class="w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)] dark:text-gray-400 dark:hover:border-dark-400 dark:hover:text-gray-300"
+            class="w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-700 border-[var(--border-default)]"
           >
             <svg
               class="mr-1 inline h-4 w-4"
@@ -2036,7 +2036,7 @@
             <label class="input-label mb-0">{{
               t('admin.accounts.interceptWarmupRequests')
             }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.interceptWarmupRequestsDesc') }}
             </p>
           </div>
@@ -2065,7 +2065,7 @@
       >
         <div class="mb-3">
           <h3 class="input-label mb-0 text-base font-semibold">{{ t('admin.accounts.quotaControl.title') }}</h3>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-xs text-gray-500">
             {{ t('admin.accounts.quotaControl.hint') }}
           </p>
         </div>
@@ -2075,7 +2075,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.windowCost.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.windowCost.hint') }}
               </p>
             </div>
@@ -2100,7 +2100,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.limit') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   v-model.number="windowCostLimit"
                   type="number"
@@ -2115,7 +2115,7 @@
             <div>
               <label class="input-label">{{ t('admin.accounts.quotaControl.windowCost.stickyReserve') }}</label>
               <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   v-model.number="windowCostStickyReserve"
                   type="number"
@@ -2135,7 +2135,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionLimit.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.sessionLimit.hint') }}
               </p>
             </div>
@@ -2180,7 +2180,7 @@
                   class="input pr-12"
                   :placeholder="t('admin.accounts.quotaControl.sessionLimit.idleTimeoutPlaceholder')"
                 />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">{{ t('common.minutes') }}</span>
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">{{ t('common.minutes') }}</span>
               </div>
               <p class="input-hint">{{ t('admin.accounts.quotaControl.sessionLimit.idleTimeoutHint') }}</p>
             </div>
@@ -2192,7 +2192,7 @@
           <div class="mb-3 flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.rpmLimit.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.rpmLimit.hint') }}
               </p>
             </div>
@@ -2238,7 +2238,7 @@
                     'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     rpmStrategy === 'tiered'
                       ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
                   ]"
                 >
                   <div class="text-center">
@@ -2253,7 +2253,7 @@
                     'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     rpmStrategy === 'sticky_exempt'
                       ? 'bg-[var(--bg-surface-alt)] text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 bg-[var(--bg-surface-alt)]'
                   ]"
                 >
                   <div class="text-center">
@@ -2282,7 +2282,7 @@
           <!-- 用户消息限速模式（独立于 RPM 开关，始终可见） -->
           <div class="mt-4">
             <label class="input-label">{{ t('admin.accounts.quotaControl.rpmLimit.userMsgQueue') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 mb-2">
+            <p class="mt-1 text-xs text-gray-500 mb-2">
               {{ t('admin.accounts.quotaControl.rpmLimit.userMsgQueueHint') }}
             </p>
             <div class="flex space-x-2">
@@ -2292,7 +2292,7 @@
                   'px-3 py-1.5 text-sm rounded-md border transition-colors',
                   userMsgQueueMode === opt.value
                     ? 'bg-[var(--accent)] text-[var(--text-inverse)] border-[var(--border-focus)]'
-                    : 'bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] text-gray-700 dark:text-gray-300 border-gray-300 border-[var(--border-default)] hover:bg-gray-50 dark:hover:bg-dark-600'
+                    : 'bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)] text-gray-700 border-gray-300 border-[var(--border-default)] hover:bg-gray-50'
                 ]">
                 {{ opt.label }}
               </button>
@@ -2305,7 +2305,7 @@
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.tlsFingerprint.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.tlsFingerprint.hint') }}
               </p>
             </div>
@@ -2340,7 +2340,7 @@
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionIdMasking.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.sessionIdMasking.hint') }}
               </p>
             </div>
@@ -2367,7 +2367,7 @@
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.cacheTTLOverride.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.cacheTTLOverride.hint') }}
               </p>
             </div>
@@ -2391,12 +2391,12 @@
             <label class="input-label text-xs">{{ t('admin.accounts.quotaControl.cacheTTLOverride.target') }}</label>
             <select
               v-model="cacheTTLOverrideTarget"
-              class="mt-1 block w-full rounded-md border border-gray-300 bg-[var(--bg-surface)] px-3 py-2 text-sm focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-[var(--text-inverse)]"
+              class="mt-1 block w-full rounded-md border border-gray-300 bg-[var(--bg-surface)] px-3 py-2 text-sm focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             >
               <option value="5m">5m</option>
               <option value="1h">1h</option>
             </select>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.quotaControl.cacheTTLOverride.targetHint') }}
             </p>
           </div>
@@ -2407,7 +2407,7 @@
           <div class="flex items-center justify-between">
             <div>
               <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.customBaseUrl.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-gray-500">
                 {{ t('admin.accounts.quotaControl.customBaseUrl.hint') }}
               </p>
             </div>
@@ -2487,7 +2487,7 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.openai.oauthPassthrough') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.openai.oauthPassthroughDesc') }}
             </p>
           </div>
@@ -2517,10 +2517,10 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.openai.wsMode') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.openai.wsModeDesc') }}
             </p>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t(openAIWSModeConcurrencyHintKey) }}
             </p>
           </div>
@@ -2538,7 +2538,7 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.anthropic.apiKeyPassthrough') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.anthropic.apiKeyPassthroughDesc') }}
             </p>
           </div>
@@ -2568,7 +2568,7 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.anthropic.webSearchEmulation') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.anthropic.webSearchEmulationDesc') }}
             </p>
           </div>
@@ -2588,7 +2588,7 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.openai.codexCLIOnly') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.openai.codexCLIOnlyDesc') }}
             </p>
           </div>
@@ -2618,7 +2618,7 @@
         <div class="flex items-center justify-between">
           <div>
             <label class="input-label mb-0">{{ t('admin.accounts.openai.compactMode') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.openai.compactModeDesc') }}
             </p>
           </div>
@@ -2655,7 +2655,7 @@
             <label class="input-label mb-0">{{
               t('admin.accounts.autoPauseOnExpired')
             }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-gray-500">
               {{ t('admin.accounts.autoPauseOnExpiredDesc') }}
             </p>
           </div>
@@ -2686,23 +2686,23 @@
               v-model="mixedScheduling"
               class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-medium text-gray-700">
               {{ t('admin.accounts.mixedScheduling') }}
             </span>
           </label>
           <div class="group relative">
             <span
-              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500"
+              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)]"
             >
               ?
             </span>
             <!-- Tooltip（向下显示避免被弹窗裁剪） -->
             <div
-              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100"
             >
               {{ t('admin.accounts.mixedSchedulingTooltip') }}
               <div
-                class="absolute bottom-full left-3 border-4 border-transparent border-b-gray-900 dark:border-b-gray-700"
+                class="absolute bottom-full left-3 border-4 border-transparent border-b-gray-900"
               ></div>
             </div>
           </div>
@@ -2714,22 +2714,22 @@
               v-model="allowOverages"
               class="h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)] border-[var(--border-default)]"
             />
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span class="text-sm font-medium text-gray-700">
               {{ t('admin.accounts.allowOverages') }}
             </span>
           </label>
           <div class="group relative">
             <span
-              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)] dark:text-gray-400 dark:hover:bg-dark-500"
+              class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-md bg-gray-200 text-xs text-gray-500 hover:bg-gray-300 bg-[var(--bg-surface-alt)]"
             >
               ?
             </span>
             <div
-              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+              class="pointer-events-none absolute left-0 top-full z-[100] mt-1.5 w-72 rounded bg-gray-900 px-3 py-2 text-xs text-[var(--text-inverse)] opacity-0 transition-opacity group-hover:opacity-100"
             >
               {{ t('admin.accounts.allowOveragesTooltip') }}
               <div
-                class="absolute bottom-full left-3 border-4 border-transparent border-b-gray-900 dark:border-b-gray-700"
+                class="absolute bottom-full left-3 border-4 border-transparent border-b-gray-900"
               ></div>
             </div>
           </div>
@@ -2863,29 +2863,29 @@
     :show="showGeminiHelpDialog"
     :title="t('admin.accounts.gemini.helpDialog.title')"
     @close="showGeminiHelpDialog = false"
-    max-width="max-w-3xl"
+    width="wide"
   >
     <div class="space-y-6">
       <!-- Setup Guide Section -->
       <div>
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900">
           {{ t('admin.accounts.gemini.setupGuide.title') }}
         </h3>
         <div class="space-y-4">
           <div>
-            <p class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <p class="mb-2 text-sm font-medium text-gray-700">
               {{ t('admin.accounts.gemini.setupGuide.checklistTitle') }}
             </p>
-            <ul class="list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <ul class="list-inside list-disc space-y-1 text-sm text-gray-600">
               <li>{{ t('admin.accounts.gemini.setupGuide.checklistItems.usIp') }}</li>
               <li>{{ t('admin.accounts.gemini.setupGuide.checklistItems.age') }}</li>
             </ul>
           </div>
           <div>
-            <p class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <p class="mb-2 text-sm font-medium text-gray-700">
               {{ t('admin.accounts.gemini.setupGuide.activationTitle') }}
             </p>
-            <ul class="list-inside list-disc space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <ul class="list-inside list-disc space-y-1 text-sm text-gray-600">
               <li>{{ t('admin.accounts.gemini.setupGuide.activationItems.geminiWeb') }}</li>
               <li>{{ t('admin.accounts.gemini.setupGuide.activationItems.gcpProject') }}</li>
             </ul>
@@ -2932,80 +2932,80 @@
 
       <!-- Quota Policy Section -->
       <div class="border-t border-gray-200 pt-6 border-[var(--border-default)]">
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900">
           {{ t('admin.accounts.gemini.quotaPolicy.title') }}
         </h3>
-        <p class="mb-4 text-xs text-amber-600 dark:text-amber-400">
+        <p class="mb-4 text-xs text-amber-600">
           {{ t('admin.accounts.gemini.quotaPolicy.note') }}
         </p>
         <div class="overflow-x-auto">
           <table class="w-full text-xs">
             <thead class="bg-gray-50 bg-[var(--bg-surface-alt)]">
               <tr>
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th class="px-3 py-2 text-left font-medium text-gray-700">
                   {{ t('admin.accounts.gemini.quotaPolicy.columns.channel') }}
                 </th>
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th class="px-3 py-2 text-left font-medium text-gray-700">
                   {{ t('admin.accounts.gemini.quotaPolicy.columns.account') }}
                 </th>
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
+                <th class="px-3 py-2 text-left font-medium text-gray-700">
                   {{ t('admin.accounts.gemini.quotaPolicy.columns.limits') }}
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-dark-600">
+            <tbody class="divide-y divide-gray-200">
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
+                <td class="px-3 py-2 text-gray-900">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.channel') }}
                 </td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Free</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-600">Free</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.limitsFree') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Pro</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-900"></td>
+                <td class="px-3 py-2 text-gray-600">Pro</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.limitsPro') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Ultra</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-900"></td>
+                <td class="px-3 py-2 text-gray-600">Ultra</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.googleOne.limitsUltra') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
+                <td class="px-3 py-2 text-gray-900">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.gcp.channel') }}
                 </td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Standard</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-600">Standard</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.gcp.limitsStandard') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Enterprise</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-900"></td>
+                <td class="px-3 py-2 text-gray-600">Enterprise</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.gcp.limitsEnterprise') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">
+                <td class="px-3 py-2 text-gray-900">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.aiStudio.channel') }}
                 </td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Free</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-600">Free</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.aiStudio.limitsFree') }}
                 </td>
               </tr>
               <tr>
-                <td class="px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]"></td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">Paid</td>
-                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">
+                <td class="px-3 py-2 text-gray-900"></td>
+                <td class="px-3 py-2 text-gray-600">Paid</td>
+                <td class="px-3 py-2 text-gray-600">
                   {{ t('admin.accounts.gemini.quotaPolicy.rows.aiStudio.limitsPaid') }}
                 </td>
               </tr>
@@ -3042,7 +3042,7 @@
 
       <!-- API Key Links Section -->
       <div class="border-t border-gray-200 pt-6 border-[var(--border-default)]">
-        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900">
           {{ t('admin.accounts.gemini.helpDialog.apiKeySection') }}
         </h3>
         <div class="flex flex-wrap gap-3">

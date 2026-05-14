@@ -1,0 +1,8 @@
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>GLM</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <rect x="4" y="4" width="16" height="16" rx="4" stroke="#5f534a"/>
+    <path d="M8 9.5h4M8 14.5h8" stroke="#BB4D1B"/>
+    <path d="M15.5 8v4.5H19" stroke="#5f534a"/>
+  </g>
+</svg>

@@ -430,10 +430,10 @@ onUnmounted(() => {
   @apply rounded-lg px-4 py-2.5 text-sm;
   @apply bg-[var(--bg-surface)] bg-[var(--bg-surface-alt)];
   @apply border border-gray-200 border-[var(--border-default)];
-  @apply text-gray-900 dark:text-gray-100;
+  @apply text-gray-900;
   @apply transition-colors duration-200;
   @apply focus:border-[var(--border-focus)] focus:outline-none;
-  @apply hover:border-gray-300 dark:hover:border-dark-500;
+  @apply hover:border-gray-300;
   @apply cursor-pointer;
 }
 
@@ -465,9 +465,6 @@ onUnmounted(() => {
   box-shadow: none;
 }
 
-.dark .select-trigger {
-  box-shadow: none;
-}
 
 .select-trigger:hover,
 .select-trigger-open {
@@ -541,8 +538,8 @@ onUnmounted(() => {
 
 .select-dropdown-portal .select-search-input {
   @apply flex-1 bg-transparent text-sm;
-  @apply text-gray-900 dark:text-gray-100;
-  @apply placeholder:text-gray-400 dark:placeholder:text-dark-400;
+  @apply text-gray-900;
+  @apply placeholder:text-gray-400;
   @apply focus:outline-none;
 }
 
@@ -553,9 +550,9 @@ onUnmounted(() => {
 .select-dropdown-portal .select-option {
   @apply flex items-center justify-between gap-2;
   @apply px-4 py-2.5 text-sm;
-  @apply text-gray-700 dark:text-gray-300;
+  @apply text-gray-700;
   @apply cursor-pointer transition-colors duration-150;
-  @apply hover:bg-gray-50 dark:hover:bg-dark-700;
+  @apply hover:bg-gray-50;
   pointer-events: auto !important;
 }
 
@@ -574,9 +571,6 @@ onUnmounted(() => {
   color: var(--accent) !important;
 }
 
-.dark .select-dropdown-portal .select-option-selected {
-  color: var(--accent) !important;
-}
 
 .select-dropdown-portal .select-option-selected {
   @apply bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)];
@@ -595,7 +589,7 @@ onUnmounted(() => {
   @apply cursor-default select-none;
   @apply bg-gray-50 bg-[var(--bg-surface-alt)];
   @apply text-[11px] font-bold uppercase tracking-wider;
-  @apply text-gray-500 dark:text-gray-400;
+  @apply text-gray-500;
 }
 
 .select-dropdown-portal .select-option-group:hover {

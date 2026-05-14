@@ -8,9 +8,9 @@
           {{ t('admin.groups.platforms.' + group.platform) }}
         </span>
         <span class="text-gray-400">|</span>
-        <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ group.name }}</span>
+        <span class="font-medium text-gray-900">{{ group.name }}</span>
         <span class="text-gray-400">|</span>
-        <span class="text-gray-600 dark:text-gray-400">
+        <span class="text-gray-600">
           {{ t('admin.groups.columns.rateMultiplier') }}: {{ group.rate_multiplier }}x
         </span>
       </div>
@@ -18,7 +18,7 @@
       <!-- 操作区 -->
       <div class="rounded-lg border border-gray-200 p-3 border-[var(--border-default)]">
         <!-- 添加用户 -->
-        <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h4 class="mb-2 text-sm font-medium text-gray-700">
           {{ t('admin.groups.addUserRate') }}
         </h4>
         <div class="flex items-end gap-2">
@@ -40,11 +40,11 @@
                 v-for="user in searchResults"
                 :key="user.id"
                 type="button"
-                class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-gray-50 dark:hover:bg-dark-600"
+                class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-gray-50"
                 @click="selectUser(user)"
               >
                 <span class="text-gray-400">#{{ user.id }}</span>
-                <span class="text-gray-900 dark:text-[var(--text-inverse)]">{{ user.username || user.email }}</span>
+                <span class="text-gray-900">{{ user.username || user.email }}</span>
                 <span v-if="user.username" class="text-xs text-gray-400">{{ user.email }}</span>
               </button>
             </div>
@@ -72,7 +72,7 @@
 
         <!-- 批量调整 + 全部清空 -->
         <div v-if="localEntries.length > 0" class="mt-3 flex items-center gap-3 border-t border-gray-100 pt-3 border-[var(--border-default)]">
-          <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.batchAdjust') }}</span>
+          <span class="text-xs font-medium text-gray-500">{{ t('admin.groups.batchAdjust') }}</span>
           <div class="flex items-center gap-1.5">
             <span class="text-xs text-gray-400">×</span>
             <input
@@ -81,7 +81,7 @@
               step="0.1"
               min="0"
               autocomplete="off"
-              class="hide-spinner w-20 rounded border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-center text-sm transition-colors focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:focus:border-[var(--border-focus)]"
+              class="hide-spinner w-20 rounded border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-center text-sm transition-colors focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
               placeholder="0.5"
             />
             <button
@@ -96,7 +96,7 @@
           <div class="ml-auto">
             <button
               type="button"
-              class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+              class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
               @click="clearAllLocal"
             >
               {{ t('admin.groups.clearAll') }}
@@ -115,11 +115,11 @@
 
       <!-- 已设置的用户列表 -->
       <div v-else>
-        <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h4 class="mb-2 text-sm font-medium text-gray-700">
           {{ t('admin.groups.rateMultipliers') }} ({{ localEntries.length }})
         </h4>
 
-        <div v-if="localEntries.length === 0" class="py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+        <div v-if="localEntries.length === 0" class="py-6 text-center text-sm text-gray-400">
           {{ t('admin.groups.noRateMultipliers') }}
         </div>
 
@@ -130,33 +130,33 @@
               <table class="w-full text-sm">
                 <thead class="sticky top-0 z-[1]">
                   <tr class="border-b border-gray-200 bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]">
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.userEmail') }}</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">ID</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.userName') }}</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.userNotes') }}</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.userStatus') }}</th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.rateMultiplier') }}</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">{{ t('admin.groups.columns.userEmail') }}</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">ID</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">{{ t('admin.groups.columns.userName') }}</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">{{ t('admin.groups.columns.userNotes') }}</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">{{ t('admin.groups.columns.userStatus') }}</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">{{ t('admin.groups.columns.rateMultiplier') }}</th>
                     <th v-if="showFinalRate" class="px-3 py-2 text-left text-xs font-medium text-[var(--accent)] text-[var(--accent)]">{{ t('admin.groups.finalRate') }}</th>
                     <th class="w-10 px-2 py-2"></th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-dark-600">
+                <tbody class="divide-y divide-gray-100">
                   <tr
                     v-for="entry in paginatedLocalEntries"
                     :key="entry.user_id"
-                    class="hover:bg-gray-50 dark:hover:bg-dark-700/50"
+                    class="hover:bg-gray-50"
                   >
-                    <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{{ entry.user_email }}</td>
-                    <td class="whitespace-nowrap px-3 py-2 text-gray-400 dark:text-gray-500">{{ entry.user_id }}</td>
-                    <td class="whitespace-nowrap px-3 py-2 text-gray-900 dark:text-[var(--text-inverse)]">{{ entry.user_name || '-' }}</td>
-                    <td class="max-w-[160px] truncate px-3 py-2 text-gray-500 dark:text-gray-400" :title="entry.user_notes">{{ entry.user_notes || '-' }}</td>
+                    <td class="px-3 py-2 text-gray-600">{{ entry.user_email }}</td>
+                    <td class="whitespace-nowrap px-3 py-2 text-gray-400">{{ entry.user_id }}</td>
+                    <td class="whitespace-nowrap px-3 py-2 text-gray-900">{{ entry.user_name || '-' }}</td>
+                    <td class="max-w-[160px] truncate px-3 py-2 text-gray-500" :title="entry.user_notes">{{ entry.user_notes || '-' }}</td>
                     <td class="whitespace-nowrap px-3 py-2">
                       <span
                         :class="[
                           'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
                           entry.user_status === 'active'
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-400'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)]'
                         ]"
                       >
                         {{ entry.user_status }}
@@ -170,7 +170,7 @@
                         autocomplete="off"
                         :value="entry.rate_multiplier ?? ''"
                         :placeholder="String(props.group?.rate_multiplier ?? 1)"
-                        class="hide-spinner w-20 rounded border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-center text-sm font-medium transition-colors focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:focus:border-[var(--border-focus)]"
+                        class="hide-spinner w-20 rounded border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-center text-sm font-medium transition-colors focus:border-[var(--border-focus)] focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
                         @change="updateLocalRate(entry.user_id, ($event.target as HTMLInputElement).value)"
                       />
                     </td>
@@ -180,7 +180,7 @@
                     <td class="px-2 py-2">
                       <button
                         type="button"
-                        class="rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                        class="rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
                         @click="removeLocal(entry.user_id)"
                       >
                         <Icon name="trash" size="sm" />
@@ -207,10 +207,10 @@
       <div class="flex items-center gap-3 border-t border-gray-200 pt-4 border-[var(--border-default)]">
         <!-- 左侧：未保存提示 + 撤销 -->
         <template v-if="isDirty">
-          <span class="text-xs text-amber-600 dark:text-amber-400">{{ t('admin.groups.unsavedChanges') }}</span>
+          <span class="text-xs text-amber-600">{{ t('admin.groups.unsavedChanges') }}</span>
           <button
             type="button"
-            class="text-xs font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+            class="text-xs font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] text-[var(--accent)]"
             @click="handleCancel"
           >
             {{ t('admin.groups.revertChanges') }}
@@ -282,9 +282,9 @@ let searchTimeout: ReturnType<typeof setTimeout>
 
 const platformColorClass = computed(() => {
   switch (props.group?.platform) {
-    case 'anthropic': return 'text-orange-700 dark:text-orange-400'
-    case 'openai': return 'text-emerald-700 dark:text-emerald-400'
-    case 'antigravity': return 'text-purple-700 dark:text-purple-400'
+    case 'anthropic': return 'text-orange-700'
+    case 'openai': return 'text-emerald-700'
+    case 'antigravity': return 'text-purple-700'
     default: return 'text-[var(--accent)] text-[var(--accent)]'
   }
 })

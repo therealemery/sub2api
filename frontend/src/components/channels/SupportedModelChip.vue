@@ -6,7 +6,7 @@
         'inline-flex cursor-help items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium transition-colors',
         effectivePlatform
           ? platformBadgeClass(effectivePlatform)
-          : 'border-gray-200 bg-gray-50 text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300',
+          : 'border-gray-200 bg-gray-50 text-gray-700 border-[var(--border-default)] bg-[var(--bg-surface-alt)]',
       ]"
       @mouseenter="onEnter"
       @mouseleave="onLeave"
@@ -21,7 +21,7 @@
       />
       <span
         v-if="showPlatform && model.platform"
-        class="rounded bg-gray-200/60 px-1 text-[10px] uppercase text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-400"
+        class="rounded bg-gray-200/60 px-1 text-[10px] uppercase text-gray-600 bg-[var(--bg-surface-alt)]"
       >
         {{ model.platform }}
       </span>
@@ -55,13 +55,13 @@
         </div>
 
         <div class="p-3">
-          <div v-if="!model.pricing" class="text-gray-500 dark:text-gray-400">
+          <div v-if="!model.pricing" class="text-gray-500">
             {{ noPricingLabel }}
           </div>
 
-          <div v-else class="space-y-2 text-gray-700 dark:text-gray-300">
+          <div v-else class="space-y-2 text-gray-700">
             <div class="flex justify-between">
-              <span class="text-gray-500 dark:text-gray-400">{{ t(prefixKey('billingMode')) }}</span>
+              <span class="text-gray-500">{{ t(prefixKey('billingMode')) }}</span>
               <span>{{ billingModeLabel }}</span>
             </div>
 
@@ -126,7 +126,7 @@
               class="mt-2 border-t pt-2"
               :class="[popoverBorderClass]"
             >
-              <div class="mb-1 font-medium text-gray-600 dark:text-gray-400">
+              <div class="mb-1 font-medium text-gray-600">
                 {{ t(prefixKey('intervals')) }}
               </div>
               <div class="space-y-1">
@@ -135,7 +135,7 @@
                   :key="idx"
                   class="flex justify-between text-[11px]"
                 >
-                  <span class="text-gray-500 dark:text-gray-400">
+                  <span class="text-gray-500">
                     <template v-if="iv.tier_label">{{ iv.tier_label }}</template>
                     <template v-else>{{ formatRange(iv.min_tokens, iv.max_tokens) }}</template>
                   </span>
@@ -206,7 +206,7 @@ const popoverBorderClass = computed(() =>
 const popoverHeaderClass = computed(() =>
   effectivePlatform.value
     ? platformBadgeLightClass(effectivePlatform.value)
-    : 'bg-gray-50 text-gray-700 bg-[var(--bg-surface-alt)] dark:text-gray-300',
+    : 'bg-gray-50 text-gray-700 bg-[var(--bg-surface-alt)]',
 )
 
 function prefixKey(k: string): string {

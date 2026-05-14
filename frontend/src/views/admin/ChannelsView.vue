@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="table-page-with-intro">
       <PageIntro
-        title="渠道管理"
-        description="配置上游模型来源、模型价格和可用状态。渠道只负责能力来源，后续由分组决定哪些用户或 API Key 可以使用。"
+        title="模型接入"
+        description="配置上游模型来源、模型价格和可用状态。模型接入只负责能力来源，后续由权限组决定哪些用户或 API Key 可以使用。"
       />
       <TablePageLayout>
       <template #filters>
@@ -14,7 +14,7 @@
               <Icon
                 name="search"
                 size="md"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
                 v-model="searchQuery"
@@ -63,11 +63,11 @@
           @sort="handleSort"
         >
           <template #cell-name="{ value }">
-            <span class="font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ value }}</span>
+            <span class="font-medium text-gray-900">{{ value }}</span>
           </template>
 
           <template #cell-description="{ value }">
-            <span class="text-sm text-gray-600 dark:text-gray-400">{{ value || '-' }}</span>
+            <span class="text-sm text-gray-600">{{ value || '-' }}</span>
           </template>
 
           <template #cell-status="{ row }">
@@ -79,7 +79,7 @@
 
           <template #cell-group_count="{ row }">
             <span
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
+              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)]"
             >
               {{ (row.group_ids || []).length }}
               {{ t('admin.channels.groupsUnit', 'groups') }}
@@ -87,16 +87,17 @@
           </template>
 
           <template #cell-pricing_count="{ row }">
-            <span
-              class="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 bg-[var(--bg-surface-alt)] dark:text-gray-300"
-            >
-              {{ (row.model_pricing || []).length }}
-              {{ t('admin.channels.pricingUnit', 'pricing rules') }}
-            </span>
+            <div class="channel-pricing-summary">
+              <span>
+                {{ (row.model_pricing || []).length }}
+                {{ t('admin.channels.pricingUnit', 'pricing rules') }}
+              </span>
+              <small>{{ visibleChannelModels(row) }}</small>
+            </div>
           </template>
 
           <template #cell-created_at="{ value }">
-            <span class="text-sm text-gray-600 dark:text-gray-400">
+            <span class="text-sm text-gray-600">
               {{ formatDate(value) }}
             </span>
           </template>
@@ -105,14 +106,14 @@
             <div class="flex items-center gap-1">
               <button
                 @click="openEditDialog(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)] dark:hover:bg-dark-700 dark:hover:text-[var(--accent-hover)]"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--accent-hover)]"
               >
                 <Icon name="edit" size="sm" />
                 <span class="text-xs">{{ t('common.edit', 'Edit') }}</span>
               </button>
               <button
                 @click="handleDelete(row)"
-                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <Icon name="trash" size="sm" />
                 <span class="text-xs">{{ t('common.delete', 'Delete') }}</span>
@@ -123,7 +124,7 @@
           <template #empty>
             <EmptyState
               :title="t('admin.channels.noChannelsYet', 'No Channels Yet')"
-              description="还没有渠道。先创建模型来源和价格规则，再到分组页面把渠道分配给用户或 API 密钥。"
+              description="还没有模型接入配置。先创建模型来源和价格规则，再到权限分组页面把能力分配给用户或 API 密钥。"
               :action-text="t('admin.channels.createChannel', 'Create Channel')"
               @action="openCreateDialog"
             />
@@ -153,8 +154,8 @@
     >
       <div class="channel-dialog-body">
         <div class="admin-config-impact-note mb-4">
-          <strong>渠道影响：</strong>
-          渠道只定义模型来源、价格规则和可用状态。保存后，只会影响已关联到该渠道的分组和 API Key。
+          <strong>接入影响：</strong>
+          这里只定义模型来源、价格规则和可用状态。保存后，只会影响已关联到该接入配置的权限组和 API Key。
         </div>
 
         <!-- Tab Bar -->
@@ -196,7 +197,7 @@
             <section class="admin-config-section">
               <div class="admin-config-section-header">
                 <h4>基础信息</h4>
-                <p>给渠道一个清晰名称，并说明它代表哪一类上游模型来源。</p>
+                <p>给模型接入一个清晰名称，并说明它代表哪一类上游模型来源。</p>
               </div>
             <!-- Name -->
             <div>
@@ -262,7 +263,7 @@
             <section class="admin-config-section">
               <div class="admin-config-section-header">
                 <h4>启用平台</h4>
-                <p>选择这个渠道承载的平台。启用后会出现对应平台的分组、映射和模型价格配置。</p>
+                <p>选择这个模型接入承载的平台。启用后会出现对应平台的权限组、映射和模型价格配置。</p>
               </div>
 
             <!-- Platform Management -->
@@ -275,7 +276,7 @@
                   class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors"
                   :class="activePlatforms.includes(p)
                     ? 'bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)]'
-                    : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700'"
+                    : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)]'"
                 >
                   <input
                     type="checkbox"
@@ -300,17 +301,17 @@
             <section class="admin-config-section">
               <div class="admin-config-section-header">
                 <h4>账号统计计费</h4>
-                <p>仅影响统计口径，不会改变渠道、分组或密钥的真实创建流程。</p>
+                <p>仅影响统计口径，不会改变模型接入、权限组或密钥的真实创建流程。</p>
               </div>
 
             <!-- Apply Pricing to Account Stats (toggle only in basic settings) -->
             <div>
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label class="text-sm font-medium text-gray-700">
                     {{ t('admin.channels.form.applyPricingToAccountStats') }}
                   </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  <p class="mt-0.5 text-xs text-gray-500">
                     {{ t('admin.channels.form.applyPricingToAccountStatsDesc') }}
                   </p>
                 </div>
@@ -332,8 +333,8 @@
           >
             <section class="admin-config-section">
               <div class="admin-config-section-header">
-                <h4>可用分组</h4>
-                <p>把这个渠道分配给哪些分组。分组决定用户或 API Key 能否使用该渠道。</p>
+                <h4>可用权限组</h4>
+                <p>把这个模型接入分配给哪些权限组。权限组决定用户或 API Key 能否使用该能力。</p>
               </div>
             <!-- Groups -->
             <div>
@@ -354,7 +355,7 @@
                   <label
                     v-for="group in getGroupsForPlatform(section.platform)"
                     :key="group.id"
-                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 px-2 py-1 text-xs transition-colors hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700"
+                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 px-2 py-1 text-xs transition-colors hover:bg-gray-50 border-[var(--border-default)]"
                     :class="[
                       section.group_ids.includes(group.id) ? 'bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)]' : '',
                       isGroupInOtherChannel(group.id, section.platform) ? 'opacity-40' : ''
@@ -395,10 +396,10 @@
             <div>
               <div class="flex items-center justify-between">
                 <div>
-                  <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  <label class="text-xs font-medium text-gray-700">
                     {{ t('admin.channels.form.webSearchEmulation') }}
                   </label>
-                  <p class="mt-0.5 text-[11px] text-red-500 dark:text-red-400">
+                  <p class="mt-0.5 text-[11px] text-red-500">
                     {{ t('admin.channels.form.webSearchEmulationHint') }}
                   </p>
                 </div>
@@ -465,7 +466,7 @@
             <section class="admin-config-section">
               <div class="admin-config-section-header">
                 <h4>模型价格</h4>
-                <p>这个区域是渠道的核心配置。每条规则只保存为原有模型价格参数。</p>
+                <p>这个区域是模型接入的核心配置。每条规则只保存为原有模型价格参数。</p>
               </div>
             <div>
               <div class="mb-1 flex flex-wrap items-center justify-between gap-2">
@@ -515,16 +516,16 @@
             <section class="admin-config-section space-y-3">
               <div class="admin-config-section-header">
                 <h4>高级统计规则</h4>
-                <p>用于账号统计侧的计费覆盖，属于高级配置；不影响基础渠道保存动作。</p>
+                <p>用于账号统计侧的计费覆盖，属于高级配置；不影响基础模型接入保存动作。</p>
               </div>
               <div class="flex items-center justify-between">
-                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <h4 class="text-sm font-medium text-gray-700">
                   {{ t('admin.channels.form.accountStatsPricingRules') }}
                 </h4>
                 <button
                   type="button"
                   @click="addAccountStatsRule(sIdx)"
-                  class="rounded-lg border border-[var(--border-focus)] px-3 py-1 text-xs font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] text-[var(--accent)] dark:hover:bg-[var(--bg-subtle)]"
+                  class="rounded-lg border border-[var(--border-focus)] px-3 py-1 text-xs font-medium text-[var(--accent)] hover:bg-[var(--bg-subtle)] border-[var(--border-focus)] text-[var(--accent)]"
                 >
                   + {{ t('admin.channels.form.addRule') }}
                 </button>
@@ -533,7 +534,7 @@
               <!-- Filter rules for this platform's groups -->
               <p
                 v-if="section.account_stats_pricing_rules.length === 0"
-                class="text-xs italic text-gray-400 dark:text-gray-500"
+                class="text-xs italic text-gray-400"
               >
                 {{ t('admin.channels.form.noRulesConfigured') }}
               </p>
@@ -547,7 +548,7 @@
                   <input
                     v-model="rule.name"
                     :placeholder="t('admin.channels.form.ruleName')"
-                    class="bg-transparent text-sm font-medium text-gray-700 placeholder-gray-400 outline-none dark:text-gray-300"
+                    class="bg-transparent text-sm font-medium text-gray-700 placeholder-gray-400 outline-none"
                   />
                   <button type="button" @click="removeAccountStatsRule(sIdx, ruleIndex)" class="text-xs text-red-500 hover:text-red-700">
                     {{ t('common.delete') }}
@@ -555,7 +556,7 @@
                 </div>
 
                 <div>
-                  <label class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.channels.form.ruleGroups') }}</label>
+                  <label class="text-xs text-gray-500">{{ t('admin.channels.form.ruleGroups') }}</label>
                   <div class="mt-1 flex flex-wrap gap-1">
                     <label
                       v-for="gid in section.group_ids"
@@ -563,7 +564,7 @@
                       class="inline-flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors"
                       :class="rule.group_ids.includes(gid)
                         ? 'border-[var(--border-focus)] bg-[var(--bg-surface-alt)] border-[var(--border-focus)] bg-[var(--bg-surface-alt)]'
-                        : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)] dark:hover:bg-dark-700'"
+                        : 'border-gray-200 hover:bg-gray-50 border-[var(--border-default)]'"
                     >
                       <input type="checkbox" :checked="rule.group_ids.includes(gid)" class="h-3 w-3 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--border-focus)]" @change="rule.group_ids.includes(gid) ? rule.group_ids.splice(rule.group_ids.indexOf(gid), 1) : rule.group_ids.push(gid)" />
                       <span class="channel-platform-logo channel-platform-logo-sm">
@@ -583,7 +584,7 @@
                 </div>
 
                 <div>
-                  <label class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.channels.form.ruleAccounts') }}</label>
+                  <label class="text-xs text-gray-500">{{ t('admin.channels.form.ruleAccounts') }}</label>
                   <!-- Selected account chips -->
                   <div class="mt-1 flex flex-wrap gap-1">
                     <span
@@ -617,7 +618,7 @@
                         :key="account.id"
                         type="button"
                         @click="selectRuleAccount(rule, account, section.platform, ruleIndex)"
-                        class="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-700"
+                        class="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
                         :class="{ 'opacity-50': rule.account_ids.includes(account.id) }"
                         :disabled="rule.account_ids.includes(account.id)"
                       >
@@ -633,7 +634,7 @@
 
                 <div>
                   <div class="mb-1 flex items-center justify-between">
-                    <label class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.channels.form.ruleModelPricing') }}</label>
+                    <label class="text-xs text-gray-500">{{ t('admin.channels.form.ruleModelPricing') }}</label>
                     <button type="button" @click="addRulePricingEntry(sIdx, ruleIndex)" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
                       + {{ t('common.add') }}
                     </button>
@@ -662,7 +663,7 @@
         <div class="flex justify-end gap-3">
           <div class="config-save-note mr-auto hidden max-w-lg text-left lg:block">
             <strong>保存区：</strong>
-            只保存当前渠道配置，不会自动创建分组、账号或用户密钥。
+            只保存当前模型接入配置，不会自动创建权限组、账号或用户密钥。
           </div>
           <button @click="closeDialog" type="button" class="btn btn-secondary">
             {{ t('common.cancel', 'Cancel') }}
@@ -844,6 +845,15 @@ const platformOrder: GroupPlatform[] = ['anthropic', 'openai', 'gemini', 'antigr
 function formatDate(value: string): string {
   if (!value) return '-'
   return new Date(value).toLocaleDateString()
+}
+
+function visibleChannelModels(channel: Channel): string {
+  const models = (channel.model_pricing || [])
+    .flatMap((item) => item.models || [])
+    .filter(Boolean)
+  if (models.length === 0) return '暂无模型价格'
+  const visible = models.slice(0, 5).join(' / ')
+  return models.length > 5 ? `${visible} 等 ${models.length} 个模型` : visible
 }
 
 // ── Platform section helpers ──
@@ -1456,7 +1466,7 @@ async function handleSubmit() {
   for (const section of form.platforms.filter(s => s.enabled)) {
     if (section.group_ids.length === 0) {
       const platformLabel = t('admin.groups.platforms.' + section.platform, section.platform)
-      appStore.showError(t('admin.channels.noGroupsSelected', { platform: platformLabel }, `${platformLabel} 平台未选择分组，请至少选择一个分组或禁用该平台`))
+      appStore.showError(t('admin.channels.noGroupsSelected', { platform: platformLabel }, `${platformLabel} 平台未选择权限组，请至少选择一个权限组或禁用该平台`))
       activeTab.value = section.platform
       return
     }
@@ -1670,13 +1680,7 @@ onUnmounted(() => {
   height: 10px;
 }
 
-:global(.dark) .channel-platform-logo {
-  background: rgba(255, 255, 255, 0.06);
-}
 
-:global(.dark) .channel-platform-logo img {
-  filter: none;
-}
 
 .channel-pricing-actions {
   display: flex;
@@ -1684,6 +1688,32 @@ onUnmounted(() => {
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.channel-pricing-summary {
+  display: grid;
+  gap: 4px;
+  max-width: 260px;
+}
+
+.channel-pricing-summary span {
+  width: fit-content;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-alt);
+  padding: 3px 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.channel-pricing-summary small {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .channel-image-preset-button {
@@ -1711,27 +1741,46 @@ onUnmounted(() => {
   background: color-mix(in srgb, var(--text-primary) 12%, var(--bg-surface) 88%);
 }
 
-:global(.dark) .channel-image-preset-button {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
-}
 
-:global(.dark) .channel-image-preset-button:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-}
 
 .channel-tab {
-  @apply flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
 .channel-tab-active {
-  border-color: var(--text-primary) !important;
-  color: var(--text-primary) !important;
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
 }
 
 .channel-tab-inactive {
-  @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300;
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.channel-tab-inactive:hover {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+.channel-tab-active :deep(span),
+.channel-tab-active :deep(svg) {
+  color: var(--accent-contrast) !important;
+  stroke: currentColor;
 }
 
 .channel-dialog-body :deep([class*='text-orange-']),

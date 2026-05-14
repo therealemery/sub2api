@@ -6,7 +6,7 @@
     @close="$emit('close')"
   >
     <div class="space-y-3">
-      <p class="text-xs text-gray-500 dark:text-gray-400">
+      <p class="text-xs text-gray-500">
         {{ t('admin.channelMonitor.form.selectKeyHint') }}
       </p>
 
@@ -31,21 +31,21 @@
       <div v-else class="max-h-96 overflow-auto rounded-lg border border-gray-200 border-[var(--border-default)]">
         <table class="w-full text-sm">
           <thead class="bg-gray-50 bg-[var(--bg-surface-alt)] sticky top-0 z-10">
-            <tr class="text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <tr class="text-left text-xs font-medium uppercase tracking-wider text-gray-500">
               <th class="px-3 py-2">{{ t('common.name') }}</th>
               <th class="px-3 py-2">{{ t('keys.apiKey') }}</th>
               <th class="px-3 py-2">{{ t('keys.group') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-dark-700">
+          <tbody class="divide-y divide-gray-200">
             <tr
               v-for="k in filteredKeys"
               :key="k.id"
-              class="cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-700"
+              class="cursor-pointer hover:bg-gray-50"
               @click="$emit('pick', k)"
             >
-              <td class="px-3 py-2 font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ k.name }}</td>
-              <td class="px-3 py-2 font-mono text-xs text-gray-500 dark:text-gray-400">{{ maskApiKey(k.key) }}</td>
+              <td class="px-3 py-2 font-medium text-gray-900">{{ k.name }}</td>
+              <td class="px-3 py-2 font-mono text-xs text-gray-500">{{ maskApiKey(k.key) }}</td>
               <td class="px-3 py-2">
                 <GroupBadge
                   v-if="k.group"

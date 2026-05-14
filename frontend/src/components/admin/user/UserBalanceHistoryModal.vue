@@ -12,7 +12,7 @@
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <p class="truncate font-medium text-gray-900 dark:text-[var(--text-inverse)]">{{ user.email }}</p>
+              <p class="truncate font-medium text-gray-900">{{ user.email }}</p>
               <span
                 v-if="user.username"
                 class="flex-shrink-0 rounded bg-[var(--bg-surface-alt)] px-1.5 py-0.5 text-xs text-[var(--accent)] bg-[var(--bg-surface-alt)] text-[var(--accent)]"
@@ -24,11 +24,11 @@
               {{ t('admin.users.createdAt') }}: {{ formatDateTime(user.created_at) }}
             </p>
           </div>
-          <!-- Current balance: prominent display on the right -->
+          <!-- Current points: prominent display on the right -->
           <div class="flex-shrink-0 text-right">
-            <p class="text-xs text-gray-500 text-[var(--text-muted)]">{{ t('admin.users.currentBalance') }}</p>
-            <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
-              ${{ user.balance?.toFixed(2) || '0.00' }}
+            <p class="text-xs text-gray-500 text-[var(--text-muted)]">当前积分</p>
+            <p class="text-xl font-bold text-gray-900">
+              {{ user.balance?.toFixed(2) || '0.00' }} 积分
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@
             <template v-else>&nbsp;</template>
           </p>
           <p class="ml-4 flex-shrink-0 text-xs text-gray-500 text-[var(--text-muted)]">
-            {{ t('admin.users.totalRecharged') }}: <span class="font-semibold text-emerald-600 dark:text-emerald-400">${{ totalRecharged.toFixed(2) }}</span>
+            总充值积分: <span class="font-semibold text-emerald-600">{{ totalRecharged.toFixed(2) }} 积分</span>
           </p>
         </div>
       </div>
@@ -56,21 +56,21 @@
         <button
           v-if="!hideActions"
           @click="emit('deposit')"
-          class="flex items-center gap-2 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-700"
+          class="flex items-center gap-2 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         >
           <Icon name="plus" size="sm" class="text-emerald-500" :stroke-width="2" />
-          {{ t('admin.users.deposit') }}
+          增加积分
         </button>
         <!-- Withdraw button - matches menu style -->
         <button
           v-if="!hideActions"
           @click="emit('withdraw')"
-          class="flex items-center gap-2 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-700"
+          class="flex items-center gap-2 rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         >
           <svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
           </svg>
-          {{ t('admin.users.withdraw') }}
+          扣减积分
         </button>
       </div>
 
@@ -106,7 +106,7 @@
                 <Icon :name="getIconName(item)" size="sm" :class="getIconColor(item)" />
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-sm font-medium text-gray-900">
                   {{ getItemTitle(item) }}
                 </p>
                 <!-- Notes (admin adjustment reason) -->
@@ -252,39 +252,39 @@ const getIconName = (item: BalanceHistoryItem) => {
 const getIconBg = (item: BalanceHistoryItem) => {
   if (isBalanceType(item.type)) {
     return item.value >= 0
-      ? 'bg-emerald-100 dark:bg-emerald-900/30'
-      : 'bg-red-100 dark:bg-red-900/30'
+      ? 'bg-emerald-100'
+      : 'bg-red-100'
   }
-  if (isSubscriptionType(item.type)) return 'bg-purple-100 dark:bg-purple-900/30'
+  if (isSubscriptionType(item.type)) return 'bg-purple-100'
   return item.value >= 0
     ? 'bg-[var(--bg-surface-alt)] bg-[var(--bg-surface-alt)]'
-    : 'bg-orange-100 dark:bg-orange-900/30'
+    : 'bg-orange-100'
 }
 
 // Icon text color
 const getIconColor = (item: BalanceHistoryItem) => {
   if (isBalanceType(item.type)) {
     return item.value >= 0
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-red-600 dark:text-red-400'
+      ? 'text-emerald-600'
+      : 'text-red-600'
   }
-  if (isSubscriptionType(item.type)) return 'text-purple-600 dark:text-purple-400'
+  if (isSubscriptionType(item.type)) return 'text-purple-600'
   return item.value >= 0
     ? 'text-[var(--accent)] text-[var(--accent)]'
-    : 'text-orange-600 dark:text-orange-400'
+    : 'text-orange-600'
 }
 
 // Value text color
 const getValueColor = (item: BalanceHistoryItem) => {
   if (isBalanceType(item.type)) {
     return item.value >= 0
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-red-600 dark:text-red-400'
+      ? 'text-emerald-600'
+      : 'text-red-600'
   }
-  if (isSubscriptionType(item.type)) return 'text-purple-600 dark:text-purple-400'
+  if (isSubscriptionType(item.type)) return 'text-purple-600'
   return item.value >= 0
     ? 'text-[var(--accent)] text-[var(--accent)]'
-    : 'text-orange-600 dark:text-orange-400'
+    : 'text-orange-600'
 }
 
 // Item title
@@ -311,7 +311,7 @@ const getItemTitle = (item: BalanceHistoryItem) => {
 const formatValue = (item: BalanceHistoryItem) => {
   if (isBalanceType(item.type)) {
     const sign = item.value >= 0 ? '+' : ''
-    return `${sign}$${item.value.toFixed(2)}`
+    return `${sign}${item.value.toFixed(2)} 积分`
   }
   if (isSubscriptionType(item.type)) {
     const days = item.validity_days || Math.round(item.value)

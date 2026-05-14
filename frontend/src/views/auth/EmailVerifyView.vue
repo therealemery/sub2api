@@ -3,25 +3,25 @@
     <div class="space-y-6">
       <!-- Title -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+        <h2 class="text-2xl font-bold text-gray-900">
           {{ t('auth.verifyYourEmail') }}
         </h2>
         <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
           {{ t('auth.sendCodeDesc') }}
-          <span class="font-medium text-gray-700 dark:text-gray-300">{{ email }}</span>
+          <span class="font-medium text-gray-700">{{ email }}</span>
         </p>
       </div>
 
       <!-- No Data Warning -->
       <div
         v-if="!hasRegisterData"
-        class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20"
+        class="rounded-lg border border-amber-200 bg-amber-50 p-4"
       >
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
             <Icon name="exclamationCircle" size="md" class="text-amber-500" />
           </div>
-          <div class="text-sm text-amber-700 dark:text-amber-400">
+          <div class="text-sm text-amber-700">
             <p class="font-medium">{{ t('auth.sessionExpired') }}</p>
             <p class="mt-1">{{ t('auth.sessionExpiredDesc') }}</p>
           </div>
@@ -54,13 +54,13 @@
         <!-- Code Status -->
         <div
           v-if="codeSent"
-          class="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800/50 dark:bg-green-900/20"
+          class="rounded-lg border border-green-200 bg-green-50 p-4"
         >
           <div class="flex items-start gap-3">
             <div class="flex-shrink-0">
               <Icon name="checkCircle" size="md" class="text-green-500" />
             </div>
-            <p class="text-sm text-green-700 dark:text-green-400">
+            <p class="text-sm text-green-700">
               {{ t('auth.codeSentSuccess') }}
             </p>
           </div>
@@ -120,7 +120,7 @@
             :disabled="
               isSendingCode || (turnstileEnabled && showResendTurnstile && !resendTurnstileToken)
             "
-            class="text-sm text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 text-[var(--accent)] dark:hover:text-[var(--accent-hover)]"
+            class="text-sm text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 text-[var(--accent)]"
           >
             <span v-if="isSendingCode">{{ t('auth.sendingCode') }}</span>
             <span v-else-if="turnstileEnabled && !showResendTurnstile">
@@ -136,7 +136,7 @@
     <template #footer>
       <button
         @click="handleBack"
-        class="flex items-center gap-2 text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)] dark:hover:text-gray-300"
+        class="flex items-center gap-2 text-gray-500 transition-colors hover:text-gray-700 text-[var(--text-muted)]"
       >
         <Icon name="arrowLeft" size="sm" />
         {{ t('auth.backToRegistration') }}

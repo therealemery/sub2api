@@ -1,48 +1,38 @@
 <template>
   <AppLayout>
     <div class="models-page">
-      <div class="models-intro-wrap">
-        <PageIntro
-          :eyebrow="modelCenterConfig.eyebrow"
-          :title="modelCenterConfig.title"
-          :description="modelCenterConfig.description"
-        >
-          <template #actions>
-            <router-link to="/keys" class="models-primary-action">配置 API 密钥</router-link>
-          </template>
-        </PageIntro>
-      </div>
+      <PageIntro
+        :eyebrow="modelCenterConfig.eyebrow"
+        :title="modelCenterConfig.title"
+        :description="modelCenterConfig.description"
+      >
+        <template #actions>
+          <router-link to="/keys" class="models-primary-action">配置 API 密钥</router-link>
+        </template>
+      </PageIntro>
 
       <section class="models-section" aria-labelledby="featured-models-title">
         <div class="models-section-heading">
-          <div>
-            <h3 id="featured-models-title">{{ modelCenterConfig.featuredTitle }}</h3>
-            <p>{{ modelCenterConfig.featuredDescription }}</p>
-          </div>
+          <h3 id="featured-models-title">{{ modelCenterConfig.featuredTitle }}</h3>
+          <p>{{ modelCenterConfig.featuredDescription }}</p>
         </div>
 
         <div class="featured-model-grid">
           <article v-for="model in featuredModels" :key="model.id" class="featured-model-card">
-            <div class="featured-model-logo">
+            <div class="model-logo-box">
               <img :src="model.logo" :alt="model.name" />
             </div>
-            <div class="featured-model-content">
-              <div class="featured-model-header">
+            <div class="model-card-body">
+              <div class="model-card-header">
                 <h4>{{ model.name }}</h4>
                 <span>{{ model.statusLabel }}</span>
               </div>
               <p>{{ model.description }}</p>
-              <div v-if="model.versions.length" class="model-version-block">
-                <span>当前模型</span>
-                <div class="model-version-list">
-                  <span v-for="version in model.versions" :key="`${model.id}-${version}`">
-                    {{ version }}
-                  </span>
-                </div>
+              <div class="model-version-list">
+                <span v-for="version in model.versions" :key="`${model.id}-${version}`">
+                  {{ version }}
+                </span>
               </div>
-              <ul>
-                <li v-for="item in model.highlights" :key="item">{{ item }}</li>
-              </ul>
               <router-link to="/keys" class="model-config-link">配置密钥</router-link>
             </div>
           </article>
@@ -51,10 +41,8 @@
 
       <section class="models-section" aria-labelledby="ecosystem-models-title">
         <div class="models-section-heading">
-          <div>
-            <h3 id="ecosystem-models-title">{{ modelCenterConfig.ecosystemTitle }}</h3>
-            <p>{{ modelCenterConfig.ecosystemDescription }}</p>
-          </div>
+          <h3 id="ecosystem-models-title">{{ modelCenterConfig.ecosystemTitle }}</h3>
+          <p>{{ modelCenterConfig.ecosystemDescription }}</p>
         </div>
 
         <div class="ecosystem-grid">
@@ -67,13 +55,7 @@
                 <h4>{{ model.name }}</h4>
                 <span>{{ model.statusLabel }}</span>
               </div>
-              <p>{{ model.description }}</p>
-              <div v-if="model.versions.length" class="ecosystem-version-list">
-                <span v-for="version in model.versions" :key="`${model.id}-${version}`">
-                  {{ version }}
-                </span>
-              </div>
-              <router-link to="/keys" class="ecosystem-action">配置</router-link>
+              <p>{{ model.versions.slice(0, 3).join(' / ') }}</p>
             </div>
           </article>
         </div>
@@ -119,28 +101,10 @@ const ecosystemModels = computed(() =>
 <style scoped>
 .models-page {
   display: grid;
-  gap: 28px;
+  gap: 26px;
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
-}
-
-.models-intro-wrap :deep(.page-intro) {
-  padding: 30px 32px;
-}
-
-.models-intro-wrap :deep(.page-intro-main) {
-  max-width: 780px;
-}
-
-.models-intro-wrap :deep(.page-intro-main h2) {
-  font-size: 28px;
-  line-height: 1.25;
-}
-
-.models-intro-wrap :deep(.page-intro-main p) {
-  max-width: 760px;
-  line-height: 1.75;
 }
 
 .models-section,
@@ -152,15 +116,13 @@ const ecosystemModels = computed(() =>
 }
 
 .models-section {
-  padding: 28px;
+  padding: 26px;
 }
 
 .models-section-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 24px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .models-section-heading h3,
@@ -168,55 +130,40 @@ const ecosystemModels = computed(() =>
   margin: 0;
   color: var(--text-primary);
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.35;
-  letter-spacing: 0;
 }
 
 .models-section-heading p,
-.featured-model-content p,
-.ecosystem-card p,
-.models-guide p {
+.model-card-body p,
+.models-guide p,
+.ecosystem-body p {
   margin: 0;
   color: var(--text-secondary);
   font-size: 14px;
-  font-weight: 400;
   line-height: 1.7;
-}
-
-.models-section-heading p {
-  max-width: 760px;
-  margin-top: 8px;
 }
 
 .featured-model-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
 .featured-model-card {
   display: grid;
-  grid-template-columns: 128px minmax(0, 1fr);
-  gap: 22px;
-  align-items: start;
-  min-width: 0;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 260px;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface-alt);
-  padding: 22px;
-  transition: none;
+  padding: 20px;
 }
 
-.featured-model-card:hover {
-  border-color: var(--border-default);
-  background: var(--bg-surface-alt);
-}
-
-.featured-model-logo {
+.model-logo-box,
+.ecosystem-logo {
   display: flex;
-  width: 128px;
-  height: 128px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-subtle);
@@ -224,19 +171,25 @@ const ecosystemModels = computed(() =>
   background: var(--bg-surface);
 }
 
-.featured-model-logo img {
-  display: block;
-  width: 82px;
-  height: 82px;
+.model-logo-box {
+  width: 96px;
+  height: 96px;
+}
+
+.model-logo-box img {
+  width: 62px;
+  height: 62px;
   object-fit: contain;
 }
 
-.featured-model-content,
-.ecosystem-body {
+.model-card-body {
+  display: flex;
   min-width: 0;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.featured-model-header,
+.model-card-header,
 .ecosystem-title-row {
   display: flex;
   align-items: center;
@@ -244,70 +197,33 @@ const ecosystemModels = computed(() =>
   gap: 12px;
 }
 
-.featured-model-header h4,
-.ecosystem-card h4 {
+.model-card-header h4,
+.ecosystem-title-row h4 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: 18px;
+  font-weight: 800;
 }
 
-.featured-model-header span,
+.model-card-header span,
 .ecosystem-title-row span {
   flex: 0 0 auto;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
-  background: var(--bg-surface);
+  background: var(--accent-soft);
   padding: 4px 9px;
-  color: var(--text-secondary);
+  color: var(--accent);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.featured-model-content p {
-  margin-top: 10px;
-}
-
-.model-version-block {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-  min-width: 0;
-}
-
-.model-version-block > span {
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.model-version-list,
-.ecosystem-version-list {
+.model-version-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  min-width: 0;
 }
 
-.featured-model-content li {
-  max-width: 100%;
-  overflow: hidden;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  background: var(--bg-surface);
-  padding: 5px 9px;
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.model-version-list span,
-.ecosystem-version-list span {
+.model-version-list span {
   max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--accent);
@@ -316,28 +232,16 @@ const ecosystemModels = computed(() =>
   padding: 5px 9px;
   color: var(--accent);
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.featured-model-content ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
 .models-primary-action,
 .models-secondary-action,
-.model-config-link,
-.ecosystem-action {
+.model-config-link {
   display: inline-flex;
   min-height: 36px;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
@@ -351,80 +255,58 @@ const ecosystemModels = computed(() =>
   padding: 0 18px;
   color: var(--accent-contrast);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.models-primary-action:hover,
-.models-secondary-action:hover {
-  background: var(--accent);
-}
-
-.model-config-link,
-.ecosystem-action {
-  justify-self: flex-start;
+.model-config-link {
+  width: fit-content;
+  margin-top: auto;
   border: 1px solid var(--border-default);
   background: var(--bg-surface);
   padding: 0 14px;
   color: var(--text-primary);
   font-size: 13px;
-  font-weight: 700;
-}
-
-.model-config-link {
-  margin-top: 16px;
+  font-weight: 800;
 }
 
 .ecosystem-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .ecosystem-card {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
-  gap: 15px;
-  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 104px;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface-alt);
-  padding: 18px;
-  transition: none;
-}
-
-.ecosystem-card:hover {
-  border-color: var(--border-default);
-  background: var(--bg-surface-alt);
+  padding: 14px;
 }
 
 .ecosystem-logo {
-  display: flex;
-  width: 58px;
-  height: 58px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
+  width: 44px;
+  height: 44px;
 }
 
 .ecosystem-logo img {
-  display: block;
-  width: 35px;
-  height: 35px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
 }
 
-.ecosystem-card p {
-  margin-top: 7px;
+.ecosystem-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
 }
 
-.ecosystem-version-list {
-  margin-top: 12px;
-}
-
-.ecosystem-action {
-  margin-top: 14px;
+.ecosystem-body p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .models-guide {
@@ -432,7 +314,7 @@ const ecosystemModels = computed(() =>
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  padding: 24px 28px;
+  padding: 24px 26px;
 }
 
 .models-guide p {
@@ -440,51 +322,24 @@ const ecosystemModels = computed(() =>
   margin-top: 7px;
 }
 
-:global(.dark) .models-section,
-:global(.dark) .models-guide,
-:global(.dark) .featured-model-logo,
-:global(.dark) .ecosystem-logo {
-  background: var(--bg-surface);
-}
-
-:global(.dark) .featured-model-card,
-:global(.dark) .ecosystem-card {
-  background: var(--bg-surface-alt);
-}
-
-:global(.dark) .featured-model-logo img,
-:global(.dark) .ecosystem-logo img {
-  filter: none;
-}
-
-@media (max-width: 1100px) {
-  .featured-model-grid,
+@media (max-width: 1180px) {
   .ecosystem-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .featured-model-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .models-intro-wrap :deep(.page-intro),
-  .models-section,
-  .models-guide {
-    padding: 20px;
-  }
-
   .featured-model-card,
-  .ecosystem-card,
   .models-guide {
     grid-template-columns: 1fr;
-    align-items: flex-start;
-  }
-
-  .featured-model-logo {
-    width: 112px;
-    height: 112px;
-  }
-
-  .models-guide {
-    display: grid;
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 </style>

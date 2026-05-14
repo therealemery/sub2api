@@ -9,27 +9,12 @@ import './style.css'
 import './styles/interaction-states.css'
 
 function initThemeClass() {
-  const savedTheme = localStorage.getItem('theme')
-  const shouldUseDark =
-    savedTheme === 'dark' ||
-    (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  document.documentElement.classList.toggle('dark', shouldUseDark)
-  document.documentElement.dataset.theme = shouldUseDark ? 'dark' : 'light'
-
-  const syncThemeAttribute = () => {
-    document.documentElement.dataset.theme = document.documentElement.classList.contains('dark')
-      ? 'dark'
-      : 'light'
-  }
-
-  new MutationObserver(syncThemeAttribute).observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class']
-  })
+  localStorage.removeItem('theme')
+  document.documentElement.classList.remove('dark')
 }
 
 async function bootstrap() {
-  // Apply theme class globally before app mount to keep all routes consistent.
+  // Keep the product on the single supported light UI before app mount.
   initThemeClass()
 
   const app = createApp(App)

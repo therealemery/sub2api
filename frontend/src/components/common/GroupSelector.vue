@@ -10,7 +10,7 @@
       <label
         v-for="group in filteredGroups"
         :key="group.id"
-        class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-[var(--bg-surface)] dark:hover:bg-dark-700"
+        class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-[var(--bg-surface)]"
         :title="t('admin.groups.rateAndAccounts', { rate: group.rate_multiplier, count: group.account_count || 0 })"
       >
         <input
@@ -31,7 +31,7 @@
       </label>
       <div
         v-if="filteredGroups.length === 0"
-        class="col-span-2 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
+        class="col-span-2 py-2 text-center text-sm text-gray-500"
       >
         {{ t('common.noGroupsAvailable') }}
       </div>

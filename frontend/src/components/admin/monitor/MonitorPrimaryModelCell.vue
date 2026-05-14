@@ -4,7 +4,7 @@
       <img v-if="getModelLogo(row.primary_model)" :src="getModelLogo(row.primary_model)" :alt="getModelDisplayName(row.primary_model)" />
       <Icon v-else name="beaker" size="xs" />
     </span>
-    <span class="text-sm text-gray-900 dark:text-gray-100">{{ row.primary_model }}</span>
+    <span class="text-sm text-gray-900">{{ row.primary_model }}</span>
     <HelpTooltip>
       <template #trigger>
         <span
@@ -129,7 +129,4 @@ const { statusLabel, statusBadgeClass, formatLatency } = useChannelMonitorFormat
   white-space: nowrap;
 }
 
-:global(.dark) .monitor-model-logo img {
-  filter: none;
-}
 </style>

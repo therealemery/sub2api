@@ -18,17 +18,24 @@
         <!-- Announcement Bell -->
         <AnnouncementBell v-if="user" />
 
+        <!-- Home Preview Link -->
+        <router-link
+          to="/home"
+          class="header-link flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-[var(--text-muted)]"
+          aria-label="查看主页"
+        >
+          <Icon name="home" size="sm" />
+          <span class="hidden sm:inline">查看主页</span>
+        </router-link>
+
         <!-- Docs Link -->
-        <a
-          v-if="docUrl"
-          :href="docUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="header-link flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 text-[var(--text-muted)] dark:hover:bg-dark-800 dark:hover:text-[var(--text-inverse)]"
+        <router-link
+          to="/docs"
+          class="header-link flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-[var(--text-muted)]"
         >
           <Icon name="book" size="sm" />
           <span class="hidden sm:inline">{{ t('nav.docs') }}</span>
-        </a>
+        </router-link>
 
         <!-- Language Switcher -->
         <LocaleSwitcher />
@@ -41,21 +48,9 @@
           v-if="user"
           class="header-balance hidden items-center gap-2 rounded-lg bg-[var(--bg-surface-alt)] px-3 py-1.5 bg-[var(--bg-surface-alt)] sm:flex"
         >
-          <svg
-            class="h-4 w-4 text-[var(--accent)] text-[var(--accent)]"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="1.5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"
-            />
-          </svg>
+          <Icon name="sparkles" size="sm" class="header-points-icon" />
           <span class="money-value text-sm font-semibold">
-            ${{ user.balance?.toFixed(2) || '0.00' }}
+            {{ formattedPoints }} 积分
           </span>
         </div>
 
@@ -63,7 +58,7 @@
         <div v-if="user" class="relative" ref="dropdownRef">
           <button
             @click="toggleDropdown"
-            class="user-menu-trigger flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-dark-800"
+            class="user-menu-trigger flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100"
             aria-label="User Menu"
           >
             <div class="user-avatar flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-[var(--accent)] text-sm font-medium text-[var(--text-inverse)]">
@@ -76,7 +71,7 @@
               <span v-else>{{ userInitials }}</span>
             </div>
             <div class="hidden text-left md:block">
-              <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+              <div class="text-sm font-medium text-gray-900">
                 {{ displayName }}
               </div>
               <div class="text-xs capitalize text-gray-500 text-[var(--text-muted)]">
@@ -91,7 +86,7 @@
             <div v-if="dropdownOpen" class="dropdown right-0 mt-2 w-56">
               <!-- User Info -->
               <div class="border-b border-gray-100 px-4 py-3 border-[var(--border-default)]">
-                <div class="text-sm font-medium text-gray-900 dark:text-[var(--text-inverse)]">
+                <div class="text-sm font-medium text-gray-900">
                   {{ displayName }}
                 </div>
                 <div class="text-xs text-gray-500 text-[var(--text-muted)]">{{ user.email }}</div>
@@ -100,10 +95,10 @@
               <!-- Balance (mobile only) -->
               <div class="border-b border-gray-100 px-4 py-2 border-[var(--border-default)] sm:hidden">
                 <div class="text-xs text-gray-500 text-[var(--text-muted)]">
-                  {{ t('common.balance') }}
+                  积分
                 </div>
                 <div class="money-value text-sm font-semibold">
-                  ${{ user.balance?.toFixed(2) || '0.00' }}
+                  {{ formattedPoints }} 积分
                 </div>
               </div>
 
@@ -143,7 +138,7 @@
                 v-if="contactInfo"
                 class="border-t border-gray-100 px-4 py-2.5 border-[var(--border-default)]"
               >
-                <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
                   <svg
                     class="h-3.5 w-3.5 flex-shrink-0"
                     fill="none"
@@ -158,7 +153,7 @@
                     />
                   </svg>
                   <span>{{ t('common.contactSupport') }}:</span>
-                  <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                  <span class="font-medium text-gray-700">{{
                     contactInfo
                   }}</span>
                 </div>
@@ -178,7 +173,7 @@
               <div class="border-t border-gray-100 py-1 border-[var(--border-default)]">
                 <button
                   @click="handleLogout"
-                  class="dropdown-item w-full text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                  class="dropdown-item w-full text-red-600 hover:bg-red-50"
                 >
                   <svg
                     class="h-4 w-4"
@@ -225,9 +220,12 @@ const user = computed(() => authStore.user)
 const dropdownOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 const contactInfo = computed(() => appStore.contactInfo)
-const docUrl = computed(() => appStore.docUrl)
 const repositoryUrl = DEFAULT_REPOSITORY_URL
 const avatarUrl = computed(() => user.value?.avatar_url?.trim() || '')
+const formattedPoints = computed(() => {
+  const points = Number(user.value?.balance ?? 0)
+  return Number.isFinite(points) ? points.toFixed(4) : '0.0000'
+})
 
 // Standard mode users can replay the onboarding map from the account menu.
 const showOnboardingButton = computed(() => {

@@ -6,10 +6,10 @@
       <div class="totp-modal-panel relative w-full max-w-md transform rounded-lg p-6 transition-colors">
         <!-- Header -->
         <div class="mb-6 text-center">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+          <h3 class="text-xl font-semibold text-gray-900">
             {{ t('profile.totp.setupTitle') }}
           </h3>
-          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p class="mt-2 text-sm text-gray-500">
             {{ stepDescription }}
           </p>
         </div>
@@ -18,7 +18,7 @@
         <div v-if="step === 0" class="space-y-6">
           <!-- Loading verification method -->
           <div v-if="methodLoading" class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700 dark:border-gray-200"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700"></div>
           </div>
 
           <template v-else>
@@ -82,13 +82,13 @@
           <!-- QR Code and Secret -->
           <template v-if="setupData">
             <div class="flex justify-center">
-              <div class="rounded-lg border border-gray-200 p-4 bg-[var(--bg-surface)] border-[var(--border-default)] dark:bg-[var(--bg-surface)]">
+              <div class="rounded-lg border border-gray-200 p-4 bg-[var(--bg-surface)] border-[var(--border-default)]">
                 <img :src="qrCodeDataUrl" alt="QR Code" class="h-48 w-48" />
               </div>
             </div>
 
             <div class="text-center">
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              <p class="text-sm text-gray-500 mb-2">
                 {{ t('profile.totp.manualEntry') }}
               </p>
               <div class="flex items-center justify-center gap-2">
@@ -97,7 +97,7 @@
                 </code>
                 <button
                   type="button"
-                  class="rounded p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-700"
+                  class="rounded p-1.5 text-gray-500 hover:bg-gray-100"
                   @click="copySecret"
                 >
                   <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

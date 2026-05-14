@@ -66,7 +66,7 @@ const primaryMetrics = computed<DashboardMetric[]>(() => {
     ? []
     : [{
         label: t('dashboard.balance'),
-        value: `$${formatBalance(props.balance)}`,
+        value: `${formatBalance(props.balance)} 积分`,
         detail: t('common.available'),
         isMoney: true
       }]

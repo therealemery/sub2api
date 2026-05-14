@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
 <template>
   <div class="space-y-6">
     <!-- Header (matches OpsDashboardHeader + overview blocks) -->
-    <div :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700', props.fullscreen ? 'p-8' : 'p-6']">
+    <div :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-8' : 'p-6']">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4 border-[var(--border-default)]">
         <div class="space-y-2">
           <div class="h-6 w-44 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
@@ -51,15 +51,15 @@ const props = withDefaults(defineProps<Props>(), {
 
     <!-- Row: Concurrency + Throughput (matches OpsDashboard.vue) -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
-      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700 lg:col-span-1', props.fullscreen ? 'p-8' : 'p-6']">
+      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] lg:col-span-1', props.fullscreen ? 'p-8' : 'p-6']">
         <div class="h-4 w-44 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         <div class="mt-6 h-72 animate-pulse rounded-lg bg-gray-100 bg-[var(--bg-surface-alt)]"></div>
       </div>
-      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700 lg:col-span-1', props.fullscreen ? 'p-8' : 'p-6']">
+      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] lg:col-span-1', props.fullscreen ? 'p-8' : 'p-6']">
         <div class="h-4 w-44 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         <div class="mt-6 h-72 animate-pulse rounded-lg bg-gray-100 bg-[var(--bg-surface-alt)]"></div>
       </div>
-      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700 lg:col-span-2', props.fullscreen ? 'p-8' : 'p-6']">
+      <div :class="['min-h-[360px] rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] lg:col-span-2', props.fullscreen ? 'p-8' : 'p-6']">
         <div class="h-4 w-56 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         <div class="mt-6 h-72 animate-pulse rounded-lg bg-gray-100 bg-[var(--bg-surface-alt)]"></div>
       </div>
@@ -70,7 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
       <div
         v-for="i in 3"
         :key="i"
-        :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700', props.fullscreen ? 'p-8' : 'p-6']"
+        :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-8' : 'p-6']"
       >
         <div class="h-4 w-44 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         <div class="mt-6 h-56 animate-pulse rounded-lg bg-gray-100 bg-[var(--bg-surface-alt)]"></div>
@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
     </div>
 
     <!-- Alert Events -->
-    <div :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700', props.fullscreen ? 'p-8' : 'p-6']">
+    <div :class="['rounded-lg bg-[var(--bg-surface)] ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)]', props.fullscreen ? 'p-8' : 'p-6']">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="h-4 w-48 animate-pulse rounded bg-gray-200 bg-[var(--bg-surface-alt)]"></div>
         <div v-if="!props.fullscreen" class="flex flex-wrap items-center gap-2">

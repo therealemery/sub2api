@@ -18,7 +18,7 @@
             >
               <Icon name="link" size="lg" class="text-gray-400" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h3 class="text-lg font-semibold text-gray-900">
               {{ t('customPage.notFoundTitle') }}
             </h3>
             <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -34,7 +34,7 @@
             >
               <Icon name="link" size="lg" class="text-gray-400" />
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h3 class="text-lg font-semibold text-gray-900">
               {{ t('customPage.notConfiguredTitle') }}
             </h3>
             <p class="mt-2 text-sm text-gray-500 text-[var(--text-muted)]">
@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores'
@@ -73,7 +73,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAdminSettingsStore } from '@/stores/adminSettings'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
-import { buildEmbeddedUrl, detectTheme } from '@/utils/embedded-url'
+import { buildEmbeddedUrl } from '@/utils/embedded-url'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -82,8 +82,6 @@ const authStore = useAuthStore()
 const adminSettingsStore = useAdminSettingsStore()
 
 const loading = ref(false)
-const pageTheme = ref<'light' | 'dark'>('light')
-let themeObserver: MutationObserver | null = null
 
 const menuItemId = computed(() => route.params.id as string)
 
@@ -106,7 +104,7 @@ const embeddedUrl = computed(() => {
     menuItem.value.url,
     authStore.user?.id,
     authStore.token,
-    pageTheme.value,
+    'light',
     locale.value,
   )
 })
@@ -117,31 +115,12 @@ const isValidUrl = computed(() => {
 })
 
 onMounted(async () => {
-  pageTheme.value = detectTheme()
-
-  if (typeof document !== 'undefined') {
-    themeObserver = new MutationObserver(() => {
-      pageTheme.value = detectTheme()
-    })
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-  }
-
   if (appStore.publicSettingsLoaded) return
   loading.value = true
   try {
     await appStore.fetchPublicSettings()
   } finally {
     loading.value = false
-  }
-})
-
-onUnmounted(() => {
-  if (themeObserver) {
-    themeObserver.disconnect()
-    themeObserver = null
   }
 })
 </script>

@@ -22,7 +22,7 @@ import {
   STATUS_ERROR,
 } from '@/constants/channelMonitor'
 
-const NEUTRAL_BADGE = 'bg-gray-100 text-gray-800 dark:bg-dark-700 dark:text-gray-300'
+const NEUTRAL_BADGE = 'bg-gray-100 text-gray-800'
 
 /** Availability HSL hue multiplier: 0%=red(0) / 50%=yellow(60) / 100%=green(120). */
 const HSL_HUE_PER_PERCENT = 1.2
@@ -45,11 +45,11 @@ export function useChannelMonitorFormat() {
   function statusBadgeClass(s: MonitorStatus | ''): string {
     switch (s) {
       case STATUS_OPERATIONAL:
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+        return 'bg-emerald-100 text-emerald-700'
       case STATUS_DEGRADED:
-        return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
+        return 'bg-amber-100 text-amber-700'
       case STATUS_FAILED:
-        return 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300'
+        return 'bg-red-100 text-red-700'
       case STATUS_ERROR:
       default:
         return NEUTRAL_BADGE
@@ -66,40 +66,21 @@ export function useChannelMonitorFormat() {
   function providerBadgeClass(p: Provider | string): string {
     switch (p) {
       case PROVIDER_OPENAI:
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+        return 'bg-emerald-100 text-emerald-700'
       case PROVIDER_ANTHROPIC:
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300'
+        return 'bg-orange-100 text-orange-700'
       case PROVIDER_GEMINI:
-        return 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300'
+        return 'bg-sky-100 text-sky-700'
       default:
         return NEUTRAL_BADGE
     }
   }
 
-  /**
-   * Tailwind class for a provider radio-button-style picker (active/inactive state).
-   * Reuses the same emerald/orange/sky palette as providerBadgeClass to keep
-   * visual semantics consistent across badges and pickers.
-   */
   function providerPickerClass(p: Provider | string, active: boolean): string {
-    switch (p) {
-      case PROVIDER_OPENAI:
-        return active
-          ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-emerald-300 hover:text-emerald-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-emerald-500/50'
-      case PROVIDER_ANTHROPIC:
-        return active
-          ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:text-orange-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-orange-500/50'
-      case PROVIDER_GEMINI:
-        return active
-          ? 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-400'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-sky-300 hover:text-sky-700 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400 dark:hover:border-sky-500/50'
-      default:
-        return active
-          ? 'border-gray-400 bg-gray-50 text-gray-700 dark:border-dark-500 dark:bg-dark-700 dark:text-gray-200'
-          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-400'
-    }
+    void p
+    return active
+      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+      : 'border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]'
   }
 
   function formatLatency(ms: number | null | undefined): string {

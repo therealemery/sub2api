@@ -173,22 +173,22 @@ function downloadChart() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col rounded-lg bg-[var(--bg-surface)] p-6 ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)] dark:ring-dark-700">
+  <div class="flex h-full flex-col rounded-lg bg-[var(--bg-surface)] p-6 ring-1 ring-gray-900/5 bg-[var(--bg-surface-alt)]">
     <div class="mb-4 flex shrink-0 items-center justify-between">
-      <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-[var(--text-inverse)]">
-        <svg class="h-4 w-4 text-gray-500 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <h3 class="flex items-center gap-2 text-sm font-bold text-gray-900">
+        <svg class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
         {{ t('admin.ops.throughputTrend') }}
         <HelpTooltip v-if="!props.fullscreen" :content="t('admin.ops.tooltips.throughputTrend')" />
       </h3>
-      <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <div class="flex items-center gap-2 text-xs text-gray-500">
         <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-slate-500"></span>QPS</span>
         <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-green-500"></span>{{ t('admin.ops.tpsK') }}</span>
         <template v-if="!props.fullscreen">
           <button
             type="button"
-            class="ml-2 inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-800"
+            class="ml-2 inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             :disabled="state !== 'ready'"
             :title="t('admin.ops.requestDetails.title')"
             @click="emit('openDetails')"
@@ -197,7 +197,7 @@ function downloadChart() {
           </button>
           <button
             type="button"
-            class="ml-2 inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-800"
+            class="ml-2 inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             :disabled="state !== 'ready'"
             :title="t('admin.ops.charts.resetZoomHint')"
             @click="resetZoom"
@@ -206,7 +206,7 @@ function downloadChart() {
           </button>
           <button
             type="button"
-            class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-300 dark:hover:bg-dark-800"
+            class="inline-flex items-center rounded-lg border border-gray-200 bg-[var(--bg-surface)] px-2 py-1 text-[11px] font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
             :disabled="state !== 'ready'"
             :title="t('admin.ops.charts.downloadChartHint')"
             @click="downloadChart"
@@ -223,11 +223,11 @@ function downloadChart() {
         v-for="g in props.topGroups"
         :key="g.group_id"
         type="button"
-        class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200 dark:hover:bg-dark-800"
+        class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         @click="emit('selectGroup', g.group_id)"
       >
         <span class="max-w-[180px] truncate">{{ g.group_name || `#${g.group_id}` }}</span>
-        <span class="text-gray-400 dark:text-gray-500">{{ formatNumber(g.request_count) }}</span>
+        <span class="text-gray-400">{{ formatNumber(g.request_count) }}</span>
       </button>
     </div>
 
@@ -236,11 +236,11 @@ function downloadChart() {
         v-for="p in props.byPlatform"
         :key="p.platform"
         type="button"
-        class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)] dark:text-gray-200 dark:hover:bg-dark-800"
+        class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-[var(--bg-surface)] px-3 py-1 text-[11px] font-semibold text-gray-700 hover:bg-gray-50 border-[var(--border-default)] bg-[var(--bg-surface-alt)]"
         @click="emit('selectPlatform', p.platform)"
       >
         <span class="uppercase">{{ p.platform }}</span>
-        <span class="text-gray-400 dark:text-gray-500">{{ formatNumber(p.request_count) }}</span>
+        <span class="text-gray-400">{{ formatNumber(p.request_count) }}</span>
       </button>
     </div>
 

@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/setup/SetupWizardView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Setup'
+      title: '初始化设置'
     }
   },
 
@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/HomeView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Home'
+      title: '首页'
     }
   },
   {
@@ -52,7 +52,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/LoginView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Login',
+      title: '登录',
       titleKey: 'common.login'
     }
   },
@@ -62,7 +62,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/RegisterView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Register',
+      title: '注册',
       titleKey: 'auth.createAccount'
     }
   },
@@ -72,7 +72,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/EmailVerifyView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Verify Email'
+      title: '验证邮箱'
     }
   },
   {
@@ -81,7 +81,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/OAuthCallbackView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'OAuth Callback',
+      title: 'OAuth 登录回调',
       titleKey: 'auth.oauthCallbackPageTitle'
     }
   },
@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/LinuxDoCallbackView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'LinuxDo OAuth Callback',
+      title: 'LinuxDo 登录回调',
       titleKey: 'auth.linuxdoCallbackPageTitle'
     }
   },
@@ -101,7 +101,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/WechatCallbackView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'WeChat OAuth Callback',
+      title: '微信登录回调',
       titleKey: 'auth.wechatCallbackPageTitle'
     }
   },
@@ -111,7 +111,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/WechatPaymentCallbackView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'WeChat Payment Callback',
+      title: '微信支付回调',
       titleKey: 'auth.wechatPaymentCallbackPageTitle'
     }
   },
@@ -121,7 +121,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/OidcCallbackView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'OIDC OAuth Callback',
+      title: 'OIDC 登录回调',
       titleKey: 'auth.oidcCallbackPageTitle'
     }
   },
@@ -131,7 +131,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/ForgotPasswordView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Forgot Password',
+      title: '找回密码',
       titleKey: 'auth.forgotPasswordTitle'
     }
   },
@@ -141,7 +141,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/auth/ResetPasswordView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Reset Password'
+      title: '重置密码'
     }
   },
   {
@@ -150,7 +150,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/KeyUsageView.vue'),
     meta: {
       requiresAuth: false,
-      title: 'Key Usage',
+      title: '密钥用量查询',
     }
   },
 
@@ -166,7 +166,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Dashboard',
+      title: '我的概览',
       titleKey: 'dashboard.title',
       descriptionKey: 'dashboard.welcomeMessage'
     }
@@ -183,13 +183,24 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/docs',
+    name: 'InternalDocs',
+    component: () => import('@/views/user/InternalDocsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: '使用文档',
+      titleKey: 'nav.docs'
+    }
+  },
+  {
     path: '/keys',
     name: 'Keys',
     component: () => import('@/views/user/KeysView.vue'),
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'API Keys',
+      title: 'API 密钥',
       titleKey: 'keys.title',
       descriptionKey: 'keys.description'
     }
@@ -201,7 +212,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Usage Records',
+      title: '使用记录',
       titleKey: 'usage.title',
       descriptionKey: 'usage.description'
     }
@@ -213,7 +224,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Redeem Code',
+      title: '兑换码',
       titleKey: 'redeem.title',
       descriptionKey: 'redeem.description'
     }
@@ -225,7 +236,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Affiliate',
+      title: '邀请返利',
       titleKey: 'affiliate.title',
       descriptionKey: 'affiliate.description'
     }
@@ -237,7 +248,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Available Channels',
+      title: '可用模型',
       titleKey: 'availableChannels.title',
       descriptionKey: 'availableChannels.description'
     }
@@ -249,7 +260,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Profile',
+      title: '账户设置',
       titleKey: 'profile.title',
       descriptionKey: 'profile.description'
     }
@@ -261,7 +272,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'My Subscriptions',
+      title: '套餐权益',
       titleKey: 'userSubscriptions.title',
       descriptionKey: 'userSubscriptions.description'
     }
@@ -269,15 +280,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/purchase',
     name: 'PurchaseSubscription',
-    component: () => import('@/views/user/PaymentView.vue'),
+    component: () => import('@/views/user/PurchaseView.vue'),
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Purchase Subscription',
+      title: '购买积分',
       titleKey: 'nav.buySubscription',
       descriptionKey: 'purchase.description',
-      requiresPayment: true
+      requiresPayment: false
     }
+  },
+  {
+    path: '/payment',
+    redirect: '/purchase'
   },
   {
     path: '/orders',
@@ -286,9 +301,9 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'My Orders',
+      title: '订单记录',
       titleKey: 'nav.myOrders',
-      requiresPayment: true
+      requiresPayment: false
     }
   },
   {
@@ -298,7 +313,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Payment',
+      title: '支付',
       titleKey: 'payment.qr.scanToPay',
       requiresPayment: true
     }
@@ -310,7 +325,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: false,
       requiresAdmin: false,
-      title: 'Payment Result',
+      title: '支付结果',
       titleKey: 'payment.result.success',
       requiresPayment: false
     }
@@ -322,7 +337,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: false,
       requiresAdmin: false,
-      title: 'Stripe Payment',
+      title: 'Stripe 支付',
       titleKey: 'payment.stripePay',
       requiresPayment: false
     }
@@ -334,7 +349,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: false,
       requiresAdmin: false,
-      title: 'Payment',
+      title: '支付',
       requiresPayment: false
     }
   },
@@ -345,7 +360,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Custom Page',
+      title: '自定义页面',
       titleKey: 'customPage.title',
     }
   },
@@ -362,7 +377,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Admin Dashboard',
+      title: '管理概览',
       titleKey: 'admin.dashboard.title',
       descriptionKey: 'admin.dashboard.description'
     }
@@ -374,7 +389,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Ops Monitoring',
+      title: '运维监控',
       titleKey: 'admin.ops.title',
       descriptionKey: 'admin.ops.description'
     }
@@ -386,7 +401,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'User Management',
+      title: '用户管理',
       titleKey: 'admin.users.title',
       descriptionKey: 'admin.users.description'
     }
@@ -398,7 +413,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Group Management',
+      title: '权限分组',
       titleKey: 'admin.groups.title',
       descriptionKey: 'admin.groups.description'
     }
@@ -414,7 +429,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Channel Management',
+      title: '模型接入',
       titleKey: 'admin.channels.title',
       descriptionKey: 'admin.channels.description'
     }
@@ -426,7 +441,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Channel Monitor',
+      title: '接入监控',
       titleKey: 'admin.channelMonitor.title',
       descriptionKey: 'admin.channelMonitor.description'
     }
@@ -438,8 +453,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: '模型中心配置',
-      description: '管理前台模型中心展示内容和模型 logo，不改变真实模型调用逻辑。'
+      title: '模型展示',
+      description: '管理前台模型中心展示内容和模型 Logo，不改变真实模型调用逻辑。'
     }
   },
   {
@@ -449,7 +464,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Channel Status',
+      title: '模型状态',
       titleKey: 'nav.channelStatus'
     }
   },
@@ -460,7 +475,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Subscription Management',
+      title: '套餐管理',
       titleKey: 'admin.subscriptions.title',
       descriptionKey: 'admin.subscriptions.description'
     }
@@ -472,7 +487,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Account Management',
+      title: '上游账号',
       titleKey: 'admin.accounts.title',
       descriptionKey: 'admin.accounts.description'
     }
@@ -484,7 +499,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Announcements',
+      title: '公告',
       titleKey: 'admin.announcements.title',
       descriptionKey: 'admin.announcements.description'
     }
@@ -496,7 +511,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Proxy Management',
+      title: '代理 IP',
       titleKey: 'admin.proxies.title',
       descriptionKey: 'admin.proxies.description'
     }
@@ -508,7 +523,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Redeem Code Management',
+      title: '积分兑换码',
       titleKey: 'admin.redeem.title',
       descriptionKey: 'admin.redeem.description'
     }
@@ -520,7 +535,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Promo Code Management',
+      title: '优惠码',
       titleKey: 'admin.promo.title',
       descriptionKey: 'admin.promo.description'
     }
@@ -532,7 +547,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'System Settings',
+      title: '系统设置',
       titleKey: 'admin.settings.title',
       descriptionKey: 'admin.settings.description'
     }
@@ -544,7 +559,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Usage Records',
+      title: '使用记录',
       titleKey: 'admin.usage.title',
       descriptionKey: 'admin.usage.description'
     }
@@ -560,7 +575,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Affiliate Invite Records',
+      title: '邀请记录',
       titleKey: 'nav.affiliateInviteRecords',
       descriptionKey: 'admin.affiliates.invitesDescription'
     }
@@ -572,7 +587,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Affiliate Rebate Records',
+      title: '返利记录',
       titleKey: 'nav.affiliateRebateRecords',
       descriptionKey: 'admin.affiliates.rebatesDescription'
     }
@@ -584,7 +599,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Affiliate Transfer Records',
+      title: '转入记录',
       titleKey: 'nav.affiliateTransferRecords',
       descriptionKey: 'admin.affiliates.transfersDescription'
     }
@@ -599,9 +614,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Payment Dashboard',
-      titleKey: 'nav.paymentDashboard',
-      requiresPayment: true
+      title: '收入概览',
+      titleKey: 'nav.paymentDashboard'
     }
   },
   {
@@ -611,9 +625,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Order Management',
-      titleKey: 'nav.orderManagement',
-      requiresPayment: true
+      title: '支付订单',
+      titleKey: 'nav.orderManagement'
     }
   },
   {
@@ -623,9 +636,8 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Subscription Plans',
-      titleKey: 'nav.paymentPlans',
-      requiresPayment: true
+      title: '套餐配置',
+      titleKey: 'nav.paymentPlans'
     }
   },
 
@@ -635,7 +647,7 @@ const routes: RouteRecordRaw[] = [
     name: 'NotFound',
     component: () => import('@/views/NotFoundView.vue'),
     meta: {
-      title: '404 Not Found'
+      title: '页面不存在'
     }
   }
 ]
@@ -773,7 +785,7 @@ router.beforeEach((to, _from, next) => {
   // Check payment requirement (internal payment system only)
   if (to.meta.requiresPayment) {
     const paymentEnabled = appStore.cachedPublicSettings?.payment_enabled
-    if (!paymentEnabled) {
+    if (paymentEnabled === false) {
       next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
       return
     }

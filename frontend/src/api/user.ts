@@ -18,6 +18,105 @@ import type {
   AffiliateTransferResponse
 } from '@/types'
 
+const LOCAL_PREVIEW_TOKEN_PREFIX = 'local-preview-'
+const LOCAL_PREVIEW_AFFILIATE_KEY = 'ownapi_local_preview_affiliate'
+const AUTH_USER_KEY = 'auth_user'
+
+function isLocalPreviewSession(): boolean {
+  return (
+    (import.meta.env.DEV || ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname)) &&
+    !!localStorage.getItem('auth_token')?.startsWith(LOCAL_PREVIEW_TOKEN_PREFIX)
+  )
+}
+
+function createPreviewAffiliateDetail(): UserAffiliateDetail {
+  const now = new Date().toISOString()
+
+  return {
+    user_id: 2,
+    aff_code: 'OWNAPI30',
+    inviter_id: null,
+    aff_count: 3,
+    aff_quota: 120,
+    aff_frozen_quota: 40,
+    aff_history_quota: 360,
+    effective_rebate_rate_percent: 10,
+    invitees: [
+      {
+        user_id: 101,
+        email: 'a***@gmail.com',
+        username: 'GPT Power User',
+        created_at: now,
+        total_rebate: 180
+      },
+      {
+        user_id: 102,
+        email: 'c***@outlook.com',
+        username: 'Claude Builder',
+        created_at: now,
+        total_rebate: 120
+      },
+      {
+        user_id: 103,
+        email: 't***@qq.com',
+        username: 'Team Admin',
+        created_at: now,
+        total_rebate: 60
+      }
+    ]
+  }
+}
+
+function readPreviewAffiliateDetail(): UserAffiliateDetail {
+  const fallback = createPreviewAffiliateDetail()
+
+  try {
+    const raw = localStorage.getItem(LOCAL_PREVIEW_AFFILIATE_KEY)
+    if (!raw) {
+      localStorage.setItem(LOCAL_PREVIEW_AFFILIATE_KEY, JSON.stringify(fallback))
+      return fallback
+    }
+
+    const parsed = JSON.parse(raw) as Partial<UserAffiliateDetail>
+    return {
+      ...fallback,
+      ...parsed,
+      invitees: Array.isArray(parsed.invitees) ? parsed.invitees : fallback.invitees
+    }
+  } catch {
+    return fallback
+  }
+}
+
+function writePreviewAffiliateDetail(detail: UserAffiliateDetail): void {
+  try {
+    localStorage.setItem(LOCAL_PREVIEW_AFFILIATE_KEY, JSON.stringify(detail))
+  } catch {
+    // Ignore preview persistence failures.
+  }
+}
+
+function addPreviewUserPoints(amount: number): number {
+  try {
+    const raw = localStorage.getItem(AUTH_USER_KEY)
+    if (!raw) return amount
+
+    const parsed = JSON.parse(raw) as Partial<User>
+    const current = Number(parsed.points ?? parsed.balance ?? 0)
+    const next = current + amount
+    const updated = {
+      ...parsed,
+      balance: next,
+      points: next,
+      updated_at: new Date().toISOString()
+    }
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(updated))
+    return next
+  } catch {
+    return amount
+  }
+}
+
 /**
  * Get current user profile
  * @returns User profile data
@@ -176,11 +275,37 @@ export async function startOAuthBinding(
 }
 
 export async function getAffiliateDetail(): Promise<UserAffiliateDetail> {
+  if (isLocalPreviewSession()) {
+    return readPreviewAffiliateDetail()
+  }
+
   const { data } = await apiClient.get<UserAffiliateDetail>('/user/aff')
   return data
 }
 
 export async function transferAffiliateQuota(): Promise<AffiliateTransferResponse> {
+  if (isLocalPreviewSession()) {
+    const detail = readPreviewAffiliateDetail()
+    const transferred = Math.max(0, Number(detail.aff_quota || 0))
+
+    if (transferred <= 0) {
+      return Promise.reject({
+        code: 'AFFILIATE_QUOTA_EMPTY',
+        message: '当前没有可转入的返利积分'
+      })
+    }
+
+    writePreviewAffiliateDetail({
+      ...detail,
+      aff_quota: 0
+    })
+
+    return {
+      transferred_quota: transferred,
+      balance: addPreviewUserPoints(transferred)
+    }
+  }
+
   const { data } = await apiClient.post<AffiliateTransferResponse>('/user/aff/transfer')
   return data
 }

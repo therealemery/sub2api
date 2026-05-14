@@ -76,7 +76,7 @@ const DISCOUNT: Record<Platform, string> = {
   antigravity: 'bg-[var(--accent-soft)] text-[var(--accent)]',
   gemini: 'bg-[var(--accent-soft)] text-[var(--accent)]',
 }
-const DISCOUNT_DEFAULT = 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+const DISCOUNT_DEFAULT = 'bg-red-100 text-red-700'
 
 // ── Header gradient (subscription confirm) ─────────────────────────
 const GRADIENT: Record<Platform, string> = {

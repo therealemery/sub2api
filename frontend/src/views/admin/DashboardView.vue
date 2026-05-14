@@ -20,13 +20,13 @@
                 <Icon name="key" size="md" class="text-[var(--accent)] text-[var(--accent)]" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.apiKeys') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ stats.total_api_keys }}
                 </p>
-                <p class="text-xs text-green-600 dark:text-green-400">
+                <p class="text-xs text-green-600">
                   {{ stats.active_api_keys }} {{ t('common.active') }}
                 </p>
               </div>
@@ -36,18 +36,18 @@
           <!-- Service Accounts -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30">
-                <Icon name="server" size="md" class="text-purple-600 dark:text-purple-400" :stroke-width="2" />
+              <div class="rounded-lg bg-purple-100 p-2">
+                <Icon name="server" size="md" class="text-purple-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.accounts') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ stats.total_accounts }}
                 </p>
                 <p class="text-xs">
-                  <span class="text-green-600 dark:text-green-400"
+                  <span class="text-green-600"
                     >{{ stats.normal_accounts }} {{ t('common.active') }}</span
                   >
                   <span v-if="stats.error_accounts > 0" class="ml-1 text-red-500"
@@ -61,17 +61,17 @@
           <!-- Today Requests -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-green-100 p-2 dark:bg-green-900/30">
-                <Icon name="chart" size="md" class="text-green-600 dark:text-green-400" :stroke-width="2" />
+              <div class="rounded-lg bg-green-100 p-2">
+                <Icon name="chart" size="md" class="text-green-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.todayRequests') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ stats.today_requests }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs text-gray-500">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_requests) }}
                 </p>
               </div>
@@ -81,17 +81,17 @@
           <!-- New Users Today -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                <Icon name="userPlus" size="md" class="text-emerald-600 dark:text-emerald-400" :stroke-width="2" />
+              <div class="rounded-lg bg-emerald-100 p-2">
+                <Icon name="userPlus" size="md" class="text-emerald-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.users') }}
                 </p>
-                <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                <p class="text-xl font-bold text-emerald-600">
                   +{{ stats.today_new_users }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs text-gray-500">
                   {{ t('common.total') }}: {{ formatNumber(stats.total_users) }}
                 </p>
               </div>
@@ -104,31 +104,31 @@
           <!-- Today Tokens -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/30">
-                <Icon name="cube" size="md" class="text-amber-600 dark:text-amber-400" :stroke-width="2" />
+              <div class="rounded-lg bg-amber-100 p-2">
+                <Icon name="cube" size="md" class="text-amber-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.todayTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ formatTokens(stats.today_tokens) }}
                 </p>
                 <p class="text-xs">
                   <span
-                    class="text-green-600 dark:text-green-400"
+                    class="text-green-600"
                     :title="t('admin.dashboard.actual')"
                     >${{ formatCost(stats.today_actual_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-gray-400"> / </span>
                   <span
-                    class="text-orange-500 dark:text-orange-400"
+                    class="text-orange-500"
                     :title="t('admin.dashboard.accountCost')"
                     >${{ formatCost(stats.today_account_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-gray-400"> / </span>
                   <span
-                    class="text-gray-400 dark:text-gray-500"
+                    class="text-gray-400"
                     :title="t('admin.dashboard.standard')"
                     >${{ formatCost(stats.today_cost) }}</span
                   >
@@ -140,31 +140,31 @@
           <!-- Total Tokens -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-indigo-100 p-2 dark:bg-indigo-900/30">
-                <Icon name="database" size="md" class="text-indigo-600 dark:text-indigo-400" :stroke-width="2" />
+              <div class="rounded-lg bg-indigo-100 p-2">
+                <Icon name="database" size="md" class="text-indigo-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.totalTokens') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ formatTokens(stats.total_tokens) }}
                 </p>
                 <p class="text-xs">
                   <span
-                    class="text-green-600 dark:text-green-400"
+                    class="text-green-600"
                     :title="t('admin.dashboard.actual')"
                     >${{ formatCost(stats.total_actual_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-gray-400"> / </span>
                   <span
-                    class="text-orange-500 dark:text-orange-400"
+                    class="text-orange-500"
                     :title="t('admin.dashboard.accountCost')"
                     >${{ formatCost(stats.total_account_cost) }}</span
                   >
-                  <span class="text-gray-400 dark:text-gray-500"> / </span>
+                  <span class="text-gray-400"> / </span>
                   <span
-                    class="text-gray-400 dark:text-gray-500"
+                    class="text-gray-400"
                     :title="t('admin.dashboard.standard')"
                     >${{ formatCost(stats.total_cost) }}</span
                   >
@@ -176,24 +176,24 @@
           <!-- Performance (RPM/TPM) -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30">
-                <Icon name="bolt" size="md" class="text-violet-600 dark:text-violet-400" :stroke-width="2" />
+              <div class="rounded-lg bg-violet-100 p-2">
+                <Icon name="bolt" size="md" class="text-violet-600" :stroke-width="2" />
               </div>
               <div class="flex-1">
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.performance') }}
                 </p>
                 <div class="flex items-baseline gap-2">
-                  <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                  <p class="text-xl font-bold text-gray-900">
                     {{ formatTokens(stats.rpm) }}
                   </p>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">RPM</span>
+                  <span class="text-xs text-gray-500">RPM</span>
                 </div>
                 <div class="flex items-baseline gap-2">
-                  <p class="text-sm font-semibold text-violet-600 dark:text-violet-400">
+                  <p class="text-sm font-semibold text-violet-600">
                     {{ formatTokens(stats.tpm) }}
                   </p>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">TPM</span>
+                  <span class="text-xs text-gray-500">TPM</span>
                 </div>
               </div>
             </div>
@@ -202,17 +202,17 @@
           <!-- Avg Response Time -->
           <div class="card p-4">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-rose-100 p-2 dark:bg-rose-900/30">
-                <Icon name="clock" size="md" class="text-rose-600 dark:text-rose-400" :stroke-width="2" />
+              <div class="rounded-lg bg-rose-100 p-2">
+                <Icon name="clock" size="md" class="text-rose-600" :stroke-width="2" />
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium text-gray-500">
                   {{ t('admin.dashboard.avgResponse') }}
                 </p>
-                <p class="text-xl font-bold text-gray-900 dark:text-[var(--text-inverse)]">
+                <p class="text-xl font-bold text-gray-900">
                   {{ formatDuration(stats.average_duration_ms) }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs text-gray-500">
                   {{ stats.active_users }} {{ t('admin.dashboard.activeUsers') }}
                 </p>
               </div>
@@ -226,7 +226,7 @@
           <div class="card p-4">
             <div class="flex flex-wrap items-center gap-4">
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                <span class="text-sm font-medium text-gray-700"
                   >{{ t('admin.dashboard.timeRange') }}:</span
                 >
                 <DateRangePicker
@@ -239,7 +239,7 @@
                 {{ t('common.refresh') }}
               </button>
               <div class="ml-auto flex items-center gap-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                <span class="text-sm font-medium text-gray-700"
                   >{{ t('admin.dashboard.granularity') }}:</span
                 >
                 <div class="w-28">
@@ -274,7 +274,7 @@
 
           <!-- User Usage Trend (Full Width) -->
           <div class="card p-4">
-            <h3 class="mb-4 text-sm font-semibold text-gray-900 dark:text-[var(--text-inverse)]">
+            <h3 class="mb-4 text-sm font-semibold text-gray-900">
               {{ t('admin.dashboard.recentUsage') }} (Top 12)
             </h3>
             <div class="h-64">
@@ -284,7 +284,7 @@
               <Line v-else-if="userTrendChartData" :data="userTrendChartData" :options="lineOptions" />
               <div
                 v-else
-                class="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400"
+                class="flex h-full items-center justify-center text-sm text-gray-500"
               >
                 {{ t('admin.dashboard.noDataAvailable') }}
               </div>

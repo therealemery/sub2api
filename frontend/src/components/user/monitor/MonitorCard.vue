@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="monitor-card group text-left p-5 rounded-lg min-h-[280px] w-full border transition-colors duration-200 ease-out flex flex-col"
+    class="monitor-card group text-left rounded-lg w-full border flex flex-col"
     @click="emit('click')"
   >
     <!-- Header: icon + name/model + status chip -->
@@ -15,7 +15,7 @@
         <ProviderIcon v-else :provider="item.provider" :size="20" />
       </span>
       <div class="flex-1 min-w-0">
-        <div class="text-base font-semibold truncate text-gray-900 dark:text-gray-100">
+        <div class="text-base font-semibold truncate text-gray-900">
           {{ item.name }}
         </div>
         <div class="mt-0.5 flex items-center gap-1.5 min-w-0">
@@ -25,12 +25,12 @@
           >
             {{ providerLabel(item.provider) }}
           </span>
-          <span class="font-mono text-xs truncate text-gray-500 dark:text-gray-400">
+          <span class="font-mono text-xs truncate text-gray-500">
             {{ item.primary_model }}
           </span>
           <span
             v-if="item.group_name"
-            class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)] dark:text-gray-300 flex-shrink-0"
+            class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600 bg-[var(--bg-surface-alt)] flex-shrink-0"
           >
             {{ item.group_name }}
           </span>
@@ -140,53 +140,57 @@ const extraModelsCountLabel = computed(() => {
 
 <style scoped>
 .monitor-card {
+  min-height: 252px;
+  padding: 18px;
   border-color: var(--border-default);
   background: var(--bg-surface);
   box-shadow: none;
+  transition: none;
 }
 
 .monitor-card:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+  transform: none;
 }
 
 .monitor-card-model-logo {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
   place-items: center;
   border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--bg-surface-alt);
   color: var(--text-primary);
 }
 
 .monitor-card-model-logo img {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
 .monitor-card-models {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 14px;
   min-width: 0;
 }
 
 .monitor-card-model-chip {
   display: inline-flex;
   max-width: 100%;
-  min-height: 28px;
+  min-height: 26px;
   align-items: center;
   gap: 6px;
   overflow: hidden;
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--bg-surface-alt);
-  padding: 4px 9px;
+  padding: 3px 8px;
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 700;
@@ -207,13 +211,5 @@ const extraModelsCountLabel = computed(() => {
   white-space: nowrap;
 }
 
-:global(.dark) .monitor-card-model-logo,
-:global(.dark) .monitor-card-model-chip {
-  background: rgba(255, 255, 255, 0.06);
-}
 
-:global(.dark) .monitor-card-model-logo img,
-:global(.dark) .monitor-card-model-chip img {
-  filter: none;
-}
 </style>

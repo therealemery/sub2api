@@ -21,9 +21,7 @@ import (
 // --- Order Creation ---
 
 func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest) (*CreateOrderResponse, error) {
-	if req.OrderType == "" {
-		req.OrderType = payment.OrderTypeBalance
-	}
+	req.OrderType = normalizeCreateOrderType(req.OrderType)
 	if normalized := NormalizeVisibleMethod(req.PaymentType); normalized != "" {
 		req.PaymentType = normalized
 	}
@@ -54,7 +52,7 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 		orderAmount = plan.Price
 		limitAmount = plan.Price
 	} else if req.OrderType == payment.OrderTypeBalance {
-		orderAmount = calculateCreditedBalance(req.Amount, cfg.BalanceRechargeMultiplier)
+		orderAmount = calculateCreditedPoints(req.Amount, cfg.PointsPerRMB)
 	}
 	feeRate := cfg.RechargeFeeRate
 	payAmountStr := payment.CalculatePayAmount(limitAmount, feeRate)
@@ -85,6 +83,17 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 		return nil, err
 	}
 	return resp, nil
+}
+
+func normalizeCreateOrderType(orderType string) string {
+	switch strings.TrimSpace(orderType) {
+	case "", payment.OrderTypeBalance, payment.OrderTypePoints:
+		return payment.OrderTypeBalance
+	case payment.OrderTypeSubscription:
+		return payment.OrderTypeSubscription
+	default:
+		return strings.TrimSpace(orderType)
+	}
 }
 
 func (s *PaymentService) validateOrderInput(ctx context.Context, req CreateOrderRequest, cfg *PaymentConfig) (*dbent.SubscriptionPlan, error) {
@@ -584,7 +593,7 @@ func classifyCreatePaymentError(req CreateOrderRequest, providerKey string, err 
 }
 
 func buildCreateOrderResponse(order *dbent.PaymentOrder, req CreateOrderRequest, payAmount float64, sel *payment.InstanceSelection, pr *payment.CreatePaymentResponse, resultType payment.CreatePaymentResultType) *CreateOrderResponse {
-	return &CreateOrderResponse{
+	resp := &CreateOrderResponse{
 		OrderID:      order.ID,
 		Amount:       order.Amount,
 		PayAmount:    payAmount,
@@ -602,6 +611,11 @@ func buildCreateOrderResponse(order *dbent.PaymentOrder, req CreateOrderRequest,
 		ExpiresAt:    order.ExpiresAt,
 		PaymentMode:  sel.PaymentMode,
 	}
+	if order.OrderType == payment.OrderTypeBalance {
+		resp.CreditedPoints = order.Amount
+		resp.PointsAmount = order.Amount
+	}
+	return resp
 }
 
 func buildWeChatPaymentOAuthStartURL(req CreateOrderRequest, scope string) (string, error) {
