@@ -1,64 +1,29 @@
 <template>
-  <div class="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
-    <!-- Background -->
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-100 dark:from-dark-950 dark:via-dark-900 dark:to-dark-950"
-    ></div>
+  <div class="auth-shell">
+    <div class="auth-grid" aria-hidden="true"></div>
 
-    <!-- Decorative Elements -->
-    <div class="pointer-events-none absolute inset-0 overflow-hidden">
-      <!-- Gradient Orbs -->
-      <div
-        class="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary-400/20 blur-3xl"
-      ></div>
-      <div
-        class="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-primary-500/15 blur-3xl"
-      ></div>
-      <div
-        class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-300/10 blur-3xl"
-      ></div>
+    <main class="auth-frame">
+      <section class="auth-brand" aria-label="Brand">
+        <div class="auth-logo">
+          <img :src="authLogo" alt="Logo" class="site-logo-img" />
+        </div>
+        <h1>{{ siteName }}</h1>
+        <p v-if="showSubtitle">{{ siteSubtitle }}</p>
+        <div class="auth-theme-line" aria-hidden="true"></div>
+      </section>
 
-      <!-- Grid Pattern -->
-      <div
-        class="absolute inset-0 bg-[linear-gradient(rgba(20,184,166,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(20,184,166,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"
-      ></div>
-    </div>
-
-    <!-- Content Container -->
-    <div class="relative z-10 w-full max-w-md">
-      <!-- Logo/Brand -->
-      <div class="mb-8 text-center">
-        <!-- Custom Logo or Default Logo -->
-        <template v-if="settingsLoaded">
-          <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl shadow-lg shadow-primary-500/30"
-          >
-            <img :src="siteLogo || '/logo.png'" alt="Logo" class="h-full w-full object-contain" />
-          </div>
-          <h1 class="text-gradient mb-2 text-3xl font-bold">
-            {{ siteName }}
-          </h1>
-          <p class="text-sm text-gray-500 dark:text-dark-400">
-            {{ siteSubtitle }}
-          </p>
-        </template>
-      </div>
-
-      <!-- Card Container -->
-      <div class="card-glass rounded-2xl p-8 shadow-glass">
+      <section class="auth-card">
         <slot />
-      </div>
+      </section>
 
-      <!-- Footer Links -->
-      <div class="mt-6 text-center text-sm">
+      <div class="auth-footer-link">
         <slot name="footer" />
       </div>
 
-      <!-- Copyright -->
-      <div class="mt-8 text-center text-xs text-gray-400 dark:text-dark-500">
+      <div class="auth-copyright">
         &copy; {{ currentYear }} {{ siteName }}. All rights reserved.
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
@@ -66,14 +31,29 @@
 import { computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores'
 import { sanitizeUrl } from '@/utils/url'
+import {
+  DEFAULT_SITE_HERO_LOGO,
+  DEFAULT_SITE_LOGO,
+  DEFAULT_SITE_NAME,
+  DEFAULT_SITE_SUBTITLE,
+  isDefaultOwnApiLogo,
+  resolveSiteLogoPath
+} from '@/constants/branding'
 
 const appStore = useAppStore()
 
-const siteName = computed(() => appStore.siteName || 'Sub2API')
-const siteLogo = computed(() => sanitizeUrl(appStore.siteLogo || '', { allowRelative: true, allowDataUrl: true }))
-const siteSubtitle = computed(() => appStore.cachedPublicSettings?.site_subtitle || 'Subscription to API Conversion Platform')
-const settingsLoaded = computed(() => appStore.publicSettingsLoaded)
-
+const siteName = computed(() => appStore.siteName || DEFAULT_SITE_NAME)
+const siteLogo = computed(() => sanitizeUrl(resolveSiteLogoPath(appStore.siteLogo || DEFAULT_SITE_LOGO), { allowRelative: true, allowDataUrl: true }))
+const authLogo = computed(() =>
+  isDefaultOwnApiLogo(siteLogo.value)
+    ? DEFAULT_SITE_HERO_LOGO
+    : siteLogo.value
+)
+const siteSubtitle = computed(() => appStore.cachedPublicSettings?.site_subtitle || DEFAULT_SITE_SUBTITLE)
+const showSubtitle = computed(() => {
+  const subtitle = siteSubtitle.value.trim()
+  return Boolean(subtitle && subtitle !== DEFAULT_SITE_SUBTITLE)
+})
 const currentYear = computed(() => new Date().getFullYear())
 
 onMounted(() => {
@@ -82,7 +62,161 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.text-gradient {
-  @apply bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
+.auth-shell {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--space-8) var(--space-4);
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+.auth-grid {
+  display: none;
+}
+
+.auth-frame {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+}
+
+.auth-brand {
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.auth-logo {
+  display: inline-flex;
+  height: min(176px, 42vw);
+  width: min(176px, 42vw);
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  line-height: 0;
+}
+
+.auth-logo img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+  mix-blend-mode: multiply;
+}
+
+.auth-brand h1 {
+  margin-top: var(--space-3);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--text-heading-lg);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.auth-brand p {
+  margin-top: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-body-sm);
+  line-height: 1.6;
+}
+
+.auth-theme-line {
+  width: 96px;
+  height: 1px;
+  margin: var(--space-4) auto 0;
+  background: var(--accent);
+}
+
+.auth-card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: var(--space-7);
+}
+
+.auth-footer-link {
+  margin-top: var(--space-5);
+  text-align: center;
+  font-size: var(--text-body-sm);
+}
+
+.auth-copyright {
+  margin-top: var(--space-6);
+  text-align: center;
+  color: var(--text-faint);
+  font-size: var(--text-micro);
+}
+
+.auth-card :deep(.input) {
+  min-height: 40px;
+  border-color: transparent;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.auth-card :deep(.input:focus) {
+  border-color: var(--border-focus);
+  box-shadow: none;
+}
+
+.auth-card :deep(.input-label) {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.auth-card :deep(.btn-primary) {
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--text-inverse);
+  box-shadow: none;
+}
+
+.auth-card :deep(.btn-primary:hover) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.auth-card :deep(.btn-secondary) {
+  min-height: 40px;
+  border-color: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.auth-card :deep(.btn-secondary:hover) {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+
+.auth-footer-link :deep(a) {
+  color: var(--text-link);
+  font-weight: 600;
+}
+
+@media (max-width: 520px) {
+  .auth-shell {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .auth-logo {
+    height: min(150px, 48vw);
+    width: min(150px, 48vw);
+  }
+
+  .auth-brand h1 {
+    font-size: var(--text-heading);
+  }
+
+  .auth-card {
+    padding: var(--space-6);
+  }
 }
 </style>
