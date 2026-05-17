@@ -364,3 +364,44 @@ onMounted(() => {
   loadSubscriptions()
 })
 </script>
+
+<style scoped>
+.subscription-card {
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+}
+
+.subscription-card-header {
+  background: var(--bg-surface-alt);
+}
+
+.subscription-logo-shell {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subscription-progress-track {
+  background: var(--bg-surface-alt);
+}
+
+.subscription-renew-button {
+  background: var(--text-primary) !important;
+  color: var(--bg-surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+.subscription-renew-button:hover {
+  background: var(--text-primary) !important;
+  color: var(--bg-surface) !important;
+}
+</style>

@@ -951,3 +951,20 @@ onMounted(() => {
   loadUsageStats()
 })
 </script>
+
+<style scoped>
+.usage-page :deep(.table-page-layout) {
+  height: auto;
+  min-height: 0;
+}
+
+.usage-page :deep(.layout-section-scrollable) {
+  min-height: 420px;
+}
+
+@media (max-width: 640px) {
+  .usage-page :deep(.layout-section-scrollable) {
+    min-height: 0;
+  }
+}
+</style>

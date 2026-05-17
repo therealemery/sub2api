@@ -1788,3 +1788,88 @@ onUnmounted(() => {
   if (resetTimer) clearInterval(resetTimer)
 })
 </script>
+
+<style scoped>
+.keys-model-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 1.4fr) auto;
+  gap: 18px;
+  align-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: 22px 24px;
+  color: var(--text-primary);
+}
+
+.keys-model-summary-copy {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.keys-model-summary-copy > span {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.keys-model-summary-copy h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.keys-model-summary-copy p {
+  margin: 0;
+  max-width: 620px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.key-action-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.key-action-button {
+  display: inline-flex;
+  min-width: 42px;
+  min-height: 42px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.key-action-button:hover,
+.key-action-button:focus-visible {
+  border-color: var(--border-default);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  outline: none;
+}
+
+@media (max-width: 1100px) {
+  .keys-model-summary {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
