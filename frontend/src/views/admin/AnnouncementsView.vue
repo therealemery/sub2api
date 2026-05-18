@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -240,7 +239,6 @@
       :announcement-id="readStatusAnnouncementId"
       @close="showReadStatusDialog = false"
     />
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -253,7 +251,6 @@ import { formatDateTime, formatDateTimeLocalInput, parseDateTimeLocalInput } fro
 import type { AdminGroup, Announcement, AnnouncementTargeting } from '@/types'
 import type { Column } from '@/components/common/types'
 
-import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'

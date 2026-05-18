@@ -15,8 +15,8 @@
     <div :class="props.embedded ? 'space-y-3' : 'flex flex-col gap-5 px-6 py-6 sm:flex-row sm:items-start'">
       <div
         :class="props.embedded
-          ? 'flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-xl font-bold text-white shadow-lg shadow-primary-500/20'
-          : 'flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-3xl font-bold text-white shadow-lg shadow-primary-500/20'"
+          ? 'profile-avatar-preview-box profile-avatar-preview-box--embedded flex shrink-0 items-center justify-center overflow-hidden'
+          : 'profile-avatar-preview-box flex shrink-0 items-center justify-center overflow-hidden'"
       >
         <img
           v-if="avatarPreviewUrl"
@@ -268,3 +268,29 @@ async function handleAvatarDelete() {
   }
 }
 </script>
+
+<style scoped>
+.profile-avatar-preview-box {
+  width: 7rem;
+  height: 7rem;
+  border: 4px solid #fff;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 52%, #0891b2 100%);
+  color: #fff;
+  font-size: 2.25rem;
+  font-weight: 700;
+  box-shadow: 0 24px 45px rgb(20 184 166 / 24%);
+}
+
+.profile-avatar-preview-box--embedded {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 1.75rem;
+  font-size: 1.875rem;
+  box-shadow: 0 18px 34px rgb(20 184 166 / 22%);
+}
+
+:global(.dark) .profile-avatar-preview-box {
+  border-color: rgb(37 36 32 / 70%);
+}
+</style>

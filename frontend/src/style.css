@@ -425,6 +425,9 @@
     align-items: center;
     justify-content: center;
     background: var(--backdrop-bg);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    overscroll-behavior: contain;
     padding: var(--space-2);
   }
 
@@ -510,6 +513,7 @@
   .dialog-body {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior: contain;
     padding: var(--space-4) var(--space-6);
   }
 
@@ -525,8 +529,10 @@
     padding: var(--space-4) var(--space-6);
   }
 
+  html.modal-open,
   body.modal-open {
-    overflow: hidden;
+    overflow: hidden !important;
+    overscroll-behavior: contain;
   }
 
   .modal-enter-active,
@@ -1740,7 +1746,8 @@ body {
 .modal-overlay,
 .dialog-overlay {
   background: var(--backdrop-bg) !important;
-  backdrop-filter: none !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
 }
 
 .modal-header,
@@ -2072,6 +2079,20 @@ body,
 .app-shell .card[class*='rounded-full'],
 .app-shell div[class*='rounded-full']:not(.avatar):not(.user-avatar):not(.status-dot):not(.model-logo):not(.logo-mark):not(.header-balance):not(.balance-pill):not(.switch-track) {
   border-radius: var(--radius-md) !important;
+}
+
+.app-shell button[role='switch'],
+.modal-content button[role='switch'],
+.dialog-container button[role='switch'] {
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--radius-full) !important;
+}
+
+.app-shell button[role='switch'] [class~='rounded-full'],
+.modal-content button[role='switch'] [class~='rounded-full'],
+.dialog-container button[role='switch'] [class~='rounded-full'] {
+  border-radius: var(--radius-full) !important;
 }
 
 .app-shell [class*='shadow-'],
@@ -3029,6 +3050,11 @@ body,
   color: var(--text-primary) !important;
 }
 
+.app-shell .empty-state:hover {
+  background: var(--bg-surface) !important;
+  transform: none !important;
+}
+
 .app-shell :is(.data-table-row, .select-option, .sidebar-link, .nav-link, .model-card, .admin-model-card, .featured-model-card, .ecosystem-card):hover {
   transition: none !important;
 }
@@ -3264,7 +3290,7 @@ body,
 .app-shell .btn-primary,
 .modal-content .btn-primary,
 .dialog-container .btn-primary,
-.app-shell [class*='bg-orange'],
+.app-shell :is(button, a, [role='button'], .btn, .primary-button)[class*='bg-orange'],
 .app-shell [class*='bg-accent'] {
   color: var(--accent-contrast) !important;
   -webkit-text-fill-color: var(--accent-contrast) !important;
@@ -3772,6 +3798,54 @@ body,
   -webkit-text-fill-color: currentColor !important;
 }
 
+.app-shell .payment-tabbar {
+  display: flex;
+  gap: var(--space-1);
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface-alt) !important;
+  padding: var(--space-1) !important;
+}
+
+.app-shell .payment-tab {
+  position: relative;
+  display: flex;
+  min-height: 48px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-md) !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  font-size: var(--text-body-sm);
+  font-weight: 650;
+}
+
+.app-shell .payment-tab:hover {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.app-shell .payment-tab-active,
+.app-shell .payment-tab-active:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.app-shell .payment-tab-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.app-shell .payment-tab-check {
+  color: inherit !important;
+  stroke: currentColor !important;
+}
+
 .app-shell :is(.admin-platform-logo, .channel-platform-logo) {
   border: 1px solid var(--border-default) !important;
   background: var(--bg-surface) !important;
@@ -3792,4 +3866,3 @@ body,
   background: var(--bg-surface-alt) !important;
   color: var(--text-secondary) !important;
 }
-

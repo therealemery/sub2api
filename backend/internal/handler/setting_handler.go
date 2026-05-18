@@ -89,6 +89,17 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 	})
 }
 
+// GetModelDisplayConfig 获取模型价格页展示配置。
+// GET /api/v1/settings/model-display
+func (h *SettingHandler) GetModelDisplayConfig(c *gin.Context) {
+	cfg, err := h.settingService.GetModelDisplayConfig(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, cfg)
+}
+
 func publicLoginAgreementDocumentsToDTO(items []service.LoginAgreementDocument) []dto.LoginAgreementDocument {
 	result := make([]dto.LoginAgreementDocument, 0, len(items))
 	for _, item := range items {

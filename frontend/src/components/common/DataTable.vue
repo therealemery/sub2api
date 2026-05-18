@@ -129,7 +129,7 @@
         </tr>
 
         <!-- Empty state -->
-        <tr v-else-if="!data || data.length === 0">
+        <tr v-else-if="!data || data.length === 0" class="data-table-empty-row">
           <td
             :colspan="columns.length"
             :class="['py-12 text-center text-gray-500 dark:text-dark-400', getAdaptivePaddingClass()]"
@@ -162,7 +162,7 @@
             :data-row-id="resolveRowKey(sortedData[virtualRow.index], virtualRow.index)"
             :data-index="virtualRow.index"
             :ref="measureElement"
-            class="hover:bg-gray-50 dark:hover:bg-dark-800"
+            class="data-table-row hover:bg-gray-50 dark:hover:bg-dark-800"
           >
             <td
               v-for="(column, colIndex) in columns"
@@ -777,22 +777,36 @@ defineExpose({
   z-index: 220; /* 高于普通表头单元格和表体固定列 */
 }
 
-/* 表体 sticky 列背景 */
-tbody .sticky-col {
-  background-color: white;
+/* 表体背景：sticky 列需要和普通单元格同色，避免横向固定列出现色块断层。 */
+tbody .data-table-row > td,
+tbody .data-table-row > .sticky-col {
+  background-color: var(--bg-surface, #ffffff);
 }
 
-.dark tbody .sticky-col {
-  background-color: rgb(17 24 39);
+tbody .data-table-row:hover > td,
+tbody .data-table-row:hover > .sticky-col {
+  background-color: var(--bg-surface-alt, rgb(249 250 251));
 }
 
-/* hover 状态保持 */
-tbody tr:hover .sticky-col {
-  background-color: rgb(249 250 251);
+.dark tbody .data-table-row > td,
+.dark tbody .data-table-row > .sticky-col {
+  background-color: var(--bg-surface, rgb(17 24 39));
 }
 
-.dark tbody tr:hover .sticky-col {
-  background-color: rgb(31 41 55);
+.dark tbody .data-table-row:hover > td,
+.dark tbody .data-table-row:hover > .sticky-col {
+  background-color: var(--bg-surface-alt, rgb(31 41 55));
+}
+
+/* Empty states are informational, not selectable rows, so hover should not imply interaction. */
+tbody .data-table-empty-row > td,
+tbody .data-table-empty-row:hover > td {
+  background-color: var(--bg-surface, #ffffff);
+}
+
+.dark tbody .data-table-empty-row > td,
+.dark tbody .data-table-empty-row:hover > td {
+  background-color: var(--bg-surface, rgb(17 24 39));
 }
 
 /* 阴影只在可滚动时显示 */

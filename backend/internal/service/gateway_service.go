@@ -6857,6 +6857,29 @@ func extractUpstreamErrorCode(body []byte) string {
 	return ""
 }
 
+func safeClientUpstreamError(statusCode int) (int, string, string) {
+	switch statusCode {
+	case http.StatusBadRequest:
+		return http.StatusBadRequest, "invalid_request_error", "Invalid request"
+	case http.StatusUnauthorized:
+		return http.StatusBadGateway, "upstream_error", "Upstream authentication failed, please contact administrator"
+	case http.StatusPaymentRequired:
+		return http.StatusBadGateway, "upstream_error", "Upstream payment required: insufficient balance or billing issue"
+	case http.StatusForbidden:
+		return http.StatusBadGateway, "upstream_error", "Upstream access forbidden, please contact administrator"
+	case http.StatusNotFound:
+		return http.StatusNotFound, "not_found_error", "Resource not found"
+	case http.StatusTooManyRequests:
+		return http.StatusTooManyRequests, "rate_limit_error", "Upstream rate limit exceeded, please retry later"
+	case 529:
+		return http.StatusServiceUnavailable, "overloaded_error", "Upstream service overloaded, please retry later"
+	case http.StatusInternalServerError, http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
+		return http.StatusBadGateway, "upstream_error", "Upstream service temporarily unavailable"
+	default:
+		return http.StatusBadGateway, "upstream_error", "Upstream request failed"
+	}
+}
+
 func isCountTokensUnsupported404(statusCode int, body []byte) bool {
 	if statusCode != http.StatusNotFound {
 		return false
@@ -6970,15 +6993,7 @@ func (s *GatewayService) handleErrorResponse(ctx context.Context, resp *http.Res
 
 	switch resp.StatusCode {
 	case 400:
-		c.Data(http.StatusBadRequest, "application/json", body)
-		summary := upstreamMsg
-		if summary == "" {
-			summary = truncateForLog(body, 512)
-		}
-		if summary == "" {
-			return nil, fmt.Errorf("upstream error: %d", resp.StatusCode)
-		}
-		return nil, fmt.Errorf("upstream error: %d message=%s", resp.StatusCode, summary)
+		statusCode, errType, errMsg = safeClientUpstreamError(resp.StatusCode)
 	case 401:
 		statusCode = http.StatusBadGateway
 		errType = "upstream_error"

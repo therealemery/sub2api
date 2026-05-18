@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <div class="space-y-6">
       <!-- Header with Day Switcher -->
       <div class="flex items-center justify-end">
@@ -64,7 +63,6 @@
         </div>
       </template>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -74,7 +72,6 @@ import { useAppStore } from '@/stores/app'
 import { adminPaymentAPI } from '@/api/admin/payment'
 import { extractI18nErrorMessage } from '@/utils/apiError'
 import type { DashboardStats } from '@/types/payment'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import Icon from '@/components/icons/Icon.vue'
 import OrderStatsCards from '@/components/admin/payment/OrderStatsCards.vue'

@@ -188,6 +188,7 @@ func RegisterAuthRoutes(
 	settings := v1.Group("/settings")
 	{
 		settings.GET("/public", h.Setting.GetPublicSettings)
+		settings.GET("/model-display", h.Setting.GetModelDisplayConfig)
 	}
 
 	// 需要认证的当前用户信息

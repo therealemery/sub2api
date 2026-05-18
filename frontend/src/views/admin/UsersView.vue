@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <TablePageLayout>
       <!-- Single Row: Search, Filters, and Actions -->
       <template #filters>
@@ -405,7 +404,7 @@
               </div>
               <button
                 @click.stop="handleDeposit(row)"
-                class="rounded px-2 py-0.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                class="deposit-inline-action rounded px-2 py-0.5 text-xs font-medium transition-colors"
                 :title="t('admin.users.deposit')"
               >
                 {{ t('admin.users.deposit') }}
@@ -615,7 +614,6 @@
     <UserBalanceHistoryModal :show="showBalanceHistoryModal" :user="balanceHistoryUser" @close="closeBalanceHistoryModal" @deposit="handleDepositFromHistory" @withdraw="handleWithdrawFromHistory" />
     <GroupReplaceModal :show="showGroupReplaceModal" :user="groupReplaceUser" :old-group="groupReplaceOldGroup" :all-groups="allGroups" @close="closeGroupReplaceModal" @success="loadUsers" />
     <UserAttributesConfigModal :show="showAttributesModal" @close="handleAttributesModalClose" />
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -631,7 +629,6 @@ import { adminAPI } from '@/api/admin'
 import type { AdminUser, AdminGroup, UserAttributeDefinition } from '@/types'
 import type { BatchUserUsageStats } from '@/api/admin/dashboard'
 import type { Column } from '@/components/common/types'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
@@ -1428,3 +1425,15 @@ onUnmounted(() => {
   abortController?.abort()
 })
 </script>
+
+<style scoped>
+.deposit-inline-action {
+  background: transparent;
+  color: var(--accent);
+}
+
+.deposit-inline-action:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+</style>

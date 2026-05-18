@@ -48,9 +48,9 @@
           v-if="user"
           class="header-balance hidden items-center gap-2 rounded-lg bg-[var(--bg-surface-alt)] px-3 py-1.5 bg-[var(--bg-surface-alt)] sm:flex"
         >
-          <Icon name="sparkles" size="sm" class="header-points-icon" />
+          <Icon name="dollar" size="sm" class="header-balance-icon" />
           <span class="money-value text-sm font-semibold">
-            {{ formattedPoints }} 积分
+            {{ formattedBalance }}
           </span>
         </div>
 
@@ -95,10 +95,10 @@
               <!-- Balance (mobile only) -->
               <div class="border-b border-gray-100 px-4 py-2 border-[var(--border-default)] sm:hidden">
                 <div class="text-xs text-gray-500 text-[var(--text-muted)]">
-                  积分
+                  {{ t('common.balance') }}
                 </div>
                 <div class="money-value text-sm font-semibold">
-                  {{ formattedPoints }} 积分
+                  {{ formattedBalance }}
                 </div>
               </div>
 
@@ -222,9 +222,10 @@ const dropdownRef = ref<HTMLElement | null>(null)
 const contactInfo = computed(() => appStore.contactInfo)
 const repositoryUrl = DEFAULT_REPOSITORY_URL
 const avatarUrl = computed(() => user.value?.avatar_url?.trim() || '')
-const formattedPoints = computed(() => {
-  const points = Number(user.value?.balance ?? 0)
-  return Number.isFinite(points) ? points.toFixed(4) : '0.0000'
+const formattedBalance = computed(() => {
+  const balance = Number(user.value?.balance ?? 0)
+  const amount = Number.isFinite(balance) ? balance.toFixed(4) : '0.0000'
+  return `$${amount}`
 })
 
 // Standard mode users can replay the onboarding map from the account menu.

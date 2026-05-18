@@ -13,8 +13,6 @@
         <span class="sidebar-brand-title text-lg font-bold text-gray-900">
           {{ siteName }}
         </span>
-        <!-- Version Badge -->
-        <VersionBadge :version="siteVersion" />
       </div>
     </div>
 
@@ -166,7 +164,6 @@ import { computed, h, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAdminSettingsStore, useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
-import VersionBadge from '@/components/common/VersionBadge.vue'
 import { sanitizeSvg } from '@/utils/sanitize'
 import { resolveSiteLogoPath } from '@/constants/branding'
 
@@ -203,7 +200,6 @@ const expandedGroups = ref<Set<string>>(new Set())
 // Site settings from appStore (cached, no flicker)
 const siteName = computed(() => appStore.siteName)
 const siteLogoPath = computed(() => resolveSiteLogoPath(appStore.siteLogo))
-const siteVersion = computed(() => appStore.siteVersion)
 
 const SIDEBAR_ICON_MAIN = 'var(--sidebar-icon-main)'
 const SIDEBAR_ICON_ACCENT = 'var(--sidebar-icon-accent)'
@@ -373,6 +369,7 @@ function buildSelfNavItems(withDashboard: boolean): NavItem[] {
     items.push({ path: '/dashboard', label: t('nav.dashboard'), icon: SidebarDashboardIcon })
   }
   items.push(
+    { path: '/models', label: t('nav.modelPricing'), icon: SidebarPriceTagIcon, hideInSimpleMode: true },
     { path: '/keys', label: t('nav.apiKeys'), icon: SidebarKeyIcon },
     { path: '/usage', label: t('nav.usage'), icon: SidebarUsageIcon, hideInSimpleMode: true },
     { path: '/available-channels', label: t('nav.availableChannels'), icon: SidebarChannelIcon, hideInSimpleMode: true },
@@ -426,6 +423,7 @@ const adminNavItems = computed((): NavItem[] => {
     { path: '/admin/ops', label: t('nav.ops'), icon: SidebarOpsIcon },
     { path: '/admin/users', label: t('nav.users'), icon: SidebarUsersIcon, hideInSimpleMode: true },
     { path: '/admin/groups', label: t('nav.groups'), icon: SidebarGroupIcon, hideInSimpleMode: true },
+    { path: '/admin/models', label: t('nav.modelPricing'), icon: SidebarPriceTagIcon, hideInSimpleMode: true },
     {
       path: '/admin/channels',
       label: t('nav.channelManagement'),

@@ -24,7 +24,10 @@ func (s *settingHandlerPublicRepoStub) Get(ctx context.Context, key string) (*se
 }
 
 func (s *settingHandlerPublicRepoStub) GetValue(ctx context.Context, key string) (string, error) {
-	panic("unexpected GetValue call")
+	if value, ok := s.values[key]; ok {
+		return value, nil
+	}
+	return "", nil
 }
 
 func (s *settingHandlerPublicRepoStub) Set(ctx context.Context, key, value string) error {
@@ -80,6 +83,46 @@ func TestSettingHandler_GetPublicSettings_ExposesForceEmailOnThirdPartySignup(t 
 	require.NoError(t, json.Unmarshal(recorder.Body.Bytes(), &resp))
 	require.Equal(t, 0, resp.Code)
 	require.True(t, resp.Data.ForceEmailOnThirdPartySignup)
+}
+
+func TestSettingHandler_GetModelDisplayConfig_ReturnsPublicDisplayConfig(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	repo := &settingHandlerPublicRepoStub{
+		values: map[string]string{
+			service.SettingKeyModelDisplayConfig: `{
+				"featured_models":[{"model":"claude-sonnet-4.5","platform":"anthropic","badge":"主推","sort_order":1}],
+				"pricing_models":[{"model":"claude-sonnet-4.5","platform":"anthropic","billing_mode":"token","input_price":0.0000018,"output_price":0.000009,"sort_order":1}],
+				"reference_discount":0.6
+			}`,
+		},
+	}
+	h := NewSettingHandler(service.NewSettingService(repo, &config.Config{}), "test-version")
+
+	recorder := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(recorder)
+	c.Request = httptest.NewRequest(http.MethodGet, "/api/v1/settings/model-display", nil)
+
+	h.GetModelDisplayConfig(c)
+
+	require.Equal(t, http.StatusOK, recorder.Code)
+
+	var resp struct {
+		Code int `json:"code"`
+		Data struct {
+			FeaturedModels []service.FeaturedModelConfig       `json:"featured_models"`
+			PricingModels  []service.ModelDisplayPricingConfig `json:"pricing_models"`
+		} `json:"data"`
+	}
+	require.NoError(t, json.Unmarshal(recorder.Body.Bytes(), &resp))
+	require.Equal(t, 0, resp.Code)
+	require.Equal(t, []service.FeaturedModelConfig{
+		{Model: "claude-sonnet-4.5", Platform: "anthropic", Badge: "主推", SortOrder: 1},
+	}, resp.Data.FeaturedModels)
+	require.Len(t, resp.Data.PricingModels, 1)
+	require.Equal(t, "claude-sonnet-4.5", resp.Data.PricingModels[0].Model)
+	require.Equal(t, "anthropic", resp.Data.PricingModels[0].Platform)
+	require.Equal(t, "token", resp.Data.PricingModels[0].BillingMode)
 }
 
 func TestSettingHandler_GetPublicSettings_ExposesWeChatOAuthModeCapabilities(t *testing.T) {

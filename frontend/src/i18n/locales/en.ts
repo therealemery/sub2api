@@ -4,19 +4,33 @@ export default {
     viewOnGithub: 'View on GitHub',
     viewDocs: 'View Documentation',
     docs: 'Docs',
+    usageGuide: 'Usage Guide',
+    agentRecruitment: 'Become an Agent',
     switchToLight: 'Switch to Light Mode',
     switchToDark: 'Switch to Dark Mode',
     dashboard: 'Dashboard',
     login: 'Login',
     getStarted: 'Get Started',
     goToDashboard: 'Go to Dashboard',
-    // User-focused value proposition
-    heroSubtitle: 'One Key, All AI Models',
-    heroDescription: 'No need to manage multiple subscriptions. Access Claude, GPT, Gemini and more with a single API key',
+    heroSubtitle: 'Access Top AI Models',
+    heroDescription: 'Easy for beginners, powerful for pros. Featuring ChatGPT and Claude for everyday use and advanced workflows.',
     tags: {
       subscriptionToApi: 'Subscription to API',
       stickySession: 'Session Persistence',
-      realtimeBilling: 'Pay As You Go'
+      realtimeBilling: 'Pay As You Go',
+      beginnerFriendly: 'Beginner Friendly',
+      proFriendly: 'Pro Friendly',
+      oneKeyAccess: 'Top Models'
+    },
+    trust: {
+      title: 'Honest, Long-term Service',
+      description: 'We run this as a long-term business. Transparent pricing, no model downgrades.',
+      longTermTitle: 'Long-term Operation',
+      longTermDescription: 'Built for sustained use, not short-term cash grabs.',
+      transparentTitle: 'Transparent Pricing',
+      transparentDescription: 'Clear pricing on all major models. You know where your money goes.',
+      modelQualityTitle: 'No Model Downgrades',
+      modelQualityDescription: 'What you see is what you get. No silent swaps to cheaper models.'
     },
     // Pain points section
     painPoints: {
@@ -341,6 +355,7 @@ export default {
 
   // Navigation
   nav: {
+    adminDashboard: 'Dashboard',
     dashboard: 'Dashboard',
     announcements: 'Announcements',
     apiKeys: 'API Keys',
@@ -355,6 +370,7 @@ export default {
     users: 'Users',
     groups: 'Groups',
     channels: 'Channels',
+    modelPricing: 'Model Pricing',
     availableChannels: 'Available Channels',
     subscriptions: 'Subscriptions',
     accounts: 'Accounts',
@@ -985,6 +1001,50 @@ export default {
       intervals: 'Tiered Pricing',
       unitPerMillion: '/ 1M tokens',
       unitPerRequest: '/ request'
+    }
+  },
+
+  modelPricing: {
+    title: 'Model Pricing',
+    description: 'See model reference prices in USD and compare them with official pricing',
+    searchPlaceholder: 'Search models or platforms...',
+    empty: 'No model reference prices yet. Wait for an administrator to configure display prices.',
+    unknownOfficial: 'Official price pending',
+    officialPending: 'Pending',
+    configuredSource: 'Admin configured',
+    configuredSourceHint: 'For pricing-page display only',
+    footnote: 'Prices on this page are customer-facing reference information only. They do not affect API billing, balance deduction, model routing, or channel pricing. Official pricing is a frontend reference table; unmatched models are not compared.',
+    filters: {
+      allPlatforms: 'All platforms'
+    },
+    metrics: {
+      models: 'Visible models',
+      platforms: 'Platforms',
+      compared: 'Official matches'
+    },
+    columns: {
+      model: 'Model',
+      currentPrice: 'Reference Price',
+      officialPrice: 'Official Price',
+      savings: 'Comparison',
+      access: 'Notes'
+    },
+    price: {
+      input: 'Input',
+      output: 'Output',
+      cacheRead: 'Cache read',
+      request: 'Request',
+      image: 'Image'
+    },
+    savings: {
+      cheaper: '{percent}% cheaper',
+      higher: '{percent}% higher',
+      same: 'Same',
+      unknown: 'Pending'
+    },
+    featured: {
+      title: 'Featured Models',
+      defaultBadge: 'Featured'
     }
   },
 
@@ -2154,6 +2214,59 @@ export default {
         geminiText: 'Gemini Text',
         geminiImage: 'Gemini Image',
         hint: 'Select at least one model family'
+      }
+    },
+
+    modelPricing: {
+      title: 'Model Pricing Management',
+      description: 'Configure customer-facing model reference prices and choose featured models for the user pricing page',
+      searchPlaceholder: 'Search models or platforms...',
+      allChannels: 'All channels',
+      addPricing: 'Add Pricing',
+      fetchReference: 'Fetch Reference Prices',
+      empty: 'No model pricing yet. Add a pricing rule first.',
+      referenceTitle: 'Official reference discount',
+      referenceDescription: 'Enter a discount factor to generate customer-facing display prices from the built-in official reference table. This only affects /models display.',
+      featuredTitle: 'User-facing featured models',
+      featuredDescription: 'Checked models are highlighted at the top of /models. This only affects display and does not affect billing, balance deduction, routing, or channel pricing.',
+      featured: 'Featured',
+      notFeatured: 'Not featured',
+      defaultBadge: 'Featured',
+      badgePlaceholder: 'Badge, e.g. Featured',
+      moveUp: 'Move up',
+      moveDown: 'Move down',
+      modelCount: 'models',
+      createTitle: 'Add Model Pricing',
+      editTitle: 'Edit Model Pricing',
+      editorDescription: 'Enter prices in USD. Token models use reference price per 1M tokens; saving only updates the model display configuration.',
+      modelsPlaceholder: 'One model per line, e.g. claude-sonnet-4-5',
+      modelPlaceholder: 'e.g. claude-sonnet-4-5',
+      modelsRequired: 'Enter at least one model',
+      modelRequired: 'Enter a model name',
+      saved: 'Model pricing saved',
+      deleted: 'Model pricing deleted',
+      discountRequired: 'Enter a discount factor greater than 0, for example 0.6',
+      referenceApplied: 'Generated {count} reference prices with the discount',
+      featuredSaved: 'Featured models saved',
+      columns: {
+        featured: 'Featured',
+        model: 'Model',
+        channel: 'Channel',
+        price: 'Reference Price',
+        actions: 'Actions'
+      },
+      fields: {
+        channel: 'Channel',
+        platform: 'Platform',
+        billingMode: 'Display type',
+        discount: 'Discount factor',
+        models: 'Models',
+        model: 'Model'
+      },
+      displayMode: {
+        token: 'Token reference price',
+        perRequest: 'Per-request reference price',
+        image: 'Image reference price'
       }
     },
 

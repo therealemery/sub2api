@@ -67,14 +67,18 @@
             {{ t('admin.dashboard.metricActualCost') }}
           </button>
         </div>
-        <div v-if="enableRankingView" class="inline-flex rounded-lg bg-gray-100 p-1 dark:bg-dark-800">
+        <div
+          v-if="enableRankingView"
+          class="dashboard-view-toggle-group"
+        >
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+            :aria-pressed="activeView === 'model_distribution'"
+            class="dashboard-view-toggle"
             :class="
               activeView === 'model_distribution'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                ? 'dashboard-view-toggle-active'
+                : 'dashboard-view-toggle-inactive'
             "
             @click="activeView = 'model_distribution'"
           >
@@ -82,11 +86,12 @@
           </button>
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+            :aria-pressed="activeView === 'spending_ranking'"
+            class="dashboard-view-toggle"
             :class="
               activeView === 'spending_ranking'
-                ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                ? 'dashboard-view-toggle-active'
+                : 'dashboard-view-toggle-inactive'
             "
             @click="activeView = 'spending_ranking'"
           >
@@ -506,3 +511,73 @@ const formatCost = (value: number): string => {
   return value.toFixed(4)
 }
 </script>
+
+<style scoped>
+.dashboard-view-toggle-group {
+  display: inline-flex;
+  gap: 0.25rem;
+  border: 1px solid #d6d2c8;
+  border-radius: 0.625rem;
+  background: #f5f3ec;
+  padding: 0.25rem;
+}
+
+.dashboard-view-toggle {
+  min-width: 5.5rem;
+  border: 1px solid transparent !important;
+  border-radius: 0.5rem !important;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.dashboard-view-toggle-active {
+  border-color: #c4471a !important;
+  background: #f6ded4 !important;
+  color: #1f1d19 !important;
+  -webkit-text-fill-color: #1f1d19 !important;
+}
+
+.dashboard-view-toggle-inactive {
+  background: transparent !important;
+  color: #4b473f !important;
+  -webkit-text-fill-color: #4b473f !important;
+}
+
+.dashboard-view-toggle-inactive:hover {
+  border-color: #b8b2a6 !important;
+  background: #ffffff !important;
+  color: #1f1d19 !important;
+  -webkit-text-fill-color: #1f1d19 !important;
+}
+
+.dashboard-view-toggle:focus-visible {
+  outline: 2px solid #c4471a;
+  outline-offset: 2px;
+}
+
+:global(.dark) .dashboard-view-toggle-group {
+  border-color: #3a3833;
+  background: #252420;
+}
+
+:global(.dark) .dashboard-view-toggle-active {
+  border-color: #f5f3ec !important;
+  background: #f5f3ec !important;
+  color: #151410 !important;
+  -webkit-text-fill-color: #151410 !important;
+}
+
+:global(.dark) .dashboard-view-toggle-inactive {
+  color: #d6d2c8 !important;
+  -webkit-text-fill-color: #d6d2c8 !important;
+}
+
+:global(.dark) .dashboard-view-toggle-inactive:hover {
+  border-color: #4a4842 !important;
+  background: #3a3833 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+</style>

@@ -4,19 +4,33 @@ export default {
     viewOnGithub: '在 GitHub 上查看',
     viewDocs: '查看文档',
     docs: '文档',
+    usageGuide: '使用教程',
+    agentRecruitment: '招募代理',
     switchToLight: '切换到浅色模式',
     switchToDark: '切换到深色模式',
     dashboard: '控制台',
     login: '登录',
     getStarted: '立即开始',
     goToDashboard: '进入控制台',
-    // 新增：面向用户的价值主张
-    heroSubtitle: '一个密钥，畅用多个 AI 模型',
-    heroDescription: '无需管理多个订阅账号，一站式接入 Claude、GPT、Gemini 等主流 AI 服务',
+    heroSubtitle: '畅用主流 AI 模型',
+    heroDescription: '新手容易上手，老手也够顺手。主推 ChatGPT 和 Claude，覆盖日常使用与进阶工作流。',
     tags: {
       subscriptionToApi: '订阅转 API',
       stickySession: '会话保持',
-      realtimeBilling: '按量计费'
+      realtimeBilling: '按量计费',
+      beginnerFriendly: '新手友好',
+      proFriendly: '老手顺手',
+      oneKeyAccess: '主流模型'
+    },
+    trust: {
+      title: '良心长线生意，不注水',
+      description: '我们按长期运营来做服务，价格透明，模型体验不偷换、不缩水。',
+      longTermTitle: '长期经营',
+      longTermDescription: '服务和配置按长期使用维护，不做短期收割式体验。',
+      transparentTitle: '价格透明',
+      transparentDescription: '主流模型价格清楚，尽量让用户知道钱花在哪里。',
+      modelQualityTitle: '模型不注水',
+      modelQualityDescription: '展示和调用口径保持一致，不用低质量模型偷换体验。'
     },
     // 用户痛点区块
     painPoints: {
@@ -42,16 +56,16 @@ export default {
     },
     // 解决方案区块
     solutions: {
-      title: '我们帮你解决',
-      subtitle: '简单三步，开始省心使用 AI'
+      title: '优势清楚，长期稳定',
+      subtitle: '新手省心，老手顺手，价格按良心做，官方价格 6 折。'
     },
     features: {
-      unifiedGateway: '一键接入',
-      unifiedGatewayDesc: '获取一个 API 密钥，即可调用所有已接入的 AI 模型，无需分别申请。',
-      multiAccount: '稳定可靠',
-      multiAccountDesc: '智能调度多个上游账号，自动切换和负载均衡，告别频繁报错。',
-      balanceQuota: '用多少付多少',
-      balanceQuotaDesc: '按实际使用量计费，支持设置配额上限，团队用量一目了然。'
+      unifiedGateway: '新手老手都友好',
+      unifiedGatewayDesc: '界面简单，流程清楚，新手不用折腾；高级用法也保留给老手直接上手。',
+      multiAccount: '安全长久稳定',
+      multiAccountDesc: '长期维护，稳定运营，不会跑路，尽量把服务可用性和使用体验放在前面。',
+      balanceQuota: '价格实惠，官方 6 折',
+      balanceQuotaDesc: '价格按良心做，模型不注水，不偷换体验，主流模型按官方价格 6 折提供。'
     },
     // 优势对比
     comparison: {
@@ -90,8 +104,11 @@ export default {
       }
     },
     providers: {
-      title: '已支持的 AI 模型',
-      description: '一个 API，多种选择',
+      title: '主推 AI 模型',
+      description: '两个核心模型放在主位，日常使用和进阶工作流都够用',
+      chatgptDescription: '主力通用模型，适合写作、代码、分析和日常问答。',
+      claudeDescription: '长文本和复杂任务表现稳定，适合深度思考和工作流。',
+      upcomingDescription: 'ChatGPT 与 Claude 已作为稳定主推模型开放，更多主流模型会按可用性、速度和质量标准持续扩展。',
       supported: '已支持',
       soon: '即将推出',
       claude: 'Claude',
@@ -341,6 +358,7 @@ export default {
 
   // Navigation
   nav: {
+    adminDashboard: '仪表盘',
     dashboard: '仪表盘',
     announcements: '公告',
     apiKeys: 'API 密钥',
@@ -355,6 +373,7 @@ export default {
     users: '用户管理',
     groups: '分组管理',
     channels: '渠道管理',
+    modelPricing: '模型定价',
     availableChannels: '可用渠道',
     subscriptions: '订阅管理',
     accounts: '账号管理',
@@ -989,6 +1008,50 @@ export default {
       intervals: '阶梯定价',
       unitPerMillion: '/ 1M token',
       unitPerRequest: '/ 次'
+    }
+  },
+
+  modelPricing: {
+    title: '模型定价',
+    description: '查看模型参考价格、USD 计价与官网价格对比',
+    searchPlaceholder: '搜索模型或平台...',
+    empty: '暂无模型参考价，请等待管理员配置展示价格',
+    unknownOfficial: '官网价待确认',
+    officialPending: '待确认',
+    configuredSource: '后台配置',
+    configuredSourceHint: '仅用于价格页展示',
+    footnote: '本页价格仅供客户参考展示，不影响 API 计费、余额扣费、模型路由或渠道定价。官网价为前端内置参考价；匹配不到的模型不会计算优惠比例。',
+    filters: {
+      allPlatforms: '全部平台'
+    },
+    metrics: {
+      models: '可展示模型',
+      platforms: '模型平台',
+      compared: '已匹配官网价'
+    },
+    columns: {
+      model: '模型',
+      currentPrice: '参考价',
+      officialPrice: '官网价',
+      savings: '对比',
+      access: '说明'
+    },
+    price: {
+      input: '输入',
+      output: '输出',
+      cacheRead: '缓存读取',
+      request: '请求',
+      image: '图片'
+    },
+    savings: {
+      cheaper: '便宜 {percent}%',
+      higher: '高 {percent}%',
+      same: '同价',
+      unknown: '待确认'
+    },
+    featured: {
+      title: '主推模型',
+      defaultBadge: '主推'
     }
   },
 
@@ -2231,6 +2294,59 @@ export default {
         geminiText: 'Gemini Text',
         geminiImage: 'Gemini Image',
         hint: '至少选择一个模型系列'
+      }
+    },
+
+    modelPricing: {
+      title: '模型定价管理',
+      description: '配置展示给客户看的模型参考价格，并设置用户侧模型定价页的主推模型',
+      searchPlaceholder: '搜索模型或平台...',
+      allChannels: '全部渠道',
+      addPricing: '新增定价',
+      fetchReference: '获取参考价',
+      empty: '暂无模型定价，请先新增一条定价规则',
+      referenceTitle: '官网参考价折扣',
+      referenceDescription: '输入折扣系数后，一键按内置官网参考价生成客户展示价。仅影响 /models 展示，不影响真实计费。',
+      featuredTitle: '用户侧主推模型',
+      featuredDescription: '勾选后会在 /models 顶部突出展示；此配置仅影响展示，不影响计费、扣费、路由或渠道定价。',
+      featured: '主推',
+      notFeatured: '未主推',
+      defaultBadge: '主推',
+      badgePlaceholder: '标签，例如：主推',
+      moveUp: '上移',
+      moveDown: '下移',
+      modelCount: '个模型',
+      createTitle: '新增模型定价',
+      editTitle: '编辑模型定价',
+      editorDescription: '价格按 USD 填写。Token 模型填写每 1M token 参考价；保存后仅写入模型展示配置。',
+      modelsPlaceholder: '每行一个模型，例如：claude-sonnet-4-5',
+      modelPlaceholder: '例如：claude-sonnet-4-5',
+      modelsRequired: '请至少填写一个模型',
+      modelRequired: '请填写模型名称',
+      saved: '模型定价已保存',
+      deleted: '模型定价已删除',
+      discountRequired: '请输入大于 0 的折扣系数，例如 0.6',
+      referenceApplied: '已按折扣生成 {count} 条参考价',
+      featuredSaved: '主推模型配置已保存',
+      columns: {
+        featured: '主推',
+        model: '模型',
+        channel: '渠道',
+        price: '参考价',
+        actions: '操作'
+      },
+      fields: {
+        channel: '渠道',
+        platform: '平台',
+        billingMode: '展示类型',
+        discount: '折扣系数',
+        models: '模型',
+        model: '模型'
+      },
+      displayMode: {
+        token: 'Token 参考价',
+        perRequest: '按次参考价',
+        image: '图片参考价'
       }
     },
 
