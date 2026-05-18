@@ -1,0 +1,8 @@
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Baichuan</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M4 9c2.7-2 5.3-2 8 0s5.3 2 8 0" stroke="#5f534a"/>
+    <path d="M4 14c2.7-2 5.3-2 8 0s5.3 2 8 0" stroke="#BB4D1B"/>
+    <path d="M7 18h10" stroke="#5f534a"/>
+  </g>
+</svg>

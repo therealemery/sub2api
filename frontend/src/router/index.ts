@@ -154,9 +154,40 @@ const routes: RouteRecordRaw[] = [
     }
   },
 
-  // ==================== User Routes ====================
+  // Routes that manage their own layout (fullscreen/popup modes)
+  {
+    path: '/admin/ops',
+    name: 'AdminOps',
+    component: () => import('@/views/admin/ops/OpsDashboard.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Ops Monitoring',
+      titleKey: 'admin.ops.title',
+      descriptionKey: 'admin.ops.description'
+    }
+  },
+  {
+    path: '/payment/stripe',
+    name: 'StripePayment',
+    component: () => import('@/views/user/StripePaymentView.vue'),
+    meta: {
+      requiresAuth: false,
+      requiresAdmin: false,
+      title: 'Stripe Payment',
+      titleKey: 'payment.stripePay',
+      requiresPayment: false
+    }
+  },
+
+  // ==================== Layout Routes (shared sidebar) ====================
   {
     path: '/',
+    component: () => import('@/components/layout/LayoutView.vue'),
+    children: [
+  // ==================== User Routes ====================
+  {
+    path: '',
     redirect: '/home'
   },
   {
@@ -169,6 +200,29 @@ const routes: RouteRecordRaw[] = [
       title: 'Dashboard',
       titleKey: 'dashboard.title',
       descriptionKey: 'dashboard.welcomeMessage'
+    }
+  },
+  {
+    path: '/docs',
+    name: 'InternalDocs',
+    component: () => import('@/views/user/InternalDocsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Docs',
+      titleKey: 'nav.docs'
+    }
+  },
+  {
+    path: '/models',
+    name: 'ModelPricing',
+    component: () => import('@/views/user/ModelPricingView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Model Pricing',
+      titleKey: 'modelPricing.title',
+      descriptionKey: 'modelPricing.description'
     }
   },
   {
@@ -305,18 +359,6 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/payment/stripe',
-    name: 'StripePayment',
-    component: () => import('@/views/user/StripePaymentView.vue'),
-    meta: {
-      requiresAuth: false,
-      requiresAdmin: false,
-      title: 'Stripe Payment',
-      titleKey: 'payment.stripePay',
-      requiresPayment: false
-    }
-  },
-  {
     path: '/payment/airwallex',
     name: 'AirwallexPayment',
     component: () => import('@/views/user/AirwallexPaymentView.vue'),
@@ -369,18 +411,6 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/admin/ops',
-    name: 'AdminOps',
-    component: () => import('@/views/admin/ops/OpsDashboard.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      title: 'Ops Monitoring',
-      titleKey: 'admin.ops.title',
-      descriptionKey: 'admin.ops.description'
-    }
-  },
-  {
     path: '/admin/users',
     name: 'AdminUsers',
     component: () => import('@/views/admin/UsersView.vue'),
@@ -430,6 +460,18 @@ const routes: RouteRecordRaw[] = [
       title: 'Channel Monitor',
       titleKey: 'admin.channelMonitor.title',
       descriptionKey: 'admin.channelMonitor.description'
+    }
+  },
+  {
+    path: '/admin/models',
+    name: 'AdminModelPricing',
+    component: () => import('@/views/admin/ModelPricingAdminView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Model Pricing',
+      titleKey: 'admin.modelPricing.title',
+      descriptionKey: 'admin.modelPricing.description'
     }
   },
   {
@@ -632,6 +674,9 @@ const routes: RouteRecordRaw[] = [
     }
   },
 
+    ] // end children of LayoutView
+  },
+
   // ==================== 404 Not Found ====================
   {
     path: '/:pathMatch(.*)*',
@@ -650,11 +695,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(_to, _from, savedPosition) {
-    // Scroll to saved position when using browser back/forward
     if (savedPosition) {
       return savedPosition
     }
-    // Scroll to top for new routes
     return { top: 0 }
   }
 })

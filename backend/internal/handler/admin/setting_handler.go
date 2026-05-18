@@ -277,6 +277,33 @@ func (h *SettingHandler) GetSettings(c *gin.Context) {
 	response.Success(c, systemSettingsResponseData(payload, authSourceDefaults))
 }
 
+// GetModelDisplayConfig 获取用户模型定价页展示配置。
+// GET /api/v1/admin/settings/model-display
+func (h *SettingHandler) GetModelDisplayConfig(c *gin.Context) {
+	cfg, err := h.settingService.GetModelDisplayConfig(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, cfg)
+}
+
+// UpdateModelDisplayConfig 更新用户模型定价页展示配置。
+// PUT /api/v1/admin/settings/model-display
+func (h *SettingHandler) UpdateModelDisplayConfig(c *gin.Context) {
+	var req service.ModelDisplayConfig
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+	cfg, err := h.settingService.UpdateModelDisplayConfig(c.Request.Context(), req)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, cfg)
+}
+
 // openaiFastPolicySettingsToDTO converts service -> dto for OpenAI fast policy.
 func openaiFastPolicySettingsToDTO(s *service.OpenAIFastPolicySettings) *dto.OpenAIFastPolicySettings {
 	if s == nil {

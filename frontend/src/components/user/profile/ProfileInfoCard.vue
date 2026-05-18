@@ -4,10 +4,10 @@
       data-testid="profile-overview-hero"
       class="card overflow-hidden border border-primary-100/80 bg-gradient-to-br from-primary-50 via-white to-amber-50/70 dark:border-primary-900/40 dark:from-primary-950/40 dark:via-dark-900 dark:to-dark-950"
     >
-      <div class="px-6 py-6 md:px-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div class="px-6 py-7 md:px-8">
+        <div class="flex flex-col gap-7 lg:flex-row lg:items-start">
           <div
-            class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary-500 to-primary-600 text-2xl font-bold text-white shadow-lg shadow-primary-500/20"
+            class="profile-hero-avatar flex shrink-0 items-center justify-center overflow-hidden"
           >
             <img
               v-if="avatarUrl"
@@ -18,10 +18,10 @@
             <span v-else>{{ avatarInitial }}</span>
           </div>
 
-          <div class="min-w-0 flex-1 space-y-5">
+          <div class="min-w-0 flex-1 space-y-6">
             <div class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-white">
+                <h2 class="truncate text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
                   {{ displayName }}
                 </h2>
                 <span :class="['badge', user?.role === 'admin' ? 'badge-primary' : 'badge-gray']">
@@ -375,3 +375,29 @@ const sourceHints = computed(() => {
   return hints
 })
 </script>
+
+<style scoped>
+.profile-hero-avatar {
+  width: 7rem;
+  height: 7rem;
+  border: 4px solid rgb(255 255 255 / 92%);
+  border-radius: 2rem;
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 52%, #0891b2 100%);
+  color: #fff;
+  font-size: 2.25rem;
+  font-weight: 700;
+  box-shadow: 0 24px 45px rgb(20 184 166 / 24%);
+}
+
+:global(.dark) .profile-hero-avatar {
+  border-color: rgb(37 36 32 / 80%);
+}
+
+@media (min-width: 640px) {
+  .profile-hero-avatar {
+    width: 8rem;
+    height: 8rem;
+    font-size: 3rem;
+  }
+}
+</style>

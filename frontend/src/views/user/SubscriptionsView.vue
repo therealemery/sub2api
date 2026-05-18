@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <div class="space-y-6">
       <!-- Loading State -->
       <div v-if="loading" class="flex justify-center py-12">
@@ -242,7 +241,6 @@
         </div>
       </div>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -252,7 +250,6 @@ import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import subscriptionsAPI from '@/api/subscriptions'
 import type { UserSubscription } from '@/types'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { formatDateOnly } from '@/utils/format'
 import { platformBorderClass, platformBadgeClass, platformButtonClass, platformLabel } from '@/utils/platformColors'
@@ -364,3 +361,44 @@ onMounted(() => {
   loadSubscriptions()
 })
 </script>
+
+<style scoped>
+.subscription-card {
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+}
+
+.subscription-card-header {
+  background: var(--bg-surface-alt);
+}
+
+.subscription-logo-shell {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subscription-progress-track {
+  background: var(--bg-surface-alt);
+}
+
+.subscription-renew-button {
+  background: var(--text-primary) !important;
+  color: var(--bg-surface) !important;
+  border-color: var(--text-primary) !important;
+}
+
+.subscription-renew-button:hover {
+  background: var(--text-primary) !important;
+  color: var(--bg-surface) !important;
+}
+</style>

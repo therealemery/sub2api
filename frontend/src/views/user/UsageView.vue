@@ -1,8 +1,7 @@
 <template>
-  <AppLayout>
     <TablePageLayout>
       <template #actions>
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <!-- Total Requests -->
           <div class="card p-4">
           <div class="flex items-center gap-3">
@@ -345,7 +344,6 @@
         />
       </template>
     </TablePageLayout>
-  </AppLayout>
 
   <!-- Token Tooltip Portal -->
   <Teleport to="body">
@@ -522,7 +520,6 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { usageAPI, keysAPI } from '@/api'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
@@ -951,3 +948,20 @@ onMounted(() => {
   loadUsageStats()
 })
 </script>
+
+<style scoped>
+.usage-page :deep(.table-page-layout) {
+  height: auto;
+  min-height: 0;
+}
+
+.usage-page :deep(.layout-section-scrollable) {
+  min-height: 420px;
+}
+
+@media (max-width: 640px) {
+  .usage-page :deep(.layout-section-scrollable) {
+    min-height: 0;
+  }
+}
+</style>

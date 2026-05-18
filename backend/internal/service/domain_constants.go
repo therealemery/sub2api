@@ -308,6 +308,10 @@ const (
 	// sidebar entry is hidden. Defaults to false (opt-in feature).
 	SettingKeyAvailableChannelsEnabled = "available_channels_enabled"
 
+	// SettingKeyModelDisplayConfig stores informational, user-facing model display
+	// preferences for /models. It must not affect billing, routing, or channels.
+	SettingKeyModelDisplayConfig = "model_display_config"
+
 	// =========================
 	// Overload Cooldown (529)
 	// =========================

@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
@@ -596,7 +595,6 @@
       @confirm="confirmDelete"
       @cancel="showDeleteDialog = false"
     />
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -611,7 +609,6 @@ import { mTokToPerToken, perTokenToMTok, apiIntervalsToForm, formIntervalsToAPI,
 import type { AdminGroup, GroupPlatform } from '@/types'
 import type { Column } from '@/components/common/types'
 import { platformTextClass, platformBadgeLightClass } from '@/utils/platformColors'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
@@ -1539,14 +1536,25 @@ onUnmounted(() => {
 }
 
 .channel-tab {
-  @apply flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap;
+  @apply flex items-center gap-1.5 whitespace-nowrap border-0 border-b-2 border-transparent bg-transparent px-4 py-3 text-sm font-medium transition-colors;
+  border-radius: 0 !important;
 }
 
 .channel-tab-active {
-  @apply border-primary-600 text-primary-600 dark:border-primary-400 dark:text-primary-400;
+  border-bottom-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
 }
 
 .channel-tab-inactive {
-  @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300;
+  @apply text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300;
+}
+
+.channel-tab-active :deep(*) {
+  color: inherit !important;
+}
+
+.channel-tab-active :deep(svg) {
+  stroke: currentColor !important;
 }
 </style>

@@ -9,9 +9,11 @@
         role="dialog"
         aria-modal="true"
         @click.self="handleClose"
+        @wheel.self.prevent
+        @touchmove.self.prevent
       >
         <!-- Modal panel -->
-        <div ref="dialogRef" :class="['modal-content', widthClasses]" @click.stop>
+        <div ref="dialogRef" :class="['modal-content', widthClasses]" @click.stop @wheel.stop>
           <!-- Header -->
           <div class="modal-header">
             <h3 :id="dialogId" class="modal-title">
@@ -48,10 +50,12 @@ import Icon from '@/components/icons/Icon.vue'
 // 生成唯一ID以避免多个对话框时ID冲突
 let dialogIdCounter = 0
 const dialogId = `modal-title-${++dialogIdCounter}`
+let openDialogCount = 0
 
 // 焦点管理
 const dialogRef = ref<HTMLElement | null>(null)
 let previousActiveElement: HTMLElement | null = null
+let hasScrollLock = false
 
 type DialogWidth = 'narrow' | 'normal' | 'wide' | 'extra-wide' | 'full'
 
@@ -108,6 +112,26 @@ const handleEscape = (event: KeyboardEvent) => {
   }
 }
 
+const syncScrollLockClass = () => {
+  const shouldLock = openDialogCount > 0
+  document.documentElement.classList.toggle('modal-open', shouldLock)
+  document.body.classList.toggle('modal-open', shouldLock)
+}
+
+const lockDocumentScroll = () => {
+  if (hasScrollLock) return
+  hasScrollLock = true
+  openDialogCount += 1
+  syncScrollLockClass()
+}
+
+const unlockDocumentScroll = () => {
+  if (!hasScrollLock) return
+  hasScrollLock = false
+  openDialogCount = Math.max(0, openDialogCount - 1)
+  syncScrollLockClass()
+}
+
 // Prevent body scroll when modal is open and manage focus
 watch(
   () => props.show,
@@ -115,8 +139,7 @@ watch(
     if (isOpen) {
       // 保存当前焦点元素
       previousActiveElement = document.activeElement as HTMLElement
-      // 使用CSS类而不是直接操作style,更易于管理多个对话框
-      document.body.classList.add('modal-open')
+      lockDocumentScroll()
 
       // 等待DOM更新后设置焦点到对话框
       await nextTick()
@@ -127,7 +150,7 @@ watch(
         firstFocusable?.focus()
       }
     } else {
-      document.body.classList.remove('modal-open')
+      unlockDocumentScroll()
       // 恢复之前的焦点
       if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
         previousActiveElement.focus()
@@ -145,6 +168,6 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscape)
   // 确保组件卸载时移除滚动锁定
-  document.body.classList.remove('modal-open')
+  unlockDocumentScroll()
 })
 </script>

@@ -1,5 +1,4 @@
 <template>
-  <AppLayout>
     <div class="space-y-6">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
@@ -289,7 +288,6 @@
         </div>
       </template>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -307,7 +305,6 @@ import type {
   UserUsageTrendPoint,
   UserSpendingRankingItem
 } from '@/types'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import Icon from '@/components/icons/Icon.vue'
 import DateRangePicker from '@/components/common/DateRangePicker.vue'
@@ -698,4 +695,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.admin-primary-metrics :deep(.card),
+.admin-secondary-metrics :deep(.card) {
+  border-color: var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none;
+}
+
+.admin-primary-metrics :deep(.card) {
+  min-height: 116px;
+}
+
+.admin-secondary-metrics :deep(.card) {
+  min-height: 96px;
+  background: var(--bg-surface-alt) !important;
+}
+
+.admin-dashboard-page :deep(.rounded-lg) {
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-surface-alt) !important;
+  color: var(--text-primary) !important;
+}
+
+@media (max-width: 768px) {
+  .admin-primary-metrics,
+  .admin-secondary-metrics {
+    grid-template-columns: 1fr !important;
+  }
+}
 </style>

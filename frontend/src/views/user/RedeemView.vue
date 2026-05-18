@@ -1,19 +1,18 @@
 <template>
-  <AppLayout>
     <div class="mx-auto max-w-2xl space-y-6">
       <!-- Current Balance Card -->
       <div class="card overflow-hidden">
-        <div class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center">
+        <div class="redeem-balance-panel px-6 py-8 text-center">
           <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm"
+            class="redeem-balance-icon mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl"
           >
             <Icon name="creditCard" size="xl" class="text-white" />
           </div>
-          <p class="text-sm font-medium text-primary-100">{{ t('redeem.currentBalance') }}</p>
-          <p class="mt-2 text-4xl font-bold text-white">
+          <p class="redeem-balance-label text-sm font-medium">{{ t('redeem.currentBalance') }}</p>
+          <p class="redeem-balance-amount mt-2 text-4xl font-bold">
             ${{ user?.balance?.toFixed(2) || '0.00' }}
           </p>
-          <p class="mt-2 text-sm text-primary-100">
+          <p class="redeem-balance-meta mt-2 text-sm">
             {{ t('redeem.concurrency') }}: {{ user?.concurrency || 0 }} {{ t('redeem.requests') }}
           </p>
         </div>
@@ -338,7 +337,6 @@
         </div>
       </div>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -348,7 +346,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { useSubscriptionStore } from '@/stores/subscriptions'
 import { redeemAPI, authAPI, type RedeemHistoryItem } from '@/api'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { formatDateTime } from '@/utils/format'
 
@@ -497,5 +494,28 @@ onMounted(async () => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+.redeem-balance-panel {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, #ffffff 18%, transparent) 0 22%, transparent 46%),
+    linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.redeem-balance-icon {
+  background: color-mix(in srgb, #ffffff 20%, transparent) !important;
+  color: var(--accent-contrast) !important;
+}
+
+.redeem-balance-label,
+.redeem-balance-meta {
+  color: color-mix(in srgb, var(--accent-contrast) 84%, transparent) !important;
+  -webkit-text-fill-color: color-mix(in srgb, var(--accent-contrast) 84%, transparent) !important;
+}
+
+.redeem-balance-amount {
+  color: var(--accent-contrast) !important;
+  -webkit-text-fill-color: var(--accent-contrast) !important;
 }
 </style>

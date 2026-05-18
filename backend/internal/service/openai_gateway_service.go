@@ -4163,20 +4163,8 @@ func (s *OpenAIGatewayService) handleCompatErrorResponse(
 		}
 	}
 
-	// Map status code to error type and write response
-	errType := "api_error"
-	switch {
-	case resp.StatusCode == 400:
-		errType = "invalid_request_error"
-	case resp.StatusCode == 404:
-		errType = "not_found_error"
-	case resp.StatusCode == 429:
-		errType = "rate_limit_error"
-	case resp.StatusCode >= 500:
-		errType = "api_error"
-	}
-
-	writeError(c, resp.StatusCode, errType, upstreamMsg)
+	statusCode, errType, errMsg := safeClientUpstreamError(resp.StatusCode)
+	writeError(c, statusCode, errType, errMsg)
 	return nil, fmt.Errorf("upstream error: %d %s", resp.StatusCode, upstreamMsg)
 }
 
