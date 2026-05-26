@@ -15,10 +15,10 @@
           <Icon name="creditCard" size="xl" class="text-gray-400" />
         </div>
         <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-          {{ t('userSubscriptions.noActiveSubscriptions') }}
+          {{ loadFailed ? t('userSubscriptions.loadUnavailable') : t('userSubscriptions.noActiveSubscriptions') }}
         </h3>
         <p class="text-gray-500 dark:text-dark-400">
-          {{ t('userSubscriptions.noActiveSubscriptionsDesc') }}
+          {{ loadFailed ? t('userSubscriptions.loadUnavailableDesc') : t('userSubscriptions.noActiveSubscriptionsDesc') }}
         </p>
       </div>
 
@@ -247,7 +247,6 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useAppStore } from '@/stores/app'
 import subscriptionsAPI from '@/api/subscriptions'
 import type { UserSubscription } from '@/types'
 import Icon from '@/components/icons/Icon.vue'
@@ -266,18 +265,20 @@ function platformAccentDotClass(p: string): string {
 
 const { t } = useI18n()
 const router = useRouter()
-const appStore = useAppStore()
 
 const subscriptions = ref<UserSubscription[]>([])
 const loading = ref(true)
+const loadFailed = ref(false)
 
 async function loadSubscriptions() {
   try {
     loading.value = true
+    loadFailed.value = false
     subscriptions.value = await subscriptionsAPI.getMySubscriptions()
   } catch (error) {
     console.error('Failed to load subscriptions:', error)
-    appStore.showError(t('userSubscriptions.failedToLoad'))
+    loadFailed.value = true
+    subscriptions.value = []
   } finally {
     loading.value = false
   }

@@ -44,11 +44,31 @@
         <template v-else>
           <!-- Top-up Tab -->
           <template v-if="activeTab === 'recharge'">
-            <!-- Recharge Account Card -->
-            <div class="card p-5">
-              <p class="text-xs font-medium text-gray-400 dark:text-gray-500">{{ t('payment.rechargeAccount') }}</p>
-              <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ user?.username || '' }}</p>
-              <p class="mt-0.5 text-sm font-medium text-green-600 dark:text-green-400">{{ t('payment.currentBalance') }}: {{ user?.balance?.toFixed(2) || '0.00' }}</p>
+            <div class="card p-6">
+              <div class="grid gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-center">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-primary-700 dark:text-primary-300">{{ t('payment.rechargeLogicKicker') }}</p>
+                  <h2 class="mt-2 text-2xl font-bold text-gray-950 dark:text-white">{{ t('payment.rechargeLogicTitle') }}</h2>
+                  <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">{{ t('payment.rechargeLogicDesc') }}</p>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  <div class="rounded-lg border border-primary-200 bg-primary-50/70 px-4 py-3 dark:border-primary-700 dark:bg-primary-900/20">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.rechargeRuleExchangeLabel') }}</p>
+                    <p class="mt-1 text-lg font-bold text-primary-700 dark:text-primary-200">{{ t('payment.rechargeRuleExchange') }}</p>
+                  </div>
+                  <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-dark-600 dark:bg-dark-800">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.rechargeRuleDiscountLabel') }}</p>
+                    <p class="mt-1 text-lg font-bold text-gray-950 dark:text-white">{{ t('payment.rechargeRuleDiscount') }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-4 text-sm dark:border-dark-600">
+                <div>
+                  <p class="font-medium text-gray-950 dark:text-white">{{ user?.username || t('payment.rechargeAccount') }}</p>
+                  <p class="mt-1 text-gray-500 dark:text-gray-400">{{ t('payment.rechargeRuleNote') }}</p>
+                </div>
+                <p class="font-semibold text-green-600 dark:text-green-400">{{ t('payment.currentBalance') }}: ${{ user?.balance?.toFixed(2) || '0.00' }}</p>
+              </div>
             </div>
             <div v-if="enabledMethods.length === 0" class="card py-16 text-center">
               <p class="text-gray-500 dark:text-gray-400">{{ t('payment.notAvailable') }}</p>
@@ -62,6 +82,9 @@
                 :max="globalMaxAmount"
               />
               <p v-if="amountError" class="mt-2 text-xs text-amber-600 dark:text-amber-300">{{ amountError }}</p>
+              <p class="mt-4 rounded-lg border border-primary-200 bg-primary-50/70 px-4 py-3 text-sm font-medium text-gray-700 dark:border-primary-700 dark:bg-primary-900/20 dark:text-gray-200">
+                {{ t('payment.rechargeTrustLine') }}
+              </p>
             </div>
             <div v-if="enabledMethods.length >= 1" class="card p-6">
               <PaymentMethodSelector
@@ -71,11 +94,34 @@
               />
             </div>
             <div v-if="validAmount > 0" class="card p-6">
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-500 dark:text-gray-400">{{ t('payment.paymentAmount') }}</span>
-                  <span class="text-gray-900 dark:text-white">{{ formatSelectedPaymentAmount(validAmount) }}</span>
+              <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-base font-bold text-gray-950 dark:text-white">{{ t('payment.rechargePreviewTitle') }}</p>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ t('payment.rechargePreviewDesc') }}</p>
                 </div>
+                <span class="rounded-md border border-primary-200 bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:border-primary-700 dark:bg-primary-900/20 dark:text-primary-200">
+                  {{ t('payment.discountSixOff') }}
+                </span>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-dark-600 dark:bg-dark-800">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.rechargeBaseAmount') }}</p>
+                  <p class="mt-1 text-lg font-bold text-gray-950 dark:text-white">{{ formatSelectedPaymentAmount(validAmount) }}</p>
+                </div>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-dark-600 dark:bg-dark-800">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.creditedBalance') }}</p>
+                  <p class="mt-1 text-lg font-bold text-green-600 dark:text-green-400">${{ creditedAmount.toFixed(2) }}</p>
+                </div>
+                <div class="rounded-lg border border-primary-200 bg-primary-50/70 px-4 py-3 dark:border-primary-700 dark:bg-primary-900/20">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.officialTokenValue') }}</p>
+                  <p class="mt-1 text-lg font-bold text-primary-700 dark:text-primary-200">${{ officialTokenValue.toFixed(2) }}</p>
+                </div>
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-dark-600 dark:bg-dark-800">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('payment.discountResult') }}</p>
+                  <p class="mt-1 text-lg font-bold text-gray-950 dark:text-white">{{ t('payment.discountSixOff') }}</p>
+                </div>
+              </div>
+              <div class="mt-4 space-y-2 border-t border-gray-200 pt-4 text-sm dark:border-dark-600">
                 <div v-if="feeRate > 0" class="flex justify-between">
                   <span class="text-gray-500 dark:text-gray-400">{{ t('payment.fee') }} ({{ feeRate }}%)</span>
                   <span class="text-gray-900 dark:text-white">{{ formatSelectedPaymentAmount(feeAmount) }}</span>
@@ -84,12 +130,8 @@
                   <span class="font-medium text-gray-700 dark:text-gray-300">{{ t('payment.actualPay') }}</span>
                   <span class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ formatSelectedPaymentAmount(totalAmount) }}</span>
                 </div>
-                <div v-if="balanceRechargeMultiplier !== 1" class="flex justify-between" :class="{ 'border-t border-gray-200 pt-2 dark:border-dark-600': feeRate <= 0 }">
-                  <span class="text-gray-500 dark:text-gray-400">{{ t('payment.creditedBalance') }}</span>
-                  <span class="text-gray-900 dark:text-white">${{ creditedAmount.toFixed(2) }}</span>
-                </div>
-                <p v-if="balanceRechargeMultiplier !== 1" class="border-t border-gray-200 pt-2 text-xs text-gray-500 dark:border-dark-600 dark:text-gray-400">
-                  {{ t('payment.rechargeRatePreview', { usd: balanceRechargeMultiplier.toFixed(2) }) }}
+                <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+                  {{ t('payment.rechargeRatePreview', { usd: balanceRechargeMultiplier.toFixed(2), multiplier: OFFICIAL_VALUE_MULTIPLIER.toFixed(1) }) }}
                 </p>
               </div>
             </div>
@@ -98,7 +140,7 @@
                 <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                 {{ t('common.processing') }}
               </span>
-              <span v-else>{{ t('payment.createOrder') }} {{ formatSelectedPaymentAmount(totalAmount) }}</span>
+              <span v-else>{{ t('payment.rechargeNow') }} {{ formatSelectedPaymentAmount(totalAmount) }}</span>
             </button>
             </template>
           </template>
@@ -492,6 +534,8 @@ const checkout = ref<CheckoutInfoResponse>({
   plans: [], balance_disabled: false, balance_recharge_multiplier: 1, recharge_fee_rate: 0, help_text: '', help_image_url: '', stripe_publishable_key: '',
 })
 
+const OFFICIAL_VALUE_MULTIPLIER = 4.2
+
 const tabs = computed(() => {
   const result: { key: 'recharge' | 'subscription'; label: string }[] = []
   if (!checkout.value.balance_disabled) result.push({ key: 'recharge', label: t('payment.tabTopUp') })
@@ -507,6 +551,7 @@ const balanceRechargeMultiplier = computed(() => {
   return multiplier > 0 ? multiplier : 1
 })
 const creditedAmount = computed(() => Math.round((validAmount.value * balanceRechargeMultiplier.value) * 100) / 100)
+const officialTokenValue = computed(() => Math.round((creditedAmount.value * OFFICIAL_VALUE_MULTIPLIER) * 100) / 100)
 
 // Adaptive grid: center single card, 2-col for 2 plans, 3-col for 3+
 const planGridClass = computed(() => {
@@ -1078,7 +1123,9 @@ onMounted(async () => {
         }
       }
     }
-  } catch (err: unknown) { appStore.showError(extractI18nErrorMessage(err, t, 'payment.errors', t('common.error'))) }
+  } catch (err: unknown) {
+    console.error('Failed to load checkout info:', err)
+  }
   finally { loading.value = false }
   // Fetch active subscriptions (uses cache, non-blocking)
   subscriptionStore.fetchActiveSubscriptions().catch(() => {})

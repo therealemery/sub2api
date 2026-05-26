@@ -287,6 +287,18 @@
           </div>
         </div>
       </template>
+
+      <div v-else class="card p-6">
+        <h2 class="text-lg font-semibold text-gray-900">
+          {{ t('admin.dashboard.title') }}
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          {{ loadError || t('admin.dashboard.noDataAvailable') }}
+        </p>
+        <button class="btn btn-secondary mt-4" @click="loadDashboardStats">
+          {{ t('common.refresh') }}
+        </button>
+      </div>
     </div>
 </template>
 
@@ -343,6 +355,7 @@ const chartsLoading = ref(false)
 const userTrendLoading = ref(false)
 const rankingLoading = ref(false)
 const rankingError = ref(false)
+const loadError = ref('')
 
 // Chart data
 const trendData = ref<TrendDataPoint[]>([])
@@ -356,6 +369,7 @@ let chartLoadSeq = 0
 let usersTrendLoadSeq = 0
 let rankingLoadSeq = 0
 const rankingLimit = 12
+const previewDashboardEnabled = import.meta.env.DEV
 
 // Helper function to format date in local timezone
 const formatLocalDate = (date: Date): string => {
@@ -563,6 +577,146 @@ const goToUserUsage = (item: UserSpendingRankingItem) => {
   })
 }
 
+const getPreviewDates = (): string[] => {
+  return Array.from({ length: 8 }, (_, index) => `${String(index + 9).padStart(2, '0')}:00`)
+}
+
+const getPreviewTrendData = (): TrendDataPoint[] => {
+  return getPreviewDates().map((date, index) => {
+    const totalTokens = [32000, 46000, 52000, 61000, 78000, 89000, 73000, 96000][index] ?? 0
+    return {
+      date,
+      requests: [42, 58, 64, 71, 88, 96, 80, 108][index] ?? 0,
+      input_tokens: Math.round(totalTokens * 0.62),
+      output_tokens: Math.round(totalTokens * 0.31),
+      cache_creation_tokens: Math.round(totalTokens * 0.04),
+      cache_read_tokens: Math.round(totalTokens * 0.03),
+      total_tokens: totalTokens,
+      cost: Number((totalTokens / 1000000 * 4.2).toFixed(4)),
+      actual_cost: Number((totalTokens / 1000000 * 2.52).toFixed(4))
+    }
+  })
+}
+
+const getPreviewModelStats = (): ModelStat[] => [
+  {
+    model: 'GPT 5.5',
+    requests: 318,
+    input_tokens: 214000,
+    output_tokens: 98000,
+    cache_creation_tokens: 18000,
+    cache_read_tokens: 26000,
+    total_tokens: 356000,
+    cost: 1.4952,
+    actual_cost: 0.8971,
+    account_cost: 0.6124
+  },
+  {
+    model: 'Claude 4.7',
+    requests: 246,
+    input_tokens: 186000,
+    output_tokens: 84000,
+    cache_creation_tokens: 14000,
+    cache_read_tokens: 22000,
+    total_tokens: 306000,
+    cost: 1.2852,
+    actual_cost: 0.7711,
+    account_cost: 0.5284
+  },
+  {
+    model: 'Gemini',
+    requests: 124,
+    input_tokens: 76000,
+    output_tokens: 39000,
+    cache_creation_tokens: 6000,
+    cache_read_tokens: 9000,
+    total_tokens: 130000,
+    cost: 0.546,
+    actual_cost: 0.3276,
+    account_cost: 0.224
+  }
+]
+
+const getPreviewUserTrend = (): UserUsageTrendPoint[] => {
+  const users = [
+    { user_id: 1, username: 'Admin', email: 'admin@example.com', seed: 1 },
+    { user_id: 2, username: 'Team API', email: 'team@example.com', seed: 0.72 },
+    { user_id: 3, username: 'Claude Code', email: 'code@example.com', seed: 0.48 }
+  ]
+  return users.flatMap((user) =>
+    getPreviewDates().map((date, index) => {
+      const tokens = Math.round(([18000, 26000, 31000, 35000, 42000, 47000, 39000, 52000][index] ?? 0) * user.seed)
+      return {
+        date,
+        user_id: user.user_id,
+        email: user.email,
+        username: user.username,
+        requests: Math.max(1, Math.round(tokens / 1100)),
+        tokens,
+        cost: Number((tokens / 1000000 * 4.2).toFixed(4)),
+        actual_cost: Number((tokens / 1000000 * 2.52).toFixed(4))
+      }
+    })
+  )
+}
+
+const applyPreviewDashboardData = () => {
+  const previewTrend = getPreviewTrendData()
+  const totalTokens = previewTrend.reduce((sum, item) => sum + item.total_tokens, 0)
+  const todayRequests = previewTrend.reduce((sum, item) => sum + item.requests, 0)
+
+  stats.value = {
+    total_users: 128,
+    today_new_users: 7,
+    active_users: 23,
+    hourly_active_users: 9,
+    stats_updated_at: new Date().toISOString(),
+    stats_stale: false,
+    total_api_keys: 42,
+    active_api_keys: 36,
+    total_accounts: 18,
+    normal_accounts: 16,
+    error_accounts: 1,
+    ratelimit_accounts: 1,
+    overload_accounts: 0,
+    total_requests: 12840,
+    total_input_tokens: 1860000,
+    total_output_tokens: 740000,
+    total_cache_creation_tokens: 126000,
+    total_cache_read_tokens: 214000,
+    total_tokens: 2940000,
+    total_cost: 12.348,
+    total_actual_cost: 7.4088,
+    total_account_cost: 5.2236,
+    today_requests: todayRequests,
+    today_input_tokens: Math.round(totalTokens * 0.62),
+    today_output_tokens: Math.round(totalTokens * 0.31),
+    today_cache_creation_tokens: Math.round(totalTokens * 0.04),
+    today_cache_read_tokens: Math.round(totalTokens * 0.03),
+    today_tokens: totalTokens,
+    today_cost: Number((totalTokens / 1000000 * 4.2).toFixed(4)),
+    today_actual_cost: Number((totalTokens / 1000000 * 2.52).toFixed(4)),
+    today_account_cost: Number((totalTokens / 1000000 * 1.78).toFixed(4)),
+    average_duration_ms: 842,
+    uptime: 86400,
+    rpm: 118,
+    tpm: 94000
+  }
+  trendData.value = previewTrend
+  modelStats.value = getPreviewModelStats()
+  userTrend.value = getPreviewUserTrend()
+  rankingItems.value = [
+    { user_id: 1, email: 'admin@example.com', actual_cost: 2.2416, requests: 318, tokens: 889000 },
+    { user_id: 2, email: 'team@example.com', actual_cost: 1.5248, requests: 226, tokens: 605000 },
+    { user_id: 3, email: 'code@example.com', actual_cost: 0.9364, requests: 144, tokens: 371000 }
+  ]
+  rankingTotalActualCost.value = rankingItems.value.reduce((sum, item) => sum + item.actual_cost, 0)
+  rankingTotalRequests.value = rankingItems.value.reduce((sum, item) => sum + item.requests, 0)
+  rankingTotalTokens.value = rankingItems.value.reduce((sum, item) => sum + item.tokens, 0)
+  rankingError.value = false
+  loadError.value = ''
+}
+
 // Date range change handler
 const onDateRangeChange = (range: {
   startDate: string
@@ -591,6 +745,7 @@ const loadDashboardSnapshot = async (includeStats: boolean) => {
     loading.value = true
   }
   chartsLoading.value = true
+  loadError.value = ''
   try {
     const response = await adminAPI.dashboard.getSnapshotV2({
       start_date: startDate.value,
@@ -610,7 +765,12 @@ const loadDashboardSnapshot = async (includeStats: boolean) => {
     modelStats.value = response.models || []
   } catch (error) {
     if (currentSeq !== chartLoadSeq) return
-    appStore.showError(t('admin.dashboard.failedToLoad'))
+    if (previewDashboardEnabled) {
+      applyPreviewDashboardData()
+    } else {
+      loadError.value = t('admin.dashboard.failedToLoad')
+      appStore.showError(t('admin.dashboard.failedToLoad'))
+    }
     console.error('Error loading dashboard snapshot:', error)
   } finally {
     if (currentSeq === chartLoadSeq) {
@@ -635,7 +795,7 @@ const loadUsersTrend = async () => {
   } catch (error) {
     if (currentSeq !== usersTrendLoadSeq) return
     console.error('Error loading users trend:', error)
-    userTrend.value = []
+    userTrend.value = previewDashboardEnabled ? getPreviewUserTrend() : []
   } finally {
     if (currentSeq === usersTrendLoadSeq) {
       userTrendLoading.value = false
@@ -661,11 +821,15 @@ const loadUserSpendingRanking = async () => {
   } catch (error) {
     if (currentSeq !== rankingLoadSeq) return
     console.error('Error loading user spending ranking:', error)
-    rankingItems.value = []
-    rankingTotalActualCost.value = 0
-    rankingTotalRequests.value = 0
-    rankingTotalTokens.value = 0
-    rankingError.value = true
+    if (previewDashboardEnabled) {
+      applyPreviewDashboardData()
+    } else {
+      rankingItems.value = []
+      rankingTotalActualCost.value = 0
+      rankingTotalRequests.value = 0
+      rankingTotalTokens.value = 0
+      rankingError.value = true
+    }
   } finally {
     if (currentSeq === rankingLoadSeq) {
       rankingLoading.value = false

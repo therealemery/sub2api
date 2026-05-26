@@ -298,6 +298,31 @@ watch(validationToastMessage, (value, previousValue) => {
 // ==================== Lifecycle ====================
 
 onMounted(async () => {
+  if (import.meta.env.DEV && !authStore.isAuthenticated) {
+    const now = new Date().toISOString()
+    const previewUser = {
+      id: 1,
+      username: 'Admin',
+      email: 'admin@example.com',
+      role: 'admin',
+      balance: 100,
+      concurrency: 5,
+      status: 'active',
+      allowed_groups: null,
+      balance_notify_enabled: false,
+      balance_notify_threshold: null,
+      balance_notify_extra_emails: [],
+      created_at: now,
+      updated_at: now
+    }
+
+    localStorage.setItem('auth_token', 'local-preview-token')
+    localStorage.setItem('auth_user', JSON.stringify(previewUser))
+    authStore.checkAuth()
+    await router.replace('/admin/dashboard')
+    return
+  }
+
   const expiredFlag = sessionStorage.getItem('auth_expired')
   if (expiredFlag) {
     sessionStorage.removeItem('auth_expired')
