@@ -65,7 +65,7 @@ describe('modelCatalog', () => {
 
     expect(result.find((item) => item.modelId === 'future-provider-model')).toMatchObject({
       provider: 'Custom',
-      artwork: '/model-art/ownapi.webp',
+      artwork: '/model-art/ownapi.jpg',
     })
   })
 
