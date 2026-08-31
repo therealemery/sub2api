@@ -36,6 +36,7 @@ describe('modelCatalog', () => {
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'gemini', 'deepseek', 'grok', 'qwen', 'glm', 'kimi']),
     )
+    expect(result[0]?.available).toBeNull()
   })
 
   it('merges configured pricing into matching family metadata', () => {
@@ -58,6 +59,7 @@ describe('modelCatalog', () => {
 
     const model = result.find((item) => item.modelId === 'gpt-5.4')
     expect(model?.price?.input).toBe(0.000001)
+    expect(model?.available).toBeNull()
     expect(model?.featured).toBe(true)
     expect(model?.artwork).toBe('/model-art/gpt.jpg')
     expect(model?.providerLogo).toBe('/brand/openai.svg')
