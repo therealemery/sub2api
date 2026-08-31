@@ -47,7 +47,7 @@
 
           <div class="catalog-results">
             <div class="results-toolbar">
-              <div><h2 id="catalog-results-title">{{ t('publicModels.available', { count: filteredModels.length }) }}</h2><p>{{ t('publicModels.resultHint') }}</p></div>
+              <div><h2 id="catalog-results-title">{{ t('publicModels.resultCount', { count: filteredModels.length }) }}</h2><p>{{ t('publicModels.resultHint') }}</p></div>
               <label>{{ t('publicModels.sort') }}
                 <select v-model="filters.sort">
                   <option value="featured">{{ t('publicModels.sortFeatured') }}</option>

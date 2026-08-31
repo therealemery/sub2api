@@ -1,16 +1,19 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
+import en from '@/i18n/locales/en'
+import zh from '@/i18n/locales/zh'
 import ModelsCatalogView from '../ModelsCatalogView.vue'
 
-const { getModelDisplayConfig, t } = vi.hoisted(() => ({
+const { getModelDisplayConfig, navigate, t } = vi.hoisted(() => ({
   getModelDisplayConfig: vi.fn<() => Promise<ModelDisplayConfig>>(),
+  navigate: vi.fn(),
   t: (key: string, params?: Record<string, unknown>) => {
     const messages: Record<string, string> = {
       'publicModels.officialListPrice': 'Official list price',
       'publicModels.officialSeventyPercent': 'Official price × 70%',
       'publicModels.ownApiPrice': 'OwnAPI price',
-      'publicModels.available': `${String(params?.count ?? '')} models available`,
+      'publicModels.resultCount': `${String(params?.count ?? '')} models`,
       'publicModels.input': 'Input',
       'publicModels.cachedInput': 'Cached input',
       'publicModels.output': 'Output',
@@ -50,7 +53,8 @@ function mountCatalog() {
         PublicSiteLayout: { template: '<div><slot /></div>' },
         RouterLink: {
           props: ['to'],
-          template: '<a :href="typeof to === `string` ? to : to?.path"><slot /></a>',
+          setup: () => ({ navigate }),
+          template: '<a :href="typeof to === `string` ? to : to?.path" @click="navigate(to)"><slot /></a>',
         },
       },
     },
@@ -60,6 +64,16 @@ function mountCatalog() {
 describe('ModelsCatalogView', () => {
   beforeEach(() => {
     getModelDisplayConfig.mockResolvedValue(emptyConfig)
+    navigate.mockClear()
+  })
+
+  it('uses neutral result-count copy in both locales', async () => {
+    expect(en.publicModels.resultCount).toBe('{count} models')
+    expect(zh.publicModels.resultCount).toBe('共 {count} 个模型')
+
+    const wrapper = mountCatalog()
+    await flushPromises()
+    expect(wrapper.get('#catalog-results-title').text()).toBe('16 models')
   })
 
   it('renders traceable OwnAPI pricing for GPT-5.6 Sol', async () => {
@@ -95,5 +109,6 @@ describe('ModelsCatalogView', () => {
     expect(grokCard?.text()).toContain('$2.8')
     expect(shortContextButton?.attributes('aria-pressed')).toBe('false')
     expect(longContextButton?.attributes('aria-pressed')).toBe('true')
+    expect(navigate).not.toHaveBeenCalled()
   })
 })

@@ -1158,7 +1158,7 @@ export default {
     clear: 'Clear filters',
     showFilters: 'Show filters',
     hideFilters: 'Hide filters',
-    available: '{count} models available',
+    resultCount: '{count} models',
     resultHint: 'Filter by provider, model class, endpoint or price.',
     sort: 'Sort',
     sortFeatured: 'Featured',
