@@ -44,6 +44,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Product design: `docs/superpowers/specs/2026-08-28-ownapi-public-models-docs-design.md`
 - Implementation plan: `docs/superpowers/plans/2026-08-28-ownapi-public-models-docs.md`
 - Handoff policy: `docs/superpowers/specs/2026-08-31-project-handoff-continuity-design.md`
+- Model pricing/status design: `docs/superpowers/specs/2026-08-31-ownapi-model-pricing-status-design.md`
+- Model pricing/status plan: `docs/superpowers/plans/2026-08-31-ownapi-model-pricing-status-plan.md`
 - Visual QA log: `design-qa.md`
 
 ## Architecture Map
@@ -167,6 +169,19 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Preserved existing valid cost thresholds and precision while displaying unavailable costs as `$0.0000`; the corresponding DashboardView render no longer creates an unhandled rejection.
 - Validation passed: focused chart/dashboard tests (2 files / 4 tests), Vue type checking, `git diff --check`, and the full frontend suite (100 files / 590 tests). The full suite still emits its existing `router-link` test-stub and intentionally exercised error-path warnings, but reports no failures or unhandled errors.
 - See `.superpowers/sdd/2026-08-31-ownapi-model-pricing-status-plan/baseline-b3-report.md`.
+
+### 2026-08-31 — Verified 16-model pricing and public Status separation
+
+- Branch/worktree: `codex/model-pricing-motion` in `.worktrees/model-pricing-motion`; latest fully verified implementation commit before this handoff record is `a861bdaf` (`fix: complete public pricing disclosures`).
+- Completed behavior: `/models` contains the exact 16 approved OpenAI, Anthropic, and xAI IDs; all customer prices derive from official standard API prices through the single `official * 0.7` calculator; cards expose input, cached input, and output pricing; Grok exposes the `>=200K` tier; detail pages expose source/date/alias and provider pricing caveats; missing prices never become `$0`.
+- Public Status boundary: public Header, Footer, Home, and Docs do not link to `/monitor`; unsupported “All systems operational” claims were removed. `/monitor` remains authenticated and redirects an anonymous visitor to `/login?redirect=/monitor`; user/admin monitoring implementation and permissions were not changed.
+- Pricing sources, all checked `2026-08-31`: OpenAI GPT-5.4 `https://developers.openai.com/api/docs/models/gpt-5.4`; GPT-5.4 Mini `https://developers.openai.com/api/docs/models/gpt-5.4-mini`; GPT-5.5 `https://developers.openai.com/api/docs/models/gpt-5.5`; GPT-5.6 Luna/Sol/Terra `https://developers.openai.com/api/docs/models/compare`; Codex alias rate card `https://help.openai.com/en/articles/20001415`; Anthropic standard pricing `https://platform.claude.com/docs/en/about-claude/pricing`; Claude Sonnet 5 release note `https://platform.claude.com/docs/en/release-notes/overview`; xAI pricing `https://docs.x.ai/developers/pricing`; PackyAPI scope reference `https://www.packyapi.com/pricing`.
+- Pricing integrity: the catalog test asserts the 16 IDs, unique slugs, exact official rates, exact source URL assignments, `0.7` multiplier, `2026-08-31` checked date, nonzero derived prices, GPT-5.4-backed Codex alias, Haiku 200K context, and both Grok long-context tiers. Manual comparison against the approved design found zero remaining official-price or derived-price discrepancies.
+- Browser QA passed at 1440 × 900 and 390 × 844 for `/models`, `/models/gpt-5-4`, `/models/claude-opus-4-6`, `/models/grok-4-6`, `/docs`, `/home`, and anonymous `/monitor`. Provider filters, price sorting, Grok tier controls, external source links, responsive overflow, image loads, public Status links, health claims, and `$0` fallbacks were checked.
+- Full frontend verification from `frontend/` passed with direct installed binaries: `node_modules/.bin/eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts`; `node_modules/.bin/vue-tsc --noEmit`; `node_modules/.bin/vitest run` (103 files / 608 tests); `node_modules/.bin/vue-tsc -b && node_modules/.bin/vite build` (859 modules); and repository `git diff --check`. Existing non-fatal warnings remain for stale Browserslist data, mixed static/dynamic imports, large chunks, and intentionally exercised test stderr.
+- The `pnpm` wrapper still stops during its automatic install with `ERR_PNPM_IGNORED_BUILDS` for `esbuild@0.21.5` and `vue-demi@0.14.10`; do not alter or commit the unrelated untracked `frontend/pnpm-workspace.yaml`. Use the installed binaries above until the wrapper policy is repaired.
+- Exact implementation files across this pricing/status work: `frontend/src/data/modelCatalog.ts`, `frontend/src/data/__tests__/modelCatalog.spec.ts`, `frontend/src/views/public/ModelsCatalogView.vue`, `frontend/src/views/public/__tests__/ModelsCatalogView.spec.ts`, `frontend/src/views/public/ModelDetailView.vue`, `frontend/src/views/public/__tests__/ModelDetailView.spec.ts`, `frontend/src/components/public/PublicSiteHeader.vue`, `frontend/src/components/public/PublicSiteFooter.vue`, `frontend/src/components/public/__tests__/PublicNavigation.spec.ts`, `frontend/src/views/HomeView.vue`, `frontend/src/views/public/DocsView.vue`, `frontend/src/router/__tests__/guards.spec.ts`, and `frontend/src/i18n/locales/en.ts` / `zh.ts`.
+- Deployment remains blocked exactly as before: GitHub Actions can build the production image, but `SERVER_SSH_KEY` is rejected for `SERVER_USER`. Repair the secret or the server user’s `authorized_keys`, rerun `.github/workflows/deploy.yml` from `main`, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` on the confirmed production domain. No deployment was attempted from this branch.
 
 ## Recovery Checklist
 
