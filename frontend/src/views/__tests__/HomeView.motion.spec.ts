@@ -1,7 +1,7 @@
-import { nextTick } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createMemoryHistory, createRouter, RouterView } from 'vue-router'
 import HomeView from '../HomeView.vue'
 import homeViewSource from '../HomeView.vue?raw'
 
@@ -98,6 +98,36 @@ async function mountHome(reducedMotion = false) {
   return { router, wrapper }
 }
 
+async function mountHomeRoute(reducedMotion = false) {
+  vi.stubGlobal('matchMedia', vi.fn(() => createMedia(reducedMotion)))
+  const EmptyPage = defineComponent({ template: '<div data-away-page />' })
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/home', component: HomeView },
+      { path: '/models', component: EmptyPage },
+      { path: '/login', component: EmptyPage },
+      { path: '/docs/ownapi-usage-guide.html', component: EmptyPage },
+      { path: '/key-usage', component: EmptyPage },
+      { path: '/agent-recruitment', component: EmptyPage }
+    ]
+  })
+  await router.push('/home')
+  await router.isReady()
+
+  const wrapper = mount(RouterView, {
+    global: {
+      plugins: [router],
+      stubs: {
+        Icon: true,
+        PublicSiteLayout: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+
+  return { router, wrapper }
+}
+
 describe('HomeView motion', () => {
   beforeEach(() => {
     state.homeContent = ''
@@ -112,10 +142,18 @@ describe('HomeView motion', () => {
     vi.unstubAllGlobals()
   })
 
-  it('uses deterministic bounded delays for the four hero layers', async () => {
-    const { wrapper } = await mountHome()
-    const layers = wrapper.findAll('[data-motion-layer]')
+  it('plays the bounded hero sequence once per session without custom-home pollution', async () => {
+    state.homeContent = '<main data-custom-home>Custom</main>'
+    const { wrapper: customWrapper } = await mountHome()
 
+    expect(customWrapper.find('.landing-page').exists()).toBe(false)
+    customWrapper.unmount()
+
+    state.homeContent = ''
+    const { router, wrapper: firstWrapper } = await mountHomeRoute()
+    const layers = firstWrapper.findAll('[data-motion-layer]')
+
+    expect(firstWrapper.get('.landing-page').classes()).toContain('is-hero-animating')
     expect(layers.map(layer => layer.attributes('data-motion-layer'))).toEqual([
       'eyebrow',
       'title',
@@ -128,7 +166,7 @@ describe('HomeView motion', () => {
       '--hero-delay: 120ms;',
       '--hero-delay: 180ms;'
     ])
-    expect(wrapper.findAll('.gateway-provider-tile').map(tile => tile.attributes('style'))).toEqual([
+    expect(firstWrapper.findAll('.gateway-provider-tile').map(tile => tile.attributes('style'))).toEqual([
       '--hero-delay: 180ms;',
       '--hero-delay: 220ms;',
       '--hero-delay: 260ms;',
@@ -137,7 +175,16 @@ describe('HomeView motion', () => {
     expect(300 + 280).toBeLessThan(600)
     expect(homeViewSource).toContain('animation:gateway-tile-enter 280ms')
 
-    wrapper.unmount()
+    await router.push('/models')
+    await flushPromises()
+    expect(firstWrapper.find('.landing-page').exists()).toBe(false)
+
+    await router.push('/home')
+    await flushPromises()
+    expect(firstWrapper.get('.landing-page').classes()).not.toContain('is-hero-animating')
+    expect(firstWrapper.findAll('[data-motion-layer]').every(layer => layer.classes().includes('is-revealed'))).toBe(true)
+
+    firstWrapper.unmount()
   })
 
   it('keeps native FAQ disclosure semantics with layout-safe grid animation', async () => {
@@ -188,6 +235,7 @@ describe('HomeView motion', () => {
     await nextTick()
 
     expect(wrapper.get('.landing-page').classes()).toContain('is-reduced-motion')
+    expect(wrapper.get('.landing-page').classes()).not.toContain('is-hero-animating')
     expect(wrapper.findAll('[data-motion-layer]').every(layer => layer.classes().includes('is-revealed'))).toBe(true)
     expect(wrapper.findAll('[data-motion-section]').every(section => section.classes().includes('is-revealed'))).toBe(true)
     expect(observerInstances).toHaveLength(0)

@@ -5,7 +5,7 @@
   </div>
 
   <PublicSiteLayout v-else>
-    <div class="landing-page" :class="{ 'is-reduced-motion': reducedMotion }">
+    <div class="landing-page" :class="{ 'is-reduced-motion': reducedMotion, 'is-hero-animating': heroShouldAnimate }">
       <main>
       <section class="announcement-bar" :aria-label="t('home.announcement.label')">
         <span>{{ t('home.announcement.text') }}</span>
@@ -14,16 +14,16 @@
 
       <section class="hero-section">
         <div class="hero-copy">
-          <span class="eyebrow hero-motion-item" :class="{ 'is-revealed': reducedMotion }" data-motion-layer="eyebrow" style="--hero-delay: 0ms">{{ t('home.heroEyebrow') }}</span>
-          <h1 class="hero-motion-item" :class="{ 'is-revealed': reducedMotion }" data-motion-layer="title" style="--hero-delay: 60ms"><span>{{ siteName }}</span><span>{{ t('home.heroSubtitle') }}</span></h1>
-          <div class="hero-actions hero-motion-item" :class="{ 'is-revealed': reducedMotion }" data-motion-layer="actions" style="--hero-delay: 120ms">
+          <span class="eyebrow hero-motion-item" :class="{ 'is-revealed': heroIsSettled }" data-motion-layer="eyebrow" style="--hero-delay: 0ms">{{ t('home.heroEyebrow') }}</span>
+          <h1 class="hero-motion-item" :class="{ 'is-revealed': heroIsSettled }" data-motion-layer="title" style="--hero-delay: 60ms"><span>{{ siteName }}</span><span>{{ t('home.heroSubtitle') }}</span></h1>
+          <div class="hero-actions hero-motion-item" :class="{ 'is-revealed': heroIsSettled }" data-motion-layer="actions" style="--hero-delay: 120ms">
             <router-link :to="primaryActionPath" class="primary-button">
               {{ isAuthenticated ? t('home.goToDashboard') : t('home.getApiKey') }}
             </router-link>
             <router-link to="/models" class="secondary-button">{{ t('home.viewPricing') }}</router-link>
           </div>
         </div>
-        <div class="gateway-visual hero-motion-item" :class="{ 'is-revealed': reducedMotion }" data-motion-layer="gateway" style="--hero-delay: 180ms" aria-hidden="true">
+        <div class="gateway-visual hero-motion-item" :class="{ 'is-revealed': heroIsSettled }" data-motion-layer="gateway" style="--hero-delay: 180ms" aria-hidden="true">
           <div class="gateway-provider gateway-provider-openai gateway-provider-tile" style="--hero-delay: 180ms"><img src="/brand/openai.svg" alt="" /></div>
           <div class="gateway-provider gateway-provider-claude gateway-provider-tile" style="--hero-delay: 220ms"><img src="/brand/claude.svg" alt="" /></div>
           <div class="gateway-center gateway-center-tile" style="--hero-delay: 180ms"><img :src="siteLogoPath" alt="" /></div>
@@ -165,8 +165,13 @@
   </PublicSiteLayout>
 </template>
 
+<script lang="ts">
+// In-memory only: a full reload starts a new page session and allows one replay.
+let hasPlayedDefaultHomeHero = false
+</script>
+
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore, useAppStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
@@ -198,6 +203,20 @@ const siteName = computed(() => {
 const siteLogo = computed(() => resolveSiteLogoPath(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || DEFAULT_SITE_LOGO))
 const siteLogoPath = computed(() => siteLogo.value)
 const homeContent = computed(() => appStore.cachedPublicSettings?.home_content || '')
+const heroShouldAnimate = ref(false)
+const heroIsSettled = computed(() => reducedMotion.value || !heroShouldAnimate.value)
+
+watch(reducedMotion, (reduced) => {
+  if (reduced) heroShouldAnimate.value = false
+}, { flush: 'sync' })
+
+onMounted(() => {
+  if (homeContent.value) return
+
+  heroShouldAnimate.value = !reducedMotion.value && !hasPlayedDefaultHomeHero
+  hasPlayedDefaultHomeHero = true
+})
+
 const usageGuideUrl = '/docs/ownapi-usage-guide.html'
 const fallbackContactEmail = 'support@ownapi.dev'
 const codeExample = computed(() => buildHomeCodeExample(window.location.origin))
@@ -304,7 +323,7 @@ const faqItems = [
 .desktop-nav,.desktop-actions,.hero-actions,.text-link{display:flex;align-items:center}.desktop-nav{justify-content:center;gap:28px;color:#444;font-size:14px}.desktop-nav a,.footer-column a{transition:color 160ms ease}.desktop-nav a:hover,.footer-column a:hover{color:#000}.desktop-actions{justify-content:flex-end;gap:10px}
 .nav-primary,.nav-secondary,.primary-button,.secondary-button{display:inline-flex;min-height:40px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;padding:0 16px;font-size:14px;font-weight:560;transition:background 160ms ease,border-color 160ms ease,color 160ms ease}.nav-primary,.primary-button{border-color:var(--ink);background:var(--ink);color:#fff!important}.nav-secondary,.secondary-button{background:var(--surface);color:var(--ink)}.nav-primary:hover,.primary-button:hover{background:#333}.nav-secondary:hover,.secondary-button:hover{border-color:#b8b8b8;background:#f6f6f6}.mobile-menu-button,.mobile-menu{display:none}
 .announcement-bar{display:flex;min-height:104px;align-items:center;justify-content:center;gap:34px;padding:24px;font-size:14px}.announcement-bar a{display:inline-flex;align-items:center;gap:8px;font-weight:600}
-.hero-motion-item{animation:hero-enter 380ms var(--ease-enter) both;animation-delay:var(--hero-delay,0ms)}.gateway-visual.hero-motion-item{animation-name:hero-fade-in;animation-duration:320ms}.gateway-provider-tile,.gateway-center-tile{animation:gateway-tile-enter 280ms var(--ease-enter) both;animation-delay:var(--hero-delay,180ms)}
+.landing-page.is-hero-animating .hero-motion-item{animation:hero-enter 380ms var(--ease-enter) both;animation-delay:var(--hero-delay,0ms)}.landing-page.is-hero-animating .gateway-visual.hero-motion-item{animation-name:hero-fade-in;animation-duration:320ms}.landing-page.is-hero-animating .gateway-provider-tile,.landing-page.is-hero-animating .gateway-center-tile{animation:gateway-tile-enter 280ms var(--ease-enter) both;animation-delay:var(--hero-delay,180ms)}
 @keyframes hero-enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes hero-fade-in{from{opacity:0}to{opacity:1}}@keyframes gateway-tile-enter{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
 .hero-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.9fr) minmax(0,1fr);align-items:center;min-height:700px;width:min(100% - 48px,1392px);margin:0 auto;padding:72px 0 48px}.hero-copy{align-self:center}.eyebrow{display:inline-block;margin-bottom:22px;color:var(--muted);font-size:13px;font-weight:560}
 .hero-copy h1,.story-heading h2,.section-title-row h2,.agent-section h2,.final-cta-section h2{margin:0;font-weight:500;letter-spacing:-.06em;line-height:.98}.hero-copy h1{display:flex;flex-direction:column;max-width:470px;font-size:clamp(54px,5.1vw,80px)}.hero-actions{gap:10px;margin-top:34px;flex-wrap:wrap}.primary-button,.secondary-button{min-height:46px;border-radius:999px;padding:0 22px;font-size:15px}
