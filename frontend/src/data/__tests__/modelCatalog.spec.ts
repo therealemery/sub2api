@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
 import {
   buildModelCatalog,
+  calculateOwnApiPricing,
   filterModelCatalog,
+  formatCatalogPrice,
   findCatalogModel,
   relatedCatalogModels,
 } from '../modelCatalog'
@@ -14,6 +16,19 @@ const emptyConfig: ModelDisplayConfig = {
 }
 
 describe('modelCatalog', () => {
+  it('calculates OwnAPI pricing from official token rates', () => {
+    expect(calculateOwnApiPricing({ input: 2.5, cachedInput: 0.25, output: 15 })).toEqual({
+      input: 1.75,
+      cachedInput: 0.175,
+      output: 10.5,
+    })
+  })
+
+  it('formats catalog prices without grouping and preserves useful precision', () => {
+    expect(formatCatalogPrice(0.0525)).toBe('0.0525')
+    expect(formatCatalogPrice(null)).toBeNull()
+  })
+
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 

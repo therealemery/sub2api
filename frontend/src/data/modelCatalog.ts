@@ -7,6 +7,42 @@ import type {
 export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'ownapi'
 export type ModelCatalogSort = 'featured' | 'name' | 'price'
 
+export interface OfficialTokenPricing {
+  input: number | null
+  cachedInput: number | null
+  output: number | null
+}
+
+export interface LongContextPricing extends OfficialTokenPricing {
+  thresholdTokens: number
+}
+
+export interface ModelPricingSource {
+  official: OfficialTokenPricing
+  longContext?: LongContextPricing
+  multiplier: 0.7
+  sourceUrl: string
+  checkedAt: '2026-08-31'
+}
+
+export function calculateOwnApiPricing(
+  pricing: OfficialTokenPricing,
+  multiplier = 0.7,
+): OfficialTokenPricing {
+  const multiply = (value: number | null) => value == null ? null : value * multiplier
+  return {
+    input: multiply(pricing.input),
+    cachedInput: multiply(pricing.cachedInput),
+    output: multiply(pricing.output),
+  }
+}
+
+export function formatCatalogPrice(value: number | null): string | null {
+  return value == null
+    ? null
+    : value.toLocaleString('en-US', { maximumFractionDigits: 4, useGrouping: false })
+}
+
 export interface ModelCatalogPrice {
   billingMode: string
   input: number | null
@@ -35,6 +71,12 @@ export interface ModelCatalogEntry {
   featuredBadge: string
   sortOrder: number
   price: ModelCatalogPrice | null
+  pricingSource: ModelPricingSource | null
+  modelClass: string[]
+  endpoints: string[]
+  isAlias: boolean
+  aliasNoteKey: string | null
+  available: boolean
 }
 
 export interface CatalogFilters {
@@ -122,6 +164,7 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
       featured: Boolean(featuredConfig) || existing?.featured === true,
       featuredBadge: featuredConfig?.badge || existing?.featuredBadge || '',
       sortOrder: featuredConfig?.sort_order ?? pricing.sort_order ?? existing?.sortOrder ?? 100 + index,
+      available: true,
     })
   }
 
@@ -215,6 +258,12 @@ function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): Mode
     featuredBadge: featuredConfig?.badge || '',
     sortOrder: featuredConfig?.sort_order ?? item.sortOrder,
     price: null,
+    pricingSource: null,
+    modelClass: [],
+    endpoints: [],
+    isAlias: false,
+    aliasNoteKey: null,
+    available: false,
   }
 }
 
@@ -235,6 +284,12 @@ function entryFromConfigured(
     featuredBadge: '',
     sortOrder: pricing.sort_order ?? 100 + index,
     price: priceFromConfig(pricing),
+    pricingSource: null,
+    modelClass: [],
+    endpoints: [],
+    isAlias: false,
+    aliasNoteKey: null,
+    available: true,
   }
 }
 
