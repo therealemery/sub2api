@@ -96,6 +96,7 @@ describe('modelCatalog', () => {
       isAlias: true,
       aliasNoteKey: 'publicModels.aliases.codexAutoReview',
     })
+    expect(catalog.find((model) => model.modelId === 'claude-haiku-4-5-20251001')?.contextWindow).toBe('200K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.longContext).toEqual({
       input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000,
     })
@@ -128,6 +129,11 @@ describe('modelCatalog', () => {
     expect(model?.featured).toBe(true)
     expect(model?.artwork).toBe('/model-art/gpt.jpg')
     expect(model?.providerLogo).toBe('/brand/openai.svg')
+    expect(model?.pricingSource).toMatchObject({
+      official: { input: 2.5, cachedInput: 0.25, output: 15 },
+      sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4',
+      checkedAt: '2026-08-31',
+    })
   })
 
   it('adds unknown configured models with provider or OwnAPI fallback metadata', () => {
