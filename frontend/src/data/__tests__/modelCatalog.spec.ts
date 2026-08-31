@@ -159,40 +159,60 @@ describe('modelCatalog', () => {
     })
   })
 
-  it('filters by query, provider, and capability', () => {
+  it('filters by query, provider, class, and endpoint', () => {
     const result = filterModelCatalog(buildModelCatalog(emptyConfig), {
       query: 'claude',
       provider: 'Anthropic',
-      capability: 'Reasoning',
+      modelClass: 'flagship',
+      endpoint: 'anthropic',
       sort: 'featured',
     })
 
     expect(result.length).toBeGreaterThan(0)
     expect(result.every((item) => item.provider === 'Anthropic')).toBe(true)
+    expect(result.every((item) => item.modelClass.includes('flagship'))).toBe(true)
+    expect(result.every((item) => item.endpoints.includes('anthropic'))).toBe(true)
   })
 
-  it('sorts by lowest input price without moving unavailable prices first', () => {
+  it('sorts by lowest OwnAPI input price with missing values last', () => {
+    const entries = buildModelCatalog(emptyConfig).map((item) => item.modelId === 'gpt-5.4'
+      ? {
+          ...item,
+          pricingSource: item.pricingSource && {
+            ...item.pricingSource,
+            official: { ...item.pricingSource.official, input: null },
+          },
+        }
+      : item)
+
+    const result = filterModelCatalog(entries, {
+      query: '',
+      provider: '',
+      modelClass: '',
+      endpoint: '',
+      sort: 'input-price',
+    })
+
+    expect(result[0]?.modelId).toBe('gpt-5.6-luna')
+    expect(result.at(-1)?.modelId).toBe('gpt-5.4')
+  })
+
+  it('sorts by lowest OwnAPI output price with missing values last', () => {
     const entries = buildModelCatalog(emptyConfig).slice(0, 2).map((item, index) => ({
       ...item,
-      price: index === 0 ? null : {
-        billingMode: 'token',
-        input: 0.000001,
-        output: null,
-        cacheRead: null,
-        cacheWrite: null,
-        imageOutput: null,
-        perRequest: null,
-      },
+      pricingSource: index === 0 ? null : item.pricingSource,
     }))
 
     const result = filterModelCatalog(entries, {
       query: '',
       provider: '',
-      capability: '',
-      sort: 'price',
+      modelClass: '',
+      endpoint: '',
+      sort: 'output-price',
     })
 
-    expect(result[0]?.price?.input).toBe(0.000001)
+    expect(result[0]?.pricingSource?.official.output).not.toBeNull()
+    expect(result.at(-1)?.pricingSource).toBeNull()
   })
 
   it('resolves a model by a stable URL-safe slug and finds related entries', () => {

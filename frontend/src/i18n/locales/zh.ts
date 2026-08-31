@@ -1144,7 +1144,7 @@ export default {
 
   publicModels: {
     eyebrow: '一个 API，连接所有模型', title: '探索 OwnAPI 模型目录', description: '搜索并比较主流 AI 模型，查看能力与价格，然后通过一个 OpenAI 兼容接口完成接入。',
-    proofModels: '精选模型家族', proofBilling: '统一计费', proofApi: '生产级 API', searchPlaceholder: '搜索模型、提供商或能力…', filters: '筛选', provider: '提供商', capability: '能力', allProviders: '全部提供商', allCapabilities: '全部能力', clear: '清除筛选', showFilters: '显示筛选', hideFilters: '收起筛选', available: '共 {count} 个可用模型', resultHint: '按能力、提供商或价格筛选。', sort: '排序', sortFeatured: '推荐优先', sortName: '按名称', sortPrice: '最低价格', featured: '推荐', from: '起价', priceUnavailable: '价格待公布', perMillion: '/ 百万 Token', perRequest: '/ 次', viewModel: '查看模型', noResults: '没有符合筛选条件的模型。', noResultsHint: '尝试其他提供商、能力或搜索词。', fallbackNotice: '实时价格暂时不可用，当前展示 OwnAPI 精选模型目录。', growthTitle: '更多模型即将加入', growthDescription: '模型目录已为未来新增提供商和模型版本预留扩展空间。', backToModels: '全部模型', modelId: '模型 ID', context: '上下文', modality: '类型', pricing: '当前价格', input: '输入', output: '输出', cacheRead: '缓存读取', request: '请求', copyModel: '复制模型 ID', modelCopied: '模型 ID 已复制', buildTitle: '开始使用此模型构建', buildDescription: '保持同一个 OwnAPI 地址，只需切换模型参数。', getStarted: '获取 API Key', createKey: '创建 API Key', related: '相关模型', notFoundTitle: '未找到模型', notFoundDescription: '该模型目前不在 OwnAPI 公共模型目录中。',
+    proofModels: '精选模型家族', proofBilling: '统一计费', proofApi: '生产级 API', searchPlaceholder: '搜索模型、提供商或能力…', filters: '筛选', provider: '提供商', capability: '能力', modelClass: '模型类型', endpoint: '接口端点', allProviders: '全部提供商', allCapabilities: '全部能力', allClasses: '全部类型', allEndpoints: '全部端点', clear: '清除筛选', showFilters: '显示筛选', hideFilters: '收起筛选', available: '共 {count} 个可用模型', resultHint: '按提供商、模型类型、端点或价格筛选。', sort: '排序', sortFeatured: '推荐优先', sortName: '按名称', sortPrice: '最低价格', sortInputPrice: '最低输入价', sortOutputPrice: '最低输出价', featured: '推荐', from: '起价', priceUnavailable: '价格待公布', perMillion: '/ 百万 Token', perRequest: '/ 次', viewModel: '查看模型', noResults: '没有符合筛选条件的模型。', noResultsHint: '尝试其他提供商、模型类型、端点或搜索词。', fallbackNotice: '实时价格暂时不可用，当前展示 OwnAPI 精选模型目录。', growthTitle: '更多模型即将加入', growthDescription: '模型目录已为未来新增提供商和模型版本预留扩展空间。', backToModels: '全部模型', modelId: '模型 ID', context: '上下文', modality: '类型', pricing: '当前价格', input: '输入', output: '输出', officialListPrice: '官方标价', ownApiPrice: 'OwnAPI 价格', officialSeventyPercent: '官方价 7 折', cacheRead: '缓存读取', cachedInput: '缓存输入', request: '请求', shortContext: '短上下文', longContext: '长上下文', longContextThreshold: '超过 {count} Token 使用长上下文价', pricingCheckedAt: '价格核验于 {date}', notPublished: '未公布', copyModel: '复制模型 ID', modelCopied: '模型 ID 已复制', buildTitle: '开始使用此模型构建', buildDescription: '保持同一个 OwnAPI 地址，只需切换模型参数。', getStarted: '获取 API Key', createKey: '创建 API Key', related: '相关模型', notFoundTitle: '未找到模型', notFoundDescription: '该模型目前不在 OwnAPI 公共模型目录中。',
     code: { python: 'Python', typescript: 'TypeScript', curl: 'cURL', copy: '复制代码', copied: '已复制' },
     families: {
       gpt: { summary: '面向推理、编程与多模态任务的前沿智能。', description: '适合复杂推理、软件工程、智能体工作流与多模态产品的通用模型家族。' },
@@ -1156,6 +1156,9 @@ export default {
       glm: { summary: '面向真实产品的结构化多语言智能。', description: '适合双语助手、工具调用、推理和多模态企业应用。' },
       kimi: { summary: '面向文档和研究的长上下文理解。', description: '适合长文档、研究综合以及需要大量上下文的连续对话。' },
       ownapi: { summary: '通过 OwnAPI 网关提供的已配置模型。', description: '该模型使用统一的 OwnAPI 路由、计费与 OpenAI 兼容接入，目录信息将持续完善。' }
+    },
+    aliases: {
+      codexAutoReview: 'GPT-5.4 的别名，用于 Codex 自动代码审查工作流。'
     }
   },
 
