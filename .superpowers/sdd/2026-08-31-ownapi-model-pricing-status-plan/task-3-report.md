@@ -51,3 +51,23 @@ Tests:
 Concerns:
 - `pnpm vitest ...` remains blocked by the pnpm wrapper's ignored-builds preflight, unchanged from the original Task 3 report.
 - Existing untracked `frontend/pnpm-workspace.yaml` remains untouched.
+
+## Review fix round 2/5
+
+Status: complete
+
+Commit:
+- `fix: preserve model artwork link aspect box`
+
+Fixed:
+- Added `display: block` to `.model-card-link` so the linked artwork preserves the same block-level 16:9 aspect-ratio box behavior as the original `div`.
+- Added a focused component assertion that GPT-5.6 Sol renders artwork navigation as `a.model-art.model-card-link` with an image inside.
+
+Tests:
+- Final: `node_modules/.bin/vitest run src/views/public/__tests__/ModelsCatalogView.spec.ts` passed, 2 tests.
+- Final: `node_modules/.bin/vue-tsc --noEmit` passed.
+- Final: `node_modules/.bin/eslint src/views/public/ModelsCatalogView.vue src/views/public/__tests__/ModelsCatalogView.spec.ts` passed.
+- Final: `git diff --check` passed.
+
+Concerns:
+- Existing pnpm wrapper ignored-builds issue and untracked `frontend/pnpm-workspace.yaml` are unchanged.

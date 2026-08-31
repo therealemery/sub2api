@@ -66,8 +66,11 @@ describe('ModelsCatalogView', () => {
     const wrapper = mountCatalog()
     await flushPromises()
     const solCard = wrapper.findAll('.model-card').find((card) => card.text().includes('GPT-5.6 Sol'))
+    const artworkLink = solCard?.find('a.model-art.model-card-link')
 
     expect(wrapper.text()).toContain('GPT-5.6 Sol')
+    expect(artworkLink?.exists()).toBe(true)
+    expect(artworkLink?.find('img').exists()).toBe(true)
     expect(wrapper.text()).toContain('Official list price')
     expect(wrapper.text()).toContain('Official price × 70%')
     expect(wrapper.text()).toContain('$2.8')
