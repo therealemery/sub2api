@@ -43,7 +43,7 @@ describe('useReducedMotion', () => {
     media.matches = true
     media.dispatchEvent(new Event('change'))
     expect(reduced?.value).toBe(true)
-    
+
     wrapper.unmount()
     expect(media.removeEventListener).toHaveBeenCalledWith('change', listener)
   })
