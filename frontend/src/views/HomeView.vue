@@ -92,7 +92,6 @@
               <li>{{ t('home.features.multiAccount') }}</li><li>{{ t('home.integration.steps.usageTitle') }}</li>
               <li>{{ t('home.trust.transparentTitle') }}</li><li>{{ t('home.status') }}</li>
             </ul>
-            <router-link to="/monitor" class="text-link">{{ t('home.trust.statusAction') }} <Icon name="arrowRight" size="xs" /></router-link>
           </div>
         </div>
       </section>
@@ -271,7 +270,7 @@ const capabilityCards: readonly CapabilityCard[] = [
   { logo: '/brand/claude.svg', titleKey: 'home.capabilities.claudeTitle', descriptionKey: 'home.providers.claudeDescription', to: '/models' },
   { icon: 'terminal', titleKey: 'home.capabilities.gatewayTitle', descriptionKey: 'home.capabilities.gatewayDescription', to: '/docs/ownapi-usage-guide.html' },
   { icon: 'chartBar', titleKey: 'home.capabilities.usageTitle', descriptionKey: 'home.capabilities.usageDescription', to: '/key-usage' },
-  { icon: 'shield', titleKey: 'home.capabilities.statusTitle', descriptionKey: 'home.capabilities.statusDescription', to: '/monitor' },
+  { icon: 'shield', titleKey: 'home.capabilities.statusTitle', descriptionKey: 'home.capabilities.statusDescription' },
   { icon: 'users', titleKey: 'home.capabilities.businessTitle', descriptionKey: 'home.capabilities.businessDescription' }
 ]
 const faqItems = [

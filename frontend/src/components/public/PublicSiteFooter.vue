@@ -8,7 +8,7 @@
       <p>{{ t('home.heroDescription') }}</p>
     </div>
     <div class="footer-directory">
-      <div><strong>{{ t('home.footer.product') }}</strong><router-link to="/models">{{ t('home.models') }}</router-link><router-link to="/monitor">{{ t('home.status') }}</router-link></div>
+      <div><strong>{{ t('home.footer.product') }}</strong><router-link to="/models">{{ t('home.models') }}</router-link></div>
       <div><strong>{{ t('home.footer.resources') }}</strong><router-link to="/docs">{{ t('home.docs') }}</router-link><router-link to="/key-usage">{{ t('keyUsage.title') }}</router-link></div>
       <div><strong>{{ t('home.footer.company') }}</strong><router-link to="/agent-recruitment">{{ t('home.agentRecruitment') }}</router-link><a href="mailto:support@ownapi.dev">{{ t('home.footer.support') }}</a></div>
     </div>

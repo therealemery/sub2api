@@ -191,6 +191,10 @@ describe('路由守卫逻辑', () => {
     it('访问 /docs 公共文档页面允许通过', () => {
       expect(simulateGuard('/docs', { requiresAuth: false }, authState)).toBeNull()
     })
+
+    it('访问 /monitor 重定向到 /login', () => {
+      expect(simulateGuard('/monitor', { requiresAuth: true }, authState)).toBe('/login')
+    })
   })
 
   // --- 已认证普通用户 ---
@@ -217,6 +221,10 @@ describe('路由守卫逻辑', () => {
     it('访问 /dashboard 允许通过', () => {
       const redirect = simulateGuard('/dashboard', {}, authState)
       expect(redirect).toBeNull()
+    })
+
+    it('访问 /monitor 允许通过', () => {
+      expect(simulateGuard('/monitor', { requiresAuth: true }, authState)).toBeNull()
     })
 
     it('访问管理页面被拒绝，重定向到 /dashboard', () => {
