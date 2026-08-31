@@ -19,7 +19,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Working directory: `/Users/owen/apizhongzhuan/sub2api`
 - Active branch: `codex/public-models-docs`
-- Latest verified product checkpoint: `a19d27cb`
+- Latest source/deployment-build checkpoint: `7d7b69c1`
 - The tracked product work is committed. The worktree still contains untracked local QA/cache/workspace artifacts (`.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`); inspect them before deciding whether they belong in Git and do not discard them blindly.
 - A frontend-only Vite server was used for QA at `http://127.0.0.1:3000`; do not assume it is still running in a later session.
 
@@ -35,6 +35,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `47faf485` — public Models catalog and model detail experience.
 - `58aebe72` — public documentation experience.
 - `a19d27cb` — browser-QA fixes and Models/Docs QA record.
+- `9cc01e91` — updated conversation-independent handoff after Models/Docs QA.
+- `d9cc9b06` — restored the previously successful traceable production deployment workflow.
+- `7d7b69c1` — pinned Docker builds to pnpm 9.15.9; the complete production image then built successfully.
 
 ## Required Reading
 
@@ -71,9 +74,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The public Models and Docs implementation and local QA are complete. Remaining work:
 
-1. Push the verified branch so another model can retrieve the full source and handoff record.
-2. Obtain or discover the user's actual production domain, server/hosting target, deployment directory or service, environment-variable location, and rollback method.
-3. Deploy the exact verified revision, verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` in production, then record the deployment below.
+1. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
+2. Re-run the `Build and Deploy` workflow on `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
+3. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
 
 ## Local Validation
 
@@ -104,8 +107,10 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Credentials: never store here.
 - Last deployed revision: not yet recorded.
 - Rollback revision: not yet recorded.
-- Production verification: pending.
-- Source backup remote: `https://github.com/therealemery/sub2api.git`; verified branch intended for push is `codex/public-models-docs`.
+- Production verification: blocked before server-side execution by rejected SSH public-key authentication; the existing online container was not replaced.
+- Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
+- CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
+- Deployment build: run `33353391215` successfully built image `ownapi:7d7b69c1c3fd`, then failed at SSH authentication before `docker load` or Compose execution.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
@@ -136,7 +141,16 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - English/Chinese switching persisted through reload; search/filter/sort, mobile menu, tabs, copy controls, anchors, and related links were exercised.
 - Validation passed: 6 Vitest files / 52 tests, Vue type checking, focused ESLint, production Vite build, and `git diff --check`.
 - Build emitted only existing mixed-import, chunk-size, and stale Browserslist-data warnings.
-- Remaining blocker: no production domain, host, deployment directory/service, or credential path is present in the repository, Git remote, environment-variable names, or SSH configuration. Obtain that target before deploying.
+- At that checkpoint the deployment target had not yet been recovered; the later source-upload/deployment checkpoint below supersedes this status.
+
+### 2026-08-31 — Source upload and production deployment attempt
+
+- Pushed the complete source and handoff record to both `origin/codex/public-models-docs` and `origin/main`.
+- Restored the historical `Build and Deploy` workflow that previously completed successfully on 2026-05-11 and uses repository secrets `SERVER_HOST`, `SERVER_USER`, and `SERVER_SSH_KEY` for `/opt/ownapi/deploy`.
+- Full GitHub CI passed in run `33352960936`.
+- First deployment run `33353242909` exposed pnpm-major drift in Docker (`pnpm@latest` rejected dependency build scripts); fixed by pinning Docker to the CI-compatible pnpm 9.15.9 in `7d7b69c1`.
+- Second deployment run `33353391215` built the complete commit-tagged Docker image successfully. The reachable server then rejected the configured SSH key for the configured user. Because authentication failed, no image was loaded and no production container, `.env`, or data was changed.
+- Exact recovery action: update `SERVER_SSH_KEY` (or correct `SERVER_USER`/server `authorized_keys`), then dispatch `.github/workflows/deploy.yml` with branch `main` and verify the public routes.
 
 ## Recovery Checklist
 
