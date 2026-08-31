@@ -184,7 +184,7 @@ export const verifiedCatalogSeeds: CuratedSeed[] = [
     modelId: 'gpt-5.6-sol', displayName: 'GPT-5.6 Sol', family: 'gpt',
     modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
     official: { input: 4, cachedInput: 0.4, output: 20 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.6-sol', checkedAt: '2026-08-31', featured: true, sortOrder: 50,
+    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', featured: true, sortOrder: 50,
   }),
   verifiedSeed({
     modelId: 'gpt-5.6-terra', displayName: 'GPT-5.6 Terra', family: 'gpt',

@@ -38,6 +38,10 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.families.grok.description': 'Grok model family',
       'publicModels.families.claude.description': 'Claude model family',
       'publicModels.aliases.codexAutoReview': 'Alias for GPT-5.4 tuned for Codex automated review workflows.',
+      'publicModels.pricingNotes.openAiLongContext': 'Inputs over 272K tokens may use OpenAI long-context rates.',
+      'publicModels.pricingNotes.openAiRegional': 'Regional processing and service tiers may add provider charges.',
+      'publicModels.pricingNotes.anthropicCacheWrite': 'Anthropic cache-write pricing is separate from the cached-input rate shown above.',
+      'publicModels.pricingNotes.anthropicDataResidency': 'Anthropic data-residency options may add provider charges.',
     }
     return messages[key] ?? key
   },
@@ -131,6 +135,16 @@ describe('ModelDetailView', () => {
     expect(sourceLink.text()).toBe('View official pricing')
     expect(sourceLink.attributes('target')).toBe('_blank')
     expect(sourceLink.attributes('rel')).toBe('noopener noreferrer')
+    expect(wrapper.text()).toContain('Inputs over 272K tokens may use OpenAI long-context rates.')
+    expect(wrapper.text()).toContain('Regional processing and service tiers may add provider charges.')
+  })
+
+  it('discloses Anthropic cache-write and data-residency pricing exclusions', async () => {
+    const wrapper = mountDetail('claude-opus-4-6')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Anthropic cache-write pricing is separate from the cached-input rate shown above.')
+    expect(wrapper.text()).toContain('Anthropic data-residency options may add provider charges.')
   })
 
   it('uses not-published copy for null verified pricing cells', async () => {

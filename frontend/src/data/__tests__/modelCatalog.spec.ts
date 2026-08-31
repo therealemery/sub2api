@@ -92,6 +92,28 @@ describe('modelCatalog', () => {
       'grok-4.6': { input: 2, cachedInput: 0.5, output: 6 },
     })
 
+    expect(Object.fromEntries(requiredIds.map((modelId) => {
+      const model = catalog.find((entry) => entry.modelId === modelId)
+      return [modelId, model?.pricingSource?.sourceUrl]
+    }))).toEqual({
+      'gpt-5.4': 'https://developers.openai.com/api/docs/models/gpt-5.4',
+      'gpt-5.4-mini': 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
+      'gpt-5.5': 'https://developers.openai.com/api/docs/models/gpt-5.5',
+      'gpt-5.6-luna': 'https://developers.openai.com/api/docs/models/compare',
+      'gpt-5.6-sol': 'https://developers.openai.com/api/docs/models/compare',
+      'gpt-5.6-terra': 'https://developers.openai.com/api/docs/models/compare',
+      'codex-auto-review': 'https://help.openai.com/en/articles/20001415',
+      'claude-haiku-4-5-20251001': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-opus-4-6': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-opus-4-7': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-opus-4-8': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-opus-5': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-sonnet-4-6': 'https://platform.claude.com/docs/en/about-claude/pricing',
+      'claude-sonnet-5': 'https://platform.claude.com/docs/en/release-notes/overview',
+      'grok-4.5': 'https://docs.x.ai/developers/pricing',
+      'grok-4.6': 'https://docs.x.ai/developers/pricing',
+    })
+
     expect(catalog.find((model) => model.modelId === 'codex-auto-review')).toMatchObject({
       isAlias: true,
       aliasNoteKey: 'publicModels.aliases.codexAutoReview',
