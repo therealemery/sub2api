@@ -38,3 +38,5 @@ Spec: `docs/superpowers/specs/2026-08-31-ownapi-public-user-motion-design.md`
 - Task 1: fix round 1/5 (1 addressed, 0 open — Reduced Motion now disables `.motion-list-move` transition and transform; commits `b03f7cde..b0ecf130`).
 - Task 1: complete (commits `7b2c9cc2..4bbcfb1d`, review clean; no deferred findings).
 - Task 2: complete (commit `a6ed6622`; independent review clean; focused tests 2 files / 7 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
+- Task 3: review round 1 found query/hash-only navigation could remount user pages and that mobile-menu interaction coverage used stubs; both findings were fixed in `a6d658e2`.
+- Task 3: complete (implementation `741d9f59`, fix `a6d658e2`; independent re-review clean; 4 related files / 55 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
