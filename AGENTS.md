@@ -161,6 +161,13 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The full frontend suite has two remaining GroupDistributionChart failures and one DashboardView unhandled rejection, each caused by `formatCost` calling `toFixed` on undefined; these are outside B2. See `.superpowers/sdd/2026-08-31-ownapi-model-pricing-status-plan/baseline-b2-report.md`.
 - Review fix round 1 preserved `undefined` for missing pending OAuth adoption-decision fields; a partial decision can no longer serialize an unselected field as `false`. Focused EmailVerifyView and B2 suites passed (8 and 12 tests respectively).
 
+### 2026-08-31 — Baseline B3 repair
+
+- Made GroupDistributionChart and the admin dashboard tolerate legacy statistics payloads that omit account-cost fields, as well as non-finite rendered cost values.
+- Preserved existing valid cost thresholds and precision while displaying unavailable costs as `$0.0000`; the corresponding DashboardView render no longer creates an unhandled rejection.
+- Validation passed: focused chart/dashboard tests (2 files / 4 tests), Vue type checking, `git diff --check`, and the full frontend suite (100 files / 590 tests). The full suite still emits its existing `router-link` test-stub and intentionally exercised error-path warnings, but reports no failures or unhandled errors.
+- See `.superpowers/sdd/2026-08-31-ownapi-model-pricing-status-plan/baseline-b3-report.md`.
+
 ## Recovery Checklist
 
 1. Read this file and the three required design/plan documents.
