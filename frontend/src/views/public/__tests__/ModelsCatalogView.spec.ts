@@ -65,23 +65,32 @@ describe('ModelsCatalogView', () => {
   it('renders traceable OwnAPI pricing for GPT-5.6 Sol', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
+    const solCard = wrapper.findAll('.model-card').find((card) => card.text().includes('GPT-5.6 Sol'))
 
     expect(wrapper.text()).toContain('GPT-5.6 Sol')
     expect(wrapper.text()).toContain('Official list price')
     expect(wrapper.text()).toContain('Official price × 70%')
     expect(wrapper.text()).toContain('$2.8')
     expect(wrapper.text()).toContain('$14')
+    expect(solCard?.findAll('.price-line .price-unit')).toHaveLength(3)
+    expect(solCard?.findAll('.price-line .price-unit').every((unit) => unit.text() === '/ 1M tokens')).toBe(true)
   })
 
-  it('switches Grok cards between short and long context pricing without leaving the card', async () => {
+  it('keeps Grok tier buttons outside links and switches pricing without navigation', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
     const grokCard = wrapper.findAll('.model-card').find((card) => card.text().includes('Grok 4.5'))
     expect(grokCard?.text()).toContain('$1.4')
+    expect(grokCard?.find('a button').exists()).toBe(false)
 
     const longContextButton = grokCard?.findAll('button').find((button) => button.text() === 'Long context')
+    const shortContextButton = grokCard?.findAll('button').find((button) => button.text() === 'Short context')
+    expect(shortContextButton?.attributes('aria-pressed')).toBe('true')
+    expect(longContextButton?.attributes('aria-pressed')).toBe('false')
     await longContextButton?.trigger('click')
 
     expect(grokCard?.text()).toContain('$2.8')
+    expect(shortContextButton?.attributes('aria-pressed')).toBe('false')
+    expect(longContextButton?.attributes('aria-pressed')).toBe('true')
   })
 })
