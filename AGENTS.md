@@ -86,7 +86,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation and local QA are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Review and integrate `codex/model-pricing-motion` through its Task 6 commits (`a861bdaf` feature verification and `b4009355` handoff) into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
+1. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, explicitly including `a861bdaf` (verified feature fixes), `b4009355` (Task 6 handoff), and `80f1fc7f` (checkout/branch recovery correction), then push the approved result to `main`. Do not stop at an earlier Task 6 commit, and do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
 2. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
 3. Re-run the `Build and Deploy` workflow on the integrated `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
 4. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
