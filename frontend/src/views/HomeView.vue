@@ -1,280 +1,196 @@
 <template>
-  <!-- Custom Home Content: Full Page Mode -->
   <div v-if="homeContent" class="min-h-screen">
-    <!-- iframe mode -->
-    <iframe
-      v-if="isHomeContentUrl"
-      :src="homeContent.trim()"
-      class="h-screen w-full border-0"
-      allowfullscreen
-    ></iframe>
-    <!-- HTML mode - SECURITY: homeContent is admin-only setting, XSS risk is acceptable -->
+    <iframe v-if="isHomeContentUrl" :src="homeContent.trim()" class="h-screen w-full border-0" allowfullscreen></iframe>
     <div v-else v-html="homeContent"></div>
   </div>
 
-  <!-- Default Home Page -->
-  <div v-else class="landing-page">
-    <!-- Header -->
-    <header class="landing-header">
-      <nav class="landing-nav">
-        <!-- Logo -->
-        <div class="brand-mark">
-          <div class="brand-logo">
-            <img :src="siteLogoPath" alt="Logo" class="site-logo-img" />
-          </div>
-          <span class="brand-name">{{ siteName }}</span>
-        </div>
+  <PublicSiteLayout v-else>
+    <div class="landing-page">
+      <main>
+      <section class="announcement-bar" :aria-label="t('home.announcement.label')">
+        <span>{{ t('home.announcement.text') }}</span>
+        <router-link to="/models">{{ t('home.announcement.action') }} <Icon name="arrowRight" size="xs" /></router-link>
+      </section>
 
-        <!-- Nav Actions -->
-        <div class="nav-actions">
-          <a
-            :href="usageGuideUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="nav-doc-link"
-          >
-            {{ t('home.usageGuide') }}
-          </a>
-
-          <router-link to="/agent-recruitment" class="nav-doc-link">
-            {{ t('home.agentRecruitment') }}
-          </router-link>
-
-          <router-link v-if="isAuthenticated" :to="dashboardPath" class="account-button">
-            <span class="account-initial">{{ userInitial }}</span>
-            <span>{{ t('home.dashboard') }}</span>
-            <Icon name="externalLink" size="xs" />
-          </router-link>
-          <router-link v-else to="/login" class="account-button">
-            {{ t('home.login') }}
-          </router-link>
-        </div>
-      </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="landing-main">
       <section class="hero-section">
-        <div class="hero-logo" aria-hidden="true">
-          <img :src="heroLogoPath" alt="" class="site-logo-img" />
-        </div>
-
         <div class="hero-copy">
-          <h1>
-            <span>{{ siteName }}</span>
-            <span class="gradient-text">
-              <span
-                v-for="(line, index) in heroSubtitleLines"
-                :key="`${line}-${index}`"
-                class="gradient-line"
-              >
-                {{ line }}
-              </span>
-            </span>
-          </h1>
-          <p>{{ heroDescription }}</p>
-        </div>
-
-        <div class="hero-actions">
-          <router-link :to="isAuthenticated ? dashboardPath : '/login'" class="primary-cta">
-            {{ isAuthenticated ? t('home.goToDashboard') : t('home.getStarted') }}
-            <Icon name="arrowRight" size="sm" />
-          </router-link>
-          <a :href="usageGuideUrl" target="_blank" rel="noopener noreferrer" class="secondary-cta">
-            {{ t('home.usageGuide') }}
-          </a>
-        </div>
-
-        <div class="trust-panel" aria-label="OwnAPI trust commitments">
-          <div class="trust-panel-copy">
-            <strong>{{ t('home.trust.title') }}</strong>
-            <span>{{ t('home.trust.description') }}</span>
-          </div>
-          <div class="trust-commitments">
-            <article>
-              <strong>{{ t('home.trust.longTermTitle') }}</strong>
-              <span>{{ t('home.trust.longTermDescription') }}</span>
-            </article>
-            <article>
-              <strong>{{ t('home.trust.transparentTitle') }}</strong>
-              <span>{{ t('home.trust.transparentDescription') }}</span>
-            </article>
-            <article>
-              <strong>{{ t('home.trust.modelQualityTitle') }}</strong>
-              <span>{{ t('home.trust.modelQualityDescription') }}</span>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="business-section" aria-label="B 端大用量 Token 方案">
-        <div class="business-panel">
-          <div class="business-copy">
-            <span class="section-kicker">B 端大用量方案</span>
-            <h2>
-              <span>面向高频调用和团队</span>
-              <span class="business-title-accent">专属批量使用</span>
-            </h2>
-            <p>
-              如果你的业务需要长期、大量、稳定地消耗 AI Token，OwnAPI 可以提供更适合团队和工具服务商的用量方案，在价格、稳定性和模型体验之间保持更好的平衡。
-            </p>
-          </div>
-          <div class="business-points">
-            <article>
-              <strong>更高性价比</strong>
-              <span>适合批量任务、自动化工具、研发团队和内部系统长期接入。</span>
-            </article>
-            <article>
-              <strong>稳定供给</strong>
-              <span>围绕主流模型持续维护通道，不做低质量模型替换和体验注水。</span>
-            </article>
-            <article>
-              <strong>长期合作</strong>
-              <span>大用量客户可按实际使用规模配置更合适的额度和调用策略。</span>
-            </article>
-          </div>
-          <button
-            type="button"
-            class="business-cta"
-            :aria-label="`复制联系邮箱 ${contactEmail}`"
-            @click="copyContactEmail"
-          >
-            {{ copiedContactEmail ? '已复制邮箱' : '粘贴联系邮箱' }}
-            <Icon :name="copiedContactEmail ? 'check' : 'copy'" size="sm" />
-          </button>
-        </div>
-      </section>
-
-      <section class="agent-recruitment-section" aria-label="中转站代理招募">
-        <div class="agent-recruitment-panel">
-          <div class="agent-recruitment-copy">
-            <span class="section-kicker">中转站代理招募</span>
-            <h2>AI 时代的长期副业入口</h2>
-            <p>
-              AI Token 需求正在持续增长。成为 OwnAPI 代理后，可以围绕身边的开发者、团队和 AI 工具用户推广服务，并获得其他用户消费最高可达 40% 的分成。
-            </p>
-          </div>
-          <div class="agent-recruitment-aside">
-            <strong>最高 40%</strong>
-            <span>用户消费分成</span>
-            <router-link to="/agent-recruitment" class="agent-recruitment-cta">
-              了解代理规则
-              <Icon name="arrowRight" size="sm" />
+          <span class="eyebrow">{{ t('home.heroEyebrow') }}</span>
+          <h1><span>{{ siteName }}</span><span>{{ t('home.heroSubtitle') }}</span></h1>
+          <div class="hero-actions">
+            <router-link :to="primaryActionPath" class="primary-button">
+              {{ isAuthenticated ? t('home.goToDashboard') : t('home.getApiKey') }}
             </router-link>
+            <router-link to="/models" class="secondary-button">{{ t('home.viewPricing') }}</router-link>
           </div>
+        </div>
+        <div class="gateway-visual" aria-hidden="true">
+          <div class="gateway-provider gateway-provider-openai"><img src="/brand/openai.svg" alt="" /></div>
+          <div class="gateway-provider gateway-provider-claude"><img src="/brand/claude.svg" alt="" /></div>
+          <div class="gateway-center"><img :src="siteLogoPath" alt="" /></div>
+          <div class="gateway-provider gateway-provider-gemini"><img src="/brand/gemini.svg" alt="" /></div>
+          <div class="gateway-provider gateway-provider-deepseek"><img src="/brand/deepseek.svg" alt="" /></div>
+        </div>
+        <ul class="hero-outcomes">
+          <li v-for="signal in heroSignals" :key="signal.titleKey">
+            <strong>{{ t(signal.titleKey) }}</strong><span>{{ t(signal.descriptionKey) }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="provider-strip" :aria-label="t('home.providers.title')">
+        <div v-for="provider in allProviders" :key="provider.name" class="provider-wordmark">
+          <img :src="provider.logo" alt="" /><span>{{ provider.name }}</span>
+          <small v-if="provider.upcoming">{{ t('home.providers.soon') }}</small>
         </div>
       </section>
 
-      <section class="advantage-section">
-        <div class="advantage-panel">
-          <div class="advantage-copy">
-            <span class="section-kicker">{{ t('home.solutions.title') }}</span>
-            <h2>{{ t('home.solutions.subtitle') }}</h2>
-            <p>{{ t('home.heroDescription') }}</p>
-          </div>
-          <div class="advantage-list">
-            <article>
-              <strong>{{ t('home.features.unifiedGateway') }}</strong>
-              <span>{{ t('home.features.unifiedGatewayDesc') }}</span>
-            </article>
-            <article>
-              <strong>{{ t('home.features.multiAccount') }}</strong>
-              <span>{{ t('home.features.multiAccountDesc') }}</span>
-            </article>
-            <article>
-              <strong>{{ t('home.features.balanceQuota') }}</strong>
-              <span>{{ t('home.features.balanceQuotaDesc') }}</span>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="providers-section">
-        <div class="section-heading">
-          <h2>{{ t('home.providers.title') }}</h2>
-          <p>{{ t('home.providers.description') }}</p>
-        </div>
-
-        <div class="provider-grid">
-          <div v-for="provider in providerLogos" :key="provider.name" class="provider-chip">
-            <span class="provider-logo">
-              <img :src="provider.logo" :alt="provider.name" />
-            </span>
-            <span class="provider-content">
-              <strong>{{ provider.name }}</strong>
-              <span>{{ t(provider.descriptionKey) }}</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="upcoming-models">
-          <p>{{ t('home.providers.upcomingDescription') }}</p>
-          <div class="upcoming-grid">
-            <div v-for="provider in upcomingProviders" :key="provider.name" class="upcoming-chip">
-              <img :src="provider.logo" alt="" aria-hidden="true" />
-              <span>{{ provider.name }}</span>
+      <section class="story-section story-section-code">
+        <div class="story-heading"><span class="section-index">01</span><h2>{{ t('home.stories.gatewayTitle') }}</h2></div>
+        <div class="story-stage story-stage-code">
+          <div class="code-panel">
+            <div class="code-panel-header">
+              <div><span>{{ t('home.code.label') }}</span><strong>{{ t('home.code.title') }}</strong></div>
+              <button type="button" :aria-label="t('home.code.copyAria')" @click="copyCodeExample">
+                <Icon :name="copiedCode ? 'check' : 'copy'" size="sm" />
+                {{ copiedCode ? t('home.code.copied') : t('home.code.copy') }}
+              </button>
             </div>
+            <pre><code>{{ codeExample }}</code></pre>
+          </div>
+          <div class="story-proof">
+            <p>{{ t('home.stories.gatewayProof') }}</p>
+            <ul>
+              <li>{{ t('home.trust.longTermTitle') }}</li><li>{{ t('home.features.unifiedGateway') }}</li>
+              <li>{{ t('home.trust.modelQualityTitle') }}</li><li>{{ t('home.features.balanceQuota') }}</li>
+            </ul>
+            <a :href="usageGuideUrl" target="_blank" rel="noopener noreferrer" class="text-link">
+              {{ t('home.trust.docsAction') }} <Icon name="arrowRight" size="xs" />
+            </a>
           </div>
         </div>
       </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="landing-footer">
-      <div class="footer-inner">
-        <p>&copy; {{ currentYear }} {{ siteName }}. {{ t('home.footer.allRightsReserved') }}</p>
-        <div class="footer-links">
-          <a v-if="docUrl" :href="docUrl" target="_blank" rel="noopener noreferrer">
-            {{ t('home.docs') }}
-          </a>
-          <a v-if="githubUrl" :href="githubUrl" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
+      <section class="story-section">
+        <div class="story-heading story-heading-right"><span class="section-index">02</span><h2>{{ t('home.stories.scaleTitle') }}</h2></div>
+        <div class="story-stage route-stage">
+          <div class="route-console">
+            <div class="route-console-header">
+              <span>{{ t('home.stories.routeConsole') }}</span>
+              <span class="status-pill"><span></span>{{ t('home.stories.operational') }}</span>
+            </div>
+            <ol>
+              <li v-for="(step, index) in integrationSteps" :key="step.titleKey">
+                <span class="route-step-number">0{{ index + 1 }}</span>
+                <div><strong>{{ t(step.titleKey) }}</strong><p>{{ t(step.descriptionKey) }}</p></div>
+                <Icon name="check" size="sm" />
+              </li>
+            </ol>
+          </div>
+          <div class="story-proof">
+            <p>{{ t('home.stories.scaleProof') }}</p>
+            <ul>
+              <li>{{ t('home.features.multiAccount') }}</li><li>{{ t('home.integration.steps.usageTitle') }}</li>
+              <li>{{ t('home.trust.transparentTitle') }}</li><li>{{ t('home.status') }}</li>
+            </ul>
+            <router-link to="/monitor" class="text-link">{{ t('home.trust.statusAction') }} <Icon name="arrowRight" size="xs" /></router-link>
+          </div>
         </div>
-      </div>
-    </footer>
-  </div>
+      </section>
+
+      <section class="story-section">
+        <div class="story-heading"><span class="section-index">03</span><h2>{{ t('home.stories.teamsTitle') }}</h2></div>
+        <div class="audience-stage">
+          <article v-for="audience in audiences" :key="audience.titleKey">
+            <Icon :name="audience.icon" size="lg" /><strong>{{ t(audience.titleKey) }}</strong><p>{{ t(audience.descriptionKey) }}</p>
+          </article>
+          <aside>
+            <span>{{ t('home.business.kicker') }}</span><strong>{{ t('home.business.titleAccent') }}</strong>
+            <p>{{ t('home.business.description', { siteName }) }}</p>
+            <button type="button" class="text-link" @click="copyContactEmail">
+              {{ copiedContactEmail ? t('home.business.emailCopied') : t('home.business.contactSales') }}
+              <Icon :name="copiedContactEmail ? 'check' : 'arrowRight'" size="xs" />
+            </button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="capabilities-section">
+        <div class="section-title-row"><h2>{{ t('home.capabilities.title') }}</h2><p>{{ t('home.capabilities.description') }}</p></div>
+        <div class="capability-grid">
+          <component
+            :is="card.to ? 'router-link' : 'article'"
+            v-for="card in capabilityCards"
+            :key="card.titleKey"
+            v-bind="card.to ? { to: card.to } : {}"
+            class="capability-card"
+          >
+            <div class="capability-card-visual">
+              <img v-if="card.logo" :src="card.logo" alt="" />
+              <Icon v-else :name="card.icon || 'sparkles'" size="xl" />
+            </div>
+            <div><strong>{{ t(card.titleKey) }}</strong><p>{{ t(card.descriptionKey) }}</p></div>
+          </component>
+        </div>
+      </section>
+
+      <section class="faq-section" :aria-labelledby="'faq-title'">
+        <div class="section-title-row">
+          <div><span class="eyebrow">{{ t('home.faq.kicker') }}</span><h2 id="faq-title">{{ t('home.faq.title') }}</h2></div>
+          <p>{{ t('home.faq.description') }}</p>
+        </div>
+        <div class="faq-list">
+          <details v-for="item in faqItems" :key="item.questionKey">
+            <summary>{{ t(item.questionKey) }} <Icon name="plus" size="sm" /></summary><p>{{ t(item.answerKey) }}</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="agent-section" :aria-label="t('home.recruitment.ariaLabel')">
+        <div><span class="eyebrow">{{ t('home.recruitment.kicker') }}</span><h2>{{ t('home.recruitment.title') }}</h2><p>{{ t('home.recruitment.description', { siteName }) }}</p></div>
+        <div class="agent-metric">
+          <strong>{{ t('home.recruitment.commission') }}</strong><span>{{ t('home.recruitment.commissionLabel') }}</span>
+          <router-link to="/agent-recruitment" class="text-link">{{ t('home.recruitment.learnMore') }} <Icon name="arrowRight" size="xs" /></router-link>
+        </div>
+      </section>
+
+      <section class="final-cta-section">
+        <span class="eyebrow">{{ siteName }}</span><h2>{{ t('home.cta.title') }}</h2><p>{{ t('home.cta.description') }}</p>
+        <div class="hero-actions">
+          <router-link :to="primaryActionPath" class="primary-button">{{ isAuthenticated ? t('home.goToDashboard') : t('home.cta.button') }}</router-link>
+          <router-link to="/models" class="secondary-button">{{ t('home.viewPricing') }}</router-link>
+          <a :href="`mailto:${contactEmail}`" class="secondary-button">{{ t('home.cta.enterprise') }}</a>
+        </div>
+      </section>
+      </main>
+    </div>
+  </PublicSiteLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore, useAppStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
-import {
-  DEFAULT_SITE_HERO_LOGO,
-  DEFAULT_REPOSITORY_URL,
-  DEFAULT_SITE_LOGO,
-  DEFAULT_SITE_NAME,
-  DEFAULT_SITE_SUBTITLE,
-  isDefaultOwnApiLogo,
-  resolveSiteLogoPath
-} from '@/constants/branding'
+import PublicSiteLayout from '@/components/public/PublicSiteLayout.vue'
+import { buildHomeCodeExample } from '@/utils/homeCodeExample'
+import { DEFAULT_SITE_LOGO, resolveSiteLogoPath, resolveSiteName } from '@/constants/branding'
 
 const { t } = useI18n()
-
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const copiedContactEmail = ref(false)
+const copiedCode = ref(false)
 
-// Site settings - directly from appStore (already initialized from injected config)
-const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || DEFAULT_SITE_NAME)
+const siteName = computed(() => {
+  const configuredName = (appStore.cachedPublicSettings?.site_name || appStore.siteName || '').trim()
+  return resolveSiteName(configuredName)
+})
 const siteLogo = computed(() => resolveSiteLogoPath(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || DEFAULT_SITE_LOGO))
 const siteLogoPath = computed(() => siteLogo.value)
-const heroLogoPath = computed(() =>
-  isDefaultOwnApiLogo(siteLogo.value)
-    ? DEFAULT_SITE_HERO_LOGO
-    : siteLogo.value
-)
-const siteSubtitle = computed(() => appStore.cachedPublicSettings?.site_subtitle || DEFAULT_SITE_SUBTITLE)
-const heroDescription = computed(() => {
-  const subtitle = siteSubtitle.value.trim()
-  return subtitle && subtitle !== DEFAULT_SITE_SUBTITLE ? subtitle : t('home.heroDescription')
-})
-const docUrl = computed(() => appStore.cachedPublicSettings?.doc_url || appStore.docUrl || '')
 const homeContent = computed(() => appStore.cachedPublicSettings?.home_content || '')
 const usageGuideUrl = '/docs/ownapi-usage-guide.html'
 const fallbackContactEmail = 'support@ownapi.dev'
-const copiedContactEmail = ref(false)
+const codeExample = computed(() => buildHomeCodeExample(window.location.origin))
 const contactEmail = computed(() => {
   const rawContact = appStore.cachedPublicSettings?.contact_info || appStore.contactInfo || ''
   const email = rawContact.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]
@@ -292,1165 +208,109 @@ function copyTextFallback(value: string) {
   document.execCommand('copy')
   document.body.removeChild(textarea)
 }
-
-async function copyContactEmail() {
+async function writeClipboard(value: string) {
   try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(contactEmail.value)
-    } else {
-      copyTextFallback(contactEmail.value)
-    }
-    copiedContactEmail.value = true
-    window.setTimeout(() => {
-      copiedContactEmail.value = false
-    }, 1600)
-  } catch {
-    copyTextFallback(contactEmail.value)
-    copiedContactEmail.value = true
-    window.setTimeout(() => {
-      copiedContactEmail.value = false
-    }, 1600)
-  }
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value)
+    else copyTextFallback(value)
+  } catch { copyTextFallback(value) }
+}
+async function copyContactEmail() {
+  await writeClipboard(contactEmail.value)
+  copiedContactEmail.value = true
+  window.setTimeout(() => { copiedContactEmail.value = false }, 1600)
+}
+async function copyCodeExample() {
+  await writeClipboard(codeExample.value)
+  copiedCode.value = true
+  window.setTimeout(() => { copiedCode.value = false }, 1600)
 }
 
-// Check if homeContent is a URL (for iframe display)
 const isHomeContentUrl = computed(() => {
   const content = homeContent.value.trim()
   return content.startsWith('http://') || content.startsWith('https://')
 })
-
-// GitHub URL
-const githubUrl = DEFAULT_REPOSITORY_URL
-
-// Auth state
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isAdmin = computed(() => authStore.isAdmin)
 const dashboardPath = computed(() => isAdmin.value ? '/admin/dashboard' : '/dashboard')
-const userInitial = computed(() => {
-  const user = authStore.user
-  if (!user || !user.email) return ''
-  return user.email.charAt(0).toUpperCase()
-})
+const primaryActionPath = computed(() => isAuthenticated.value ? dashboardPath.value : '/login')
 
-const providerLogos = [
-  { name: 'ChatGPT', logo: '/brand/openai.svg', descriptionKey: 'home.providers.chatgptDescription' },
-  { name: 'Claude', logo: '/brand/claude.svg', descriptionKey: 'home.providers.claudeDescription' }
+const heroSignals = [
+  { titleKey: 'home.heroSignals.compatible', descriptionKey: 'home.trust.longTermDescription' },
+  { titleKey: 'home.heroSignals.billing', descriptionKey: 'home.trust.transparentDescription' },
+  { titleKey: 'home.heroSignals.models', descriptionKey: 'home.trust.modelQualityDescription' }
+] as const
+const allProviders = [
+  { name: 'ChatGPT', logo: '/brand/openai.svg', upcoming: false },
+  { name: 'Claude', logo: '/brand/claude.svg', upcoming: false },
+  { name: 'Gemini', logo: '/brand/gemini.svg', upcoming: true },
+  { name: 'DeepSeek', logo: '/brand/deepseek.svg', upcoming: true },
+  { name: 'Qwen', logo: '/brand/qwen.svg', upcoming: true },
+  { name: 'Mistral', logo: '/brand/mistral.svg', upcoming: true }
+] as const
+const integrationSteps = [
+  { titleKey: 'home.integration.steps.accountTitle', descriptionKey: 'home.integration.steps.accountDescription' },
+  { titleKey: 'home.integration.steps.keyTitle', descriptionKey: 'home.integration.steps.keyDescription' },
+  { titleKey: 'home.integration.steps.urlTitle', descriptionKey: 'home.integration.steps.urlDescription' },
+  { titleKey: 'home.integration.steps.usageTitle', descriptionKey: 'home.integration.steps.usageDescription' }
+] as const
+const audiences = [
+  { icon: 'terminal', titleKey: 'home.audiences.developerTitle', descriptionKey: 'home.audiences.developerDescription' },
+  { icon: 'users', titleKey: 'home.audiences.teamTitle', descriptionKey: 'home.audiences.teamDescription' },
+  { icon: 'server', titleKey: 'home.audiences.providerTitle', descriptionKey: 'home.audiences.providerDescription' }
+] as const
+type CapabilityCard = {
+  logo?: string
+  icon?: 'terminal' | 'chartBar' | 'shield' | 'users'
+  titleKey: string
+  descriptionKey: string
+  to?: string
+}
+
+const capabilityCards: readonly CapabilityCard[] = [
+  { logo: '/brand/openai.svg', titleKey: 'home.capabilities.chatgptTitle', descriptionKey: 'home.providers.chatgptDescription', to: '/models' },
+  { logo: '/brand/claude.svg', titleKey: 'home.capabilities.claudeTitle', descriptionKey: 'home.providers.claudeDescription', to: '/models' },
+  { icon: 'terminal', titleKey: 'home.capabilities.gatewayTitle', descriptionKey: 'home.capabilities.gatewayDescription', to: '/docs/ownapi-usage-guide.html' },
+  { icon: 'chartBar', titleKey: 'home.capabilities.usageTitle', descriptionKey: 'home.capabilities.usageDescription', to: '/key-usage' },
+  { icon: 'shield', titleKey: 'home.capabilities.statusTitle', descriptionKey: 'home.capabilities.statusDescription', to: '/monitor' },
+  { icon: 'users', titleKey: 'home.capabilities.businessTitle', descriptionKey: 'home.capabilities.businessDescription' }
 ]
-const upcomingProviders = [
-  { name: 'Gemini', logo: '/brand/gemini.svg' },
-  { name: 'DeepSeek', logo: '/brand/deepseek.svg' },
-  { name: 'Qwen', logo: '/brand/qwen.svg' },
-  { name: 'Mistral', logo: '/brand/mistral.svg' }
-]
-const heroSubtitleLines = computed(() => {
-  const subtitle = t('home.heroSubtitle')
-  return [subtitle]
-})
-// Current year for footer
-const currentYear = computed(() => new Date().getFullYear())
-
-onMounted(() => {
-  document.documentElement.classList.remove('dark')
-
-  // Check auth state
-  authStore.checkAuth()
-
-  // Ensure public settings are loaded (will use cache if already loaded from injected config)
-  if (!appStore.publicSettingsLoaded) {
-    appStore.fetchPublicSettings()
-  }
-})
+const faqItems = [
+  { questionKey: 'home.faq.protocolQuestion', answerKey: 'home.faq.protocolAnswer' },
+  { questionKey: 'home.faq.billingQuestion', answerKey: 'home.faq.billingAnswer' },
+  { questionKey: 'home.faq.balanceQuestion', answerKey: 'home.faq.balanceAnswer' },
+  { questionKey: 'home.faq.modelQuestion', answerKey: 'home.faq.modelAnswer' },
+  { questionKey: 'home.faq.failedQuestion', answerKey: 'home.faq.failedAnswer' },
+  { questionKey: 'home.faq.dataQuestion', answerKey: 'home.faq.dataAnswer' },
+  { questionKey: 'home.faq.supportQuestion', answerKey: 'home.faq.supportAnswer' }
+] as const
 </script>
 
 <style scoped>
-.landing-page {
-  position: relative;
-  min-height: 100vh;
-  overflow-x: hidden;
-  --bg-page: #f8f5f2;
-  --bg-surface: #ffffff;
-  --bg-surface-alt: #f1ebe4;
-  --bg-subtle: #ebe2d8;
-  --text-primary: #22201c;
-  --text-secondary: #5f574e;
-  --text-muted: #7d746a;
-  --border-default: #ddd7ce;
-  --border-strong: #c9bfb2;
-  --accent: #d96941;
-  --accent-hover: #bf5731;
-  --accent-soft: #f5ded1;
-  --accent-contrast: #ffffff;
-  background: var(--bg-page);
-  color: var(--text-primary);
-}
-
-.landing-page,
-.landing-page *,
-.landing-page *::before,
-.landing-page *::after {
-  box-sizing: border-box;
-}
-
-.landing-header {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  border-bottom: 1px solid var(--border-default);
-  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
-  backdrop-filter: none;
-}
-
-.landing-nav {
-  display: flex;
-  height: 64px;
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.brand-mark,
-.nav-actions,
-.footer-links,
-.hero-actions {
-  display: flex;
-  align-items: center;
-}
-
-.brand-mark {
-  min-width: 0;
-  gap: 10px;
-}
-
-.brand-logo {
-  display: flex;
-  height: 36px;
-  width: 36px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.brand-logo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  mix-blend-mode: multiply;
-}
-
-.brand-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
-.nav-actions {
-  flex: 0 0 auto;
-  gap: 10px;
-}
-
-.icon-action {
-  display: inline-flex;
-  height: 36px;
-  width: 36px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-surface);
-  color: var(--text-secondary);
-  transition: none;
-}
-
-.nav-doc-link {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  padding: 0 10px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 800;
-  white-space: nowrap;
-  transition: none;
-}
-
-.icon-action:hover {
-  background: var(--bg-surface-alt);
-  color: var(--accent);
-}
-
-.nav-doc-link:hover {
-  border-color: transparent;
-  background: transparent;
-  color: var(--accent);
-}
-
-.account-button {
-  display: inline-flex;
-  min-height: 36px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-contrast);
-  transition: none;
-}
-
-.account-button:hover {
-  background: var(--accent-hover);
-}
-
-.account-button:active {
-  transform: none;
-}
-
-.account-initial {
-  display: inline-flex;
-  height: 20px;
-  width: 20px;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--accent-contrast) 18%, transparent);
-  font-size: 11px;
-}
-
-.landing-main {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-section {
-  display: flex;
-  min-height: auto;
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 72px 0 52px;
-  text-align: center;
-}
-
-.hero-logo {
-  display: block;
-  width: min(270px, 44vw);
-  filter: none;
-  line-height: 0;
-  aspect-ratio: 1 / 1;
-}
-
-.hero-logo img {
-  display: block;
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
-  object-position: center;
-  mix-blend-mode: multiply;
-}
-
-.hero-copy {
-  max-width: 900px;
-}
-
-.hero-copy h1 {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: clamp(38px, 4.6vw, 60px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: 0;
-  overflow-wrap: anywhere;
-}
-
-.gradient-text {
-  background: none;
-  background-clip: initial;
-  color: var(--accent);
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.gradient-line {
-  display: inline;
-}
-
-.gradient-line + .gradient-line {
-  margin-left: 0.16em;
-}
-
-.hero-copy p {
-  max-width: 720px;
-  margin: 18px auto 0;
-  color: var(--text-secondary);
-  font-size: clamp(15px, 1.7vw, 18px);
-  line-height: 1.72;
-  overflow-wrap: anywhere;
-}
-
-.hero-actions {
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.primary-cta,
-.secondary-cta {
-  display: inline-flex;
-  min-height: 48px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: var(--radius-md);
-  padding: 0 28px;
-  font-size: 15px;
-  font-weight: 800;
-  transition: none;
-}
-
-.primary-cta {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  box-shadow: none;
-}
-
-.primary-cta:hover {
-  background: var(--accent);
-}
-
-.secondary-cta {
-  border: 1px solid var(--border-focus);
-  color: var(--accent);
-}
-
-.secondary-cta:hover {
-  border-color: var(--border-focus);
-  background: var(--accent-soft);
-}
-
-.primary-cta:active,
-.secondary-cta:active {
-  transform: none;
-}
-
-.trust-panel {
-  display: grid;
-  width: min(100%, 1020px);
-  gap: 22px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  padding: 34px 38px;
-  text-align: left;
-}
-
-.trust-panel-copy {
-  display: grid;
-  gap: 8px;
-}
-
-.trust-panel-copy strong {
-  color: var(--accent);
-  font-size: 18px;
-  font-weight: 900;
-  line-height: 1.35;
-}
-
-.trust-panel-copy span {
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-.trust-commitments {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  border-top: 1px solid var(--border-default);
-  padding-top: 22px;
-}
-
-.trust-commitments article {
-  display: grid;
-  min-width: 0;
-  gap: 8px;
-  padding: 4px 22px 4px 0;
-}
-
-.trust-commitments article + article {
-  border-left: 1px solid var(--border-default);
-  padding-right: 22px;
-  padding-left: 22px;
-}
-
-.trust-commitments article strong {
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 850;
-  line-height: 1.35;
-}
-
-.trust-commitments article span {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-.business-section {
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  padding: 4px 0 34px;
-}
-
-.business-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr) auto;
-  gap: 30px;
-  align-items: center;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  padding: 34px 38px;
-}
-
-.business-copy {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-
-.business-copy h2 {
-  color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 2.8vw, 36px);
-  font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: 0;
-}
-
-.business-copy h2 span {
-  display: block;
-}
-
-.business-title-accent {
-  color: var(--accent);
-}
-
-.business-copy p {
-  max-width: 520px;
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.78;
-}
-
-.business-points {
-  display: grid;
-  gap: 0;
-  min-width: 0;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-alt);
-}
-
-.business-points article {
-  display: grid;
-  gap: 6px;
-  padding: 16px 18px;
-}
-
-.business-points article + article {
-  border-top: 1px solid var(--border-default);
-}
-
-.business-points strong {
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 900;
-  line-height: 1.35;
-}
-
-.business-points span {
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.business-cta {
-  appearance: none;
-  display: inline-flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  padding: 0 18px;
-  color: var(--accent-contrast);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 900;
-  white-space: nowrap;
-  transition: none;
-}
-
-.business-cta:hover {
-  background: var(--accent-hover);
-  color: var(--accent-contrast);
-}
-
-.agent-recruitment-section {
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  padding: 4px 0 34px;
-}
-
-.agent-recruitment-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 34px;
-  align-items: center;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--accent-soft) 42%, var(--bg-surface));
-  padding: 34px 38px;
-}
-
-.agent-recruitment-copy {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-
-.agent-recruitment-copy h2 {
-  color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-size: clamp(26px, 3vw, 38px);
-  font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: 0;
-}
-
-.agent-recruitment-copy p {
-  max-width: 760px;
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.78;
-}
-
-.agent-recruitment-aside {
-  display: grid;
-  justify-items: start;
-  gap: 8px;
-  min-width: 0;
-  border-left: 1px solid var(--border-default);
-  padding-left: 30px;
-}
-
-.agent-recruitment-aside strong {
-  color: var(--accent);
-  font-family: var(--font-serif);
-  font-size: clamp(42px, 5vw, 64px);
-  font-weight: 700;
-  line-height: 1;
-}
-
-.agent-recruitment-aside span {
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.agent-recruitment-cta {
-  display: inline-flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  padding: 0 18px;
-  color: var(--accent-contrast);
-  font-size: 14px;
-  font-weight: 900;
-  transition: none;
-}
-
-.agent-recruitment-cta:hover {
-  background: var(--accent-hover);
-  color: var(--accent-contrast);
-}
-
-.advantage-section {
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  padding: 6px 0 34px;
-}
-
-.advantage-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 40px;
-  align-items: center;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  padding: 38px;
-}
-
-.advantage-copy {
-  display: grid;
-  gap: 14px;
-}
-
-.section-kicker {
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.advantage-copy h2 {
-  color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 2.8vw, 34px);
-  font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: 0;
-}
-
-.advantage-copy p {
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-.advantage-list {
-  display: grid;
-  gap: 0;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-alt);
-}
-
-.advantage-list article {
-  display: grid;
-  gap: 6px;
-  padding: 18px 20px;
-}
-
-.advantage-list article + article {
-  border-top: 1px solid var(--border-default);
-}
-
-.advantage-list strong {
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.advantage-list span {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-.providers-section {
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  padding: 34px 0 74px;
-}
-
-.section-heading {
-  max-width: 720px;
-  margin: 0 auto 30px;
-  text-align: center;
-}
-
-.section-heading h2 {
-  font-size: clamp(26px, 3vw, 36px);
-  font-weight: 700;
-  line-height: 1.16;
-  letter-spacing: 0;
-}
-
-.section-heading p {
-  margin-top: 10px;
-  color: var(--text-secondary);
-  font-size: 16px;
-  line-height: 1.7;
-}
-
-.provider-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  justify-content: center;
-  gap: 20px;
-}
-
-.provider-chip {
-  display: flex;
-  min-height: 188px;
-  min-width: 0;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 24px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-default);
-  background: var(--bg-surface);
-  padding: 34px;
-  color: var(--text-primary);
-  text-align: left;
-}
-
-.provider-logo {
-  display: inline-flex;
-  height: 112px;
-  width: 112px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-alt);
-  color: var(--text-primary);
-}
-
-.provider-logo img {
-  height: 68px;
-  width: 68px;
-}
-
-.provider-content {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.provider-content strong {
-  font-size: 26px;
-  font-weight: 900;
-  line-height: 1.2;
-}
-
-.provider-content span {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.upcoming-models {
-  margin: 24px auto 0;
-  max-width: 880px;
-  text-align: center;
-}
-
-.upcoming-models p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.upcoming-grid {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-
-.upcoming-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: var(--radius-md);
-  border: 0;
-  background: transparent;
-  padding: 6px 8px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.upcoming-chip img {
-  height: 24px;
-  width: 24px;
-  opacity: 0.82;
-}
-
-.landing-footer {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
-  padding: 28px 0;
-}
-
-.footer-inner {
-  display: flex;
-  width: min(100% - 32px, 1120px);
-  margin: 0 auto;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.footer-links {
-  gap: 16px;
-}
-
-.footer-links a {
-  transition: color 0.16s ease;
-}
-
-.footer-links a:hover {
-  color: rgb(15 23 42);
-}
-
-@media (max-width: 768px) {
-  .landing-nav {
-    height: auto;
-    min-height: 60px;
-    width: min(100% - 24px, 1120px);
-    padding: 10px 0;
-  }
-
-  .brand-name {
-    max-width: 140px;
-  }
-
-  .nav-actions {
-    gap: 6px;
-  }
-
-  .icon-action {
-    height: 34px;
-    width: 34px;
-  }
-
-  .account-button {
-    min-height: 34px;
-    padding: 7px 12px;
-  }
-
-  .hero-section {
-    width: min(100% - 24px, 1120px);
-    gap: 22px;
-    padding: 48px 0 36px;
-  }
-
-  .hero-copy h1 {
-    font-size: clamp(32px, 10vw, 44px);
-    line-height: 1.12;
-  }
-
-  .business-section,
-  .agent-recruitment-section,
-  .advantage-section,
-  .providers-section {
-    width: min(100% - 24px, 1120px);
-    padding: 38px 0;
-  }
-
-  .business-panel {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 28px 24px;
-  }
-
-  .business-copy p {
-    max-width: none;
-  }
-
-  .business-cta {
-    justify-self: start;
-  }
-
-  .agent-recruitment-panel {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 28px 24px;
-  }
-
-  .agent-recruitment-aside {
-    border-top: 1px solid var(--border-default);
-    border-left: 0;
-    padding-top: 22px;
-    padding-left: 0;
-  }
-
-  .advantage-panel {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 28px 24px;
-  }
-
-  .provider-grid,
-  .trust-commitments {
-    grid-template-columns: 1fr;
-  }
-
-  .trust-panel {
-    padding: 28px 24px;
-  }
-
-  .trust-commitments article,
-  .trust-commitments article + article {
-    border-left: 0;
-    padding: 16px 0;
-  }
-
-  .trust-commitments article + article {
-    border-top: 1px solid var(--border-default);
-  }
-
-  .provider-chip {
-    min-height: auto;
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 28px 24px;
-    text-align: left;
-  }
-
-  .provider-logo {
-    height: 82px;
-    width: 82px;
-  }
-
-  .provider-logo img {
-    height: 50px;
-    width: 50px;
-  }
-
-  .footer-inner {
-    width: min(100% - 24px, 1120px);
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-@media (max-width: 520px) {
-  .landing-nav {
-    width: 100%;
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-
-  .nav-actions {
-    min-width: 0;
-  }
-
-  .brand-name {
-    display: none;
-  }
-
-  .hero-copy {
-    max-width: 100%;
-  }
-
-  .hero-copy h1 {
-    font-size: clamp(28px, 8vw, 32px);
-    line-height: 1.16;
-  }
-
-  .hero-copy p {
-    width: 100%;
-    max-width: 340px;
-  }
-
-  .gradient-text {
-    display: block;
-    width: 100%;
-    margin: 0 auto;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-
-  .gradient-line {
-    display: block;
-  }
-
-  .gradient-line + .gradient-line {
-    margin-left: 0;
-  }
-
-  .hero-actions {
-    width: 100%;
-    max-width: min(100%, 340px);
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .primary-cta,
-  .secondary-cta {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .nav-doc-link {
-    display: none;
-  }
-}
-
-/* RELAY-UI-SPEC v2.0 landing lock */
-.landing-page {
-  background: var(--bg-page);
-  color: var(--text-primary);
-}
-
-.dot-grid {
-  display: none;
-}
-
-.landing-header {
-  border-bottom: 1px solid var(--border-default);
-  background: var(--bg-surface);
-  backdrop-filter: none;
-}
-
-.brand-logo,
-.icon-action,
-.provider-logo,
-.account-initial {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-alt);
-  color: var(--accent);
-}
-
-.brand-logo {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.brand-name,
-.hero-copy h1,
-.section-heading h2 {
-  color: var(--text-primary);
-  font-family: var(--font-serif);
-  letter-spacing: 0;
-}
-
-.brand-name {
-  font-weight: 700;
-}
-
-.hero-copy h1,
-.section-heading h2 {
-  font-weight: 700;
-}
-
-.hero-logo {
-  filter: none;
-}
-
-.gradient-text,
-.gradient-line {
-  background: none;
-  color: var(--accent);
-  -webkit-text-fill-color: currentColor;
-}
-
-.hero-copy p,
-.section-heading p,
-.provider-content span,
-.upcoming-models p,
-.trust-panel-copy span,
-.trust-commitments span,
-.business-copy p,
-.business-points span,
-.landing-footer,
-.footer-links a {
-  color: var(--text-muted);
-}
-
-.trust-commitments strong,
-.business-points strong,
-.advantage-list strong,
-.provider-content strong,
-.section-kicker {
-  color: var(--text-primary);
-}
-
-.primary-cta,
-.account-button {
-  border: 1px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: var(--text-inverse);
-  box-shadow: none;
-}
-
-.primary-cta:hover,
-.account-button:hover {
-  background: var(--accent-hover);
-}
-
-.secondary-cta,
-.trust-panel,
-.business-panel,
-.advantage-panel,
-.provider-chip {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: none;
-}
-
-.secondary-cta:hover,
-.icon-action:hover,
-.footer-links a:hover,
-.nav-doc-link:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-subtle);
-  color: var(--accent);
-}
-
-.provider-logo {
-  background: var(--bg-surface-alt);
-}
-
-.trust-panel-copy strong,
-.section-kicker {
-  color: var(--accent);
-}
-
-.footer-links a:hover {
-  color: var(--accent);
-}
-
-.landing-footer {
-  border-top: 1px solid var(--border-default);
-}
-
-.landing-page :is(.provider-logo img, .upcoming-chip img) {
-  filter: none;
-}
+.landing-page{--page:#fafafa;--surface:#fff;--ink:#171717;--muted:#666;--soft:#8f8f8f;--line:#e5e5e5;min-height:100vh;overflow-x:hidden;background:var(--page);color:var(--ink);font-family:GeistSans,Geist,Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.landing-page,.landing-page *,.landing-page *::before,.landing-page *::after{box-sizing:border-box}.landing-page a{color:inherit;text-decoration:none}.landing-page button{font:inherit}
+.landing-header{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--page) 92%,transparent);backdrop-filter:blur(16px)}
+.landing-nav{display:grid;grid-template-columns:minmax(180px,1fr) auto minmax(300px,1fr);align-items:center;gap:28px;width:min(100% - 48px,1392px);height:64px;margin:0 auto}
+.brand-mark{display:inline-flex;align-items:center;gap:10px;width:fit-content}.brand-logo{width:26px;height:26px;object-fit:contain;mix-blend-mode:multiply}.brand-name{font-size:16px;font-weight:650;letter-spacing:-.02em}
+.desktop-nav,.desktop-actions,.hero-actions,.status-pill,.text-link{display:flex;align-items:center}.desktop-nav{justify-content:center;gap:28px;color:#444;font-size:14px}.desktop-nav a,.footer-column a{transition:color 160ms ease}.desktop-nav a:hover,.footer-column a:hover{color:#000}.desktop-actions{justify-content:flex-end;gap:10px}
+.nav-primary,.nav-secondary,.primary-button,.secondary-button{display:inline-flex;min-height:40px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;padding:0 16px;font-size:14px;font-weight:560;transition:background 160ms ease,border-color 160ms ease,color 160ms ease}.nav-primary,.primary-button{border-color:var(--ink);background:var(--ink);color:#fff!important}.nav-secondary,.secondary-button{background:var(--surface);color:var(--ink)}.nav-primary:hover,.primary-button:hover{background:#333}.nav-secondary:hover,.secondary-button:hover{border-color:#b8b8b8;background:#f6f6f6}.mobile-menu-button,.mobile-menu{display:none}
+.announcement-bar{display:flex;min-height:104px;align-items:center;justify-content:center;gap:34px;padding:24px;font-size:14px}.announcement-bar a{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.hero-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.9fr) minmax(0,1fr);align-items:center;min-height:700px;width:min(100% - 48px,1392px);margin:0 auto;padding:72px 0 48px}.hero-copy{align-self:center}.eyebrow{display:inline-block;margin-bottom:22px;color:var(--muted);font-size:13px;font-weight:560}
+.hero-copy h1,.story-heading h2,.section-title-row h2,.agent-section h2,.final-cta-section h2{margin:0;font-weight:500;letter-spacing:-.06em;line-height:.98}.hero-copy h1{display:flex;flex-direction:column;max-width:470px;font-size:clamp(54px,5.1vw,80px)}.hero-actions{gap:10px;margin-top:34px;flex-wrap:wrap}.primary-button,.secondary-button{min-height:46px;border-radius:999px;padding:0 22px;font-size:15px}
+.gateway-visual{display:grid;grid-template-columns:repeat(3,74px);grid-template-rows:repeat(3,74px);justify-content:center;align-content:center;min-height:420px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:74px 74px;background-position:center;mask-image:radial-gradient(circle,#000 25%,transparent 72%)}
+.gateway-center,.gateway-provider{display:flex;align-items:center;justify-content:center;width:56px;height:56px;align-self:center;justify-self:center;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.gateway-center{grid-column:2;grid-row:2;width:68px;height:68px;border-color:var(--ink);box-shadow:0 12px 32px rgba(0,0,0,.08)}.gateway-provider img{width:28px;height:28px;object-fit:contain}.gateway-center img{width:38px;height:38px;object-fit:contain;mix-blend-mode:multiply}.gateway-provider-openai{grid-column:1;grid-row:1}.gateway-provider-claude{grid-column:3;grid-row:1}.gateway-provider-gemini{grid-column:1;grid-row:3}.gateway-provider-deepseek{grid-column:3;grid-row:3}
+.hero-outcomes{display:grid;gap:22px;margin:0;padding:0 0 0 64px;list-style:none}.hero-outcomes li{display:grid;gap:7px}.hero-outcomes strong{font-size:17px;font-weight:560}.hero-outcomes span{max-width:310px;color:var(--muted);font-size:14px;line-height:1.55}
+.provider-strip{display:grid;grid-template-columns:repeat(6,1fr);width:min(100% - 48px,1392px);margin:0 auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.provider-wordmark{display:flex;min-height:116px;align-items:center;justify-content:center;gap:10px;border-right:1px solid var(--line)}.provider-wordmark:last-child{border-right:0}.provider-wordmark img{width:26px;height:26px;object-fit:contain;filter:grayscale(1)}.provider-wordmark span{font-size:16px;font-weight:620}.provider-wordmark small{border-radius:999px;background:#ededed;padding:3px 7px;color:var(--muted);font-size:10px}
+.story-section,.capabilities-section,.faq-section,.agent-section,.final-cta-section,.landing-footer{width:min(100% - 48px,1392px);margin:0 auto}.story-section{padding-top:180px}.story-heading{display:grid;grid-template-columns:72px minmax(0,920px);align-items:start}.story-heading-right{grid-template-columns:minmax(120px,1fr) minmax(0,920px)}.story-heading-right .section-index{grid-column:1}.story-heading-right h2{grid-column:2}.section-index{padding-top:12px;color:var(--soft);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.story-heading h2{font-size:clamp(52px,6vw,92px)}
+.story-stage{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);margin-top:60px;border:1px solid var(--line);background:var(--surface)}.story-stage-code{min-height:610px}.code-panel{min-width:0;padding:clamp(24px,4vw,64px);border-right:1px solid var(--line);background:#0d0d0d;color:#ededed}.code-panel-header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:44px}.code-panel-header>div{display:grid;gap:6px}.code-panel-header span{color:#888;font-size:12px}.code-panel-header strong{font-size:15px;font-weight:560}.code-panel-header button{display:inline-flex;align-items:center;gap:8px;border:1px solid #343434;border-radius:8px;background:#1a1a1a;padding:9px 12px;color:#ddd;cursor:pointer}.code-panel pre{margin:0;overflow-x:auto}.code-panel code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.1vw,15px);line-height:1.8;white-space:pre}
+.story-proof{display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(30px,4vw,56px)}.story-proof>p{margin:0 0 38px;font-size:clamp(22px,2.5vw,36px);letter-spacing:-.04em;line-height:1.15}.story-proof ul{display:grid;gap:12px;margin:0 0 36px;padding:0;color:var(--muted);font-size:14px;list-style:none}.text-link{width:fit-content;gap:8px;border:0;background:transparent;padding:0;color:var(--ink);font-size:14px;font-weight:620;cursor:pointer}.text-link:hover{text-decoration:underline;text-underline-offset:4px}
+.route-stage{min-height:640px}.route-console{display:flex;flex-direction:column;justify-content:center;min-width:0;padding:clamp(24px,5vw,76px);border-right:1px solid var(--line)}.route-console-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--line);font-size:13px;font-weight:620}.status-pill{width:fit-content;gap:7px;border-radius:999px;background:#f1f8f3;padding:6px 9px;color:#16794b;font-size:11px}.status-pill>span{width:7px;height:7px;border-radius:50%;background:#27a866}.route-console ol{margin:0;padding:0;list-style:none}.route-console li{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:18px;padding:26px 0;border-bottom:1px solid var(--line)}.route-console li:last-child{border-bottom:0}.route-step-number{color:var(--soft);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.route-console li div{display:grid;gap:5px}.route-console strong{font-size:15px;font-weight:620}.route-console p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.audience-stage{display:grid;grid-template-columns:repeat(3,1fr) 1.25fr;margin-top:60px;border:1px solid var(--line);background:var(--surface)}.audience-stage article,.audience-stage aside{display:flex;min-height:360px;flex-direction:column;justify-content:flex-end;padding:34px;border-right:1px solid var(--line)}.audience-stage>:last-child{border-right:0}.audience-stage svg{margin-bottom:auto;color:#444}.audience-stage strong{margin-bottom:12px;font-size:19px;font-weight:590}.audience-stage p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}.audience-stage aside{background:#171717;color:#fff}.audience-stage aside>span{margin-bottom:auto;color:#888;font-size:12px}.audience-stage aside p{margin-bottom:24px;color:#aaa}.audience-stage aside .text-link{color:#fff}
+.capabilities-section{padding-top:180px}.section-title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:56px}.section-title-row h2{max-width:820px;font-size:clamp(48px,6vw,86px)}.section-title-row>p{max-width:360px;margin:0;color:var(--muted);font-size:15px;line-height:1.6}.capability-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}.capability-card{display:flex;min-height:320px;flex-direction:column;justify-content:space-between;padding:32px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);transition:background 180ms ease}a.capability-card:hover{background:#f5f5f5}.capability-card-visual{display:flex;height:148px;align-items:center;justify-content:center}.capability-card-visual img{width:54px;height:54px;object-fit:contain;filter:grayscale(1)}.capability-card-visual svg{color:#333}.capability-card strong{display:block;margin-bottom:8px;font-size:20px;font-weight:590}.capability-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.faq-section{padding-top:180px}.faq-section .section-title-row{align-items:flex-start}.faq-list{border-top:1px solid var(--line)}.faq-list details{border-bottom:1px solid var(--line)}.faq-list summary{display:flex;min-height:76px;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;font-size:17px;font-weight:550;list-style:none}.faq-list summary::-webkit-details-marker{display:none}.faq-list details[open] summary svg{transform:rotate(45deg)}.faq-list summary svg{transition:transform 180ms ease}.faq-list details p{max-width:780px;margin:-8px 0 30px;color:var(--muted);font-size:14px;line-height:1.7}
+.agent-section{display:grid;grid-template-columns:2fr 1fr;margin-top:180px;border:1px solid var(--line);background:var(--surface)}.agent-section>div{min-height:360px;padding:clamp(32px,5vw,68px)}.agent-section>div:first-child{border-right:1px solid var(--line)}.agent-section h2{max-width:780px;font-size:clamp(42px,5vw,72px)}.agent-section p{max-width:760px;margin:28px 0 0;color:var(--muted);line-height:1.7}.agent-metric{display:flex;flex-direction:column;justify-content:flex-end}.agent-metric>strong{font-size:clamp(48px,5vw,76px);font-weight:500;letter-spacing:-.06em}.agent-metric>span{margin:6px 0 36px;color:var(--muted);font-size:13px}
+.final-cta-section{display:flex;min-height:660px;flex-direction:column;align-items:center;justify-content:center;padding:100px 24px;text-align:center}.final-cta-section h2{max-width:900px;font-size:clamp(54px,7vw,100px)}.final-cta-section p{max-width:600px;margin:26px 0 0;color:var(--muted);font-size:16px;line-height:1.65}.final-cta-section .hero-actions{justify-content:center}
+.landing-footer{display:grid;grid-template-columns:1.2fr 2fr;gap:80px;padding:64px 0 24px;border-top:1px solid var(--line)}.footer-brand p{max-width:360px;margin:20px 0 0;color:var(--muted);font-size:13px;line-height:1.65}.footer-directory{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}.footer-column{display:grid;align-content:start;gap:12px;font-size:13px}.footer-column strong{margin-bottom:4px;font-weight:620}.footer-column a{color:var(--muted)}.footer-bottom{display:flex;grid-column:1/-1;align-items:center;justify-content:space-between;margin-top:50px;padding-top:22px;border-top:1px solid var(--line)}.footer-bottom p{margin:0;color:var(--soft);font-size:12px}
+@media(max-width:1100px){.landing-nav{grid-template-columns:1fr auto}.desktop-nav{display:none}.hero-section{grid-template-columns:1fr 320px}.hero-outcomes{grid-column:1/-1;grid-template-columns:repeat(3,1fr);padding:20px 0 0}.provider-strip{grid-template-columns:repeat(3,1fr)}.provider-wordmark:nth-child(3){border-right:0}.provider-wordmark:nth-child(-n+3){border-bottom:1px solid var(--line)}.audience-stage{grid-template-columns:repeat(2,1fr)}.audience-stage>:nth-child(2){border-right:0}.audience-stage>:nth-child(-n+2){border-bottom:1px solid var(--line)}.capability-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:767px){.landing-nav{width:calc(100% - 32px);height:64px}.brand-name,.desktop-actions{display:none}.mobile-menu-button{display:inline-flex;width:42px;height:42px;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}.mobile-menu{display:flex;position:fixed;inset:65px 0 0;z-index:39;flex-direction:column;justify-content:space-between;overflow-y:auto;background:var(--page);padding:26px 24px 34px}.mobile-menu-links{display:grid}.mobile-menu-links a{display:flex;min-height:52px;align-items:center;border-bottom:1px solid var(--line);font-size:20px}.mobile-menu-actions{display:grid;gap:10px}.mobile-menu-actions .primary-button,.mobile-menu-actions .secondary-button{width:100%;border-radius:9px}.announcement-bar{min-height:112px;flex-direction:column;gap:10px;padding:18px;text-align:center}.hero-section{display:flex;min-height:620px;width:calc(100% - 32px);flex-direction:column;justify-content:center;padding:26px 0 24px;text-align:center}.hero-copy{display:contents}.hero-copy .eyebrow{display:none}.hero-copy h1{order:3;align-items:center;font-size:clamp(42px,12vw,52px)}.gateway-visual{order:2;min-height:210px;transform:scale(.74);margin:-22px 0}.hero-outcomes{order:4;display:block;padding:0}.hero-outcomes li{display:none}.hero-outcomes li:first-child{display:grid}.hero-outcomes li:first-child span{display:none}.hero-copy .hero-actions{order:5;display:grid;width:100%;margin-top:24px}.hero-copy .primary-button,.hero-copy .secondary-button{width:100%}.provider-strip{display:flex;width:100%;overflow-x:auto;border-left:0;border-right:0;scrollbar-width:none}.provider-strip::-webkit-scrollbar{display:none}.provider-wordmark{min-width:170px;min-height:100px;border-bottom:0!important}.story-section,.capabilities-section,.faq-section,.agent-section,.final-cta-section,.landing-footer{width:calc(100% - 32px)}.story-section,.capabilities-section,.faq-section{padding-top:112px}.story-heading,.story-heading-right{display:block}.story-heading .section-index{display:block;margin-bottom:18px;padding:0}.story-heading h2,.story-heading-right h2{font-size:clamp(43px,13vw,60px)}.story-stage{display:flex;flex-direction:column;margin-top:38px}.story-stage-code,.route-stage{min-height:0}.code-panel,.route-console{border-right:0;border-bottom:1px solid var(--line)}.code-panel{padding:24px 20px 34px}.code-panel-header{align-items:flex-start;margin-bottom:30px}.code-panel-header button{padding:8px;font-size:0}.code-panel code{font-size:11px}.story-proof{min-height:360px;padding:28px 24px}.route-console{padding:12px 24px}.route-console li{grid-template-columns:30px 1fr auto;gap:10px;padding:22px 0}.audience-stage{grid-template-columns:1fr;margin-top:38px}.audience-stage article,.audience-stage aside{min-height:300px;border-right:0;border-bottom:1px solid var(--line)}.audience-stage>:last-child{border-bottom:0}.section-title-row{display:block;margin-bottom:38px}.section-title-row h2{font-size:clamp(43px,13vw,60px)}.section-title-row>p{margin-top:24px}.capability-grid{grid-template-columns:1fr}.capability-card{min-height:280px}.faq-list summary{font-size:15px}.agent-section{grid-template-columns:1fr;margin-top:112px}.agent-section>div{min-height:320px}.agent-section>div:first-child{border-right:0;border-bottom:1px solid var(--line)}.final-cta-section{min-height:600px}.final-cta-section h2{font-size:clamp(48px,15vw,68px)}.final-cta-section .hero-actions{display:grid;width:100%}.landing-footer{grid-template-columns:1fr;gap:54px}.footer-directory{grid-template-columns:repeat(2,1fr)}.footer-bottom{align-items:flex-start;flex-direction:column;gap:18px}}
+@media(prefers-reduced-motion:reduce){.landing-page *,.landing-page *::before,.landing-page *::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>

@@ -16,18 +16,15 @@ function isLocaleCode(value: string): value is LocaleCode {
   return value === 'en' || value === 'zh'
 }
 
-function getDefaultLocale(): LocaleCode {
-  const saved = localStorage.getItem(LOCALE_KEY)
+export function resolveInitialLocale(saved: string | null): LocaleCode {
   if (saved && isLocaleCode(saved)) {
     return saved
   }
-
-  const browserLang = navigator.language.toLowerCase()
-  if (browserLang.startsWith('zh')) {
-    return 'zh'
-  }
-
   return DEFAULT_LOCALE
+}
+
+function getDefaultLocale(): LocaleCode {
+  return resolveInitialLocale(localStorage.getItem(LOCALE_KEY))
 }
 
 export const i18n = createI18n({

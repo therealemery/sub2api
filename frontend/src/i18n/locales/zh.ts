@@ -4,6 +4,8 @@ export default {
     viewOnGithub: '在 GitHub 上查看',
     viewDocs: '查看文档',
     docs: '文档',
+    models: '模型',
+    status: '状态',
     usageGuide: '使用教程',
     agentRecruitment: '招募代理',
     switchToLight: '切换到浅色模式',
@@ -11,9 +13,56 @@ export default {
     dashboard: '控制台',
     login: '登录',
     getStarted: '立即开始',
+    getApiKey: '获取 API Key',
+    viewPricing: '查看价格',
     goToDashboard: '进入控制台',
-    heroSubtitle: '畅用主流 AI 模型',
-    heroDescription: '新手容易上手，老手也够顺手。主推 ChatGPT 和 Claude，覆盖日常使用与进阶工作流。',
+    heroEyebrow: '兼容 OpenAI · 按量计费',
+    heroSubtitle: '一个 API 接入 ChatGPT 与 Claude',
+    heroDescription: '使用一个 API Key 稳定接入 ChatGPT 与 Claude，按量计费、价格透明，不静默替换低质量模型。',
+    heroSignals: {
+      compatible: '兼容 OpenAI',
+      billing: '按实际用量计费',
+      models: '模型处理透明'
+    },
+    navigation: {
+      openMenu: '打开菜单',
+      closeMenu: '关闭菜单'
+    },
+    announcement: {
+      label: 'OwnAPI 产品动态',
+      text: '一个网关，接入工作中依赖的 AI 模型',
+      action: '查看模型'
+    },
+    stories: {
+      gatewayTitle: '一个 API 接入推动工作前进的主流模型',
+      gatewayProof: '保留熟悉的 SDK 调用方式，由 OwnAPI 通过一个兼容端点统一处理模型接入。',
+      scaleTitle: '从第一次请求扩展到持续的生产流量',
+      scaleProof: '在一个地方完成接入、路由、额度控制、用量记录和通道状态查看。',
+      teamsTitle: '为开发者、团队和他们运营的工具而构建',
+      routeConsole: 'OwnAPI 接入路径',
+      operational: '所有系统运行正常'
+    },
+    capabilities: {
+      title: '构建 AI 模型应用所需的核心能力',
+      description: '围绕真实负载提供清晰的模型、网关、用量可见性和支持能力。',
+      chatgptTitle: 'ChatGPT',
+      claudeTitle: 'Claude',
+      gatewayTitle: '兼容 OpenAI 的网关',
+      gatewayDescription: '让熟悉的客户端指向一个 Base URL，保持简单的接入方式。',
+      usageTitle: '用量可见性',
+      usageDescription: '通过一个账户查看请求用量和消费记录。',
+      statusTitle: '通道状态',
+      statusDescription: '在生产使用前和使用过程中检查模型路由可用性。',
+      businessTitle: '企业大用量方案',
+      businessDescription: '针对持续负载协调用量额度、并发、账单和支持方式。'
+    },
+    code: {
+      label: 'Python · OpenAI SDK',
+      title: '替换 Base URL，即可开始调用',
+      copy: '复制代码',
+      copied: '代码已复制',
+      copyAria: '复制 Python 接入示例'
+    },
     tags: {
       subscriptionToApi: '订阅转 API',
       stickySession: '会话保持',
@@ -23,14 +72,43 @@ export default {
       oneKeyAccess: '主流模型'
     },
     trust: {
-      title: '良心长线生意，不注水',
-      description: '我们按长期运营来做服务，价格透明，模型体验不偷换、不缩水。',
-      longTermTitle: '长期经营',
-      longTermDescription: '服务和配置按长期使用维护，不做短期收割式体验。',
-      transparentTitle: '价格透明',
-      transparentDescription: '主流模型价格清楚，尽量让用户知道钱花在哪里。',
-      modelQualityTitle: '模型不注水',
-      modelQualityDescription: '展示和调用口径保持一致，不用低质量模型偷换体验。'
+      title: '可以亲自验证的能力',
+      description: '在扩大用量前，先查看接入教程、模型价格、用量记录和通道状态。',
+      longTermTitle: '兼容 OpenAI 请求',
+      longTermDescription: '继续使用熟悉的 SDK，只需把 Base URL 指向当前服务。',
+      transparentTitle: '用量明细可追溯',
+      transparentDescription: '从账户中查看请求用量和消费，不依赖模糊估算。',
+      modelQualityTitle: '模型处理透明',
+      modelQualityDescription: '模型名称和路由行为保持可见，不静默替换低质量模型。',
+      docsAction: '阅读接入教程',
+      pricingAction: '查看模型价格',
+      statusAction: '检查通道状态'
+    },
+    business: {
+      ariaLabel: 'B 端大用量 Token 方案',
+      kicker: 'B 端大用量方案',
+      title: '面向高频调用和团队',
+      titleAccent: '专属批量使用',
+      description: '如果你的业务需要长期、大量地消耗 AI Token，{siteName} 可以根据实际负载协调用量额度、并发策略、账单与支持方式。',
+      valueTitle: '更高性价比',
+      valueDescription: '适合批量任务、自动化工具、研发团队和内部系统长期接入。',
+      supplyTitle: '稳定供给',
+      supplyDescription: '围绕主流模型持续维护通道，不做低质量模型替换和体验注水。',
+      partnershipTitle: '长期合作',
+      partnershipDescription: '大用量客户可按实际使用规模配置更合适的额度和调用策略。',
+      copyEmail: '复制联系邮箱',
+      contactSales: '联系企业方案',
+      emailCopied: '邮箱已复制',
+      copyEmailAria: '复制联系邮箱 {email}'
+    },
+    recruitment: {
+      ariaLabel: '中转站代理招募',
+      kicker: '中转站代理招募',
+      title: 'AI 时代的长期副业入口',
+      description: 'AI Token 需求正在持续增长。成为 {siteName} 代理后，可以围绕身边的开发者、团队和 AI 工具用户推广服务，并获得其他用户消费最高可达 40% 的分成。',
+      commission: '最高 40%',
+      commissionLabel: '用户消费分成',
+      learnMore: '了解代理规则'
     },
     // 用户痛点区块
     painPoints: {
@@ -56,16 +134,16 @@ export default {
     },
     // 解决方案区块
     solutions: {
-      title: '优势清楚，长期稳定',
-      subtitle: '新手省心，老手顺手，价格按良心做，官方价格 6 折。'
+      title: '开发者为什么选择我们',
+      subtitle: '从第一次请求到生产使用，都更简单清楚'
     },
     features: {
-      unifiedGateway: '新手老手都友好',
-      unifiedGatewayDesc: '界面简单，流程清楚，新手不用折腾；高级用法也保留给老手直接上手。',
-      multiAccount: '安全长久稳定',
-      multiAccountDesc: '长期维护，稳定运营，不会跑路，尽量把服务可用性和使用体验放在前面。',
-      balanceQuota: '价格实惠，官方 6 折',
-      balanceQuotaDesc: '价格按良心做，模型不注水，不偷换体验，主流模型按官方价格 6 折提供。'
+      unifiedGateway: '一个凭据，继续使用熟悉的 SDK',
+      unifiedGatewayDesc: '保留已有的 OpenAI SDK 调用方式，切换模型时不再分别管理各家密钥。',
+      multiAccount: '面向连续使用的路由能力',
+      multiAccountDesc: '通过账号池和路由策略降低上游可用性带来的运维负担。',
+      balanceQuota: '用量和消费看得清楚',
+      balanceQuotaDesc: '按量计费、额度控制和详细记录，让个人与团队更容易理解实际消耗。'
     },
     // 优势对比
     comparison: {
@@ -109,6 +187,9 @@ export default {
       chatgptDescription: '主力通用模型，适合写作、代码、分析和日常问答。',
       claudeDescription: '长文本和复杂任务表现稳定，适合深度思考和工作流。',
       upcomingDescription: 'ChatGPT 与 Claude 已作为稳定主推模型开放，更多主流模型会按可用性、速度和质量标准持续扩展。',
+      chatgptUseCase: '写作 · 编程 · 分析',
+      claudeUseCase: '长上下文 · 推理 · 工作流',
+      viewAll: '查看模型与价格',
       supported: '已支持',
       soon: '即将推出',
       claude: 'Claude',
@@ -116,14 +197,64 @@ export default {
       antigravity: 'Antigravity',
       more: '更多'
     },
+    integration: {
+      kicker: '接入流程',
+      title: '从注册到第一次请求，只需四步',
+      description: '不用学习新的 SDK，也不用为每个模型分别维护上游控制台。',
+      steps: {
+        accountTitle: '创建账号',
+        accountDescription: '登录并进入自己的工作区。',
+        keyTitle: '创建 API Key',
+        keyDescription: '为应用和工具生成一个统一凭据。',
+        urlTitle: '替换 Base URL',
+        urlDescription: '把现有 OpenAI 兼容客户端指向当前服务。',
+        usageTitle: '查看用量并扩展',
+        usageDescription: '随着负载增长查看明细、调整额度并选择合适模型。'
+      }
+    },
+    audiences: {
+      kicker: '面向真实使用场景',
+      title: '适合个人开发者，也适合持续运行的团队业务',
+      description: '按你的开发和运营方式选择接入路径。',
+      developerTitle: '开发者与 AI 编程工具',
+      developerDescription: '使用一个熟悉的 API 接入编程助手、脚本和原型项目。',
+      teamTitle: '团队与内部自动化',
+      teamDescription: '集中管理凭据、用量可见性和共享工作流的额度。',
+      providerTitle: 'API 工具服务商',
+      providerDescription: '围绕支持的模型运行持续负载，让计费和账号运维更清楚。'
+    },
+    faq: {
+      kicker: '常见问题',
+      title: '第一次调用前需要了解的问题',
+      description: '快速了解兼容性、计费、模型和支持方式。',
+      protocolQuestion: '支持哪些客户端和协议？',
+      protocolAnswer: '网关支持常见的 OpenAI 兼容调用方式，并提供其他服务商的兼容端点。请在使用教程中确认你的客户端所需端点和配置。',
+      billingQuestion: '如何计费？',
+      billingAnswer: '用量会记录到账户，并按照当前配置的分组和模型规则计算。实际数值请以模型价格页和账户用量记录为准。',
+      balanceQuestion: '账户余额会过期吗？',
+      balanceAnswer: '余额和订阅规则可能因套餐与部署配置而不同。大额购买前请查看账户说明或联系支持。',
+      modelQuestion: '请求的模型会被静默替换吗？',
+      modelAnswer: '服务以模型名称和路由行为可见为目标。管理员可能配置模型映射；如果你关心准确的上游模型，请查看公开的模型信息。',
+      failedQuestion: '失败请求会收费吗？',
+      failedAnswer: '请通过详细用量记录核对每次请求的计费结果。如果失败请求出现异常扣费，请携带请求信息联系支持。',
+      dataQuestion: '请求数据会如何处理？',
+      dataAnswer: '请求会转发给所选上游服务商，元数据和日志保留方式取决于部署配置。在了解运营方政策前，请勿发送敏感数据。',
+      supportQuestion: '如何获得技术支持？',
+      supportAnswer: '通过页面公布的联系邮箱咨询账户、计费、模型和接入问题。'
+    },
     // CTA 区块
     cta: {
-      title: '准备好开始了吗？',
-      description: '注册即可获得免费试用额度，体验一站式 AI 服务',
-      button: '免费注册'
+      title: '准备发送第一次请求了吗？',
+      description: '创建 API Key，继续使用熟悉的 SDK，并从一个账户查看每次调用。',
+      button: '获取 API Key',
+      enterprise: '联系企业方案'
     },
     footer: {
-      allRightsReserved: '保留所有权利。'
+      allRightsReserved: '保留所有权利。',
+      product: '产品',
+      resources: '资源',
+      company: '合作',
+      support: '支持'
     }
   },
 
@@ -1009,6 +1140,27 @@ export default {
       unitPerMillion: '/ 1M token',
       unitPerRequest: '/ 次'
     }
+  },
+
+  publicModels: {
+    eyebrow: '一个 API，连接所有模型', title: '探索 OwnAPI 模型目录', description: '搜索并比较主流 AI 模型，查看能力与价格，然后通过一个 OpenAI 兼容接口完成接入。',
+    proofModels: '精选模型家族', proofBilling: '统一计费', proofApi: '生产级 API', searchPlaceholder: '搜索模型、提供商或能力…', filters: '筛选', provider: '提供商', capability: '能力', allProviders: '全部提供商', allCapabilities: '全部能力', clear: '清除筛选', showFilters: '显示筛选', hideFilters: '收起筛选', available: '共 {count} 个可用模型', resultHint: '按能力、提供商或价格筛选。', sort: '排序', sortFeatured: '推荐优先', sortName: '按名称', sortPrice: '最低价格', featured: '推荐', from: '起价', priceUnavailable: '价格待公布', perMillion: '/ 百万 Token', perRequest: '/ 次', viewModel: '查看模型', noResults: '没有符合筛选条件的模型。', noResultsHint: '尝试其他提供商、能力或搜索词。', fallbackNotice: '实时价格暂时不可用，当前展示 OwnAPI 精选模型目录。', growthTitle: '更多模型即将加入', growthDescription: '模型目录已为未来新增提供商和模型版本预留扩展空间。', backToModels: '全部模型', modelId: '模型 ID', context: '上下文', modality: '类型', pricing: '当前价格', input: '输入', output: '输出', cacheRead: '缓存读取', request: '请求', copyModel: '复制模型 ID', modelCopied: '模型 ID 已复制', buildTitle: '开始使用此模型构建', buildDescription: '保持同一个 OwnAPI 地址，只需切换模型参数。', getStarted: '获取 API Key', createKey: '创建 API Key', related: '相关模型', notFoundTitle: '未找到模型', notFoundDescription: '该模型目前不在 OwnAPI 公共模型目录中。',
+    code: { python: 'Python', typescript: 'TypeScript', curl: 'cURL', copy: '复制代码', copied: '已复制' },
+    families: {
+      gpt: { summary: '面向推理、编程与多模态任务的前沿智能。', description: '适合复杂推理、软件工程、智能体工作流与多模态产品的通用模型家族。' },
+      claude: { summary: '细致推理与高质量长文本工作。', description: '适合编程、文档分析、写作和多步骤知识任务，拥有稳定的指令遵循能力。' },
+      gemini: { summary: '原生多模态理解与高效生产速度。', description: '适合文本、图像和长上下文工作流，兼顾多模态输入与快速迭代。' },
+      deepseek: { summary: '高效推理与代码能力。', description: '适合分析推理、软件任务和注重成本的大规模文本工作负载。' },
+      grok: { summary: '适合推理与探索的直接、强大模型。', description: '面向研究、推理和多模态产品体验的通用模型家族。' },
+      qwen: { summary: '覆盖推理、代码和视觉的多语言模型。', description: '适合多语言助手、编程、视觉理解和高效生产工作负载。' },
+      glm: { summary: '面向真实产品的结构化多语言智能。', description: '适合双语助手、工具调用、推理和多模态企业应用。' },
+      kimi: { summary: '面向文档和研究的长上下文理解。', description: '适合长文档、研究综合以及需要大量上下文的连续对话。' },
+      ownapi: { summary: '通过 OwnAPI 网关提供的已配置模型。', description: '该模型使用统一的 OwnAPI 路由、计费与 OpenAI 兼容接入，目录信息将持续完善。' }
+    }
+  },
+
+  publicDocs: {
+    eyebrow: '从这里开始', title: 'OwnAPI 使用文档', description: 'OwnAPI 快速开始、OpenAI 兼容调用、模型发现、集成方式与生产环境指南。', navigation: '文档目录', onThisPage: '本页内容', copyPage: '复制页面链接', copied: '已复制', quickStart: '快速开始', quickStartDescription: '创建 API Key，并在几分钟内完成第一次请求。', modelList: '模型列表', modelListDescription: '浏览可用模型和当前公开价格。', dashboard: 'API 控制台', dashboardDescription: '管理密钥、监控用量并查看费用。', accessTitle: '通过一个 API 使用主流模型', typesTitle: '按模型类型探索', startTitle: '几分钟完成接入', whyTitle: '为什么选择 OwnAPI', resourcesTitle: '更多资源', textTitle: '文本与大语言模型', textDescription: '通过一个 Chat Completions 地址使用 GPT、Claude、Gemini、DeepSeek 等模型。', imageTitle: '多模态与图像', imageDescription: '通过一致的认证层调用视觉理解与图像模型。', codeTitle: '代码与智能体', codeDescription: '无需分别管理不同提供商的密钥，即可构建编程助手和智能体。', baseUrlTitle: '只需更换地址与密钥', baseUrlDescription: '现有 OpenAI SDK 应用只需修改 baseURL 和 apiKey 即可使用 OwnAPI。', unifiedTitle: '一个密钥，多个模型', unifiedDescription: '保持同一套接入，通过模型 ID 切换不同提供商。', billingTitle: '透明的用量记录', billingDescription: '在 OwnAPI 工作台查看请求、Token 和费用。', reliabilityTitle: '生产环境控制', reliabilityDescription: '结合状态监控、重试和模型回退构建可靠应用。', errorsTitle: '错误与重试', errorsDescription: '按明确规则处理认证、限流和上游错误。', integrationsTitle: '集成指南', integrationsDescription: '连接 OpenAI 兼容 SDK、编辑器和自动化工具。', statusTitle: '模型状态', statusDescription: '排查应用问题前先确认模型可用性。', navGroups: { start: '从这里开始', api: '模型 API 快速开始', guides: '核心 API 指南', support: '支持' }, navItems: { overview: '文档概览', key: '创建 API Key', models: '列出模型', text: '文本 API', images: '图像 API', sdk: '使用 OpenAI SDK', baseUrl: '更换 Base URL', fallback: '模型回退', errors: '处理错误', limits: '速率限制', help: '帮助中心' }
   },
 
   modelPricing: {

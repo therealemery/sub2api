@@ -4,6 +4,8 @@ export default {
     viewOnGithub: 'View on GitHub',
     viewDocs: 'View Documentation',
     docs: 'Docs',
+    models: 'Models',
+    status: 'Status',
     usageGuide: 'Usage Guide',
     agentRecruitment: 'Become an Agent',
     switchToLight: 'Switch to Light Mode',
@@ -11,9 +13,56 @@ export default {
     dashboard: 'Dashboard',
     login: 'Login',
     getStarted: 'Get Started',
+    getApiKey: 'Get API Key',
+    viewPricing: 'View Pricing',
     goToDashboard: 'Go to Dashboard',
-    heroSubtitle: 'Access Top AI Models',
-    heroDescription: 'Easy for beginners, powerful for pros. Featuring ChatGPT and Claude for everyday use and advanced workflows.',
+    heroEyebrow: 'OpenAI-compatible API · Pay as you go',
+    heroSubtitle: 'One API for ChatGPT and Claude',
+    heroDescription: 'Use one API key to access reliable ChatGPT and Claude routes, with transparent usage-based billing and no silent model substitutions.',
+    heroSignals: {
+      compatible: 'OpenAI compatible',
+      billing: 'Usage-based billing',
+      models: 'Transparent model handling'
+    },
+    navigation: {
+      openMenu: 'Open menu',
+      closeMenu: 'Close menu'
+    },
+    announcement: {
+      label: 'OwnAPI product update',
+      text: 'One gateway for the AI models your work depends on',
+      action: 'Explore models'
+    },
+    stories: {
+      gatewayTitle: 'One API for the models that move your work forward',
+      gatewayProof: 'Keep the SDK workflow you already know while OwnAPI handles access through one compatible endpoint.',
+      scaleTitle: 'Scale from your first request to sustained production traffic',
+      scaleProof: 'Move from setup to ongoing usage with routing, quota controls, records, and channel visibility in one place.',
+      teamsTitle: 'Built for developers, teams, and the tools they operate',
+      routeConsole: 'OwnAPI integration path',
+      operational: 'All systems operational'
+    },
+    capabilities: {
+      title: 'Everything you need to build with AI models',
+      description: 'A focused set of model, gateway, visibility, and support capabilities for real workloads.',
+      chatgptTitle: 'ChatGPT',
+      claudeTitle: 'Claude',
+      gatewayTitle: 'OpenAI-compatible Gateway',
+      gatewayDescription: 'Point familiar clients to one base URL and keep the integration surface simple.',
+      usageTitle: 'Usage Visibility',
+      usageDescription: 'Review request usage and spending from a single account.',
+      statusTitle: 'Channel Status',
+      statusDescription: 'Check model-route availability before and during production use.',
+      businessTitle: 'Business Volume Plans',
+      businessDescription: 'Coordinate quotas, concurrency, billing, and support for sustained workloads.'
+    },
+    code: {
+      label: 'Python · OpenAI SDK',
+      title: 'Switch the base URL and start building',
+      copy: 'Copy code',
+      copied: 'Code copied',
+      copyAria: 'Copy Python integration example'
+    },
     tags: {
       subscriptionToApi: 'Subscription to API',
       stickySession: 'Session Persistence',
@@ -23,14 +72,43 @@ export default {
       oneKeyAccess: 'Top Models'
     },
     trust: {
-      title: 'Honest, Long-term Service',
-      description: 'We run this as a long-term business. Transparent pricing, no model downgrades.',
-      longTermTitle: 'Long-term Operation',
-      longTermDescription: 'Built for sustained use, not short-term cash grabs.',
-      transparentTitle: 'Transparent Pricing',
-      transparentDescription: 'Clear pricing on all major models. You know where your money goes.',
-      modelQualityTitle: 'No Model Downgrades',
-      modelQualityDescription: 'What you see is what you get. No silent swaps to cheaper models.'
+      title: 'Capabilities You Can Verify',
+      description: 'Check the integration guide, model pricing, usage records, and channel status before you scale.',
+      longTermTitle: 'OpenAI-compatible Requests',
+      longTermDescription: 'Use familiar SDKs and point the base URL to your deployment.',
+      transparentTitle: 'Traceable Usage Details',
+      transparentDescription: 'Review request usage and spending from your account instead of relying on estimates.',
+      modelQualityTitle: 'Transparent Model Handling',
+      modelQualityDescription: 'Model names and routing behavior stay visible, without silent low-quality substitutions.',
+      docsAction: 'Read the integration guide',
+      pricingAction: 'Review model pricing',
+      statusAction: 'Check channel status'
+    },
+    business: {
+      ariaLabel: 'High-volume token plans for businesses',
+      kicker: 'High-volume Business Plans',
+      title: 'Built for High-frequency Use and Teams',
+      titleAccent: 'Dedicated Volume Access',
+      description: 'If your business needs sustained, high-volume AI token usage, {siteName} can help align quotas, concurrency, billing, and support with your actual workload.',
+      valueTitle: 'Better Value',
+      valueDescription: 'Ideal for batch workloads, automation tools, engineering teams, and long-term internal integrations.',
+      supplyTitle: 'Reliable Supply',
+      supplyDescription: 'Continuously maintained access to leading models without low-quality substitutions or diluted performance.',
+      partnershipTitle: 'Long-term Partnership',
+      partnershipDescription: 'High-volume customers can receive quotas and request strategies tailored to their actual usage.',
+      copyEmail: 'Copy Contact Email',
+      contactSales: 'Contact Sales',
+      emailCopied: 'Email Copied',
+      copyEmailAria: 'Copy contact email {email}'
+    },
+    recruitment: {
+      ariaLabel: 'API relay agent recruitment',
+      kicker: 'Become an API Agent',
+      title: 'A Long-term Opportunity in the AI Era',
+      description: 'Demand for AI tokens continues to grow. Join the {siteName} agent program, introduce the service to developers, teams, and AI tool users around you, and earn up to 40% of their spending.',
+      commission: 'Up to 40%',
+      commissionLabel: 'User spending commission',
+      learnMore: 'View Agent Program'
     },
     // Pain points section
     painPoints: {
@@ -56,16 +134,16 @@ export default {
     },
     // Solutions section
     solutions: {
-      title: 'We Solve These Problems',
-      subtitle: 'Three simple steps to stress-free AI access'
+      title: 'Why Developers Choose Us',
+      subtitle: 'A simpler path from first request to production usage'
     },
     features: {
-      unifiedGateway: 'One-Click Access',
-      unifiedGatewayDesc: 'Get a single API key to call all connected AI models. No separate applications needed.',
-      multiAccount: 'Always Reliable',
-      multiAccountDesc: 'Smart routing across multiple upstream accounts with automatic failover. Say goodbye to errors.',
-      balanceQuota: 'Pay What You Use',
-      balanceQuotaDesc: 'Usage-based billing with quota limits. Full visibility into team consumption.'
+      unifiedGateway: 'One Credential, Familiar SDKs',
+      unifiedGatewayDesc: 'Keep the OpenAI SDK workflow you already know and switch models without managing separate vendor keys.',
+      multiAccount: 'Routing Built for Continuity',
+      multiAccountDesc: 'Account pools and routing policies reduce the operational work behind upstream availability.',
+      balanceQuota: 'Usage You Can Inspect',
+      balanceQuotaDesc: 'Usage-based billing, quota controls, and detailed records make team consumption easier to understand.'
     },
     // Comparison section
     comparison: {
@@ -106,6 +184,12 @@ export default {
     providers: {
       title: 'Supported AI Models',
       description: 'One API, Multiple Choices',
+      chatgptDescription: 'A leading general-purpose model for writing, coding, analysis, and everyday questions.',
+      claudeDescription: 'Reliable for long documents and complex tasks, with strong reasoning and workflow support.',
+      upcomingDescription: 'ChatGPT and Claude are available as our primary stable models. More leading models will be added as they meet our availability, speed, and quality standards.',
+      chatgptUseCase: 'Writing · Coding · Analysis',
+      claudeUseCase: 'Long context · Reasoning · Workflows',
+      viewAll: 'View models and pricing',
       supported: 'Supported',
       soon: 'Soon',
       claude: 'Claude',
@@ -113,14 +197,64 @@ export default {
       antigravity: 'Antigravity',
       more: 'More'
     },
+    integration: {
+      kicker: 'Integration Flow',
+      title: 'From account to first request in four steps',
+      description: 'No new SDK to learn and no separate vendor dashboard for every model.',
+      steps: {
+        accountTitle: 'Create your account',
+        accountDescription: 'Sign in and open your workspace.',
+        keyTitle: 'Create an API key',
+        keyDescription: 'Generate one credential for your applications and tools.',
+        urlTitle: 'Replace the base URL',
+        urlDescription: 'Point your existing OpenAI-compatible client to this deployment.',
+        usageTitle: 'Monitor and scale',
+        usageDescription: 'Review usage, adjust quotas, and choose models as your workload grows.'
+      }
+    },
+    audiences: {
+      kicker: 'Built for Real Workloads',
+      title: 'A practical API layer for individuals and teams',
+      description: 'Choose the workflow that matches how you build and operate.',
+      developerTitle: 'Developers & Coding Tools',
+      developerDescription: 'Connect coding assistants, scripts, and prototypes with one familiar API.',
+      teamTitle: 'Teams & Internal Automation',
+      teamDescription: 'Centralize credentials, usage visibility, and quota controls for shared workflows.',
+      providerTitle: 'API Tool Providers',
+      providerDescription: 'Route sustained workloads across supported models with clearer billing and account operations.'
+    },
+    faq: {
+      kicker: 'FAQ',
+      title: 'Questions to answer before your first request',
+      description: 'The short version of compatibility, billing, models, and support.',
+      protocolQuestion: 'Which clients and protocols are supported?',
+      protocolAnswer: 'The gateway supports common OpenAI-compatible workflows and additional provider-compatible endpoints. Check the usage guide for the exact endpoint and client configuration you need.',
+      billingQuestion: 'How does billing work?',
+      billingAnswer: 'Usage is recorded against your account and calculated using the configured group and model rules. Review the model pricing page and your usage records for the current values.',
+      balanceQuestion: 'Does account balance expire?',
+      balanceAnswer: 'Balance and subscription rules can vary by plan and deployment configuration. Check your account details or contact support before purchasing a large amount.',
+      modelQuestion: 'Will a requested model be silently replaced?',
+      modelAnswer: 'The service is designed to keep requested model names and routing behavior visible. Administrators may configure mappings, so review the published model information when exact upstream identity matters.',
+      failedQuestion: 'Are failed requests charged?',
+      failedAnswer: 'Use the detailed usage records to verify what was billed for each request. If a failed request produces an unexpected charge, contact support with the request details.',
+      dataQuestion: 'How is request data handled?',
+      dataAnswer: 'Requests are forwarded to the selected upstream provider. Metadata and logs depend on deployment configuration, so do not send sensitive data without reviewing the operator policy.',
+      supportQuestion: 'How can I get support?',
+      supportAnswer: 'Use the published contact email for account, billing, model, and integration questions.'
+    },
     // CTA section
     cta: {
-      title: 'Ready to Get Started?',
-      description: 'Sign up now and get free trial credits to experience seamless AI access',
-      button: 'Sign Up Free'
+      title: 'Ready to send your first request?',
+      description: 'Create an API key, keep your familiar SDK, and review every request from one account.',
+      button: 'Get API Key',
+      enterprise: 'Contact Sales'
     },
     footer: {
-      allRightsReserved: 'All rights reserved.'
+      allRightsReserved: 'All rights reserved.',
+      product: 'Product',
+      resources: 'Resources',
+      company: 'Company',
+      support: 'Support'
     }
   },
 
@@ -1002,6 +1136,92 @@ export default {
       unitPerMillion: '/ 1M tokens',
       unitPerRequest: '/ request'
     }
+  },
+
+  publicModels: {
+    eyebrow: 'One API, every model',
+    title: 'Explore the OwnAPI model catalog',
+    description: 'Search and compare leading AI models, review their capabilities and pricing, then integrate with one OpenAI-compatible API.',
+    proofModels: 'Curated model families',
+    proofBilling: 'Unified billing',
+    proofApi: 'Production-ready API',
+    searchPlaceholder: 'Search models, providers or capabilities...',
+    filters: 'Filters',
+    provider: 'Provider',
+    capability: 'Capability',
+    allProviders: 'All providers',
+    allCapabilities: 'All capabilities',
+    clear: 'Clear filters',
+    showFilters: 'Show filters',
+    hideFilters: 'Hide filters',
+    available: '{count} models available',
+    resultHint: 'Filter by capability, provider or price.',
+    sort: 'Sort',
+    sortFeatured: 'Featured',
+    sortName: 'Name',
+    sortPrice: 'Lowest price',
+    featured: 'Featured',
+    from: 'From',
+    priceUnavailable: 'Price on request',
+    perMillion: '/ 1M tokens',
+    perRequest: '/ request',
+    viewModel: 'View model',
+    noResults: 'No models match these filters.',
+    noResultsHint: 'Try a different provider, capability, or search term.',
+    fallbackNotice: 'Live pricing is temporarily unavailable. Showing the curated OwnAPI catalog.',
+    growthTitle: 'More models are on the way',
+    growthDescription: 'This catalog is designed to expand as new providers and model versions become available.',
+    backToModels: 'All models',
+    modelId: 'Model ID',
+    context: 'Context',
+    modality: 'Modality',
+    pricing: 'Current pricing',
+    input: 'Input',
+    output: 'Output',
+    cacheRead: 'Cache read',
+    request: 'Request',
+    copyModel: 'Copy model ID',
+    modelCopied: 'Model ID copied',
+    buildTitle: 'Start building with this model',
+    buildDescription: 'Use the same OwnAPI endpoint and switch models with one parameter.',
+    getStarted: 'Get an API key',
+    createKey: 'Create API key',
+    related: 'Related models',
+    notFoundTitle: 'Model not found',
+    notFoundDescription: 'This model is not currently listed in the public OwnAPI catalog.',
+    code: { python: 'Python', typescript: 'TypeScript', curl: 'cURL', copy: 'Copy code', copied: 'Copied' },
+    families: {
+      gpt: { summary: 'Frontier reasoning, coding and multimodal intelligence.', description: 'A versatile model family for complex reasoning, software engineering, agentic workflows and multimodal applications.' },
+      claude: { summary: 'Careful reasoning and precise long-form work.', description: 'A dependable family for coding, document analysis, writing and multi-step knowledge work with strong instruction following.' },
+      gemini: { summary: 'Native multimodal understanding at production speed.', description: 'A flexible family for text, image and long-context workflows where multimodal inputs and fast iteration matter.' },
+      deepseek: { summary: 'Efficient reasoning and code-focused intelligence.', description: 'A focused family for analytical reasoning, software tasks and cost-conscious high-volume text workloads.' },
+      grok: { summary: 'Direct, capable models for reasoning and exploration.', description: 'A general-purpose family suited to research, reasoning and multimodal product experiences.' },
+      qwen: { summary: 'Multilingual models spanning reasoning, code and vision.', description: 'A broad model family for multilingual assistants, coding, visual understanding and efficient production workloads.' },
+      glm: { summary: 'Structured multilingual intelligence for real products.', description: 'A practical family for bilingual assistants, tool use, reasoning and multimodal enterprise applications.' },
+      kimi: { summary: 'Long-context understanding for documents and research.', description: 'A family designed for extended documents, research synthesis and conversations that need substantial context.' },
+      ownapi: { summary: 'A configured model available through the OwnAPI gateway.', description: 'This model uses shared OwnAPI routing, billing and OpenAI-compatible integration while catalog details are being expanded.' }
+    }
+  },
+
+  publicDocs: {
+    eyebrow: 'Start here', title: 'OwnAPI Documentation', description: 'Quick start, OpenAI-compatible chat completions, model discovery, integrations and production guidance for OwnAPI.',
+    navigation: 'Documentation', onThisPage: 'On this page', copyPage: 'Copy page link', copied: 'Copied',
+    quickStart: 'Quick Start', quickStartDescription: 'Create your API key and make your first request in minutes.',
+    modelList: 'Model List', modelListDescription: 'Browse available models with current public pricing.',
+    dashboard: 'API Dashboard', dashboardDescription: 'Manage keys, monitor usage and track costs.',
+    accessTitle: 'Access top models through one API', typesTitle: 'Explore by model type', startTitle: 'Start in minutes', whyTitle: 'Why OwnAPI', resourcesTitle: 'More resources',
+    textTitle: 'Text & LLM', textDescription: 'GPT, Claude, Gemini, DeepSeek and more through one chat completions endpoint.',
+    imageTitle: 'Multimodal & image', imageDescription: 'Use capable vision and image models through a consistent authentication layer.',
+    codeTitle: 'Code & agents', codeDescription: 'Build coding assistants and agent workflows without managing separate provider keys.',
+    baseUrlTitle: 'Change only the endpoint and key', baseUrlDescription: 'Existing OpenAI SDK applications can use OwnAPI by changing baseURL and apiKey.',
+    unifiedTitle: 'One key, many models', unifiedDescription: 'Switch providers with a model ID while keeping the same integration.',
+    billingTitle: 'Transparent usage', billingDescription: 'Track requests, tokens and costs from the OwnAPI workspace.',
+    reliabilityTitle: 'Production controls', reliabilityDescription: 'Use status monitoring, retries and model fallbacks for reliable applications.',
+    errorsTitle: 'Errors and retries', errorsDescription: 'Handle authentication, rate limits and upstream failures with clear retry rules.',
+    integrationsTitle: 'Integration guides', integrationsDescription: 'Connect OpenAI-compatible SDKs, editors and automation tools.',
+    statusTitle: 'Model status', statusDescription: 'Check availability before investigating an application-side issue.',
+    navGroups: { start: 'Start here', api: 'Model API quickstarts', guides: 'Core API guides', support: 'Support' },
+    navItems: { overview: 'Documentation overview', key: 'Create an API key', models: 'List models', text: 'Text APIs', images: 'Image APIs', sdk: 'Use OpenAI SDKs', baseUrl: 'Change base URL', fallback: 'Model fallback', errors: 'Handle errors', limits: 'Rate limits', help: 'Help center' }
   },
 
   modelPricing: {

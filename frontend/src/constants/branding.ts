@@ -7,6 +7,11 @@ export const DEFAULT_PAYMENT_PRODUCT_PREFIX = DEFAULT_SITE_NAME
 export const DEFAULT_DOC_URL = ''
 export const DEFAULT_REPOSITORY_URL = ''
 
+export function resolveSiteName(name?: string): string {
+  const trimmed = name?.trim()
+  return trimmed && trimmed.toLowerCase() !== 'sub2api' ? trimmed : DEFAULT_SITE_NAME
+}
+
 const LEGACY_OWNAPI_LOGO_PATTERN = /^\/(?:brand\/)?(?:logo|ownapi-(?:hero-)?logo(?:-(?:light|dark))?)\.(?:png|svg)$/i
 
 function isLegacyOwnApiLogoPath(value?: string): boolean {
