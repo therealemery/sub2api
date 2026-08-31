@@ -1,19 +1,25 @@
 <template>
   <div class="public-site">
     <PublicSiteHeader />
-    <slot />
+    <Transition name="motion-fade" mode="out-in" appear>
+      <div :key="route.fullPath" class="public-route-content">
+        <slot />
+      </div>
+    </Transition>
     <PublicSiteFooter />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore, useAppStore } from '@/stores'
 import PublicSiteHeader from './PublicSiteHeader.vue'
 import PublicSiteFooter from './PublicSiteFooter.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const route = useRoute()
 
 onMounted(() => {
   document.documentElement.classList.remove('dark')
