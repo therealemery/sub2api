@@ -9,7 +9,6 @@
       <div class="public-links">
         <router-link to="/models">{{ t('home.models') }}</router-link>
         <router-link to="/docs">{{ t('home.docs') }}</router-link>
-        <router-link to="/monitor">{{ t('home.status') }}</router-link>
         <router-link to="/agent-recruitment">{{ t('home.agentRecruitment') }}</router-link>
       </div>
 
@@ -36,7 +35,6 @@
       <div class="mobile-links">
         <router-link to="/models" @click="closeMenu">{{ t('home.models') }}</router-link>
         <router-link to="/docs" @click="closeMenu">{{ t('home.docs') }}</router-link>
-        <router-link to="/monitor" @click="closeMenu">{{ t('home.status') }}</router-link>
         <router-link to="/agent-recruitment" @click="closeMenu">{{ t('home.agentRecruitment') }}</router-link>
       </div>
       <div class="mobile-actions">
