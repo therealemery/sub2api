@@ -3921,10 +3921,14 @@ body,
   .motion-scale-fade-enter-active,
   .motion-scale-fade-leave-active,
   .motion-list-enter-active,
-  .motion-list-leave-active,
-  .motion-list-move {
+  .motion-list-leave-active {
     transition-duration: 1ms !important;
     transition-delay: 0ms !important;
+  }
+
+  .motion-list-move {
+    transition: none !important;
+    transform: none !important;
   }
 
   .motion-scale-fade-enter-from,
