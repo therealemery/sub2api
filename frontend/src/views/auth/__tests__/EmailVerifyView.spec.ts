@@ -350,6 +350,53 @@ describe('EmailVerifyView', () => {
     expect(registerMock).not.toHaveBeenCalled()
   })
 
+  it('omits absent adoption decisions from a partial pending oauth decision', async () => {
+    authStoreState.pendingAuthSession = {
+      token: 'pending-token-1',
+      token_field: 'pending_auth_token',
+      provider: 'wechat',
+      redirect: '/profile',
+    }
+    sessionStorage.setItem(
+      'register_data',
+      JSON.stringify({
+        email: 'fresh@example.com',
+        password: 'secret-123',
+        pending_adoption_decision: {
+          adopt_display_name: true,
+        },
+      })
+    )
+    apiClientPostMock.mockResolvedValue({
+      data: {
+        access_token: 'oauth-access-token',
+      },
+    })
+
+    const wrapper = mount(EmailVerifyView, {
+      global: {
+        stubs: {
+          AuthLayout: { template: '<div><slot /><slot name="footer" /></div>' },
+          Icon: true,
+          TurnstileWidget: true,
+          transition: false,
+        },
+      },
+    })
+
+    await flushPromises()
+    await wrapper.get('#code').setValue('123456')
+    await wrapper.get('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(apiClientPostMock).toHaveBeenCalledWith('/auth/oauth/pending/create-account', {
+      email: 'fresh@example.com',
+      password: 'secret-123',
+      verify_code: '123456',
+      adopt_display_name: true,
+    })
+  })
+
   it('returns to the oauth callback flow when pending account creation becomes bind-login', async () => {
     authStoreState.pendingAuthSession = {
       token: '',

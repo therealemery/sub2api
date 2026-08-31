@@ -272,10 +272,17 @@ onMounted(async () => {
       pendingAuthTokenField.value = registerData.pending_auth_token_field || activePendingSession?.token_field || 'pending_auth_token'
       pendingProvider.value = registerData.pending_provider || activePendingSession?.provider || ''
       pendingRedirect.value = registerData.pending_redirect || activePendingSession?.redirect || ''
-      pendingAdoptionDecision.value = registerData.pending_adoption_decision
+      const pendingAdoptionDecisionData = registerData.pending_adoption_decision
+      pendingAdoptionDecision.value = pendingAdoptionDecisionData
         ? {
-            adoptDisplayName: registerData.pending_adoption_decision.adopt_display_name === true,
-            adoptAvatar: registerData.pending_adoption_decision.adopt_avatar === true
+            adoptDisplayName:
+              typeof pendingAdoptionDecisionData.adopt_display_name === 'boolean'
+                ? pendingAdoptionDecisionData.adopt_display_name
+                : undefined,
+            adoptAvatar:
+              typeof pendingAdoptionDecisionData.adopt_avatar === 'boolean'
+                ? pendingAdoptionDecisionData.adopt_avatar
+                : undefined
           }
         : null
       hasRegisterData.value = !!(email.value && password.value)
