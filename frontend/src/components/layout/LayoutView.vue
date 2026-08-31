@@ -2,7 +2,7 @@
   <AppLayout>
     <router-view v-slot="{ Component, route }">
       <UserRouteTransition :route-path="route.path">
-        <component :is="Component" :key="route.fullPath" />
+        <component :is="Component" :key="route.path" />
       </UserRouteTransition>
     </router-view>
   </AppLayout>

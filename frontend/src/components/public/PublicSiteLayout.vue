@@ -2,7 +2,7 @@
   <div class="public-site">
     <PublicSiteHeader />
     <Transition name="motion-fade" mode="out-in" appear>
-      <div :key="route.fullPath" class="public-route-content">
+      <div :key="route.path" class="public-route-content">
         <slot />
       </div>
     </Transition>

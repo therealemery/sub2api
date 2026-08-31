@@ -1,13 +1,15 @@
-import { defineComponent, nextTick } from 'vue'
-import { mount, shallowMount } from '@vue/test-utils'
+import { defineComponent, nextTick, onMounted, onUnmounted } from 'vue'
+import { flushPromises, mount, shallowMount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createMemoryHistory, createRouter, RouterView } from 'vue-router'
 import PublicSiteHeader from '../../public/PublicSiteHeader.vue'
 import PublicSiteLayout from '../../public/PublicSiteLayout.vue'
 import publicSiteLayoutSource from '../../public/PublicSiteLayout.vue?raw'
+import LayoutView from '../LayoutView.vue'
 import layoutViewSource from '../LayoutView.vue?raw'
 import UserRouteTransition from '../UserRouteTransition.vue'
 
-const route = { fullPath: '/models' }
+const route = { fullPath: '/models', path: '/models' }
 const checkAuth = vi.fn()
 const fetchPublicSettings = vi.fn()
 
@@ -44,23 +46,55 @@ vi.mock('@/stores', () => ({
   })
 }))
 
-const RouterLinkStub = defineComponent({
-  props: {
-    to: {
-      type: String,
-      required: true
-    }
-  },
-  emits: ['click'],
-  template: '<a :href="to" @click.prevent="$emit(\'click\', $event)"><slot /></a>'
-})
-
 describe('UserRouteTransition', () => {
   it('is the single route gate around the keyed LayoutView router slot', () => {
     expect(layoutViewSource).toContain('<router-view v-slot="{ Component, route }">')
     expect(layoutViewSource).toContain('<UserRouteTransition :route-path="route.path">')
-    expect(layoutViewSource).toContain('<component :is="Component" :key="route.fullPath" />')
+    expect(layoutViewSource).toContain('<component :is="Component" :key="route.path" />')
     expect(layoutViewSource).not.toContain("startsWith('/admin')")
+  })
+
+  it('does not remount a user page when only its query changes', async () => {
+    const mounted = vi.fn()
+    const unmounted = vi.fn()
+    const PaymentPage = defineComponent({
+      setup() {
+        onMounted(mounted)
+        onUnmounted(unmounted)
+      },
+      template: '<section data-test="payment-page">Payment</section>'
+    })
+    const AppLayoutStub = defineComponent({ template: '<div><slot /></div>' })
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{
+        path: '/payment',
+        component: LayoutView,
+        children: [{ path: '', component: PaymentPage }]
+      }]
+    })
+
+    await router.push('/payment?resume=confirm')
+    await router.isReady()
+    const wrapper = mount(RouterView, {
+      global: {
+        plugins: [router],
+        stubs: { AppLayout: AppLayoutStub }
+      }
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="payment-page"]').exists()).toBe(true)
+    expect(mounted).toHaveBeenCalledTimes(1)
+
+    await router.push('/payment?resume=complete')
+    await flushPromises()
+
+    expect(router.currentRoute.value.query.resume).toBe('complete')
+    expect(mounted).toHaveBeenCalledTimes(1)
+    expect(unmounted).not.toHaveBeenCalled()
+
+    wrapper.unmount()
   })
 
   it('uses motion-fade for ordinary authenticated user routes', () => {
@@ -97,7 +131,7 @@ describe('public route and navigation motion', () => {
     fetchPublicSettings.mockClear()
   })
 
-  it('fades public route content with a stable full-path key', () => {
+  it('fades public route content with a stable path key', () => {
     const wrapper = shallowMount(PublicSiteLayout, {
       slots: { default: '<main data-test="public-page">Models</main>' }
     })
@@ -110,34 +144,65 @@ describe('public route and navigation motion', () => {
     expect(wrapper.get('.public-route-content').element.parentElement).toBe(
       wrapper.get('transition-stub').element
     )
-    expect(publicSiteLayoutSource).toContain(':key="route.fullPath"')
+    expect(publicSiteLayoutSource).toContain(':key="route.path"')
   })
 
-  it('wraps the open mobile menu in motion-scale-fade without delaying link clicks', async () => {
+  it('keeps the real mobile menu transition keyboard-focusable and navigates immediately', async () => {
+    const EmptyPage = defineComponent({ template: '<div />' })
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/home', component: EmptyPage },
+        { path: '/models', component: EmptyPage },
+        { path: '/docs', component: EmptyPage },
+        { path: '/agent-recruitment', component: EmptyPage },
+        { path: '/login', component: EmptyPage },
+        { path: '/register', component: EmptyPage }
+      ]
+    })
+    await router.push('/home')
+    await router.isReady()
+
     const wrapper = mount(PublicSiteHeader, {
+      attachTo: document.body,
       global: {
+        plugins: [router],
         stubs: {
           Icon: true,
           LocaleSwitcher: true,
-          RouterLink: RouterLinkStub
+          Transition: false
         }
       }
     })
 
     const toggle = wrapper.get('button.menu-button')
     expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(toggle.attributes('type')).toBe('button')
+    toggle.element.focus()
+    expect(document.activeElement).toBe(toggle.element)
 
-    await toggle.trigger('click')
+    // JSDOM does not synthesize a native button click for Enter, so model the
+    // browser's default activation only when the key event was not cancelled.
+    const enterEvent = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter' })
+    toggle.element.dispatchEvent(enterEvent)
+    if (!enterEvent.defaultPrevented) toggle.element.click()
+    await nextTick()
     expect(toggle.attributes('aria-expanded')).toBe('true')
-    expect(wrapper.get('transition-stub').attributes('name')).toBe('motion-scale-fade')
+    expect(wrapper.get('.mobile-panel').classes()).toContain('motion-scale-fade-enter-from')
 
     const firstLink = wrapper.get('.mobile-links a')
     expect(firstLink.attributes('href')).toBe('/models')
     expect(firstLink.element.tabIndex).toBe(0)
 
+    const push = vi.spyOn(router, 'push')
     await firstLink.trigger('click')
-    await nextTick()
+    expect(push).toHaveBeenCalledWith('/models')
     expect(toggle.attributes('aria-expanded')).toBe('false')
-    expect(wrapper.find('.mobile-panel').exists()).toBe(false)
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/models')
+    const leavingPanel = wrapper.get('.mobile-panel')
+    expect(leavingPanel.classes()).toContain('motion-scale-fade-leave-active')
+
+    wrapper.unmount()
   })
 })
