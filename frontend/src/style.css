@@ -1860,7 +1860,14 @@ body {
   --duration-base: 150ms;
   --duration-normal: 150ms;
   --duration-modal: 200ms;
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-instant: 120ms;
+  --motion-fast: 160ms;
+  --motion-base: 220ms;
+  --motion-slow: 320ms;
+  --motion-hero: 450ms;
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --ease-exit: cubic-bezier(.4, 0, 1, 1);
 
 }
 
@@ -3865,4 +3872,65 @@ body,
   border-color: var(--border-default) !important;
   background: var(--bg-surface-alt) !important;
   color: var(--text-secondary) !important;
+}
+
+/* Shared Vue transition primitives for public and ordinary-user surfaces. */
+.motion-fade-enter-active,
+.motion-fade-leave-active {
+  transition: opacity var(--motion-base) var(--ease-standard);
+}
+
+.motion-fade-enter-from,
+.motion-fade-leave-to {
+  opacity: 0;
+}
+
+.motion-scale-fade-enter-active,
+.motion-scale-fade-leave-active {
+  transition:
+    opacity var(--motion-base) var(--ease-standard),
+    transform var(--motion-base) var(--ease-standard);
+}
+
+.motion-scale-fade-enter-from,
+.motion-scale-fade-leave-to {
+  opacity: 0;
+  transform: scale(.98);
+}
+
+.motion-list-enter-active,
+.motion-list-leave-active {
+  transition:
+    opacity var(--motion-base) var(--ease-standard),
+    transform var(--motion-base) var(--ease-standard);
+}
+
+.motion-list-move {
+  transition: transform var(--motion-base) var(--ease-standard);
+}
+
+.motion-list-enter-from,
+.motion-list-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade-enter-active,
+  .motion-fade-leave-active,
+  .motion-scale-fade-enter-active,
+  .motion-scale-fade-leave-active,
+  .motion-list-enter-active,
+  .motion-list-leave-active,
+  .motion-list-move {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .motion-scale-fade-enter-from,
+  .motion-scale-fade-leave-to,
+  .motion-list-enter-from,
+  .motion-list-leave-to {
+    transform: none;
+  }
 }
