@@ -74,3 +74,35 @@ The run also emits pre-existing `router-link` resolution warnings and intentiona
 
 - The full suite still has the two unrelated GroupDistributionChart test failures and one unrelated DashboardView unhandled rejection listed above.
 - `frontend/pnpm-workspace.yaml` remains an untracked pre-existing workspace artifact and is intentionally excluded from this commit.
+
+## Fix round 1 — Partial adoption decisions
+
+### Implementation
+
+- Preserved each persisted adoption decision only when its raw value is a boolean. A partial decision such as `{ adopt_display_name: true }` now retains `adoptAvatar` as `undefined`, so pending OAuth account creation omits `adopt_avatar` instead of serializing `false`.
+- Added a regression test that asserts a partial adoption decision submits only `adopt_display_name: true`.
+
+### RED
+
+```text
+node node_modules/vitest/vitest.mjs run src/views/auth/__tests__/EmailVerifyView.spec.ts
+1 failed | 7 passed (8)
+```
+
+The new regression test observed the erroneous `adopt_avatar: false` request property.
+
+### GREEN
+
+```text
+node node_modules/vitest/vitest.mjs run src/views/auth/__tests__/EmailVerifyView.spec.ts
+1 passed (8)
+
+node node_modules/vitest/vitest.mjs run src/views/auth/__tests__/EmailVerifyView.spec.ts src/api/__tests__/settings.authSourceDefaults.spec.ts src/composables/__tests__/usePersistedPageSize.spec.ts
+3 passed (12)
+```
+
+### Self-review
+
+- Explicit `false` values remain serialized because they pass the boolean check.
+- Missing or non-boolean values remain `undefined` and are omitted by the existing conditional request spreading.
+- The change is restricted to the pending OAuth adoption-decision parser and its covering test.

@@ -159,6 +159,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Restored the current system page-size default as the authoritative read value over stale browser storage.
 - Focused B2 tests passed: 3 files / 11 tests. Vue type checking and `git diff --check` passed.
 - The full frontend suite has two remaining GroupDistributionChart failures and one DashboardView unhandled rejection, each caused by `formatCost` calling `toFixed` on undefined; these are outside B2. See `.superpowers/sdd/2026-08-31-ownapi-model-pricing-status-plan/baseline-b2-report.md`.
+- Review fix round 1 preserved `undefined` for missing pending OAuth adoption-decision fields; a partial decision can no longer serialize an unselected field as `false`. Focused EmailVerifyView and B2 suites passed (8 and 12 tests respectively).
 
 ## Recovery Checklist
 
