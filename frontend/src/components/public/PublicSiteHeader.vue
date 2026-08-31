@@ -31,19 +31,21 @@
       </button>
     </nav>
 
-    <div v-if="menuOpen" class="mobile-panel">
-      <div class="mobile-links">
-        <router-link to="/models" @click="closeMenu">{{ t('home.models') }}</router-link>
-        <router-link to="/docs" @click="closeMenu">{{ t('home.docs') }}</router-link>
-        <router-link to="/agent-recruitment" @click="closeMenu">{{ t('home.agentRecruitment') }}</router-link>
+    <Transition name="motion-scale-fade">
+      <div v-if="menuOpen" class="mobile-panel">
+        <div class="mobile-links">
+          <router-link to="/models" @click="closeMenu">{{ t('home.models') }}</router-link>
+          <router-link to="/docs" @click="closeMenu">{{ t('home.docs') }}</router-link>
+          <router-link to="/agent-recruitment" @click="closeMenu">{{ t('home.agentRecruitment') }}</router-link>
+        </div>
+        <div class="mobile-actions">
+          <LocaleSwitcher />
+          <router-link :to="primaryActionPath" class="nav-button nav-button-dark" @click="closeMenu">
+            {{ isAuthenticated ? t('home.dashboard') : t('home.getStarted') }}
+          </router-link>
+        </div>
       </div>
-      <div class="mobile-actions">
-        <LocaleSwitcher />
-        <router-link :to="primaryActionPath" class="nav-button nav-button-dark" @click="closeMenu">
-          {{ isAuthenticated ? t('home.dashboard') : t('home.getStarted') }}
-        </router-link>
-      </div>
-    </div>
+    </Transition>
   </header>
 </template>
 
