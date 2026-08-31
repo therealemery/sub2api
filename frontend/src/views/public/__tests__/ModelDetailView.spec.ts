@@ -1,6 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
+import type { ModelCatalogEntry } from '@/data/modelCatalog'
 import ModelDetailView from '../ModelDetailView.vue'
 
 const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
@@ -23,12 +24,14 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.cachedInput': 'Cached input',
       'publicModels.output': 'Output',
       'publicModels.perMillion': '/ 1M tokens',
+      'publicModels.usdPerMillion': 'USD / 1M tokens',
       'publicModels.shortContext': 'Short context',
       'publicModels.longContext': 'Long context',
-      'publicModels.longContextThreshold': `Long context above ${String(params?.count ?? '')} tokens`,
+      'publicModels.longContextThreshold': `Long context: ${String(params?.count ?? '')} tokens or more`,
       'publicModels.pricingCheckedAt': `Pricing checked ${String(params?.date ?? '')}`,
       'publicModels.viewOfficialPricing': 'View official pricing',
       'publicModels.priceUnavailable': 'Price on request',
+      'publicModels.notPublished': 'Not published',
       'publicModels.priceType': 'Price type',
       'publicModels.related': 'Related models',
       'publicModels.families.gpt.description': 'GPT model family',
@@ -97,19 +100,23 @@ describe('ModelDetailView', () => {
 
     expect(wrapper.text()).toContain('Grok 4.6')
     expect(wrapper.text()).toContain('Short context')
-    expect(wrapper.text()).toContain('Long context above 200,000 tokens')
-    expect(wrapper.text()).toContain('$2')
-    expect(wrapper.text()).toContain('$1.4')
-    expect(wrapper.text()).toContain('$0.5')
-    expect(wrapper.text()).toContain('$0.35')
-    expect(wrapper.text()).toContain('$6')
-    expect(wrapper.text()).toContain('$4.2')
-    expect(wrapper.text()).toContain('$4')
-    expect(wrapper.text()).toContain('$2.8')
-    expect(wrapper.text()).toContain('$1')
-    expect(wrapper.text()).toContain('$0.7')
-    expect(wrapper.text()).toContain('$12')
-    expect(wrapper.text()).toContain('$8.4')
+    expect(wrapper.text()).toContain('Long context: 200,000 tokens or more')
+    for (const price of [
+      '$2 USD / 1M tokens',
+      '$1.4 USD / 1M tokens',
+      '$0.5 USD / 1M tokens',
+      '$0.35 USD / 1M tokens',
+      '$6 USD / 1M tokens',
+      '$4.2 USD / 1M tokens',
+      '$4 USD / 1M tokens',
+      '$2.8 USD / 1M tokens',
+      '$1 USD / 1M tokens',
+      '$0.7 USD / 1M tokens',
+      '$12 USD / 1M tokens',
+      '$8.4 USD / 1M tokens',
+    ]) {
+      expect(wrapper.text()).toContain(price)
+    }
   })
 
   it('renders alias disclosure and links to GPT-5.4 official pricing source', async () => {
@@ -124,5 +131,49 @@ describe('ModelDetailView', () => {
     expect(sourceLink.text()).toBe('View official pricing')
     expect(sourceLink.attributes('target')).toBe('_blank')
     expect(sourceLink.attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('uses not-published copy for null verified pricing cells', async () => {
+    const wrapper = mountDetail('null-price-model')
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as { entries: ModelCatalogEntry[] }
+    vm.entries = [{
+      slug: 'null-price-model',
+      modelId: 'null-price-model',
+      displayName: 'Null Price Model',
+      provider: 'OwnAPI',
+      platform: 'custom',
+      family: 'ownapi',
+      modality: 'Text',
+      capabilities: ['Text'],
+      summaryKey: 'publicModels.families.ownapi.summary',
+      descriptionKey: 'publicModels.families.ownapi.description',
+      artwork: '/model-art/ownapi.jpg',
+      providerLogo: '/brand/ownapi-logo-clean.png',
+      contextWindow: null,
+      featured: false,
+      featuredBadge: '',
+      sortOrder: 1,
+      price: null,
+      pricingSource: {
+        official: { input: null, cachedInput: null, output: null },
+        multiplier: 0.7,
+        sourceUrl: 'https://example.com/pricing',
+        checkedAt: '2026-08-31',
+      },
+      modelClass: [],
+      endpoints: [],
+      isAlias: false,
+      aliasNoteKey: null,
+      available: null,
+    }]
+    await wrapper.vm.$nextTick()
+
+    const priceCells = wrapper.findAll('.pricing-tier tbody td')
+    expect(wrapper.text()).toContain('Null Price Model')
+    expect(priceCells).toHaveLength(6)
+    expect(priceCells.every((cell) => cell.text() === 'Not published')).toBe(true)
+    expect(wrapper.text()).not.toContain('Price on request')
   })
 })
