@@ -198,7 +198,7 @@ describe('modelCatalog', () => {
   })
 
   it('sorts by lowest OwnAPI output price with missing values last', () => {
-    const entries = buildModelCatalog(emptyConfig).slice(0, 2).map((item, index) => ({
+    const entries = buildModelCatalog(emptyConfig).map((item, index) => ({
       ...item,
       pricingSource: index === 0 ? null : item.pricingSource,
     }))
@@ -211,7 +211,11 @@ describe('modelCatalog', () => {
       sort: 'output-price',
     })
 
-    expect(result[0]?.pricingSource?.official.output).not.toBeNull()
+    expect(result.slice(0, 3).map((item) => item.modelId)).toEqual([
+      'gpt-5.6-luna',
+      'gpt-5.4-mini',
+      'claude-haiku-4-5-20251001',
+    ])
     expect(result.at(-1)?.pricingSource).toBeNull()
   })
 
