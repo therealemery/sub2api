@@ -122,6 +122,7 @@ interface VerifiedSeedOptions {
   sourceUrl: string
   checkedAt: ModelPricingSource['checkedAt']
   longContext?: LongContextPricing
+  contextWindow?: string | null
   isAlias?: boolean
   aliasNoteKey?: string
   featured?: boolean
@@ -201,7 +202,7 @@ export const verifiedCatalogSeeds: CuratedSeed[] = [
     modelId: 'claude-haiku-4-5-20251001', displayName: 'Claude Haiku 4.5', family: 'claude',
     modelClass: ['fast', 'balanced'], endpoints: ['anthropic'],
     official: { input: 1, cachedInput: 0.1, output: 5 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 80,
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', contextWindow: '200K', sortOrder: 80,
   }),
   verifiedSeed({
     modelId: 'claude-opus-4-6', displayName: 'Claude Opus 4.6', family: 'claude',
@@ -354,6 +355,7 @@ function verifiedSeed(options: VerifiedSeedOptions): CuratedSeed {
   if (!metadata) throw new Error(`Missing model family metadata: ${options.family}`)
   return {
     ...metadata,
+    contextWindow: options.contextWindow ?? metadata.contextWindow,
     modelId: options.modelId,
     displayName: options.displayName,
     featured: options.featured ?? false,
