@@ -30,6 +30,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `74460be6` — tested model catalog domain.
 - `0ce0bb11` — nine original model-family artworks and catalog mapping adjustments.
 - `e3be2797` — project handoff and deployment-continuity design.
+- `c0b90cde` — repository-level agent handoff entry point.
+- `737d31d0` — verified OwnAPI homepage foundations and shared public-site shell.
 
 ## Required Reading
 
@@ -60,15 +62,14 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The public Models and Docs implementation is incomplete. Resume from Task 3 of the implementation plan:
+The public Models and Docs implementation is incomplete. Resume from Task 4 of the implementation plan:
 
-1. Inspect and finish the shared public-site shell without losing the existing homepage design.
-2. Build public `/models` and `/models/:modelId` views using `modelCatalog.ts` and live model-display data.
-3. Build the functional public `/docs` view with structured navigation and copyable examples.
-4. Run targeted tests, type checking, lint checks, production build, and `git diff --check`.
-5. Perform desktop and `390 × 844` browser QA and update `design-qa.md`.
-6. Commit coherent checkpoints separately.
-7. Discover the user's real production website target, deploy the exact verified revision, verify production routes, and record the deployment below.
+1. Build public `/models` and `/models/:modelId` views using `modelCatalog.ts` and live model-display data.
+2. Build the functional public `/docs` view with structured navigation and copyable examples.
+3. Run targeted tests, type checking, lint checks, production build, and `git diff --check`.
+4. Perform desktop and `390 × 844` browser QA and update `design-qa.md`.
+5. Commit coherent checkpoints separately.
+6. Discover the user's real production website target, deploy the exact verified revision, verify production routes, and record the deployment below.
 
 ## Local Validation
 
@@ -111,7 +112,16 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Recovered the prior task from local thread history after its WebSocket response stream repeatedly disconnected.
 - Confirmed that project-code errors were not the cause of the old conversation failure.
 - Confirmed the active branch, stable commits, dirty worktree, and remaining Models/Docs objective.
-- Next task: audit the uncommitted shared public-shell changes against Task 3, run focused tests, and complete the shell checkpoint.
+- Result: superseded by the completed shared-shell checkpoint below.
+
+### 2026-08-31 — Shared public-site shell
+
+- Commit: `737d31d0`.
+- Consolidated the completed homepage foundations, OwnAPI branding/default language behavior, localized code example, tests, and visual QA record.
+- Added and integrated `PublicSiteHeader.vue`, `PublicSiteFooter.vue`, and `PublicSiteLayout.vue` without changing the custom-home override.
+- Validation passed: 11 focused Vitest tests, Vue type checking, focused ESLint, production Vite build, and `git diff --check`.
+- Build emitted only existing chunk-size and mixed static/dynamic import warnings; no build error occurred.
+- Next task: implement the public Models catalog and model detail routes from Task 4.
 
 ## Recovery Checklist
 
