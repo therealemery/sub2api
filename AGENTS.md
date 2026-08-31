@@ -152,6 +152,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Second deployment run `33353391215` built the complete commit-tagged Docker image successfully. The reachable server then rejected the configured SSH key for the configured user. Because authentication failed, no image was loaded and no production container, `.env`, or data was changed.
 - Exact recovery action: update `SERVER_SSH_KEY` (or correct `SERVER_USER`/server `authorized_keys`), then dispatch `.github/workflows/deploy.yml` with branch `main` and verify the public routes.
 
+### 2026-08-31 — Baseline B2 repair
+
+- Repaired pending OAuth EmailVerify account creation so separately stored OAuth affiliate data is preserved and absent invitation/adoption fields are omitted from the request.
+- Made admin auth-source-default serialization handle incomplete source maps with the existing declared defaults.
+- Restored the current system page-size default as the authoritative read value over stale browser storage.
+- Focused B2 tests passed: 3 files / 11 tests. Vue type checking and `git diff --check` passed.
+- The full frontend suite has two remaining GroupDistributionChart failures and one DashboardView unhandled rejection, each caused by `formatCost` calling `toFixed` on undefined; these are outside B2. See `.superpowers/sdd/2026-08-31-ownapi-model-pricing-status-plan/baseline-b2-report.md`.
+
 ## Recovery Checklist
 
 1. Read this file and the three required design/plan documents.
