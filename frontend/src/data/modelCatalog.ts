@@ -105,6 +105,27 @@ interface CuratedSeed extends FamilyMetadata {
   displayName: string
   featured: boolean
   sortOrder: number
+  pricingSource: ModelPricingSource
+  modelClass: string[]
+  endpoints: string[]
+  isAlias: boolean
+  aliasNoteKey: string | null
+}
+
+interface VerifiedSeedOptions {
+  modelId: string
+  displayName: string
+  family: Exclude<ModelFamily, 'ownapi'>
+  modelClass: string[]
+  endpoints: string[]
+  official: OfficialTokenPricing
+  sourceUrl: string
+  checkedAt: ModelPricingSource['checkedAt']
+  longContext?: LongContextPricing
+  isAlias?: boolean
+  aliasNoteKey?: string
+  featured?: boolean
+  sortOrder: number
 }
 
 const families: FamilyMetadata[] = [
@@ -132,15 +153,106 @@ const fallbackFamily: FamilyMetadata = {
   contextWindow: null,
 }
 
-const curatedSeeds: CuratedSeed[] = [
-  seed('gpt-5.4', 'GPT-5.4', 'gpt', true, 10),
-  seed('claude-sonnet-4.6', 'Claude Sonnet 4.6', 'claude', true, 20),
-  seed('gemini-3.1-flash-image', 'Gemini 3.1 Flash Image', 'gemini', true, 30),
-  seed('deepseek-reasoner', 'DeepSeek Reasoner', 'deepseek', false, 40),
-  seed('grok-4', 'Grok 4', 'grok', false, 50),
-  seed('qwen3-235b-a22b', 'Qwen3 235B', 'qwen', false, 60),
-  seed('glm-4.6', 'GLM-4.6', 'glm', false, 70),
-  seed('kimi-latest', 'Kimi Latest', 'kimi', false, 80),
+export const verifiedCatalogSeeds: CuratedSeed[] = [
+  verifiedSeed({
+    modelId: 'gpt-5.4', displayName: 'GPT-5.4', family: 'gpt',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
+    official: { input: 2.5, cachedInput: 0.25, output: 15 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4', checkedAt: '2026-08-31', featured: true, sortOrder: 10,
+  }),
+  verifiedSeed({
+    modelId: 'gpt-5.4-mini', displayName: 'GPT-5.4 Mini', family: 'gpt',
+    modelClass: ['balanced', 'fast', 'coding'], endpoints: ['openai'],
+    official: { input: 0.75, cachedInput: 0.075, output: 4.5 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', checkedAt: '2026-08-31', sortOrder: 20,
+  }),
+  verifiedSeed({
+    modelId: 'gpt-5.5', displayName: 'GPT-5.5', family: 'gpt',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
+    official: { input: 5, cachedInput: 0.5, output: 30 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.5', checkedAt: '2026-08-31', featured: true, sortOrder: 30,
+  }),
+  verifiedSeed({
+    modelId: 'gpt-5.6-luna', displayName: 'GPT-5.6 Luna', family: 'gpt',
+    modelClass: ['fast', 'balanced'], endpoints: ['openai'],
+    official: { input: 0.2, cachedInput: 0.02, output: 1.2 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', sortOrder: 40,
+  }),
+  verifiedSeed({
+    modelId: 'gpt-5.6-sol', displayName: 'GPT-5.6 Sol', family: 'gpt',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
+    official: { input: 4, cachedInput: 0.4, output: 20 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.6-sol', checkedAt: '2026-08-31', featured: true, sortOrder: 50,
+  }),
+  verifiedSeed({
+    modelId: 'gpt-5.6-terra', displayName: 'GPT-5.6 Terra', family: 'gpt',
+    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['openai'],
+    official: { input: 2, cachedInput: 0.2, output: 12 },
+    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', sortOrder: 60,
+  }),
+  verifiedSeed({
+    modelId: 'codex-auto-review', displayName: 'Codex Auto Review', family: 'gpt',
+    modelClass: ['coding', 'reasoning'], endpoints: ['openai'],
+    official: { input: 2.5, cachedInput: 0.25, output: 15 },
+    sourceUrl: 'https://help.openai.com/en/articles/20001415', checkedAt: '2026-08-31',
+    isAlias: true, aliasNoteKey: 'publicModels.aliases.codexAutoReview', sortOrder: 70,
+  }),
+  verifiedSeed({
+    modelId: 'claude-haiku-4-5-20251001', displayName: 'Claude Haiku 4.5', family: 'claude',
+    modelClass: ['fast', 'balanced'], endpoints: ['anthropic'],
+    official: { input: 1, cachedInput: 0.1, output: 5 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 80,
+  }),
+  verifiedSeed({
+    modelId: 'claude-opus-4-6', displayName: 'Claude Opus 4.6', family: 'claude',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 5, cachedInput: 0.5, output: 25 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', featured: true, sortOrder: 90,
+  }),
+  verifiedSeed({
+    modelId: 'claude-opus-4-7', displayName: 'Claude Opus 4.7', family: 'claude',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 5, cachedInput: 0.5, output: 25 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 100,
+  }),
+  verifiedSeed({
+    modelId: 'claude-opus-4-8', displayName: 'Claude Opus 4.8', family: 'claude',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 5, cachedInput: 0.5, output: 25 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 110,
+  }),
+  verifiedSeed({
+    modelId: 'claude-opus-5', displayName: 'Claude Opus 5', family: 'claude',
+    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 5, cachedInput: 0.5, output: 25 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 120,
+  }),
+  verifiedSeed({
+    modelId: 'claude-sonnet-4-6', displayName: 'Claude Sonnet 4.6', family: 'claude',
+    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 3, cachedInput: 0.3, output: 15 },
+    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', featured: true, sortOrder: 130,
+  }),
+  verifiedSeed({
+    modelId: 'claude-sonnet-5', displayName: 'Claude Sonnet 5', family: 'claude',
+    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['anthropic'],
+    official: { input: 2, cachedInput: 0.2, output: 10 },
+    sourceUrl: 'https://platform.claude.com/docs/en/release-notes/overview', checkedAt: '2026-08-31', sortOrder: 140,
+  }),
+  verifiedSeed({
+    modelId: 'grok-4.5', displayName: 'Grok 4.5', family: 'grok',
+    modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
+    official: { input: 2, cachedInput: 0.3, output: 6 },
+    longContext: { input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000 },
+    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', sortOrder: 150,
+  }),
+  verifiedSeed({
+    modelId: 'grok-4.6', displayName: 'Grok 4.6', family: 'grok',
+    modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
+    official: { input: 2, cachedInput: 0.5, output: 6 },
+    longContext: { input: 4, cachedInput: 1, output: 12, thresholdTokens: 200_000 },
+    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', sortOrder: 160,
+  }),
 ]
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
@@ -148,7 +260,7 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
   const configured = config?.pricing_models ?? []
   const byIdentity = new Map<string, ModelCatalogEntry>()
 
-  for (const item of curatedSeeds) {
+  for (const item of verifiedCatalogSeeds) {
     byIdentity.set(identity(item.platform, item.modelId), entryFromSeed(item, featured))
   }
 
@@ -237,16 +349,27 @@ function family(
   }
 }
 
-function seed(
-  modelId: string,
-  displayName: string,
-  familyName: Exclude<ModelFamily, 'ownapi'>,
-  featured: boolean,
-  sortOrder: number,
-): CuratedSeed {
-  const metadata = families.find((item) => item.family === familyName)
-  if (!metadata) throw new Error(`Missing model family metadata: ${familyName}`)
-  return { ...metadata, modelId, displayName, featured, sortOrder }
+function verifiedSeed(options: VerifiedSeedOptions): CuratedSeed {
+  const metadata = families.find((item) => item.family === options.family)
+  if (!metadata) throw new Error(`Missing model family metadata: ${options.family}`)
+  return {
+    ...metadata,
+    modelId: options.modelId,
+    displayName: options.displayName,
+    featured: options.featured ?? false,
+    sortOrder: options.sortOrder,
+    pricingSource: {
+      official: options.official,
+      longContext: options.longContext,
+      multiplier: 0.7,
+      sourceUrl: options.sourceUrl,
+      checkedAt: options.checkedAt,
+    },
+    modelClass: options.modelClass,
+    endpoints: options.endpoints,
+    isAlias: options.isAlias ?? false,
+    aliasNoteKey: options.aliasNoteKey ?? null,
+  }
 }
 
 function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): ModelCatalogEntry {
@@ -258,11 +381,11 @@ function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): Mode
     featuredBadge: featuredConfig?.badge || '',
     sortOrder: featuredConfig?.sort_order ?? item.sortOrder,
     price: null,
-    pricingSource: null,
-    modelClass: [],
-    endpoints: [],
-    isAlias: false,
-    aliasNoteKey: null,
+    pricingSource: item.pricingSource,
+    modelClass: item.modelClass,
+    endpoints: item.endpoints,
+    isAlias: item.isAlias,
+    aliasNoteKey: item.aliasNoteKey,
     available: null,
   }
 }
