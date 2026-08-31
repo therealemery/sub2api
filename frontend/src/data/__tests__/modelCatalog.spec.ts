@@ -119,6 +119,9 @@ describe('modelCatalog', () => {
       aliasNoteKey: 'publicModels.aliases.codexAutoReview',
     })
     expect(catalog.find((model) => model.modelId === 'claude-haiku-4-5-20251001')?.contextWindow).toBe('200K')
+    expect(catalog.find((model) => model.modelId === 'gpt-5.4-mini')?.contextWindow).toBe('400K')
+    expect(catalog.find((model) => model.modelId === 'grok-4.5')?.contextWindow).toBe('500K')
+    expect(catalog.find((model) => model.modelId === 'grok-4.6')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.longContext).toEqual({
       input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000,
     })

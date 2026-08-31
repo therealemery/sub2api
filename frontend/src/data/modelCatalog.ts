@@ -166,7 +166,7 @@ export const verifiedCatalogSeeds: CuratedSeed[] = [
     modelId: 'gpt-5.4-mini', displayName: 'GPT-5.4 Mini', family: 'gpt',
     modelClass: ['balanced', 'fast', 'coding'], endpoints: ['openai'],
     official: { input: 0.75, cachedInput: 0.075, output: 4.5 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', checkedAt: '2026-08-31', sortOrder: 20,
+    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', checkedAt: '2026-08-31', contextWindow: '400K', sortOrder: 20,
   }),
   verifiedSeed({
     modelId: 'gpt-5.5', displayName: 'GPT-5.5', family: 'gpt',
@@ -246,14 +246,14 @@ export const verifiedCatalogSeeds: CuratedSeed[] = [
     modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
     official: { input: 2, cachedInput: 0.3, output: 6 },
     longContext: { input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000 },
-    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', sortOrder: 150,
+    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', contextWindow: '500K', sortOrder: 150,
   }),
   verifiedSeed({
     modelId: 'grok-4.6', displayName: 'Grok 4.6', family: 'grok',
     modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
     official: { input: 2, cachedInput: 0.5, output: 6 },
     longContext: { input: 4, cachedInput: 1, output: 12, thresholdTokens: 200_000 },
-    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', sortOrder: 160,
+    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', contextWindow: '500K', sortOrder: 160,
   }),
 ]
 
