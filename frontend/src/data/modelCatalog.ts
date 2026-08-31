@@ -5,7 +5,7 @@ import type {
 } from '@/api/modelDisplay'
 
 export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'ownapi'
-export type ModelCatalogSort = 'featured' | 'name' | 'price'
+export type ModelCatalogSort = 'featured' | 'name' | 'input-price' | 'output-price'
 
 export interface OfficialTokenPricing {
   input: number | null
@@ -82,7 +82,8 @@ export interface ModelCatalogEntry {
 export interface CatalogFilters {
   query: string
   provider: string
-  capability: string
+  modelClass: string
+  endpoint: string
   sort: ModelCatalogSort
 }
 
@@ -284,23 +285,31 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
   return Array.from(byIdentity.values()).sort(compareFeatured)
 }
 
-export function filterModelCatalog(entries: ModelCatalogEntry[], filters: CatalogFilters): ModelCatalogEntry[] {
-  const query = normalize(filters.query)
+export function filterModelCatalog(entries: ModelCatalogEntry[], filters: Partial<CatalogFilters>): ModelCatalogEntry[] {
+  const query = normalize(filters.query ?? '')
+  const provider = filters.provider ?? ''
+  const modelClass = filters.modelClass ?? ''
+  const endpoint = filters.endpoint ?? ''
+  const sort = filters.sort ?? 'featured'
   const result = entries.filter((entry) => {
     const queryTarget = normalize([
       entry.modelId,
       entry.displayName,
       entry.provider,
       ...entry.capabilities,
+      ...entry.modelClass,
+      ...entry.endpoints,
     ].join(' '))
     return (!query || queryTarget.includes(query))
-      && (!filters.provider || entry.provider === filters.provider)
-      && (!filters.capability || entry.capabilities.includes(filters.capability))
+      && (!provider || entry.provider === provider)
+      && (!modelClass || entry.modelClass.includes(modelClass))
+      && (!endpoint || entry.endpoints.includes(endpoint))
   })
 
   return [...result].sort((a, b) => {
-    if (filters.sort === 'name') return a.displayName.localeCompare(b.displayName)
-    if (filters.sort === 'price') return compareNullablePrice(a.price?.input ?? a.price?.perRequest, b.price?.input ?? b.price?.perRequest)
+    if (sort === 'name') return a.displayName.localeCompare(b.displayName)
+    if (sort === 'input-price') return compareNullablePrice(ownApiSortPrice(a, 'input'), ownApiSortPrice(b, 'input'))
+    if (sort === 'output-price') return compareNullablePrice(ownApiSortPrice(a, 'output'), ownApiSortPrice(b, 'output'))
     return compareFeatured(a, b)
   })
 }
@@ -459,6 +468,11 @@ function compareNullablePrice(a: number | null | undefined, b: number | null | u
   if (a == null) return 1
   if (b == null) return -1
   return a - b
+}
+
+function ownApiSortPrice(entry: ModelCatalogEntry, kind: 'input' | 'output'): number | null {
+  if (!entry.pricingSource) return null
+  return calculateOwnApiPricing(entry.pricingSource.official, entry.pricingSource.multiplier)[kind]
 }
 
 function relationScore(candidate: ModelCatalogEntry, entry: ModelCatalogEntry): number {
