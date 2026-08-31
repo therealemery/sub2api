@@ -40,3 +40,5 @@ Spec: `docs/superpowers/specs/2026-08-31-ownapi-public-user-motion-design.md`
 - Task 2: complete (commit `a6ed6622`; independent review clean; focused tests 2 files / 7 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
 - Task 3: review round 1 found query/hash-only navigation could remount user pages and that mobile-menu interaction coverage used stubs; both findings were fixed in `a6d658e2`.
 - Task 3: complete (implementation `741d9f59`, fix `a6d658e2`; independent re-review clean; 4 related files / 55 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
+- Task 4: review round 1 found the homepage Hero replayed after route return; fixed with session-local one-time state and remount coverage in `d8ee4ba1`.
+- Task 4: complete (implementation `7ec99a26`, fix `d8ee4ba1`; independent re-review clean; focused + related 14/14 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
