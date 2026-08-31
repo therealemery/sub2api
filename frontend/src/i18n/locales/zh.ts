@@ -1159,6 +1159,12 @@ export default {
     },
     aliases: {
       codexAutoReview: 'GPT-5.4 的别名，用于 Codex 自动代码审查工作流。'
+    },
+    pricingNotes: {
+      openAiLongContext: '输入超过 272K tokens 时，可能适用 OpenAI 长上下文价格。',
+      openAiRegional: '区域处理和不同服务档位可能产生额外的原厂费用。',
+      anthropicCacheWrite: 'Anthropic 缓存写入价格与上方展示的缓存读取价格分开计算。',
+      anthropicDataResidency: 'Anthropic 数据驻留选项可能产生额外的原厂费用。'
     }
   },
 

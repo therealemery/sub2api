@@ -1221,6 +1221,12 @@ export default {
     },
     aliases: {
       codexAutoReview: 'Alias for GPT-5.4 tuned for Codex automated review workflows.'
+    },
+    pricingNotes: {
+      openAiLongContext: 'Inputs over 272K tokens may use OpenAI long-context rates.',
+      openAiRegional: 'Regional processing and service tiers may add provider charges.',
+      anthropicCacheWrite: 'Anthropic cache-write pricing is separate from the cached-input rate shown above.',
+      anthropicDataResidency: 'Anthropic data-residency options may add provider charges.'
     }
   },
 

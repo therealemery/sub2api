@@ -15,4 +15,11 @@ describe('public navigation', () => {
   it.each(Object.entries(publicSurfaces))('does not link %s to the authenticated monitor', (_name, source) => {
     expect(source).not.toMatch(/(?:to|href)\s*=\s*["']\/monitor["']/)
   })
+
+  it.each([
+    ['public footer', publicSiteFooterSource],
+    ['home page', homeViewSource],
+  ])('does not claim service health on the %s without probe-backed status data', (_name, source) => {
+    expect(source).not.toContain("t('home.stories.operational')")
+  })
 })
