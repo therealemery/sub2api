@@ -19,9 +19,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Working directory: `/Users/owen/apizhongzhuan/sub2api`
 - Active branch: `codex/public-models-docs`
-- Handoff design checkpoint: `e3be2797`
-- The worktree contains valuable uncommitted homepage, localization, routing, store, test, utility, public-component, workspace, and visual-QA changes. Inspect `git status` before editing and do not discard them.
-- No Sub2API development server was running at the time this handoff was created.
+- Latest verified product checkpoint: `a19d27cb`
+- The tracked product work is committed. The worktree still contains untracked local QA/cache/workspace artifacts (`.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`); inspect them before deciding whether they belong in Git and do not discard them blindly.
+- A frontend-only Vite server was used for QA at `http://127.0.0.1:3000`; do not assume it is still running in a later session.
 
 ## Stable Checkpoints
 
@@ -32,6 +32,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `e3be2797` — project handoff and deployment-continuity design.
 - `c0b90cde` — repository-level agent handoff entry point.
 - `737d31d0` — verified OwnAPI homepage foundations and shared public-site shell.
+- `47faf485` — public Models catalog and model detail experience.
+- `58aebe72` — public documentation experience.
+- `a19d27cb` — browser-QA fixes and Models/Docs QA record.
 
 ## Required Reading
 
@@ -46,6 +49,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `frontend/src/components/public/` — shared public header, footer, and layout under active development.
 - `frontend/src/data/modelCatalog.ts` — curated model metadata, API merge, filtering, lookup, and related-model logic.
 - `frontend/src/data/__tests__/modelCatalog.spec.ts` — catalog-domain tests.
+- `frontend/src/views/public/ModelsCatalogView.vue` and `ModelDetailView.vue` — public model discovery and model detail routes.
+- `frontend/src/views/public/DocsView.vue` and `frontend/src/data/docsContent.ts` — public documentation route and structured content.
 - `frontend/public/model-art/` — original family artwork for GPT, Claude, Gemini, DeepSeek, Grok, Qwen, GLM, Kimi, and OwnAPI fallback.
 - `frontend/src/router/index.ts` — public and authenticated route boundaries.
 - `frontend/src/i18n/locales/en.ts` and `zh.ts` — public-site copy.
@@ -59,27 +64,26 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - The public homepage was rebuilt in the OwnAPI/Vercel-inspired direction and previously passed targeted tests, type checking, linting, build, and browser QA before later work began.
 - The model catalog data layer supports curated fallback entries, live API pricing merges, normalized family metadata, search/filter/sort helpers, slug lookup, and related models.
 - Nine family artwork files exist under `frontend/public/model-art/` and were visually inspected for crop safety and absence of text, trademarks, and watermarks.
+- Public `/models`, `/models/:modelId`, and `/docs` are implemented with the shared public-site shell, responsive layouts, localized content, functional filters/tabs/copy controls, and curated fallback behavior when live pricing is unavailable.
+- Browser QA passed at 1440 × 900 and 390 × 844. The login translation and GPT artwork-path findings discovered during QA were fixed in `a19d27cb`.
 
 ## Work in Progress
 
-The public Models and Docs implementation is incomplete. Resume from Task 4 of the implementation plan:
+The public Models and Docs implementation and local QA are complete. Remaining work:
 
-1. Build public `/models` and `/models/:modelId` views using `modelCatalog.ts` and live model-display data.
-2. Build the functional public `/docs` view with structured navigation and copyable examples.
-3. Run targeted tests, type checking, lint checks, production build, and `git diff --check`.
-4. Perform desktop and `390 × 844` browser QA and update `design-qa.md`.
-5. Commit coherent checkpoints separately.
-6. Discover the user's real production website target, deploy the exact verified revision, verify production routes, and record the deployment below.
+1. Push the verified branch so another model can retrieve the full source and handoff record.
+2. Obtain or discover the user's actual production domain, server/hosting target, deployment directory or service, environment-variable location, and rollback method.
+3. Deploy the exact verified revision, verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` in production, then record the deployment below.
 
 ## Local Validation
 
-Run from `frontend/` unless otherwise noted:
+Run from `frontend/` unless otherwise noted. The generated `frontend/pnpm-workspace.yaml` caused the pnpm wrapper to fail during the final run, so the verified commands used the already-installed local binaries:
 
 ```bash
-pnpm vitest run src/data/__tests__/modelCatalog.spec.ts src/router/__tests__/guards.spec.ts src/router/__tests__/title.spec.ts src/i18n/__tests__/defaultLocale.spec.ts src/i18n/__tests__/homeLocales.spec.ts src/utils/__tests__/homeCodeExample.spec.ts
-pnpm vue-tsc --noEmit
-pnpm lint:check
-pnpm build
+node_modules/.bin/vitest run src/data/__tests__/modelCatalog.spec.ts src/router/__tests__/guards.spec.ts src/router/__tests__/title.spec.ts src/i18n/__tests__/defaultLocale.spec.ts src/i18n/__tests__/homeLocales.spec.ts src/utils/__tests__/homeCodeExample.spec.ts
+node_modules/.bin/vue-tsc --noEmit
+node_modules/.bin/eslint src/components/public/*.vue src/components/models/*.vue src/components/docs/*.vue src/data/modelCatalog.ts src/data/docsContent.ts src/data/__tests__/modelCatalog.spec.ts src/views/HomeView.vue src/views/public/ModelsCatalogView.vue src/views/public/ModelDetailView.vue src/views/public/DocsView.vue src/router/index.ts
+node_modules/.bin/vue-tsc -b && node_modules/.bin/vite build
 cd .. && git diff --check
 ```
 
@@ -101,6 +105,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Last deployed revision: not yet recorded.
 - Rollback revision: not yet recorded.
 - Production verification: pending.
+- Source backup remote: `https://github.com/therealemery/sub2api.git`; verified branch intended for push is `codex/public-models-docs`.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
@@ -122,6 +127,16 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Validation passed: 11 focused Vitest tests, Vue type checking, focused ESLint, production Vite build, and `git diff --check`.
 - Build emitted only existing chunk-size and mixed static/dynamic import warnings; no build error occurred.
 - Next task: implement the public Models catalog and model detail routes from Task 4.
+
+### 2026-08-31 — Public Models, Docs, and responsive QA
+
+- Commits: `47faf485`, `58aebe72`, and `a19d27cb`.
+- Implemented public model catalog, model detail, documentation content, responsive navigation, code examples, copy controls, public routing, and backend-mode allowances.
+- Browser QA passed for Models, GPT-5.4 detail, and Docs at 1440 × 900 and 390 × 844; no horizontal overflow or broken artwork remains.
+- English/Chinese switching persisted through reload; search/filter/sort, mobile menu, tabs, copy controls, anchors, and related links were exercised.
+- Validation passed: 6 Vitest files / 52 tests, Vue type checking, focused ESLint, production Vite build, and `git diff --check`.
+- Build emitted only existing mixed-import, chunk-size, and stale Browserslist-data warnings.
+- Remaining blocker: no production domain, host, deployment directory/service, or credential path is present in the repository, Git remote, environment-variable names, or SSH configuration. Obtain that target before deploying.
 
 ## Recovery Checklist
 
