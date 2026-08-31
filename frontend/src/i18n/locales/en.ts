@@ -1218,6 +1218,7 @@ export default {
     billingTitle: 'Transparent usage', billingDescription: 'Track requests, tokens and costs from the OwnAPI workspace.',
     reliabilityTitle: 'Production controls', reliabilityDescription: 'Use status monitoring, retries and model fallbacks for reliable applications.',
     errorsTitle: 'Errors and retries', errorsDescription: 'Handle authentication, rate limits and upstream failures with clear retry rules.',
+    authErrorDescription: 'Check the API key and Authorization header.', rateLimitDescription: 'Back off, then retry with jitter.', upstreamErrorDescription: 'Retry transient upstream failures or use a fallback model.',
     integrationsTitle: 'Integration guides', integrationsDescription: 'Connect OpenAI-compatible SDKs, editors and automation tools.',
     statusTitle: 'Model status', statusDescription: 'Check availability before investigating an application-side issue.',
     navGroups: { start: 'Start here', api: 'Model API quickstarts', guides: 'Core API guides', support: 'Support' },

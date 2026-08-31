@@ -187,6 +187,10 @@ describe('路由守卫逻辑', () => {
     it.each(['/models', '/models/gpt-5-4'])('访问 %s 公开模型页面允许通过', (path) => {
       expect(simulateGuard(path, { requiresAuth: false }, authState)).toBeNull()
     })
+
+    it('访问 /docs 公共文档页面允许通过', () => {
+      expect(simulateGuard('/docs', { requiresAuth: false }, authState)).toBeNull()
+    })
   })
 
   // --- 已认证普通用户 ---
