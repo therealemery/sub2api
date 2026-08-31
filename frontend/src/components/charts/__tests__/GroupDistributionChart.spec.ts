@@ -72,6 +72,7 @@ describe('GroupDistributionChart', () => {
     const rows = wrapper.findAll('tbody tr')
     expect(rows[0].text()).toContain('group-a')
     expect(rows[1].text()).toContain('group-b')
+    expect(rows[0].text()).toContain('$0.0000')
 
     const options = (wrapper.vm as any).$?.setupState.doughnutOptions
     const label = options.plugins.tooltip.callbacks.label({
@@ -110,5 +111,27 @@ describe('GroupDistributionChart', () => {
       dataset: { data: [0.9, 0.1] },
     })
     expect(label).toBe('group-b: $0.900 (90.0%)')
+  })
+
+  it('renders missing and non-finite costs as zero without changing numeric precision', () => {
+    const wrapper = mount(GroupDistributionChart, {
+      props: {
+        groupStats: [{
+          group_id: 3,
+          group_name: 'legacy-group',
+          requests: 1,
+          total_tokens: 1,
+          cost: Number.NaN,
+          actual_cost: Number.POSITIVE_INFINITY,
+        }],
+      },
+      global: {
+        stubs: {
+          LoadingSpinner: true,
+        },
+      },
+    })
+
+    expect(wrapper.find('tbody tr').text()).toMatch(/\$0\.0000\s+\$0\.0000\s+\$0\.0000/)
   })
 })

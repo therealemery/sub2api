@@ -229,6 +229,13 @@ export function formatNumberLocaleString(num: number): string {
 }
 
 /**
+ * Normalizes API values that are rendered as numbers while preserving valid values.
+ */
+export function normalizeFiniteNumber(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
+/**
  * 格式化金额（固定小数位，不带货币符号）
  * @param amount 金额
  * @param fractionDigits 小数位数，默认 4
