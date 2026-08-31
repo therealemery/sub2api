@@ -203,7 +203,7 @@ function priceRow(key: string, label: string, official: number | null, ownApi: n
 
 function formatTokenPrice(value: number | null): string {
   const formatted = formatCatalogPrice(value)
-  return formatted == null ? t('publicModels.priceUnavailable') : `$${formatted} ${t('publicModels.perMillion')}`
+  return formatted == null ? t('publicModels.notPublished') : `$${formatted} ${t('publicModels.usdPerMillion')}`
 }
 </script>
 
