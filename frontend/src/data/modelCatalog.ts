@@ -76,7 +76,7 @@ export interface ModelCatalogEntry {
   endpoints: string[]
   isAlias: boolean
   aliasNoteKey: string | null
-  available: boolean
+  available: boolean | null
 }
 
 export interface CatalogFilters {
@@ -164,7 +164,7 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
       featured: Boolean(featuredConfig) || existing?.featured === true,
       featuredBadge: featuredConfig?.badge || existing?.featuredBadge || '',
       sortOrder: featuredConfig?.sort_order ?? pricing.sort_order ?? existing?.sortOrder ?? 100 + index,
-      available: true,
+      available: null,
     })
   }
 
@@ -263,7 +263,7 @@ function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): Mode
     endpoints: [],
     isAlias: false,
     aliasNoteKey: null,
-    available: false,
+    available: null,
   }
 }
 
@@ -289,7 +289,7 @@ function entryFromConfigured(
     endpoints: [],
     isAlias: false,
     aliasNoteKey: null,
-    available: true,
+    available: null,
   }
 }
 
