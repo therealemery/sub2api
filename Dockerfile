@@ -20,8 +20,10 @@ FROM ${NODE_IMAGE} AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Keep Docker builds on the same pnpm major as CI. pnpm 10+ rejects the
+# existing lockfile's dependency build scripts unless a workspace policy is
+# committed, while pnpm 9 is the version this repository currently validates.
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # Install dependencies first (better caching)
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
