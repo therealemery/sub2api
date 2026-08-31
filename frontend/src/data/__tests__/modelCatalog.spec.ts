@@ -44,6 +44,8 @@ describe('modelCatalog', () => {
     const model = result.find((item) => item.modelId === 'gpt-5.4')
     expect(model?.price?.input).toBe(0.000001)
     expect(model?.featured).toBe(true)
+    expect(model?.artwork).toBe('/model-art/gpt.jpg')
+    expect(model?.providerLogo).toBe('/brand/openai.svg')
   })
 
   it('adds unknown configured models with provider or OwnAPI fallback metadata', () => {

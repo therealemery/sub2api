@@ -65,3 +65,33 @@ No actionable P0, P1, or P2 findings remain.
 - [x] Desktop/mobile browser comparison and runtime inspection
 
 final result: passed
+
+## Public Models and Docs QA — 2026-08-31
+
+### Evidence
+
+- Models desktop: `.codex-qa/models-ownapi-desktop.png` at 1440 × 900.
+- Models mobile: `.codex-qa/models-ownapi-mobile.png` at 390 × 844.
+- Model detail desktop: `.codex-qa/model-detail-ownapi-desktop.png` at 1440 × 900.
+- Docs desktop: `.codex-qa/docs-ownapi-desktop.png` at 1440 × 900.
+- Docs mobile: `.codex-qa/docs-ownapi-mobile.png` at 390 × 844.
+- State: frontend-only local development with curated catalog fallback because the backend was not running.
+
+### Findings and fixes
+
+- Fixed the public-header login label, which referenced the missing `common.login` translation instead of `home.login`.
+- Fixed GPT family artwork resolution. GPT models now use `/model-art/gpt.jpg` while retaining `/brand/openai.svg` as the provider logo.
+- No remaining horizontal overflow at either 1440 px or 390 px.
+- No remaining broken model artwork, missing component, route, syntax, or dynamic-import errors.
+- The only recurring browser error is the expected public-settings request failure while running without the backend; Models falls back to the curated catalog and all three public views remain usable.
+
+### Interaction checks
+
+- Models search, provider/capability filters, sort control, mobile filter affordance, card navigation, and fallback notice render and respond.
+- Model detail has working model-ID copy, Python/TypeScript/cURL tabs, code copy, related-model links, and production-domain-derived API examples.
+- Docs has working section navigation, quick links, Python/TypeScript/cURL tabs, code copy, responsive documentation navigation, and resource links.
+- Mobile navigation opens and closes with correct expanded state.
+- English/Chinese switching works and the Chinese selection persists after reload.
+- Models, model detail, and Docs all render without horizontal overflow; model images have non-zero natural dimensions.
+
+final result: passed

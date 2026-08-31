@@ -15,7 +15,7 @@
 
       <div class="public-actions">
         <LocaleSwitcher />
-        <router-link to="/login" class="nav-button nav-button-light">{{ t('common.login') }}</router-link>
+        <router-link to="/login" class="nav-button nav-button-light">{{ t('home.login') }}</router-link>
         <router-link :to="primaryActionPath" class="nav-button nav-button-dark">
           {{ isAuthenticated ? t('home.dashboard') : t('home.getStarted') }}
         </router-link>

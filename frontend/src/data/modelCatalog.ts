@@ -184,7 +184,7 @@ function family(
     provider,
     platform,
     match,
-    artwork: `/model-art/${assetName}.jpg`,
+    artwork: `/model-art/${familyName}.jpg`,
     providerLogo: `/brand/${assetName}.svg`,
     modality,
     capabilities,
