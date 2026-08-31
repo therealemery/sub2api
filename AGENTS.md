@@ -17,11 +17,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Working directory: `/Users/owen/apizhongzhuan/sub2api`
-- Active branch: `codex/public-models-docs`
-- Latest source/deployment-build checkpoint: `7d7b69c1`
-- The tracked product work is committed. The worktree still contains untracked local QA/cache/workspace artifacts (`.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`); inspect them before deciding whether they belong in Git and do not discard them blindly.
-- A frontend-only Vite server was used for QA at `http://127.0.0.1:3000`; do not assume it is still running in a later session.
+- Canonical/main checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `bd19ddda`. This checkout does **not** contain the completed pricing/status feature yet. Its known untracked artifacts are `.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`; preserve and inspect them rather than cleaning blindly.
+- Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. Use this checkout for review or continuation of the pricing/status work; do not accidentally edit the parent checkout and assume the feature is present there.
+- Latest fully verified feature commit: `a861bdaf` (`fix: complete public pricing disclosures`). Latest committed handoff record before the current documentation correction: `b4009355` (`docs: record model pricing implementation`). The branch HEAD containing this paragraph is the authoritative documentation-fix revision.
+- The isolated worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed. The QA Vite server was stopped; do not assume port 3000 or 3001 is still serving this worktree.
+- Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. Integrate/review `codex/model-pricing-motion` before attempting a feature deployment.
 
 ## Stable Checkpoints
 
@@ -38,6 +38,16 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `9cc01e91` — updated conversation-independent handoff after Models/Docs QA.
 - `d9cc9b06` — restored the previously successful traceable production deployment workflow.
 - `7d7b69c1` — pinned Docker builds to pnpm 9.15.9; the complete production image then built successfully.
+- `604b7963` — approved model pricing and Status-navigation design.
+- `dfa59bc5` — pricing/status and public/user-motion implementation plans.
+- `bd19ddda` — isolated-worktree boundary; current parent checkout checkpoint.
+- `ff43cc4e` and `68a5104a` — traceable pricing domain with backend availability kept separate.
+- `dd5efd26` and `048dde15` — exact verified 16-model catalog and corrected Haiku context metadata.
+- `12e6def5`, `bddc4cfa`, and `a31e4a02` — public pricing filters/cards and valid, crop-safe card markup.
+- `36fc770f` and `95afbdde` — detail pricing/source disclosure and clarified price semantics.
+- `21b1b7f7` — public Status links removed while authenticated `/monitor` remains protected.
+- `a861bdaf` — final verified pricing sources/caveats and unsupported health-claim removal.
+- `b4009355` — durable Task 6 verification and handoff record.
 
 ## Required Reading
 
@@ -74,11 +84,12 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The public Models and Docs implementation and local QA are complete. Remaining work:
+The pricing/status implementation and local QA are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-2. Re-run the `Build and Deploy` workflow on `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
-3. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
+1. Review and integrate `codex/model-pricing-motion` through its Task 6 commits (`a861bdaf` feature verification and `b4009355` handoff) into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
+2. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
+3. Re-run the `Build and Deploy` workflow on the integrated `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
+4. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
 
 ## Local Validation
 
@@ -185,7 +196,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Recovery Checklist
 
-1. Read this file and the three required design/plan documents.
+1. Read this file, the five required design/plan documents listed under Required Reading, and `design-qa.md`.
 2. Run `git status --short` and `git log -5 --oneline --decorate`.
 3. Do not clean or reset the worktree.
 4. Inspect the files relevant to the current task before editing.
