@@ -19,7 +19,7 @@ Responses, images, audio, embeddings, reranking, and other protocols are out of 
 
 - Customer balances and deductions are denominated in USD.
 - Recharge conversion is fixed at `6.7 CNY = 1 USD`.
-- The standard customer price is the current manufacturer list price multiplied by `0.7`.
+- The OwnAPI base price is the current manufacturer list price multiplied by `0.7`.
 - PackyAPI charges are upstream costs only and never determine the customer charge.
 - Customers do not select Packy routing groups when creating an OwnAPI key.
 - A newly created customer key uses the single standard OwnAPI customer group by default.
@@ -43,23 +43,24 @@ OwnAPI groups and Packy groups have different purposes and must not be conflated
 
 Create one active OpenAI-platform OwnAPI group for normal customers, provisionally named `OwnAPI Standard`.
 
-- `rate_multiplier = 0.7`
+- `rate_multiplier = 1.0`
 - wallet billing in USD
 - all approved first-release text models available
 - new customer API keys default to this group without asking the customer to select a group
 
-The existing group multiplier is the source of the standard discount. The channel pricing table stores manufacturer list prices in USD per token, not already-discounted prices. Billing therefore remains:
+The existing public catalog already derives OwnAPI prices as manufacturer list price multiplied by `0.7`. The channel pricing table stores those final OwnAPI base prices in USD per token. The standard group multiplier must therefore be `1.0`; setting it to `0.7` would apply the discount twice and charge only 49% of manufacturer list price. Billing is:
 
 ```text
-customer_charge_usd = official_list_cost_usd * effective_customer_multiplier
+ownapi_base_cost_usd = official_list_cost_usd * 0.7
+customer_charge_usd = ownapi_base_cost_usd * effective_customer_multiplier
 ```
 
 The effective multiplier uses the repository's existing precedence:
 
 1. user-specific multiplier for the OwnAPI customer group, when configured;
-2. otherwise the OwnAPI customer group's multiplier (`0.7` for Standard).
+2. otherwise the OwnAPI customer group's multiplier (`1.0` for Standard).
 
-Administrators can create additional customer groups or apply existing per-user group overrides for negotiated pricing. No new discount data model is needed.
+Administrators can create additional customer groups or apply existing per-user group overrides for negotiated pricing. These multipliers are relative to the OwnAPI 70%-of-list base price. For example, `0.9` produces a final manufacturer-list multiplier of `0.7 × 0.9 = 0.63`. No new discount data model is needed.
 
 ### Channel
 
@@ -68,7 +69,7 @@ Create one customer-facing language-model channel, provisionally named `OwnAPI L
 - bind it to `OwnAPI Standard` and any later customer pricing groups;
 - enable `restrict_models`;
 - configure only approved first-release models;
-- store manufacturer list prices in USD;
+- store the final OwnAPI base prices (`manufacturer list price × 0.7`) in USD;
 - map customer-facing OwnAPI model IDs to the exact Packy model IDs;
 - use channel-mapped models as the billing source so aliases cannot select an unintended price.
 
@@ -107,7 +108,7 @@ The Packy token group does not become an OwnAPI customer group. Routing is selec
 5. The scheduler considers only accounts bound to the customer's OwnAPI group and supporting the requested model.
 6. The selected Packy account replaces the inbound credential with its server-side Packy token and forwards to Packy's `/v1/chat/completions` endpoint.
 7. Streaming requests force `stream_options.include_usage=true`; OwnAPI drains the upstream stream even if the client disconnects so usage can still be settled.
-8. On a successful response with usable usage data, OwnAPI calculates the official-list cost and applies the effective customer multiplier.
+8. On a successful response with usable usage data, OwnAPI calculates the configured 70%-of-list base cost and applies the effective customer multiplier.
 9. OwnAPI atomically records usage and deducts the customer's USD balance using the existing idempotent billing path.
 10. Upstream account cost is recorded separately for margin reporting.
 
@@ -155,9 +156,9 @@ Raw Packy response bodies and credentials must not be exposed to customers. Requ
 
 The first implementation reuses existing admin surfaces:
 
-- Groups: create and manage the standard `0.7` customer group and optional alternative multiplier groups.
+- Groups: create and manage the standard `1.0` customer group and optional alternative multiplier groups relative to the OwnAPI base price.
 - Group user multipliers: override the multiplier for negotiated customers.
-- Channels: configure the callable model allowlist, mappings, and official USD list prices.
+- Channels: configure the callable model allowlist, mappings, and OwnAPI USD base prices (official × `0.7`).
 - Accounts: configure six dedicated Packy accounts, credentials, mappings, concurrency, and status.
 - Usage: inspect customer charge and normalized account cost.
 
@@ -178,9 +179,10 @@ The mapping table must record, for every enabled model:
 - exact Packy upstream model ID;
 - Packy token group;
 - official input, cached-input, and output prices;
+- OwnAPI base input, cached-input, and output prices (official × `0.7`);
 - Packy input, cached-input, and output cost in CNY;
 - normalized cost in USD;
-- expected margin at the standard `0.7` multiplier;
+- expected margin at the standard `1.0` group multiplier (the OwnAPI base price remains official × `0.7`);
 - source URL and verification date.
 
 No model is enabled through a wildcard.
@@ -195,7 +197,7 @@ Automated validation must cover:
 - the Packy authorization header replaces, and never leaks, the OwnAPI customer key;
 - raw streaming and non-streaming Chat Completions forwarding;
 - forced streaming usage collection;
-- customer charge equals official list cost multiplied by the effective group/user multiplier;
+- customer charge equals the OwnAPI 70%-of-list base cost multiplied by the effective group/user multiplier;
 - upstream account cost uses Packy CNY cost divided by `6.7`;
 - customer balance, API-key quota, usage log, and cost records remain consistent and idempotent;
 - no customer charge on rejected, unauthorized, rate-limited, failed, or usage-less upstream responses;
