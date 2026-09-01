@@ -149,15 +149,10 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
   seed('qwen3.8-max', 'Qwen3.8 Max', 'qwen', ['flagship', 'reasoning'], ['openai'], { input: 2, cachedInput: null, output: 6 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 340, { contextWindow: null, noteKey: 'publicModels.pricingNotes.alibabaGlobal' }),
   seed('glm-5', 'GLM-5', 'glm', ['flagship', 'reasoning', 'coding'], ['openai'], { input: 1, cachedInput: 0.2, output: 3.2 }, 'https://docs.z.ai/guides/overview/pricing', 50, 350, { contextWindow: null }),
   seed('glm-5.2', 'GLM-5.2', 'glm', ['flagship', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://docs.z.ai/guides/overview/pricing', 50, 360, { pricingStatus: 'unpublished', contextWindow: null }),
-  seed('glm-5.3-flash', 'GLM-5.3 Flash', 'glm', ['fast', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://docs.z.ai/guides/overview/pricing', 50, 370, { pricingStatus: 'unpublished', contextWindow: null }),
   seed('kimi-k2.5', 'Kimi K2.5', 'kimi', ['balanced', 'reasoning', 'long-context'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://platform.kimi.com/docs/pricing/chat', 50, 380, { pricingStatus: 'unpublished', contextWindow: null }),
   seed('kimi-k3', 'Kimi K3', 'kimi', ['flagship', 'reasoning', 'long-context'], ['openai'], { input: 3, cachedInput: 0.3, output: 15 }, 'https://platform.kimi.com/docs/pricing/chat-k3', 65, 390, { contextWindow: '1M' }),
   seed('minimax-m2.5', 'MiniMax M2.5', 'minimax', ['balanced', 'reasoning'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 1.2 }, 'https://platform.minimax.io/docs/guides/pricing-paygo', 50, 400, { contextWindow: null }),
   seed('MiniMax-M2.7', 'MiniMax M2.7', 'minimax', ['balanced', 'reasoning'], ['openai'], { input: 0.3, cachedInput: 0.06, output: 1.2 }, 'https://platform.minimax.io/docs/guides/pricing-paygo', 50, 410, { contextWindow: null }),
-  seed('MiniMax-M3', 'MiniMax M3', 'minimax', ['flagship', 'reasoning', 'long-context'], ['openai'], { input: 0.6, cachedInput: 0.12, output: 2.4 }, 'https://platform.minimax.io/subscribe/token-plan?tab=api-enterprise', 50, 420, {
-    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.minimaxPromotion',
-    tiers: [{ id: 'over-512k', minInputTokens: 512_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 1.2, cachedInput: 0.24, output: 4.8 } }],
-  }),
 ]
 
 interface SeedOverrides {
