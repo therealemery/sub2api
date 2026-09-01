@@ -1,7 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
-import type { ModelCatalogEntry } from '@/data/modelCatalog'
 import ModelDetailView from '../ModelDetailView.vue'
 
 const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
@@ -27,21 +26,31 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.usdPerMillion': 'USD / 1M tokens',
       'publicModels.shortContext': 'Short context',
       'publicModels.longContext': 'Long context',
+      'publicModels.pricingTierBase': 'Base pricing',
+      'publicModels.pricingTierMinimum': `${String(params?.operator ?? '')} ${String(params?.count ?? '')} input tokens`,
+      'publicModels.pricingTierRange': `${String(params?.minOperator ?? '')} ${String(params?.min ?? '')} – ${String(params?.maxOperator ?? '')} ${String(params?.max ?? '')} input tokens`,
       'publicModels.longContextThreshold': `Long context: ${String(params?.count ?? '')} tokens or more`,
       'publicModels.pricingCheckedAt': `Pricing checked ${String(params?.date ?? '')}`,
       'publicModels.viewOfficialPricing': 'View official pricing',
       'publicModels.priceUnavailable': 'Price on request',
       'publicModels.notPublished': 'Not published',
+      'publicModels.free': 'Free',
       'publicModels.priceType': 'Price type',
       'publicModels.related': 'Related models',
       'publicModels.families.gpt.description': 'GPT model family',
       'publicModels.families.grok.description': 'Grok model family',
       'publicModels.families.claude.description': 'Claude model family',
+      'publicModels.families.gemini.description': 'Gemini model family',
+      'publicModels.families.qwen.description': 'Qwen model family',
+      'publicModels.families.minimax.description': 'MiniMax model family',
       'publicModels.aliases.codexAutoReview': 'Alias for GPT-5.4 tuned for Codex automated review workflows.',
       'publicModels.pricingNotes.openAiLongContext': 'Inputs over 272K tokens may use OpenAI long-context rates.',
       'publicModels.pricingNotes.openAiRegional': 'Regional processing and service tiers may add provider charges.',
       'publicModels.pricingNotes.anthropicCacheWrite': 'Anthropic cache-write pricing is separate from the cached-input rate shown above.',
       'publicModels.pricingNotes.anthropicDataResidency': 'Anthropic data-residency options may add provider charges.',
+      'publicModels.pricingNotes.alibabaGlobal': 'Alibaba Cloud international-region list prices and context tiers are shown.',
+      'publicModels.pricingNotes.minimaxPromotion': 'MiniMax list prices are shown before its separate promotional discount.',
+      'publicModels.pricingNotes.unpublishedDecision': 'The provider has not published a verified public token price.',
     }
     return messages[key] ?? key
   },
@@ -103,8 +112,8 @@ describe('ModelDetailView', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Grok 4.6')
-    expect(wrapper.text()).toContain('Short context')
-    expect(wrapper.text()).toContain('Long context: 200,000 tokens or more')
+    expect(wrapper.text()).toContain('Base pricing')
+    expect(wrapper.text()).toContain('≥ 200,000 input tokens')
     for (const price of [
       '$2 USD / 1M tokens',
       '$1.4 USD / 1M tokens',
@@ -112,6 +121,12 @@ describe('ModelDetailView', () => {
       '$0.35 USD / 1M tokens',
       '$6 USD / 1M tokens',
       '$4.2 USD / 1M tokens',
+    ]) {
+      expect(wrapper.text()).toContain(price)
+    }
+
+    await wrapper.findAll('button.pricing-tier-option')[1]?.trigger('click')
+    for (const price of [
       '$4 USD / 1M tokens',
       '$2.8 USD / 1M tokens',
       '$1 USD / 1M tokens',
@@ -121,6 +136,66 @@ describe('ModelDetailView', () => {
     ]) {
       expect(wrapper.text()).toContain(price)
     }
+    expect(wrapper.find('a button').exists()).toBe(false)
+  })
+
+  it('renders verified Free and Not published pricing states without numeric fallbacks', async () => {
+    const free = mountDetail('omni-moderation-latest')
+    await flushPromises()
+    expect(free.get('.pricing-state').text()).toContain('Free')
+    expect(free.findAll('.pricing-tier tbody td')).toHaveLength(0)
+    expect(free.text()).not.toContain('$0')
+
+    const unpublished = mountDetail('gpt-daybreak-blue-latest')
+    await flushPromises()
+    expect(unpublished.get('.pricing-state').text()).toContain('Not published')
+    expect(unpublished.text()).toContain('The provider has not published a verified public token price.')
+    expect(unpublished.findAll('.pricing-tier tbody td')).toHaveLength(0)
+    expect(unpublished.text()).not.toMatch(/\$\d/)
+  })
+
+  it('switches Gemini and MiniMax threshold tiers with exact derived pricing', async () => {
+    const gemini = mountDetail('gemini-2.5-pro')
+    await flushPromises()
+    expect(gemini.text()).toContain('> 200,000 input tokens')
+    expect(gemini.text()).toContain('$1.25 USD / 1M tokens')
+    expect(gemini.text()).toContain('$0.875 USD / 1M tokens')
+    await gemini.findAll('button.pricing-tier-option')[1]?.trigger('click')
+    expect(gemini.text()).toContain('$2.5 USD / 1M tokens')
+    expect(gemini.text()).toContain('$1.75 USD / 1M tokens')
+    expect(gemini.text()).toContain('$15 USD / 1M tokens')
+    expect(gemini.text()).toContain('$10.5 USD / 1M tokens')
+
+    const minimax = mountDetail('minimax-m3')
+    await flushPromises()
+    expect(minimax.text()).toContain('> 512,000 input tokens')
+    await minimax.findAll('button.pricing-tier-option')[1]?.trigger('click')
+    expect(minimax.text()).toContain('$1.2 USD / 1M tokens')
+    expect(minimax.text()).toContain('$0.84 USD / 1M tokens')
+    expect(minimax.text()).toContain('$4.8 USD / 1M tokens')
+    expect(minimax.text()).toContain('$3.36 USD / 1M tokens')
+    expect(minimax.text()).toContain('MiniMax list prices are shown before its separate promotional discount.')
+  })
+
+  it('renders and switches all three Qwen pricing tiers', async () => {
+    const wrapper = mountDetail('qwen3-5-plus')
+    await flushPromises()
+    const buttons = wrapper.findAll('button.pricing-tier-option')
+
+    expect(buttons).toHaveLength(3)
+    expect(buttons.map((button) => button.text())).toEqual([
+      'Base pricing', '> 128,000 – ≤ 256,000 input tokens', '> 256,000 – ≤ 1,000,000 input tokens',
+    ])
+    expect(wrapper.text()).toContain('$0.115 USD / 1M tokens')
+    expect(wrapper.text()).toContain('$0.0805 USD / 1M tokens')
+
+    await buttons[1]?.trigger('click')
+    expect(wrapper.text()).toContain('$0.287 USD / 1M tokens')
+    expect(wrapper.text()).toContain('$0.2009 USD / 1M tokens')
+    await buttons[2]?.trigger('click')
+    expect(wrapper.text()).toContain('$0.573 USD / 1M tokens')
+    expect(wrapper.text()).toContain('$0.4011 USD / 1M tokens')
+    expect(wrapper.text()).toContain('Alibaba Cloud international-region list prices and context tiers are shown.')
   })
 
   it('renders alias disclosure and links to GPT-5.4 official pricing source', async () => {
@@ -147,47 +222,4 @@ describe('ModelDetailView', () => {
     expect(wrapper.text()).toContain('Anthropic data-residency options may add provider charges.')
   })
 
-  it('uses not-published copy for null verified pricing cells', async () => {
-    const wrapper = mountDetail('null-price-model')
-    await flushPromises()
-
-    const vm = wrapper.vm as unknown as { entries: ModelCatalogEntry[] }
-    vm.entries = [{
-      slug: 'null-price-model',
-      modelId: 'null-price-model',
-      displayName: 'Null Price Model',
-      provider: 'OwnAPI',
-      platform: 'custom',
-      family: 'ownapi',
-      modality: 'Text',
-      capabilities: ['Text'],
-      summaryKey: 'publicModels.families.ownapi.summary',
-      descriptionKey: 'publicModels.families.ownapi.description',
-      artwork: '/model-art/ownapi.jpg',
-      providerLogo: '/brand/ownapi-logo-clean.png',
-      contextWindow: null,
-      featured: false,
-      featuredBadge: '',
-      sortOrder: 1,
-      price: null,
-      pricingSource: {
-        official: { input: null, cachedInput: null, output: null },
-        multiplier: 0.7,
-        sourceUrl: 'https://example.com/pricing',
-        checkedAt: '2026-08-31',
-      },
-      modelClass: [],
-      endpoints: [],
-      isAlias: false,
-      aliasNoteKey: null,
-      available: null,
-    }]
-    await wrapper.vm.$nextTick()
-
-    const priceCells = wrapper.findAll('.pricing-tier tbody td')
-    expect(wrapper.text()).toContain('Null Price Model')
-    expect(priceCells).toHaveLength(6)
-    expect(priceCells.every((cell) => cell.text() === 'Not published')).toBe(true)
-    expect(wrapper.text()).not.toContain('Price on request')
-  })
 })
