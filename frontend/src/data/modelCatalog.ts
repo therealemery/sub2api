@@ -132,6 +132,7 @@ const families: FamilyMetadata[] = [
   family('qwen', 'Qwen', 'qwen', /qwen|qwq/i, 'qwen', 'Multimodal', ['Reasoning', 'Coding', 'Vision'], '1M'),
   family('glm', 'Z.AI', 'zhipu', /glm|chatglm/i, 'glm', 'Multimodal', ['Reasoning', 'Coding', 'Vision'], '128K'),
   family('kimi', 'Moonshot', 'moonshot', /kimi|moonshot/i, 'kimi', 'Text', ['Long context', 'Reasoning', 'Text'], '128K'),
+  family('minimax', 'MiniMax', 'minimax', /minimax/i, 'minimax', 'Text', ['Reasoning', 'Coding', 'Text'], '1M', 'ownapi'),
 ]
 
 const fallbackFamily: FamilyMetadata = {
@@ -236,13 +237,14 @@ function family(
   modality: ModelCatalogEntry['modality'],
   capabilities: string[],
   contextWindow: string,
+  artworkName: string = familyName,
 ): FamilyMetadata {
   return {
     family: familyName,
     provider,
     platform,
     match,
-    artwork: `/model-art/${familyName}.jpg`,
+    artwork: `/model-art/${artworkName}.jpg`,
     providerLogo: `/brand/${assetName}.svg`,
     modality,
     capabilities,
