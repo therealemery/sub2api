@@ -250,6 +250,15 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Do not deploy this branch as if the CNY/USD recharge conversion were complete. Merge the reviewed completed feature subset or finish and verify payment conversion first.
 - Production deployment remains blocked by the rejected `SERVER_SSH_KEY` for `SERVER_USER`; pushing source does not repair server authentication.
 
+### 2026-09-01 — Payment currency conversion implementation
+
+- Implemented USD-denominated balance crediting after concrete payment-instance selection: CNY converts at `6.7:1`, USD at `1:1`, then the configured operational multiplier applies.
+- Balance recharge rejects payment instances outside CNY/USD. Gateway fees remain excluded from credited balance; subscriptions, webhook validation, and refunds retain their existing semantics.
+- Updated customer previews, order/payment amount formatting, administrator wording, payment documentation, and focused backend/frontend conversion tests.
+- Local validation passed: focused payment tests (10/10), ESLint, `vue-tsc --noEmit`, the full frontend suite (108 files / 653 tests), production Vite build (864 modules), and `git diff --check`. Existing non-fatal test stderr, stale Browserslist, mixed-import, and large-chunk warnings remain.
+- Browser verification confirmed unauthenticated `/purchase` redirects to `/login?redirect=/purchase`. The frontend-only server had no backend session or payment configuration, so no real or mocked provider order was submitted; CNY/USD previews remain covered by focused tests.
+- This host has no Go toolchain or active Docker daemon. GitHub CI must provide Go formatting/lint, unit, and integration verification after the implementation commit. The unrelated `frontend/pnpm-workspace.yaml` remains untouched.
+
 ## Recovery Checklist
 
 1. Read this file, every document listed under Required Reading, and `design-qa.md`.
