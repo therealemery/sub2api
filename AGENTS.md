@@ -59,6 +59,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `61119191` — homepage provider strip synchronized with the expanded catalog.
 - `1ab80f67` — loss-making GLM 5.3 Flash and MiniMax M3 entries removed from the public catalog.
 - `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md` — approved architecture for customer OwnAPI keys, OwnAPI base prices already set to manufacturer list × 0.7, a standard 1.0 billing group, per-account Packy token groups, model-restricted routing, and separate upstream cost accounting; pending written-spec review and implementation planning.
+- `docs/superpowers/specs/2026-09-01-ownapi-payment-currency-conversion-design.md` — approved CNY/USD balance-recharge conversion design: CNY converts at 6.7:1, USD at 1:1, and the existing recharge multiplier applies only after conversion.
 
 ## Required Reading
 
@@ -102,12 +103,13 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation, 44-model catalog expansion, and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Review and approve `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md`, then write its implementation plan. The design reuses the existing OwnAPI group multiplier and per-user override: channel prices are already manufacturer list × 0.7, customers default to one standard 1.0 group, and Packy token groups remain account-level upstream routing/cost metadata.
-2. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
-3. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
-4. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
-5. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-6. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
+1. Review the written payment-currency conversion spec, write its implementation plan, and implement the approved CNY/USD recharge conversion before resuming PackyAPI work.
+2. Review and approve `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md`, then write its implementation plan. The design reuses the existing OwnAPI group multiplier and per-user override: channel prices are already manufacturer list × 0.7, customers default to one standard 1.0 group, and Packy token groups remain account-level upstream routing/cost metadata.
+3. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
+4. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
+5. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
+6. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
+7. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
 
 ## Local Validation
 
@@ -230,6 +232,13 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The curated catalog now contains 44 models. Z.AI and MiniMax each contain two public entries; all eight provider sections remain present.
 - Focused validation passed: model catalog, catalog view, and model detail tests (3 files / 30 tests), `vue-tsc --noEmit`, `git diff --check`, and browser verification of the 44-model count and removed MiniMax detail route.
 - The unrelated untracked `frontend/pnpm-workspace.yaml` remains untouched.
+
+### 2026-09-01 — Payment currency conversion design
+
+- The user approved USD-denominated customer balances with `6.7 CNY = 1 USD` and `1 USD = 1 USD` recharge conversion.
+- The selected design calculates credited USD only after selecting the concrete payment instance currency, applies `BALANCE_RECHARGE_MULTIPLIER` after conversion, excludes fees from credited balance, and rejects non-CNY/USD balance recharge instances.
+- Existing subscription behavior, gateway-currency webhook validation, and proportional/full refund behavior remain unchanged.
+- Implementation is intentionally paused until the written specification is reviewed, per the required brainstorming workflow.
 
 ## Recovery Checklist
 
