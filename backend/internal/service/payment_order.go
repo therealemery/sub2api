@@ -53,8 +53,6 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 	if plan != nil {
 		orderAmount = plan.Price
 		limitAmount = plan.Price
-	} else if req.OrderType == payment.OrderTypeBalance {
-		orderAmount = calculateCreditedBalance(req.Amount, cfg.BalanceRechargeMultiplier)
 	}
 	feeRate := cfg.RechargeFeeRate
 	methodCurrency := payment.DefaultPaymentCurrency
@@ -83,6 +81,12 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 		payAmountStr, payAmount, err = calculateCreateOrderPayAmount(limitAmount, feeRate, selectedCurrency)
 		if err != nil {
 			return nil, err
+		}
+	}
+	if plan == nil && req.OrderType == payment.OrderTypeBalance {
+		orderAmount, err = calculateCreditedBalanceForCurrency(req.Amount, selectedCurrency, cfg.BalanceRechargeMultiplier)
+		if err != nil {
+			return nil, infraerrors.BadRequest("UNSUPPORTED_PAYMENT_CURRENCY", err.Error())
 		}
 	}
 	if err := validateSelectedCreateOrderAmountCurrency(payAmountStr, sel); err != nil {

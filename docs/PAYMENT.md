@@ -65,6 +65,18 @@ Configure the following in Admin Dashboard **Settings → Payment Settings**:
 | **Max Pending Orders** | Maximum concurrent pending orders per user | 3 |
 | **Load Balance Strategy** | Strategy for selecting provider instances | Round Robin |
 
+### Balance Recharge Currency Conversion
+
+Customer balances are denominated in USD. Balance recharge supports only CNY and USD payment instances:
+
+- `6.70 CNY` principal credits `1.00 USD`; `1.00 USD` principal credits `1.00 USD`.
+- `BALANCE_RECHARGE_MULTIPLIER` is applied after conversion. Keep it at `1.0` for the standard rate.
+- Gateway fees increase `pay_amount` but never increase credited balance.
+- For balance orders, `amount` stores credited USD, `pay_amount` stores the gateway-currency charge, and the provider snapshot stores that currency.
+- Subscription order amounts, webhook amount validation, and proportional/full refund behavior retain their existing semantics.
+
+Existing payment credentials and settings require no migration.
+
 ### Frontend Visible Method Routing
 
 The current payment UX keeps the frontend method list unified and does not expose provider brands directly:
