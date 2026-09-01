@@ -58,6 +58,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `0db8fcbf` — public pricing disclosure for free, unpublished, tiered, and generic prices.
 - `61119191` — homepage provider strip synchronized with the expanded catalog.
 - `1ab80f67` — loss-making GLM 5.3 Flash and MiniMax M3 entries removed from the public catalog.
+- `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md` — approved architecture for customer OwnAPI keys, a standard 0.7 billing group, per-account Packy token groups, model-restricted routing, and separate upstream cost accounting; pending written-spec review and implementation planning.
 
 ## Required Reading
 
@@ -101,8 +102,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation, 44-model catalog expansion, and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Finish the PackyAPI integration design: OwnAPI customer balances and deductions remain USD; recharge uses `6.7 CNY = 1 USD`; customer model prices use current manufacturer price × 0.7; Packy balances remain an upstream CNY cost only. Do not store the Packy API key in Git or frontend code.
-2. Implement the approved PackyAPI upstream account/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting after the design is fully approved. The currently selected Packy token groups cover only part of the 44-model catalog and require expansion or catalog reduction before launch.
+1. Review and approve `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md`, then write its implementation plan. The design reuses the existing OwnAPI group multiplier and per-user override: customers default to one standard 0.7 group while Packy token groups remain account-level upstream routing/cost metadata.
+2. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
 3. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
 4. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
 5. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
