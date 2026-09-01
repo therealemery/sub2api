@@ -60,6 +60,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `1ab80f67` — loss-making GLM 5.3 Flash and MiniMax M3 entries removed from the public catalog.
 - `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md` — approved architecture for customer OwnAPI keys, OwnAPI base prices already set to manufacturer list × 0.7, a standard 1.0 billing group, per-account Packy token groups, model-restricted routing, and separate upstream cost accounting; pending written-spec review and implementation planning.
 - `docs/superpowers/specs/2026-09-01-ownapi-payment-currency-conversion-design.md` — approved CNY/USD balance-recharge conversion design: CNY converts at 6.7:1, USD at 1:1, and the existing recharge multiplier applies only after conversion.
+- `docs/superpowers/plans/2026-09-01-ownapi-payment-currency-conversion-plan.md` — test-first implementation sequence for backend order semantics, frontend previews/currency formatting, documentation, and local QA.
 
 ## Required Reading
 
@@ -238,7 +239,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The user approved USD-denominated customer balances with `6.7 CNY = 1 USD` and `1 USD = 1 USD` recharge conversion.
 - The selected design calculates credited USD only after selecting the concrete payment instance currency, applies `BALANCE_RECHARGE_MULTIPLIER` after conversion, excludes fees from credited balance, and rejects non-CNY/USD balance recharge instances.
 - Existing subscription behavior, gateway-currency webhook validation, and proportional/full refund behavior remain unchanged.
-- Implementation is intentionally paused until the written specification is reviewed, per the required brainstorming workflow.
+- The written specification was approved and the implementation plan was recorded; implementation starts with backend conversion tests.
 
 ## Recovery Checklist
 
