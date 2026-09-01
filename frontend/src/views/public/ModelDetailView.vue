@@ -74,13 +74,13 @@
                     </div>
                   </Transition>
                 </div>
-                <div v-if="detailPricingSource.longContext" class="pricing-tier">
+                <div v-if="detailLongTier" class="pricing-tier">
                   <div class="pricing-tier-heading">
                     <strong>{{ t('publicModels.longContext') }}</strong>
-                    <span>{{ t('publicModels.longContextThreshold', { count: detailPricingSource.longContext.thresholdTokens.toLocaleString('en-US') }) }}</span>
+                    <span>{{ t('publicModels.longContextThreshold', { count: detailLongTier.minInputTokens.toLocaleString('en-US') }) }}</span>
                   </div>
                   <Transition name="motion-fade" mode="out-in">
-                    <div :key="pricingTierKey(model, 'long', detailPricingSource.longContext)" class="pricing-tier-values">
+                    <div :key="pricingTierKey(model, 'long', detailLongTier.official)" class="pricing-tier-values">
                       <table>
                         <thead>
                           <tr>
@@ -90,7 +90,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="row in pricingRows(detailPricingSource.longContext, detailPricingSource.multiplier)" :key="row.key">
+                          <tr v-for="row in pricingRows(detailLongTier.official, detailPricingSource.multiplier)" :key="row.key">
                             <th scope="row">{{ row.label }}</th>
                             <td>{{ row.official }}</td>
                             <td>{{ row.ownApi }}</td>
@@ -166,6 +166,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const primaryActionPath = computed(() => isAuthenticated.value ? '/keys' : '/register')
 const detailPricingEntry = computed(() => model.value ? pricingSourceEntryFor(model.value) : undefined)
 const detailPricingSource = computed(() => detailPricingEntry.value?.pricingSource ?? null)
+const detailLongTier = computed(() => detailPricingSource.value?.tiers?.find((tier) => tier.id === 'long') ?? null)
 const detailPricingSourceUrl = computed(() => detailPricingSource.value?.sourceUrl ?? '#')
 const pricingNotes = computed(() => {
   if (!model.value) return []

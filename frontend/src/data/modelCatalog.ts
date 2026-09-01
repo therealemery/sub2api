@@ -3,27 +3,26 @@ import type {
   ModelDisplayConfig,
   ModelDisplayPricingConfig,
 } from '@/api/modelDisplay'
+import { verifiedModelSeedData } from './verifiedModelSeeds'
+import type {
+  CatalogEligibilitySource,
+  ModelPricingSource,
+  OfficialTokenPricing,
+  RawVerifiedModelSeed,
+} from './verifiedModelSeeds'
 
-export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'ownapi'
+export { verifiedModelSeedData } from './verifiedModelSeeds'
+export type {
+  CatalogEligibilitySource,
+  ModelPricingSource,
+  ModelPricingStatus,
+  OfficialPricingTier,
+  OfficialTokenPricing,
+  RawVerifiedModelSeed,
+} from './verifiedModelSeeds'
+
+export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'ownapi'
 export type ModelCatalogSort = 'featured' | 'name' | 'input-price' | 'output-price'
-
-export interface OfficialTokenPricing {
-  input: number | null
-  cachedInput: number | null
-  output: number | null
-}
-
-export interface LongContextPricing extends OfficialTokenPricing {
-  thresholdTokens: number
-}
-
-export interface ModelPricingSource {
-  official: OfficialTokenPricing
-  longContext?: LongContextPricing
-  multiplier: 0.7
-  sourceUrl: string
-  checkedAt: '2026-08-31'
-}
 
 export function calculateOwnApiPricing(
   pricing: OfficialTokenPricing,
@@ -35,6 +34,13 @@ export function calculateOwnApiPricing(
     cachedInput: multiply(pricing.cachedInput),
     output: multiply(pricing.output),
   }
+}
+
+export function activeOfficialTier(
+  pricing: ModelPricingSource,
+  tierId?: string | null,
+): OfficialTokenPricing {
+  return pricing.tiers?.find((tier) => tier.id === tierId)?.official ?? pricing.official
 }
 
 export function formatCatalogPrice(value: number | null): string | null {
@@ -72,6 +78,8 @@ export interface ModelCatalogEntry {
   sortOrder: number
   price: ModelCatalogPrice | null
   pricingSource: ModelPricingSource | null
+  eligibilitySource: CatalogEligibilitySource | null
+  searchAliases: string[]
   modelClass: string[]
   endpoints: string[]
   isAlias: boolean
@@ -111,23 +119,8 @@ interface CuratedSeed extends FamilyMetadata {
   endpoints: string[]
   isAlias: boolean
   aliasNoteKey: string | null
-}
-
-interface VerifiedSeedOptions {
-  modelId: string
-  displayName: string
-  family: Exclude<ModelFamily, 'ownapi'>
-  modelClass: string[]
-  endpoints: string[]
-  official: OfficialTokenPricing
-  sourceUrl: string
-  checkedAt: ModelPricingSource['checkedAt']
-  longContext?: LongContextPricing
-  contextWindow?: string | null
-  isAlias?: boolean
-  aliasNoteKey?: string
-  featured?: boolean
-  sortOrder: number
+  eligibilitySource: CatalogEligibilitySource
+  searchAliases: string[]
 }
 
 const families: FamilyMetadata[] = [
@@ -155,107 +148,7 @@ const fallbackFamily: FamilyMetadata = {
   contextWindow: null,
 }
 
-export const verifiedCatalogSeeds: CuratedSeed[] = [
-  verifiedSeed({
-    modelId: 'gpt-5.4', displayName: 'GPT-5.4', family: 'gpt',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
-    official: { input: 2.5, cachedInput: 0.25, output: 15 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4', checkedAt: '2026-08-31', featured: true, sortOrder: 10,
-  }),
-  verifiedSeed({
-    modelId: 'gpt-5.4-mini', displayName: 'GPT-5.4 Mini', family: 'gpt',
-    modelClass: ['balanced', 'fast', 'coding'], endpoints: ['openai'],
-    official: { input: 0.75, cachedInput: 0.075, output: 4.5 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', checkedAt: '2026-08-31', contextWindow: '400K', sortOrder: 20,
-  }),
-  verifiedSeed({
-    modelId: 'gpt-5.5', displayName: 'GPT-5.5', family: 'gpt',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
-    official: { input: 5, cachedInput: 0.5, output: 30 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.5', checkedAt: '2026-08-31', featured: true, sortOrder: 30,
-  }),
-  verifiedSeed({
-    modelId: 'gpt-5.6-luna', displayName: 'GPT-5.6 Luna', family: 'gpt',
-    modelClass: ['fast', 'balanced'], endpoints: ['openai'],
-    official: { input: 0.2, cachedInput: 0.02, output: 1.2 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', sortOrder: 40,
-  }),
-  verifiedSeed({
-    modelId: 'gpt-5.6-sol', displayName: 'GPT-5.6 Sol', family: 'gpt',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['openai'],
-    official: { input: 4, cachedInput: 0.4, output: 20 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', featured: true, sortOrder: 50,
-  }),
-  verifiedSeed({
-    modelId: 'gpt-5.6-terra', displayName: 'GPT-5.6 Terra', family: 'gpt',
-    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['openai'],
-    official: { input: 2, cachedInput: 0.2, output: 12 },
-    sourceUrl: 'https://developers.openai.com/api/docs/models/compare', checkedAt: '2026-08-31', sortOrder: 60,
-  }),
-  verifiedSeed({
-    modelId: 'codex-auto-review', displayName: 'Codex Auto Review', family: 'gpt',
-    modelClass: ['coding', 'reasoning'], endpoints: ['openai'],
-    official: { input: 2.5, cachedInput: 0.25, output: 15 },
-    sourceUrl: 'https://help.openai.com/en/articles/20001415', checkedAt: '2026-08-31',
-    isAlias: true, aliasNoteKey: 'publicModels.aliases.codexAutoReview', sortOrder: 70,
-  }),
-  verifiedSeed({
-    modelId: 'claude-haiku-4-5-20251001', displayName: 'Claude Haiku 4.5', family: 'claude',
-    modelClass: ['fast', 'balanced'], endpoints: ['anthropic'],
-    official: { input: 1, cachedInput: 0.1, output: 5 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', contextWindow: '200K', sortOrder: 80,
-  }),
-  verifiedSeed({
-    modelId: 'claude-opus-4-6', displayName: 'Claude Opus 4.6', family: 'claude',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 5, cachedInput: 0.5, output: 25 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', featured: true, sortOrder: 90,
-  }),
-  verifiedSeed({
-    modelId: 'claude-opus-4-7', displayName: 'Claude Opus 4.7', family: 'claude',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 5, cachedInput: 0.5, output: 25 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 100,
-  }),
-  verifiedSeed({
-    modelId: 'claude-opus-4-8', displayName: 'Claude Opus 4.8', family: 'claude',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 5, cachedInput: 0.5, output: 25 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 110,
-  }),
-  verifiedSeed({
-    modelId: 'claude-opus-5', displayName: 'Claude Opus 5', family: 'claude',
-    modelClass: ['flagship', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 5, cachedInput: 0.5, output: 25 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', sortOrder: 120,
-  }),
-  verifiedSeed({
-    modelId: 'claude-sonnet-4-6', displayName: 'Claude Sonnet 4.6', family: 'claude',
-    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 3, cachedInput: 0.3, output: 15 },
-    sourceUrl: 'https://platform.claude.com/docs/en/about-claude/pricing', checkedAt: '2026-08-31', featured: true, sortOrder: 130,
-  }),
-  verifiedSeed({
-    modelId: 'claude-sonnet-5', displayName: 'Claude Sonnet 5', family: 'claude',
-    modelClass: ['balanced', 'coding', 'reasoning'], endpoints: ['anthropic'],
-    official: { input: 2, cachedInput: 0.2, output: 10 },
-    sourceUrl: 'https://platform.claude.com/docs/en/release-notes/overview', checkedAt: '2026-08-31', sortOrder: 140,
-  }),
-  verifiedSeed({
-    modelId: 'grok-4.5', displayName: 'Grok 4.5', family: 'grok',
-    modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
-    official: { input: 2, cachedInput: 0.3, output: 6 },
-    longContext: { input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000 },
-    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', contextWindow: '500K', sortOrder: 150,
-  }),
-  verifiedSeed({
-    modelId: 'grok-4.6', displayName: 'Grok 4.6', family: 'grok',
-    modelClass: ['flagship', 'reasoning'], endpoints: ['openai'],
-    official: { input: 2, cachedInput: 0.5, output: 6 },
-    longContext: { input: 4, cachedInput: 1, output: 12, thresholdTokens: 200_000 },
-    sourceUrl: 'https://docs.x.ai/developers/pricing', checkedAt: '2026-08-31', contextWindow: '500K', sortOrder: 160,
-  }),
-]
+export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData.map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
   const featured = config?.featured_models ?? []
@@ -359,27 +252,36 @@ function family(
   }
 }
 
-function verifiedSeed(options: VerifiedSeedOptions): CuratedSeed {
-  const metadata = families.find((item) => item.family === options.family)
-  if (!metadata) throw new Error(`Missing model family metadata: ${options.family}`)
+function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
+  const metadata = families.find((item) => item.family === raw.family)
+  if (!metadata) throw new Error(`Missing model family metadata: ${raw.family}`)
   return {
     ...metadata,
-    contextWindow: options.contextWindow ?? metadata.contextWindow,
-    modelId: options.modelId,
-    displayName: options.displayName,
-    featured: options.featured ?? false,
-    sortOrder: options.sortOrder,
+    contextWindow: raw.contextWindow ?? metadata.contextWindow,
+    modelId: raw.modelId,
+    displayName: raw.displayName,
+    featured: raw.featured ?? false,
+    sortOrder: raw.sortOrder,
     pricingSource: {
-      official: options.official,
-      longContext: options.longContext,
+      status: raw.pricingStatus,
+      official: raw.official,
+      tiers: raw.tiers ?? [],
       multiplier: 0.7,
-      sourceUrl: options.sourceUrl,
-      checkedAt: options.checkedAt,
+      sourceUrl: raw.sourceUrl,
+      checkedAt: '2026-08-31',
+      noteKey: raw.noteKey ?? null,
     },
-    modelClass: options.modelClass,
-    endpoints: options.endpoints,
-    isAlias: options.isAlias ?? false,
-    aliasNoteKey: options.aliasNoteKey ?? null,
+    eligibilitySource: {
+      source: 'packyapi',
+      discountPercent: raw.discountPercent,
+      checkedAt: '2026-08-31',
+      sourceUrl: 'https://www.packyapi.com/pricing',
+    },
+    searchAliases: raw.searchAliases ?? [],
+    modelClass: raw.modelClass,
+    endpoints: raw.endpoints,
+    isAlias: raw.isAlias ?? false,
+    aliasNoteKey: raw.aliasNoteKey ?? null,
   }
 }
 
@@ -393,6 +295,8 @@ function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): Mode
     sortOrder: featuredConfig?.sort_order ?? item.sortOrder,
     price: null,
     pricingSource: item.pricingSource,
+    eligibilitySource: item.eligibilitySource,
+    searchAliases: item.searchAliases,
     modelClass: item.modelClass,
     endpoints: item.endpoints,
     isAlias: item.isAlias,
@@ -419,6 +323,8 @@ function entryFromConfigured(
     sortOrder: pricing.sort_order ?? 100 + index,
     price: priceFromConfig(pricing),
     pricingSource: null,
+    eligibilitySource: null,
+    searchAliases: [],
     modelClass: [],
     endpoints: [],
     isAlias: false,
