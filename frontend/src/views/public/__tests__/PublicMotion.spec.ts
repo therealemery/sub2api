@@ -7,6 +7,7 @@ import ModelsCatalogView from '../ModelsCatalogView.vue'
 import catalogSource from '../ModelsCatalogView.vue?raw'
 import detailSource from '../ModelDetailView.vue?raw'
 import docsSource from '../DocsView.vue?raw'
+import docsCodeSource from '@/components/docs/DocsCodeExamples.vue?raw'
 import modelCodeSource from '@/components/models/ModelCodeExamples.vue?raw'
 
 const { getModelDisplayConfig, navigate, t } = vi.hoisted(() => ({
@@ -27,6 +28,7 @@ const { getModelDisplayConfig, navigate, t } = vi.hoisted(() => ({
       'publicModels.longContextThreshold': `Long context: ${String(params?.count ?? '')}`,
       'publicModels.code.copy': 'Copy',
       'publicModels.code.copied': 'Copied',
+      'publicDocs.copied': 'Copied',
     }
     return messages[key] ?? key
   },
@@ -76,6 +78,7 @@ describe('public Models and Docs motion', () => {
   beforeEach(() => {
     getModelDisplayConfig.mockResolvedValue(emptyConfig)
     navigate.mockClear()
+    window.history.replaceState({}, '', '/')
   })
 
   afterEach(() => {
@@ -159,7 +162,6 @@ describe('public Models and Docs motion', () => {
       attachTo: document.body,
       global: {
         stubs: {
-          DocsCodeExamples: { template: '<div class="docs-code" />' },
           Icon: true,
           PublicSiteLayout: { template: '<div><slot /></div>' },
           RouterLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
@@ -172,13 +174,53 @@ describe('public Models and Docs motion', () => {
     expect(quickStart.classes()).toContain('is-active')
     expect(quickStart.attributes('aria-current')).toBe('location')
     expect(observe).toHaveBeenCalled()
+    expect(wrapper.findAll('.docs-active-indicator')).toHaveLength(1)
+    expect(wrapper.get('.on-this-page-links').attributes('style')).toBe('--active-index: 2;')
 
     expect(docsSource).toContain('transition:transform var(--motion-fast)')
-    expect(docsSource).toMatch(/@media\(prefers-reduced-motion:reduce\).*scroll-behavior:auto.*transform:none/s)
+    expect(docsSource).toContain('transform:translateY(calc(var(--active-index) * var(--docs-nav-step)))')
+    expect(docsSource).not.toContain('.docs-nav a::before')
+    expect(docsSource).not.toContain('.on-this-page a::before')
+    expect(docsSource).toMatch(/@media\(prefers-reduced-motion:reduce\).*scroll-behavior:auto.*\.docs-active-indicator\{transition:none\}/s)
     expect(docsSource).not.toContain('reveal-item')
     expect(docsSource).not.toContain('data-motion-section')
 
     wrapper.unmount()
     expect(disconnect).toHaveBeenCalledTimes(1)
+  })
+
+  it('tests the real Docs copy feedback and clears its exact 1.5 second timer', async () => {
+    vi.useFakeTimers()
+    const clearTimeout = vi.spyOn(window, 'clearTimeout')
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const wrapper = mount(DocsView, {
+      global: {
+        stubs: {
+          Icon: true,
+          PublicSiteLayout: { template: '<div><slot /></div>' },
+          RouterLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
+        },
+      },
+    })
+    const button = wrapper.get('.docs-code .copy-button')
+
+    expect(button.get('transition-stub[name="motion-fade"]').attributes('mode')).toBe('out-in')
+    await button.trigger('click')
+    await flushPromises()
+    expect(writeText).toHaveBeenCalledTimes(1)
+    expect(button.text()).toContain('Copied')
+
+    await vi.advanceTimersByTimeAsync(1499)
+    expect(button.text()).toContain('Copied')
+    await vi.advanceTimersByTimeAsync(1)
+    expect(button.text()).toContain('Copy')
+    expect(docsCodeSource).toContain('min-inline-size:82px')
+
+    await button.trigger('click')
+    await flushPromises()
+    const clearCountBeforeUnmount = clearTimeout.mock.calls.length
+    wrapper.unmount()
+    expect(clearTimeout).toHaveBeenCalledTimes(clearCountBeforeUnmount + 1)
   })
 })
