@@ -41,6 +41,24 @@ export interface ModelProviderGroup {
   entries: ModelCatalogEntry[]
 }
 
+export interface CatalogProviderSummary {
+  provider: string
+  label: string
+  logo: string
+  count: number
+}
+
+const catalogProviderPresentation: Record<typeof CATALOG_PROVIDER_ORDER[number], { label: string; logo: string }> = {
+  OpenAI: { label: 'ChatGPT', logo: '/brand/openai.svg' },
+  Anthropic: { label: 'Claude', logo: '/brand/claude.svg' },
+  xAI: { label: 'Grok', logo: '/brand/grok.svg' },
+  Google: { label: 'Gemini', logo: '/brand/gemini.svg' },
+  Qwen: { label: 'Qwen', logo: '/brand/qwen.svg' },
+  'Z.AI': { label: 'GLM', logo: '/brand/glm.svg' },
+  Moonshot: { label: 'Kimi', logo: '/brand/kimi.svg' },
+  MiniMax: { label: 'MiniMax', logo: '/brand/minimax.svg' },
+}
+
 const providerSearchAliases: Record<string, string[]> = {
   OpenAI: ['open ai', '开放人工智能'],
   Anthropic: ['claude', '克劳德'],
@@ -279,6 +297,17 @@ export function groupModelCatalog(entries: ModelCatalogEntry[]): ModelProviderGr
     })
   }
   return [...groups.values()].sort((a, b) => compareProviders(a.provider, b.provider))
+}
+
+export function getCatalogProviderSummaries(
+  entries: ModelCatalogEntry[] = buildModelCatalog(),
+): CatalogProviderSummary[] {
+  return CATALOG_PROVIDER_ORDER.flatMap((provider) => {
+    const count = entries.filter((entry) => entry.provider === provider).length
+    if (count === 0) return []
+    const presentation = catalogProviderPresentation[provider]
+    return [{ provider, ...presentation, count }]
+  })
 }
 
 export function findCatalogModel(entries: ModelCatalogEntry[], slug: string): ModelCatalogEntry | undefined {

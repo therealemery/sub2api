@@ -220,6 +220,25 @@ describe('HomeView motion', () => {
     wrapper.unmount()
   })
 
+  it('derives the provider strip from the verified catalog', async () => {
+    const { wrapper } = await mountHome()
+    const providers = wrapper.findAll('.provider-wordmark')
+
+    expect(providers.map(provider => provider.text())).toEqual([
+      'ChatGPT', 'Claude', 'Grok', 'Gemini', 'Qwen', 'GLM', 'Kimi', 'MiniMax',
+    ])
+    expect(providers.map(provider => provider.get('img').attributes('src'))).toEqual([
+      '/brand/openai.svg', '/brand/claude.svg', '/brand/grok.svg', '/brand/gemini.svg',
+      '/brand/qwen.svg', '/brand/glm.svg', '/brand/kimi.svg', '/brand/minimax.svg',
+    ])
+    expect(wrapper.get('[data-motion-section="providers"]').classes()).toContain('reveal-item')
+    expect(wrapper.text()).not.toContain('DeepSeek')
+    expect(wrapper.text()).not.toContain('Mistral')
+    expect(wrapper.text()).not.toContain('home.providers.soon')
+
+    wrapper.unmount()
+  })
+
   it('keeps the primary CTA immediately navigable without advancing timers', async () => {
     const { router, wrapper } = await mountHome()
 
@@ -249,6 +268,7 @@ describe('HomeView motion', () => {
 
     expect(wrapper.get('[data-custom-home]').text()).toBe('Custom')
     expect(wrapper.find('.landing-page').exists()).toBe(false)
+    expect(wrapper.find('.provider-strip').exists()).toBe(false)
     expect(observerInstances).toHaveLength(0)
 
     wrapper.unmount()
