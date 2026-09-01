@@ -77,7 +77,7 @@
                       <small>{{ t('publicModels.officialListPrice') }}</small>
                     </div>
                     <div class="pricing-badge">{{ t('publicModels.officialSeventyPercent') }}</div>
-                    <div v-if="model.pricingSource.longContext" class="context-toggle" :aria-label="`${model.displayName} ${t('publicModels.longContextThreshold', { count: model.pricingSource.longContext.thresholdTokens.toLocaleString('en-US') })}`">
+                    <div v-if="longPricingTier(model)" class="context-toggle" :aria-label="`${model.displayName} ${t('publicModels.longContextThreshold', { count: longPricingTier(model)?.minInputTokens.toLocaleString('en-US') })}`">
                       <button type="button" :class="{ active: contextMode(model) === 'short' }" :aria-pressed="contextMode(model) === 'short'" @click="setContextMode(model, 'short')">{{ t('publicModels.shortContext') }}</button>
                       <button type="button" :class="{ active: contextMode(model) === 'long' }" :aria-pressed="contextMode(model) === 'long'" @click="setContextMode(model, 'long')">{{ t('publicModels.longContext') }}</button>
                     </div>
@@ -203,10 +203,15 @@ function priceMetric(
 }
 
 function activeOfficialPricing(model: ModelCatalogEntry): OfficialTokenPricing {
-  if (contextMode(model) === 'long' && model.pricingSource?.longContext) {
-    return model.pricingSource.longContext
+  const longTier = longPricingTier(model)
+  if (contextMode(model) === 'long' && longTier) {
+    return longTier.official
   }
   return model.pricingSource?.official ?? { input: null, cachedInput: null, output: null }
+}
+
+function longPricingTier(model: ModelCatalogEntry) {
+  return model.pricingSource?.tiers?.find((tier) => tier.id === 'long')
 }
 
 function formatPriceValue(value: number | null): string {

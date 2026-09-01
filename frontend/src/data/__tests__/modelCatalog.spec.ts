@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
 import {
+  activeOfficialTier,
   buildModelCatalog,
   calculateOwnApiPricing,
   filterModelCatalog,
@@ -22,6 +23,31 @@ describe('modelCatalog', () => {
       input: 1.75,
       cachedInput: 0.175,
       output: 10.5,
+    })
+  })
+
+  it('distinguishes pricing states and selects generic official tiers', () => {
+    expect(activeOfficialTier({
+      status: 'paid',
+      official: { input: 2, cachedInput: 0.2, output: 12 },
+      tiers: [{
+        id: 'long',
+        minInputTokens: 200_000,
+        minInclusive: false,
+        maxInputTokens: null,
+        maxInclusive: true,
+        official: { input: 4, cachedInput: 0.4, output: 18 },
+      }],
+      multiplier: 0.7,
+      sourceUrl: 'https://vendor.example/pricing',
+      checkedAt: '2026-08-31',
+      noteKey: null,
+    }, 'long')).toEqual({ input: 4, cachedInput: 0.4, output: 18 })
+
+    expect(calculateOwnApiPricing({ input: 0, cachedInput: 0, output: 0 })).toEqual({
+      input: 0,
+      cachedInput: 0,
+      output: 0,
     })
   })
 
@@ -58,10 +84,18 @@ describe('modelCatalog', () => {
       const model = catalog.find((entry) => entry.modelId === modelId)
       expect(model?.slug).toBe(modelId.replace(/[^a-z0-9]+/g, '-'))
       expect(model?.pricingSource).toMatchObject({
+        status: 'paid',
         sourceUrl: expect.stringMatching(/^https:\/\//),
         checkedAt: '2026-08-31',
         multiplier: 0.7,
       })
+      expect(model?.eligibilitySource).toMatchObject({
+        source: 'packyapi',
+        discountPercent: expect.any(Number),
+        checkedAt: '2026-08-31',
+        sourceUrl: 'https://www.packyapi.com/pricing',
+      })
+      expect(model?.searchAliases).toEqual(expect.any(Array))
       expect(model?.providerLogo).toMatch(/^\/brand\/(openai|claude|grok)\.svg$/)
 
       const derived = model?.pricingSource && calculateOwnApiPricing(model.pricingSource.official)
@@ -122,12 +156,14 @@ describe('modelCatalog', () => {
     expect(catalog.find((model) => model.modelId === 'gpt-5.4-mini')?.contextWindow).toBe('400K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.6')?.contextWindow).toBe('500K')
-    expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.longContext).toEqual({
-      input: 4, cachedInput: 0.6, output: 12, thresholdTokens: 200_000,
-    })
-    expect(catalog.find((model) => model.modelId === 'grok-4.6')?.pricingSource?.longContext).toEqual({
-      input: 4, cachedInput: 1, output: 12, thresholdTokens: 200_000,
-    })
+    expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.tiers).toEqual([{
+      id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true,
+      official: { input: 4, cachedInput: 0.6, output: 12 },
+    }])
+    expect(catalog.find((model) => model.modelId === 'grok-4.6')?.pricingSource?.tiers).toEqual([{
+      id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true,
+      official: { input: 4, cachedInput: 1, output: 12 },
+    }])
   })
 
   it('merges configured pricing into matching family metadata', () => {
