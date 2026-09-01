@@ -84,6 +84,80 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
     contextWindow: '500K',
     tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 1, output: 12 } }],
   }),
+  seed('gemini-2.5-flash', 'Gemini 2.5 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 2.5 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 170, { contextWindow: '1M' }),
+  seed('gemini-2.5-pro', 'Gemini 2.5 Pro', 'gemini', ['flagship', 'reasoning', 'multimodal'], ['openai'], { input: 1.25, cachedInput: 0.125, output: 10 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 180, {
+    contextWindow: '1M',
+    tiers: [{ id: 'over-200k', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 2.5, cachedInput: 0.25, output: 15 } }],
+  }),
+  seed('gemini-3-flash-preview', 'Gemini 3 Flash Preview', 'gemini', ['fast', 'preview', 'multimodal'], ['openai'], { input: 0.5, cachedInput: 0.05, output: 3 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 190, { contextWindow: null }),
+  seed('gemini-3-pro-preview', 'Gemini 3 Pro Preview', 'gemini', ['flagship', 'preview', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 200, { pricingStatus: 'unpublished', contextWindow: null }),
+  seed('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 'gemini', ['flagship', 'preview', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 210, {
+    contextWindow: '1M',
+    tiers: [{ id: 'over-200k', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 0.4, output: 18 } }],
+  }),
+  seed('gemini-3.5-flash', 'Gemini 3.5 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 1.5, cachedInput: 0.15, output: 9 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 220, { contextWindow: null }),
+  seed('gemini-3.7-flash', 'Gemini 3.7 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 1.5, cachedInput: 0.15, output: 7.5 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 230, { contextWindow: null, noteKey: 'publicModels.pricingNotes.googleIntroductory' }),
+  seed('qwen3-coder-next', 'Qwen3 Coder Next', 'qwen', ['coding', 'reasoning'], ['openai'], { input: 0.144, cachedInput: null, output: 0.574 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 240, {
+    contextWindow: '256K', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [
+      { id: '32k-128k', minInputTokens: 32_000, minInclusive: false, maxInputTokens: 128_000, maxInclusive: true, official: { input: 0.216, cachedInput: null, output: 0.861 } },
+      { id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 0.359, cachedInput: null, output: 1.434 } },
+    ],
+  }),
+  seed('qwen3-max', 'Qwen3 Max', 'qwen', ['flagship', 'reasoning'], ['openai'], { input: 1.2, cachedInput: null, output: 6 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 250, {
+    contextWindow: '256K', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [
+      { id: '32k-128k', minInputTokens: 32_000, minInclusive: false, maxInputTokens: 128_000, maxInclusive: true, official: { input: 2.4, cachedInput: null, output: 12 } },
+      { id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 3, cachedInput: null, output: 15 } },
+    ],
+  }),
+  seed('qwen3-vl-flash', 'Qwen3 VL Flash', 'qwen', ['fast', 'vision', 'multimodal'], ['openai'], { input: 0.022, cachedInput: null, output: 0.215 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 260, {
+    contextWindow: '256K', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [
+      { id: '32k-128k', minInputTokens: 32_000, minInclusive: false, maxInputTokens: 128_000, maxInclusive: true, official: { input: 0.043, cachedInput: null, output: 0.43 } },
+      { id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 0.086, cachedInput: null, output: 0.859 } },
+    ],
+  }),
+  seed('qwen3.5-flash', 'Qwen3.5 Flash', 'qwen', ['fast', 'multimodal'], ['openai'], { input: 0.029, cachedInput: null, output: 0.287 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 270, {
+    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [
+      { id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 0.115, cachedInput: null, output: 1.147 } },
+      { id: '256k-1m', minInputTokens: 256_000, minInclusive: false, maxInputTokens: 1_000_000, maxInclusive: true, official: { input: 0.172, cachedInput: null, output: 1.72 } },
+    ],
+  }),
+  seed('qwen3.5-plus', 'Qwen3.5 Plus', 'qwen', ['balanced', 'reasoning', 'multimodal'], ['openai'], { input: 0.115, cachedInput: null, output: 0.688 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 280, {
+    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [
+      { id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 0.287, cachedInput: null, output: 1.72 } },
+      { id: '256k-1m', minInputTokens: 256_000, minInclusive: false, maxInputTokens: 1_000_000, maxInclusive: true, official: { input: 0.573, cachedInput: null, output: 3.44 } },
+    ],
+  }),
+  seed('qwen3.6-max-preview', 'Qwen3.6 Max Preview', 'qwen', ['flagship', 'preview', 'reasoning'], ['openai'], { input: 1.3, cachedInput: null, output: 7.8 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 290, {
+    contextWindow: '256K', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [{ id: '128k-256k', minInputTokens: 128_000, minInclusive: false, maxInputTokens: 256_000, maxInclusive: true, official: { input: 2, cachedInput: null, output: 12 } }],
+  }),
+  seed('qwen3.6-plus', 'Qwen3.6 Plus', 'qwen', ['balanced', 'reasoning'], ['openai'], { input: 0.276, cachedInput: null, output: 1.651 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 300, {
+    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [{ id: '256k-1m', minInputTokens: 256_000, minInclusive: false, maxInputTokens: 1_000_000, maxInclusive: true, official: { input: 1.101, cachedInput: null, output: 6.602 } }],
+  }),
+  seed('qwen3.7-max', 'Qwen3.7 Max', 'qwen', ['flagship', 'reasoning'], ['openai'], { input: 2.5, cachedInput: null, output: 7.5 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 310, { contextWindow: null, noteKey: 'publicModels.pricingNotes.alibabaGlobal' }),
+  seed('qwen3.7-plus', 'Qwen3.7 Plus', 'qwen', ['balanced', 'reasoning'], ['openai'], { input: 0.4, cachedInput: null, output: 1.6 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 320, {
+    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.alibabaGlobal',
+    tiers: [{ id: '256k-1m', minInputTokens: 256_000, minInclusive: false, maxInputTokens: 1_000_000, maxInclusive: true, official: { input: 1.2, cachedInput: null, output: 4.8 } }],
+  }),
+  seed('qwen3.8-flash', 'Qwen3.8 Flash', 'qwen', ['fast', 'multimodal'], ['openai'], { input: 0.113, cachedInput: null, output: 0.382 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 330, { contextWindow: null, noteKey: 'publicModels.pricingNotes.alibabaGlobal' }),
+  seed('qwen3.8-max', 'Qwen3.8 Max', 'qwen', ['flagship', 'reasoning'], ['openai'], { input: 2, cachedInput: null, output: 6 }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 50, 340, { contextWindow: null, noteKey: 'publicModels.pricingNotes.alibabaGlobal' }),
+  seed('glm-5', 'GLM-5', 'glm', ['flagship', 'reasoning', 'coding'], ['openai'], { input: 1, cachedInput: 0.2, output: 3.2 }, 'https://docs.z.ai/guides/overview/pricing', 50, 350, { contextWindow: null }),
+  seed('glm-5.2', 'GLM-5.2', 'glm', ['flagship', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://docs.z.ai/guides/overview/pricing', 50, 360, { pricingStatus: 'unpublished', contextWindow: null }),
+  seed('glm-5.3-flash', 'GLM-5.3 Flash', 'glm', ['fast', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://docs.z.ai/guides/overview/pricing', 50, 370, { pricingStatus: 'unpublished', contextWindow: null }),
+  seed('kimi-k2.5', 'Kimi K2.5', 'kimi', ['balanced', 'reasoning', 'long-context'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://platform.kimi.com/docs/pricing/chat', 50, 380, { pricingStatus: 'unpublished', contextWindow: null }),
+  seed('kimi-k3', 'Kimi K3', 'kimi', ['flagship', 'reasoning', 'long-context'], ['openai'], { input: 3, cachedInput: 0.3, output: 15 }, 'https://platform.kimi.com/docs/pricing/chat-k3', 65, 390, { contextWindow: '1M' }),
+  seed('minimax-m2.5', 'MiniMax M2.5', 'minimax', ['balanced', 'reasoning'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 1.2 }, 'https://platform.minimax.io/docs/guides/pricing-paygo', 50, 400, { contextWindow: null }),
+  seed('MiniMax-M2.7', 'MiniMax M2.7', 'minimax', ['balanced', 'reasoning'], ['openai'], { input: 0.3, cachedInput: 0.06, output: 1.2 }, 'https://platform.minimax.io/docs/guides/pricing-paygo', 50, 410, { contextWindow: null }),
+  seed('MiniMax-M3', 'MiniMax M3', 'minimax', ['flagship', 'reasoning', 'long-context'], ['openai'], { input: 0.6, cachedInput: 0.12, output: 2.4 }, 'https://platform.minimax.io/subscribe/token-plan?tab=api-enterprise', 50, 420, {
+    contextWindow: '1M', noteKey: 'publicModels.pricingNotes.minimaxPromotion',
+    tiers: [{ id: 'over-512k', minInputTokens: 512_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 1.2, cachedInput: 0.24, output: 4.8 } }],
+  }),
 ]
 
 interface SeedOverrides {

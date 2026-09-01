@@ -9,6 +9,7 @@ import {
   findCatalogModel,
   relatedCatalogModels,
   verifiedCatalogSeeds,
+  verifiedModelSeedData,
 } from '../modelCatalog'
 
 const emptyConfig: ModelDisplayConfig = {
@@ -59,7 +60,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(20)
+    expect(result).toHaveLength(46)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -74,9 +75,7 @@ describe('modelCatalog', () => {
     ]
     const catalog = buildModelCatalog(emptyConfig)
 
-    expect(verifiedCatalogSeeds).toHaveLength(20)
-    expect(new Set(verifiedCatalogSeeds.map((model) => model.modelId)).size).toBe(20)
-    expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(requiredIds)
+    expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(expect.arrayContaining(requiredIds))
     expect(requiredIds.every((id) => catalog.some((model) => model.modelId === id))).toBe(true)
     expect(new Set(requiredIds).size).toBe(20)
     expect(Object.fromEntries(['OpenAI', 'Anthropic', 'xAI'].map((provider) => [
@@ -188,6 +187,81 @@ describe('modelCatalog', () => {
     }])
   })
 
+  it('contains the exact 46-model eligibility snapshot across eight providers', () => {
+    const providerIds = {
+      OpenAI: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest'],
+      Anthropic: ['claude-fable-5', 'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
+      xAI: ['grok-4.5', 'grok-4.6'],
+      Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-3.7-flash'],
+      Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
+      'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3-flash'],
+      Moonshot: ['kimi-k2.5', 'kimi-k3'],
+      MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3'],
+    }
+    const catalog = buildModelCatalog(emptyConfig)
+    const expectedIds = Object.values(providerIds).flat()
+
+    expect(verifiedModelSeedData).toHaveLength(46)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(46)
+    expect(new Set(expectedIds).size).toBe(46)
+    expect(verifiedModelSeedData.map((seed) => seed.modelId)).toEqual(expectedIds)
+    expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
+      provider,
+      catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
+    ]))).toEqual({ OpenAI: 9, Anthropic: 9, xAI: 2, Google: 7, Qwen: 11, 'Z.AI': 3, Moonshot: 2, MiniMax: 3 })
+
+    const addedIds = expectedIds.slice(20)
+    expect(Object.fromEntries(addedIds.map((modelId) => [
+      modelId,
+      catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.official,
+    ]))).toEqual({
+      'gemini-2.5-flash': { input: 0.3, cachedInput: 0.03, output: 2.5 },
+      'gemini-2.5-pro': { input: 1.25, cachedInput: 0.125, output: 10 },
+      'gemini-3-flash-preview': { input: 0.5, cachedInput: 0.05, output: 3 },
+      'gemini-3-pro-preview': { input: null, cachedInput: null, output: null },
+      'gemini-3.1-pro-preview': { input: 2, cachedInput: 0.2, output: 12 },
+      'gemini-3.5-flash': { input: 1.5, cachedInput: 0.15, output: 9 },
+      'gemini-3.7-flash': { input: 1.5, cachedInput: 0.15, output: 7.5 },
+      'qwen3-coder-next': { input: 0.144, cachedInput: null, output: 0.574 },
+      'qwen3-max': { input: 1.2, cachedInput: null, output: 6 },
+      'qwen3-vl-flash': { input: 0.022, cachedInput: null, output: 0.215 },
+      'qwen3.5-flash': { input: 0.029, cachedInput: null, output: 0.287 },
+      'qwen3.5-plus': { input: 0.115, cachedInput: null, output: 0.688 },
+      'qwen3.6-max-preview': { input: 1.3, cachedInput: null, output: 7.8 },
+      'qwen3.6-plus': { input: 0.276, cachedInput: null, output: 1.651 },
+      'qwen3.7-max': { input: 2.5, cachedInput: null, output: 7.5 },
+      'qwen3.7-plus': { input: 0.4, cachedInput: null, output: 1.6 },
+      'qwen3.8-flash': { input: 0.113, cachedInput: null, output: 0.382 },
+      'qwen3.8-max': { input: 2, cachedInput: null, output: 6 },
+      'glm-5': { input: 1, cachedInput: 0.2, output: 3.2 },
+      'glm-5.2': { input: null, cachedInput: null, output: null },
+      'glm-5.3-flash': { input: null, cachedInput: null, output: null },
+      'kimi-k2.5': { input: null, cachedInput: null, output: null },
+      'kimi-k3': { input: 3, cachedInput: 0.3, output: 15 },
+      'minimax-m2.5': { input: 0.3, cachedInput: 0.03, output: 1.2 },
+      'MiniMax-M2.7': { input: 0.3, cachedInput: 0.06, output: 1.2 },
+      'MiniMax-M3': { input: 0.6, cachedInput: 0.12, output: 2.4 },
+    })
+    expect(['gemini-3-pro-preview', 'glm-5.2', 'glm-5.3-flash', 'kimi-k2.5'].map((modelId) =>
+      catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
+    )).toEqual(['unpublished', 'unpublished', 'unpublished', 'unpublished'])
+    expect(catalog.find((entry) => entry.modelId === 'gemini-2.5-pro')?.pricingSource?.tiers[0]).toMatchObject({
+      id: 'over-200k', minInputTokens: 200_000, minInclusive: false,
+      official: { input: 2.5, cachedInput: 0.25, output: 15 },
+    })
+    expect(catalog.find((entry) => entry.modelId === 'qwen3.5-plus')?.pricingSource?.tiers).toHaveLength(2)
+    expect(catalog.find((entry) => entry.modelId === 'MiniMax-M3')?.pricingSource?.tiers[0]).toMatchObject({
+      id: 'over-512k', minInputTokens: 512_000, minInclusive: false,
+      official: { input: 1.2, cachedInput: 0.24, output: 4.8 },
+    })
+
+    for (const entry of catalog) {
+      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(50)
+      expect(entry.available).toBeNull()
+      expect(entry.providerLogo).toMatch(/^\/brand\/(openai|claude|grok|gemini|qwen|glm|kimi|minimax)\.svg$/)
+    }
+  })
+
   it('merges configured pricing into matching family metadata', () => {
     const result = buildModelCatalog({
       featured_models: [{ model: 'gpt-5.4', platform: 'openai', badge: 'Featured', sort_order: 1 }],
@@ -276,8 +350,8 @@ describe('modelCatalog', () => {
       sort: 'input-price',
     })
 
-    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['omni-moderation-latest', 'gpt-5.6-luna'])
-    expect(result.slice(-2).map((item) => item.modelId)).toEqual(expect.arrayContaining(['gpt-5.4', 'gpt-daybreak-blue-latest']))
+    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['omni-moderation-latest', 'qwen3-vl-flash'])
+    expect(result.at(-1)?.pricingSource?.official.input ?? null).toBeNull()
   })
 
   it('sorts by lowest OwnAPI output price with missing values last', () => {
@@ -296,9 +370,9 @@ describe('modelCatalog', () => {
 
     expect(result.slice(0, 4).map((item) => item.modelId)).toEqual([
       'omni-moderation-latest',
-      'gpt-5.6-luna',
-      'gpt-5.4-mini',
-      'claude-haiku-4-5-20251001',
+      'qwen3-vl-flash',
+      'qwen3.5-flash',
+      'qwen3.8-flash',
     ])
     expect(result.at(-1)?.pricingSource?.official.output ?? null).toBeNull()
   })
