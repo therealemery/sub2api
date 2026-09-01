@@ -14,10 +14,12 @@
 
       <section class="catalog-workspace" aria-labelledby="catalog-results-title">
         <div class="search-row">
-          <label class="search-box">
+          <div class="search-box">
             <Icon name="search" size="sm" />
-            <input v-model="filters.query" type="search" :placeholder="t('publicModels.searchPlaceholder')" />
-          </label>
+            <label for="catalog-search" class="sr-only">{{ t('publicModels.searchLabel') }}</label>
+            <input id="catalog-search" v-model="filters.query" type="search" :placeholder="t('publicModels.searchPlaceholder')" @keydown.esc="clearSearch" />
+            <button v-if="filters.query" type="button" class="search-clear" :aria-label="t('publicModels.clearSearch')" @click="clearSearch">{{ t('publicModels.clearSearch') }}</button>
+          </div>
           <button type="button" class="filter-toggle" :aria-expanded="filtersOpen" @click="filtersOpen = !filtersOpen">
             {{ filtersOpen ? t('publicModels.hideFilters') : t('publicModels.showFilters') }}
           </button>
@@ -27,7 +29,7 @@
 
         <div class="catalog-grid">
           <aside class="filter-rail" :class="{ 'filter-rail-open': filtersOpen }">
-            <div class="filter-heading"><strong>{{ t('publicModels.filters') }}</strong><button type="button" @click="clearFilters">{{ t('publicModels.clear') }}</button></div>
+            <div class="filter-heading"><strong>{{ t('publicModels.filters') }}</strong><button type="button" class="reset-all" @click="resetFilters">{{ t('publicModels.resetAll') }}</button></div>
             <fieldset>
               <legend>{{ t('publicModels.provider') }}</legend>
               <label><input v-model="filters.provider" type="radio" value="" />{{ t('publicModels.allProviders') }}</label>
@@ -62,8 +64,14 @@
               <div v-for="index in 6" :key="index" class="model-card model-card-skeleton"></div>
             </div>
 
-            <TransitionGroup v-else-if="filteredModels.length" name="motion-list" tag="div" class="model-card-grid">
-              <article v-for="(model, index) in filteredModels" :key="`${model.platform}:${model.modelId}`" class="model-card" :style="{ '--motion-delay': modelMotionDelay(index) }">
+            <template v-else-if="providerGroups.length">
+              <section v-for="group in providerGroups" :key="group.provider" class="provider-section" :aria-labelledby="`provider-${providerSlug(group.provider)}`">
+                <header class="provider-section-heading">
+                  <div><img :src="group.providerLogo" alt="" /><h2 :id="`provider-${providerSlug(group.provider)}`">{{ group.provider }}</h2></div>
+                  <span>{{ t('publicModels.providerModelCount', { count: group.entries.length }) }}</span>
+                </header>
+                <TransitionGroup name="motion-list" tag="div" class="model-card-grid">
+                  <article v-for="model in group.entries" :key="`${model.platform}:${model.modelId}`" class="model-card" :style="{ '--motion-delay': modelMotionDelay(modelMotionIndex(model)) }">
                 <router-link :to="`/models/${model.slug}`" class="model-art model-card-link" :aria-label="`${t('publicModels.viewModel')} ${model.displayName}`"><img :src="model.artwork" alt="" loading="lazy" /><span v-if="model.featured">{{ model.featuredBadge || t('publicModels.featured') }}</span></router-link>
                 <div class="model-card-body">
                   <div class="provider-line"><img :src="model.providerLogo" alt="" /><span>{{ model.provider }}</span><small>{{ model.modality }}</small></div>
@@ -71,7 +79,7 @@
                   <p>{{ t(model.summaryKey) }}</p>
                   <div class="capability-row"><span v-for="capability in model.capabilities.slice(0, 3)" :key="capability">{{ capability }}</span></div>
                   <p v-if="model.isAlias && model.aliasNoteKey" class="alias-note">{{ t(model.aliasNoteKey) }}</p>
-                  <div v-if="model.pricingSource" class="pricing-card">
+                  <div v-if="model.pricingSource?.status === 'paid'" class="pricing-card">
                     <div class="pricing-card-heading">
                       <span>{{ t('publicModels.ownApiPrice') }}</span>
                       <small>{{ t('publicModels.officialListPrice') }}</small>
@@ -94,15 +102,18 @@
                     </Transition>
                     <small class="pricing-checked">{{ t('publicModels.pricingCheckedAt', { date: model.pricingSource.checkedAt }) }}</small>
                   </div>
-                  <div v-else class="pricing-card pricing-card-empty">{{ t('publicModels.notPublished') }}</div>
+                  <div v-else class="pricing-card pricing-card-status" :class="{ 'pricing-card-free': model.pricingSource?.status === 'free' }">
+                    <span>{{ model.pricingSource?.status === 'free' ? t('publicModels.free') : t('publicModels.notPublished') }}</span>
+                  </div>
                   <router-link :to="`/models/${model.slug}`" class="model-card-footer"><strong>{{ t('publicModels.viewModel') }} <Icon name="arrowRight" size="xs" /></strong></router-link>
                 </div>
               </article>
+                </TransitionGroup>
+              </section>
+              <article class="growth-card"><span>+</span><h3>{{ t('publicModels.growthTitle') }}</h3><p>{{ t('publicModels.growthDescription') }}</p></article>
+            </template>
 
-              <article key="growth-card" class="growth-card"><span>+</span><h3>{{ t('publicModels.growthTitle') }}</h3><p>{{ t('publicModels.growthDescription') }}</p></article>
-            </TransitionGroup>
-
-            <div v-else class="empty-state"><h3>{{ t('publicModels.noResults') }}</h3><p>{{ t('publicModels.noResultsHint') }}</p><button type="button" @click="clearFilters">{{ t('publicModels.clear') }}</button></div>
+            <div v-else class="empty-state"><h3>{{ t('publicModels.noResults') }}</h3><p>{{ t('publicModels.noResultsHint') }}</p><button type="button" @click="resetFilters">{{ t('publicModels.resetAll') }}</button></div>
           </div>
         </div>
       </section>
@@ -121,6 +132,7 @@ import {
   calculateOwnApiPricing,
   filterModelCatalog,
   formatCatalogPrice,
+  groupModelCatalog,
   type ModelCatalogEntry,
   type CatalogFilters,
   type OfficialTokenPricing,
@@ -134,10 +146,11 @@ const filtersOpen = ref(false)
 const filters = reactive<CatalogFilters>({ query: '', provider: '', modelClass: '', endpoint: '', sort: 'featured' })
 const contextModes = reactive<Record<string, 'short' | 'long'>>({})
 
-const providers = computed(() => [...new Set(models.value.map((model) => model.provider))].sort())
+const providers = computed(() => groupModelCatalog(models.value).map((group) => group.provider))
 const modelClasses = computed(() => [...new Set(models.value.flatMap((model) => model.modelClass))].sort())
 const endpoints = computed(() => [...new Set(models.value.flatMap((model) => model.endpoints))].sort())
 const filteredModels = computed(() => filterModelCatalog(models.value, filters))
+const providerGroups = computed(() => groupModelCatalog(filteredModels.value))
 
 onMounted(async () => {
   try {
@@ -152,7 +165,11 @@ onMounted(async () => {
   }
 })
 
-function clearFilters() {
+function clearSearch() {
+  filters.query = ''
+}
+
+function resetFilters() {
   filters.query = ''
   filters.provider = ''
   filters.modelClass = ''
@@ -170,6 +187,14 @@ function setContextMode(model: ModelCatalogEntry, mode: 'short' | 'long') {
 
 function modelMotionDelay(index: number): string {
   return index < 6 ? `${index * 40}ms` : '0ms'
+}
+
+function modelMotionIndex(model: ModelCatalogEntry): number {
+  return filteredModels.value.findIndex((entry) => entry.platform === model.platform && entry.modelId === model.modelId)
+}
+
+function providerSlug(provider: string): string {
+  return provider.toLocaleLowerCase().replace(/[^a-z0-9]+/g, '-')
 }
 
 function pricingMetrics(model: ModelCatalogEntry) {
@@ -240,7 +265,8 @@ function formatFilterLabel(value: string): string {
 <style scoped>
 .models-page{min-height:100vh;background:#fafafa;color:#171717}.catalog-hero{display:flex;min-height:530px;flex-direction:column;align-items:center;justify-content:center;width:min(100% - 48px,1120px);margin:0 auto;padding:90px 0 64px;text-align:center}.eyebrow{margin-bottom:22px;color:#666;font-size:13px;font-weight:620}.catalog-hero h1{max-width:900px;margin:0;font-size:clamp(56px,7vw,98px);font-weight:520;letter-spacing:-.065em;line-height:.98}.catalog-hero>p{max-width:690px;margin:26px 0 0;color:#666;font-size:17px;line-height:1.65}.proof-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:36px}.proof-row span{border:1px solid #dedede;border-radius:999px;background:#fff;padding:7px 11px;color:#555;font-size:11px}.catalog-workspace{width:min(100% - 48px,1392px);margin:0 auto;padding-bottom:160px}.search-row{display:flex;gap:12px;margin-bottom:20px}.search-box{display:flex;min-height:54px;flex:1;align-items:center;gap:12px;border:1px solid #dcdcdc;border-radius:12px;background:#fff;padding:0 17px;color:#777}.search-box:focus-within{border-color:#999;box-shadow:0 0 0 3px rgba(0,0,0,.05)}.search-box input{width:100%;border:0;outline:0;background:transparent;font:inherit;font-size:15px}.filter-toggle{display:none;border:1px solid #dcdcdc;border-radius:10px;background:#fff;padding:0 16px;font:inherit}.catalog-notice{margin-bottom:20px;border:1px solid #e7dfc8;border-radius:10px;background:#fffdf5;padding:12px 15px;color:#725d27;font-size:12px}.catalog-grid{display:grid;grid-template-columns:230px minmax(0,1fr);gap:42px}.filter-rail{align-self:start;position:sticky;top:90px}.filter-heading{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid #dedede}.filter-heading strong{font-size:14px}.filter-heading button{border:0;background:transparent;color:#777;font:inherit;font-size:11px;cursor:pointer}.filter-rail fieldset{display:grid;gap:10px;margin:0;padding:24px 0;border:0;border-bottom:1px solid #dedede}.filter-rail legend{margin-bottom:14px;font-size:12px;font-weight:650}.filter-rail label{display:flex;align-items:center;gap:9px;color:#555;font-size:13px;cursor:pointer}.filter-rail input{accent-color:#171717}.results-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px}.results-toolbar h2{margin:0;font-size:21px;font-weight:590;letter-spacing:-.03em}.results-toolbar p{margin:7px 0 0;color:#777;font-size:12px}.results-toolbar label{display:flex;align-items:center;gap:10px;color:#666;font-size:12px}.results-toolbar select{min-height:38px;border:1px solid #ddd;border-radius:9px;background:#fff;padding:0 34px 0 11px;color:#222;font:inherit}.model-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.model-card{overflow:hidden;border:1px solid #dedede;border-radius:16px;background:#fff;color:inherit;text-decoration:none;transition:transform var(--motion-fast) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),box-shadow var(--motion-fast) var(--ease-standard)}.model-card.motion-list-enter-active,.model-card.motion-list-leave-active{transition:opacity var(--motion-base) var(--ease-standard),transform var(--motion-base) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),box-shadow var(--motion-fast) var(--ease-standard)}.model-card.motion-list-enter-active{transition-delay:var(--motion-delay,0ms)}.model-card:hover{transform:translateY(-2px);border-color:#bdbdbd;box-shadow:0 18px 40px rgba(0,0,0,.07)}.model-art{position:relative;aspect-ratio:16/9;overflow:hidden;background:#eee}.model-art>img{width:100%;height:100%;object-fit:cover;transition:transform var(--motion-base) var(--ease-standard)}.model-card:hover .model-art>img{transform:scale(1.02)}.model-art>span{position:absolute;top:14px;left:14px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(20,20,20,.72);padding:6px 9px;color:#fff;font-size:10px;backdrop-filter:blur(8px)}.model-card-body{padding:20px}.provider-line{display:flex;align-items:center;gap:8px;color:#555;font-size:11px}.provider-line img{width:18px;height:18px;object-fit:contain}.provider-line small{margin-left:auto;border-radius:999px;background:#f1f1f1;padding:4px 7px;color:#777}.model-card h3{margin:20px 0 7px;font-size:24px;font-weight:590;letter-spacing:-.045em}.model-card code{color:#777;font-size:11px}.model-card p{min-height:66px;margin:18px 0;color:#666;font-size:13px;line-height:1.65}.capability-row{display:flex;min-height:50px;align-content:flex-start;flex-wrap:wrap;gap:6px}.capability-row span{height:fit-content;border:1px solid #e5e5e5;border-radius:999px;padding:5px 8px;color:#555;font-size:10px}.model-card-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:20px;padding-top:17px;border-top:1px solid #ececec}.model-card-footer>span{max-width:145px;color:#666;font-size:11px;line-height:1.4}.model-card-footer strong{display:inline-flex;align-items:center;gap:6px;font-size:11px}.growth-card{display:flex;min-height:460px;flex-direction:column;justify-content:flex-end;border:1px dashed #cfcfcf;border-radius:16px;padding:26px;color:#666}.growth-card>span{margin-bottom:auto;font-size:44px;font-weight:200}.growth-card h3{margin:0 0 10px;color:#222;font-size:20px;font-weight:550}.growth-card p{margin:0;font-size:13px;line-height:1.65}.model-card-skeleton{min-height:450px;background:linear-gradient(100deg,#f2f2f2 30%,#fafafa 45%,#f2f2f2 60%);background-size:200% 100%;animation:shimmer 1.4s infinite}.empty-state{display:flex;min-height:420px;flex-direction:column;align-items:center;justify-content:center;border:1px dashed #d5d5d5;border-radius:16px;text-align:center}.empty-state h3{margin:0;font-size:24px}.empty-state p{margin:12px 0 24px;color:#777}.empty-state button{border:1px solid #222;border-radius:9px;background:#222;padding:10px 14px;color:#fff;font:inherit;cursor:pointer}@keyframes shimmer{to{background-position:-200% 0}}
 .model-card-link,.model-title-link,.model-card-footer{color:inherit;text-decoration:none}.model-card-link,.model-title-link{display:block}.model-title-link{width:fit-content}.model-card .alias-note{min-height:0;margin:12px 0 0;border-left:2px solid #d7d7d7;padding-left:10px;color:#666;font-size:11px;line-height:1.5}.pricing-card{display:grid;gap:12px;margin-top:18px;border-top:1px solid #ececec;padding-top:17px}.pricing-card-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}.pricing-card-heading>span{color:#222;font-size:12px;font-weight:650}.pricing-card-heading small,.pricing-checked{color:#777;font-size:10px}.pricing-badge{width:fit-content;border:1px solid #d7d7d7;border-radius:999px;background:#f7f7f7;padding:5px 8px;color:#333;font-size:10px;font-weight:650}.context-toggle{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:1px solid #dedede;border-radius:9px;background:#fafafa}.context-toggle button{min-height:30px;border:0;background:transparent;color:#666;font:inherit;font-size:11px;cursor:pointer}.context-toggle button.active{background:#171717;color:#fff}.price-lines{display:grid;gap:8px}.price-line{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.price-line>span{color:#555;font-size:11px}.price-line>div{display:grid;justify-items:end;gap:2px;text-align:right}.price-line small{color:#777;font-size:10px;line-height:1.3}.price-line s{color:#999;text-decoration-color:#999}.price-line strong{color:#111;font-size:15px;font-weight:650;line-height:1.1}.price-unit{color:#777;font-size:10px;font-weight:500;white-space:nowrap}.pricing-card-empty{color:#666;font-size:12px;line-height:1.5}.model-card-footer{align-items:center;justify-content:flex-end;margin-top:16px;padding-top:16px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.search-box input{min-width:0}.search-clear{flex:none;border:0;border-radius:7px;background:#f1f1f1;padding:7px 9px;color:#555;font:inherit;font-size:11px;cursor:pointer}.provider-section{padding:30px 0 46px;border-top:1px solid #ddd}.provider-section:first-of-type{padding-top:10px;border-top:0}.provider-section-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:20px}.provider-section-heading>div{display:flex;align-items:center;gap:11px}.provider-section-heading img{width:24px;height:24px;object-fit:contain}.provider-section-heading h2{margin:0;font-size:23px;font-weight:610;letter-spacing:-.035em}.provider-section-heading>span{color:#777;font-size:11px}.pricing-card-status{display:flex;min-height:72px;align-items:center;justify-content:center;border:1px solid #e2e2e2;border-radius:10px;background:#f7f7f7;padding:14px;color:#666;font-size:12px;font-weight:650;line-height:1.5}.pricing-card-free{border-color:#cfe4d6;background:#f3faf5;color:#287342}.catalog-results>.growth-card{min-height:240px}
 @media(max-width:1100px){.model-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.catalog-hero{min-height:460px;width:calc(100% - 32px);padding-top:64px}.catalog-hero h1{font-size:clamp(48px,14vw,68px)}.catalog-hero>p{font-size:15px}.catalog-workspace{width:calc(100% - 32px)}.filter-toggle{display:block}.catalog-grid{grid-template-columns:1fr;gap:24px}.filter-rail{display:none;position:static}.filter-rail-open{display:block}.results-toolbar{align-items:flex-start;flex-direction:column}.model-card-grid{grid-template-columns:1fr}.model-card p{min-height:0}.growth-card{min-height:320px}}
+@media(max-width:760px){.catalog-hero{min-height:460px;width:calc(100% - 32px);padding-top:64px}.catalog-hero h1{font-size:clamp(48px,14vw,68px)}.catalog-hero>p{font-size:15px}.catalog-workspace{width:calc(100% - 32px)}.filter-toggle{display:block}.catalog-grid{grid-template-columns:1fr;gap:24px}.filter-rail{display:none;position:static}.filter-rail-open{display:block}.results-toolbar{align-items:flex-start;flex-direction:column}.provider-section{padding:24px 0 36px}.provider-section-heading{margin-bottom:16px}.model-card-grid{grid-template-columns:1fr}.model-card p{min-height:0}.growth-card{min-height:320px}.search-clear{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 @media(prefers-reduced-motion:reduce){.model-card,.model-art>img,.model-card-skeleton{animation:none!important;transition:none!important}.model-card:hover,.model-card:hover .model-art>img{transform:none!important}}
 </style>
