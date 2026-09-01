@@ -22,6 +22,7 @@ Implement only Task 5 from `docs/superpowers/plans/2026-08-31-ownapi-public-user
 - Modify `frontend/src/views/public/ModelDetailView.vue`
 - Modify `frontend/src/views/public/DocsView.vue`
 - Modify `frontend/src/components/models/ModelCodeExamples.vue`
+- Modify `frontend/src/components/docs/DocsCodeExamples.vue`
 - Create `frontend/src/views/public/__tests__/PublicMotion.spec.ts`
 
 ## Constraints

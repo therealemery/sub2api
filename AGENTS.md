@@ -19,8 +19,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Canonical/main checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `bd19ddda`. This checkout does **not** contain the completed pricing/status feature yet. Its known untracked artifacts are `.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`; preserve and inspect them rather than cleaning blindly.
 - Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. Use this checkout for review or continuation of the pricing/status work; do not accidentally edit the parent checkout and assume the feature is present there.
-- Latest fully verified feature commit: `a861bdaf` (`fix: complete public pricing disclosures`). Latest committed handoff record before the current documentation correction: `b4009355` (`docs: record model pricing implementation`). The branch HEAD containing this paragraph is the authoritative documentation-fix revision.
-- The isolated worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed. The QA Vite server was stopped; do not assume port 3000 or 3001 is still serving this worktree.
+- Latest independently approved public-motion implementation/fix commit: `37967265` (`fix: complete docs motion behavior`); its review report checkpoint is `cd577adf`. Tasks 1–5 of the public/user motion plan are complete. Tasks 6–8 (authenticated user dashboard/interaction motion and final QA) remain.
+- The isolated worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed. A Vite preview from this worktree was verified at `http://127.0.0.1:3000` on 2026-09-01; confirm the current process before relying on it.
 - Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. Integrate/review `codex/model-pricing-motion` before attempting a feature deployment.
 
 ## Stable Checkpoints
@@ -48,6 +48,12 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `21b1b7f7` — public Status links removed while authenticated `/monitor` remains protected.
 - `a861bdaf` — final verified pricing sources/caveats and unsupported health-claim removal.
 - `b4009355` — durable Task 6 verification and handoff record.
+- `b03f7cde`, `b0ecf130`, and `4bbcfb1d` — accessible global motion tokens/primitives and Reduced Motion corrections.
+- `a6ed6622` — one-time IntersectionObserver reveal primitive with no-JS/reduced-motion fallbacks.
+- `741d9f59` and `a6d658e2` — public/user route transitions, mobile navigation motion, and query-only navigation remount protection.
+- `7ec99a26` and `d8ee4ba1` — restrained homepage motion and session-once Hero behavior.
+- `0792a4a8` and `37967265` — Models/Docs motion, real Docs copy feedback, and single moving Docs indicator.
+- `23eaca7a` and `ebda251f` — approved 46-model expansion design and implementation plan.
 
 ## Required Reading
 
@@ -57,6 +63,10 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Model pricing/status design: `docs/superpowers/specs/2026-08-31-ownapi-model-pricing-status-design.md`
 - Model pricing/status plan: `docs/superpowers/plans/2026-08-31-ownapi-model-pricing-status-plan.md`
 - Visual QA log: `design-qa.md`
+- Public/user motion design: `docs/superpowers/specs/2026-08-31-ownapi-public-user-motion-design.md`
+- Public/user motion plan: `docs/superpowers/plans/2026-08-31-ownapi-public-user-motion-plan.md`
+- 46-model expansion design: `docs/superpowers/specs/2026-08-31-ownapi-50-percent-model-expansion-design.md`
+- 46-model expansion plan: `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`
 
 ## Architecture Map
 
@@ -81,15 +91,17 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Nine family artwork files exist under `frontend/public/model-art/` and were visually inspected for crop safety and absence of text, trademarks, and watermarks.
 - Public `/models`, `/models/:modelId`, and `/docs` are implemented with the shared public-site shell, responsive layouts, localized content, functional filters/tabs/copy controls, and curated fallback behavior when live pricing is unavailable.
 - Browser QA passed at 1440 × 900 and 390 × 844. The login translation and GPT artwork-path findings discovered during QA were fixed in `a19d27cb`.
+- Public motion Tasks 1–5 are implemented and independently reviewed: route/mobile-menu transitions, a session-once homepage Hero, meaningful one-time section reveals, bounded model-list/card/tier motion, a moving Docs active indicator, and 1500ms stable-width copy feedback. Reduced Motion removes delays/transforms and keeps final content visible. No admin view was modified.
 
 ## Work in Progress
 
-The pricing/status implementation and local QA are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
+The pricing/status implementation and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, explicitly including `a861bdaf` (verified feature fixes), `b4009355` (Task 6 handoff), and `80f1fc7f` (checkout/branch recovery correction), then push the approved result to `main`. Do not stop at an earlier Task 6 commit, and do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
-2. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-3. Re-run the `Build and Deploy` workflow on the integrated `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
-4. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
+1. Execute Tasks 1–7 of `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`: expand the catalog from 16 to the exact 46 PackyAPI entries at 50% discount or better, preserve vendor-list-price × 0.7 pricing, group by provider, and add ranked normalized search.
+2. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
+3. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
+4. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
+5. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
 
 ## Local Validation
 
@@ -194,9 +206,20 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Exact implementation files across this pricing/status work: `frontend/src/data/modelCatalog.ts`, `frontend/src/data/__tests__/modelCatalog.spec.ts`, `frontend/src/views/public/ModelsCatalogView.vue`, `frontend/src/views/public/__tests__/ModelsCatalogView.spec.ts`, `frontend/src/views/public/ModelDetailView.vue`, `frontend/src/views/public/__tests__/ModelDetailView.spec.ts`, `frontend/src/components/public/PublicSiteHeader.vue`, `frontend/src/components/public/PublicSiteFooter.vue`, `frontend/src/components/public/__tests__/PublicNavigation.spec.ts`, `frontend/src/views/HomeView.vue`, `frontend/src/views/public/DocsView.vue`, `frontend/src/router/__tests__/guards.spec.ts`, and `frontend/src/i18n/locales/en.ts` / `zh.ts`.
 - Deployment remains blocked exactly as before: GitHub Actions can build the production image, but `SERVER_SSH_KEY` is rejected for `SERVER_USER`. Repair the secret or the server user’s `authorized_keys`, rerun `.github/workflows/deploy.yml` from `main`, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` on the confirmed production domain. No deployment was attempted from this branch.
 
+### 2026-09-01 — Public motion Tasks 1–5 approved
+
+- Motion foundations: CSS tokens/transitions, `useReducedMotion`, and `useInViewReveal` are accessible, progressively enhanced, and safe when `IntersectionObserver` is absent.
+- Public/user navigation: ordinary routes crossfade; every `/admin` path bypasses motion. Route keys use `route.path`, so query/hash-only changes do not remount Payment or other user pages. The mobile public menu uses a real Vue transition while preserving focus, keyboard activation, immediate navigation, and ARIA state.
+- Homepage: Hero layers enter at 0/60/120/180ms with the complete sequence under 600ms, only once per SPA session. Eight meaningful sections reveal once in view; provider/capability hover and native FAQ disclosure stay within approved transform/scale limits. Custom home HTML/URL overrides remain unchanged.
+- Models and Docs: model filtering uses bounded list motion with stable keys and delays only on the first six visible cards; card/tier feedback remains subtle. Docs uses one vertically moving active indicator and the real copy component uses a stable 82px label area, crossfade, exact 1500ms reset, and timer cleanup.
+- Independent review fixes are included in `a6d658e2`, `d8ee4ba1`, and `37967265`. Latest public-motion report checkpoint: `cd577adf`.
+- Verification: Task 3 related routing/navigation tests 55/55; Task 4 focused/related homepage tests 14/14; Task 5 focused/related public tests 19/19; focused ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed for each approved task. In-app browser checks on the live local worktree confirmed `/home`, `/models`, `/docs`, and the Docs 1500ms copy reset.
+- No administrator view changed. The pre-existing untracked `frontend/pnpm-workspace.yaml` remains untouched.
+- The exact 46-model, provider-grouped, ranked-search expansion is designed/planned but not yet implemented; continue from `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`.
+
 ## Recovery Checklist
 
-1. Read this file, the five required design/plan documents listed under Required Reading, and `design-qa.md`.
+1. Read this file, every document listed under Required Reading, and `design-qa.md`.
 2. Run `git status --short` and `git log -5 --oneline --decorate`.
 3. Do not clean or reset the worktree.
 4. Inspect the files relevant to the current task before editing.
