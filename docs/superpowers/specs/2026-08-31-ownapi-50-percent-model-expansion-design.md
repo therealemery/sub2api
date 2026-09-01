@@ -1,7 +1,7 @@
 # OwnAPI PackyAPI 50%-Or-Better Model Expansion Design
 
 **Date:** 2026-08-31  
-**Status:** Awaiting user review  
+**Status:** Approved
 **Related implementation:** `frontend/src/data/modelCatalog.ts`, public Models list/detail views  
 **Reference snapshot:** [PackyAPI pricing](https://www.packyapi.com/pricing), checked 2026-08-31
 
@@ -181,6 +181,23 @@ Every new seed receives a stable detail route. The detail page reuses the verifi
 
 Unknown metadata is omitted or labeled unpublished; it is never guessed from the model name.
 
+## Homepage Provider Strip
+
+After the 46-model catalog is complete, the homepage provider strip must consume the same catalog provider metadata instead of maintaining a separate hard-coded availability list. It displays exactly these eight supported families in catalog order:
+
+1. ChatGPT — OpenAI logo
+2. Claude — Anthropic logo
+3. Grok — xAI logo
+4. Gemini — Google logo
+5. Qwen — Alibaba/Qwen logo
+6. GLM — Zhipu AI logo
+7. Kimi — Moonshot AI logo
+8. MiniMax — MiniMax logo
+
+DeepSeek and Mistral are removed because they are not in the approved 46-model snapshot. Supported families never show “Soon” / “即将推出”. The strip uses real existing original-vendor logo assets and remains a single eight-cell row on wide desktop, a four-by-two grid at narrower desktop/tablet widths, and a horizontally scrollable row on mobile. Existing one-time reveal and restrained hover behavior remain unchanged.
+
+Provider presentation metadata has one source of truth in the catalog domain. The Models page uses formal provider names while the homepage may use the familiar family labels above; both views use the same provider keys, order, logo paths, and nonempty catalog membership. A provider appears on the homepage only when at least one catalog entry belongs to it.
+
 ## Motion Interaction
 
 This expansion consumes the separately approved public/user motion system. Provider sections may use the one-time reveal primitive, and model cards may use the bounded list transition and restrained hover already defined in that plan. Search, filters, clear, reset, tier switches, and navigation remain immediately interactive. Reduced Motion displays final content without displacement or stagger.
@@ -204,6 +221,7 @@ Automated coverage must prove:
 - search composes with every existing filter and handles empty/reset states;
 - vendor logos and family-art paths resolve to real files;
 - desktop and mobile layouts have no broken images or horizontal overflow.
+- the homepage provider strip contains exactly the eight nonempty catalog providers in catalog order, uses the expected family labels and real logos, contains no DeepSeek/Mistral or “Soon” badges, and stays synchronized with catalog membership.
 
 Run full frontend lint, typecheck, tests, and production build. Browser QA covers the 46-model catalog, every provider section, representative paid/free/unpublished detail pages, search/filter composition, mobile layout, normal motion, and Reduced Motion.
 

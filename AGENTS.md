@@ -97,7 +97,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Execute Tasks 1–7 of `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`: expand the catalog from 16 to the exact 46 PackyAPI entries at 50% discount or better, preserve vendor-list-price × 0.7 pricing, group by provider, and add ranked normalized search.
+1. Execute Tasks 1–8 of `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`: expand the catalog from 16 to the exact 46 PackyAPI entries at 50% discount or better, preserve vendor-list-price × 0.7 pricing, group by provider, add ranked normalized search, then synchronize the homepage provider strip from the same catalog data.
 2. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
 3. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
 4. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
@@ -215,7 +215,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Independent review fixes are included in `a6d658e2`, `d8ee4ba1`, and `37967265`. Latest public-motion report checkpoint: `cd577adf`.
 - Verification: Task 3 related routing/navigation tests 55/55; Task 4 focused/related homepage tests 14/14; Task 5 focused/related public tests 19/19; focused ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed for each approved task. In-app browser checks on the live local worktree confirmed `/home`, `/models`, `/docs`, and the Docs 1500ms copy reset.
 - No administrator view changed. The pre-existing untracked `frontend/pnpm-workspace.yaml` remains untouched.
-- The exact 46-model, provider-grouped, ranked-search expansion is designed/planned but not yet implemented; continue from `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`.
+- The exact 46-model, provider-grouped, ranked-search expansion is designed/planned but not yet implemented; continue from `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`. Approved follow-up Task 7 replaces the homepage's hard-coded ChatGPT/Claude/Gemini/DeepSeek/Qwen/Mistral strip with the eight nonempty catalog families: ChatGPT, Claude, Grok, Gemini, Qwen, GLM, Kimi, and MiniMax, using real vendor marks and no “Soon” badges.
 
 ## Recovery Checklist
 

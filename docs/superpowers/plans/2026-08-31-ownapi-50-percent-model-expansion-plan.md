@@ -464,13 +464,57 @@ git add frontend/src/views/public/ModelDetailView.vue frontend/src/views/public/
 git commit -m "feat: disclose expanded model pricing tiers"
 ```
 
-### Task 7: Full Verification And Durable Handoff
+### Task 7: Synchronize The Homepage Provider Strip
+
+**Files:**
+- Modify: `frontend/src/data/modelCatalog.ts`
+- Modify: `frontend/src/data/__tests__/modelCatalog.spec.ts`
+- Modify: `frontend/src/views/HomeView.vue`
+- Modify: `frontend/src/views/__tests__/HomeView.motion.spec.ts`
+- Modify: `frontend/src/i18n/locales/en.ts`
+- Modify: `frontend/src/i18n/locales/zh.ts`
+
+**Interfaces:**
+- Consumes: complete 46-model catalog, `CATALOG_PROVIDER_ORDER`, provider logos, and approved homepage motion.
+- Produces: `getCatalogProviderSummaries(entries?)` and a homepage strip derived from nonempty catalog providers.
+
+- [ ] **Step 1: Write failing catalog-summary tests**
+
+Assert that `getCatalogProviderSummaries()` returns exactly eight entries in provider order, with counts `9/9/2/7/11/3/2/3`, real logo paths, and homepage labels `ChatGPT`, `Claude`, `Grok`, `Gemini`, `Qwen`, `GLM`, `Kimi`, and `MiniMax`. Pass a catalog subset and assert providers with zero entries are omitted.
+
+- [ ] **Step 2: Write failing homepage tests**
+
+Mount the default homepage and assert the strip contains the eight approved labels and logo assets, contains no `DeepSeek`, `Mistral`, “Soon”, or “即将推出”, and retains the existing reveal/hover hooks. Confirm configured custom HTML/URL home content does not render the strip.
+
+- [ ] **Step 3: Implement one provider-presentation source**
+
+Add formal provider name, homepage family label, and real logo path to the catalog provider metadata. `getCatalogProviderSummaries(entries = modelCatalog)` filters to nonempty providers and returns model counts without importing Vue, i18n, router, or API code. Do not duplicate provider availability in `HomeView.vue`.
+
+- [ ] **Step 4: Replace the hard-coded homepage list**
+
+Render the summary output in `HomeView.vue`. Remove DeepSeek/Mistral and every `upcoming`/Soon branch. Use an eight-column wide-desktop grid, four-by-two tablet grid, and the current overflow-safe horizontal row on mobile. Preserve the approved one-time section reveal, maximum 3px hover lift, maximum 1.04 logo scale, and Reduced Motion behavior.
+
+- [ ] **Step 5: Run checks and commit**
+
+```bash
+cd frontend
+node node_modules/vitest/vitest.mjs run src/data/__tests__/modelCatalog.spec.ts src/views/__tests__/HomeView.motion.spec.ts src/i18n/__tests__/homeLocales.spec.ts
+node_modules/.bin/vue-tsc --noEmit
+node_modules/.bin/eslint src/data/modelCatalog.ts src/data/__tests__/modelCatalog.spec.ts src/views/HomeView.vue src/views/__tests__/HomeView.motion.spec.ts src/i18n/locales/en.ts src/i18n/locales/zh.ts
+```
+
+```bash
+git add frontend/src/data/modelCatalog.ts frontend/src/data/__tests__/modelCatalog.spec.ts frontend/src/views/HomeView.vue frontend/src/views/__tests__/HomeView.motion.spec.ts frontend/src/i18n/locales/en.ts frontend/src/i18n/locales/zh.ts
+git commit -m "feat: sync homepage providers with model catalog"
+```
+
+### Task 8: Full Verification And Durable Handoff
 
 **Files:**
 - Modify: `AGENTS.md`
 
 **Interfaces:**
-- Consumes: all prior tasks and the approved motion system state.
+- Consumes: all prior tasks, the synchronized homepage provider strip, and the approved motion system state.
 - Produces: verified 46-model catalog and accurate recovery/integration notes.
 
 - [ ] **Step 1: Run the full frontend gate with reliable local binaries**
@@ -492,7 +536,7 @@ Verify exactly 46 unique IDs, provider counts `9/9/2/7/11/3/2/3`, every discount
 
 - [ ] **Step 3: Browser QA desktop and mobile**
 
-At 1440×900 and 390×844, verify all eight provider sections, `gpt 5.4 mini`, `google flash`, and `qwen coder` searches, every filter combination, clear versus reset, price sorting inside providers, free/unpublished cards, representative detail tiers, images, overflow, and public motion. Repeat core Models interactions with `prefers-reduced-motion: reduce`.
+At 1440×900 and 390×844, verify all eight provider sections, `gpt 5.4 mini`, `google flash`, and `qwen coder` searches, every filter combination, clear versus reset, price sorting inside providers, free/unpublished cards, representative detail tiers, images, overflow, and public motion. Verify the homepage strip shows the same eight nonempty providers, the approved family labels and logos, no DeepSeek/Mistral/Soon state, and correct 8-column/4-by-2/mobile-scroll layouts. Repeat core Home/Models interactions with `prefers-reduced-motion: reduce`.
 
 - [ ] **Step 4: Verify exclusions**
 
