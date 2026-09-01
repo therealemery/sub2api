@@ -42,3 +42,5 @@ Spec: `docs/superpowers/specs/2026-08-31-ownapi-public-user-motion-design.md`
 - Task 3: complete (implementation `741d9f59`, fix `a6d658e2`; independent re-review clean; 4 related files / 55 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
 - Task 4: review round 1 found the homepage Hero replayed after route return; fixed with session-local one-time state and remount coverage in `d8ee4ba1`.
 - Task 4: complete (implementation `7ec99a26`, fix `d8ee4ba1`; independent re-review clean; focused + related 14/14 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
+- Task 5: review round 1 found the real Docs copy component was outside the original file list and the active indicator faded separate pseudo-elements instead of moving one indicator; both findings were fixed in `37967265` with real-component coverage.
+- Task 5: complete (implementation `0792a4a8`, fix `37967265`; independent re-review clean; 4 related files / 19 tests, ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed; no deferred findings).
