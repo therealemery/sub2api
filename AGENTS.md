@@ -257,7 +257,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Updated customer previews, order/payment amount formatting, administrator wording, payment documentation, and focused backend/frontend conversion tests.
 - Local validation passed: focused payment tests (10/10), ESLint, `vue-tsc --noEmit`, the full frontend suite (108 files / 653 tests), production Vite build (864 modules), and `git diff --check`. Existing non-fatal test stderr, stale Browserslist, mixed-import, and large-chunk warnings remain.
 - Browser verification confirmed unauthenticated `/purchase` redirects to `/login?redirect=/purchase`. The frontend-only server had no backend session or payment configuration, so no real or mocked provider order was submitted; CNY/USD previews remain covered by focused tests.
-- This host has no Go toolchain or active Docker daemon. GitHub CI must provide Go formatting/lint, unit, and integration verification after the implementation commit. The unrelated `frontend/pnpm-workspace.yaml` remains untouched.
+- This host has no Go toolchain or active Docker daemon. GitHub CI run `33502901887` passed Go lint, Go unit tests, Go integration tests, and the frontend job for implementation commit `a6c51542` after retrying one external golangci-lint JSON Schema timeout. The unrelated `frontend/pnpm-workspace.yaml` remains untouched.
 
 ## Recovery Checklist
 
