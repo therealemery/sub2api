@@ -18,11 +18,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Canonical/main checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `bd19ddda`. This checkout does **not** contain the completed pricing/status feature yet. Its known untracked artifacts are `.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`; preserve and inspect them rather than cleaning blindly.
-- Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. Use this checkout for review or continuation of the pricing/status work; do not accidentally edit the parent checkout and assume the feature is present there.
+- Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. The branch is published as `origin/codex/model-pricing-motion`; use this checkout for review or continuation of the pricing/status work and do not accidentally edit the parent checkout and assume the feature is present there.
 - Latest committed catalog checkpoint: `1ab80f67` (`fix: remove loss-making catalog models`). The provider-grouped model expansion Tasks 1–7 and public/user motion Tasks 1–5 are complete. Motion Tasks 6–8 and final integrated QA remain.
 - The catalog now intentionally contains 44 models: loss-making `glm-5.3-flash` and `MiniMax-M3` were removed from the public seed on 2026-09-01 after comparing current manufacturer pricing with PackyAPI costs. The worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed.
 - A Vite preview from this worktree was verified at `http://127.0.0.1:3000` on 2026-09-01; confirm the current process before relying on it.
-- Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. Integrate/review `codex/model-pricing-motion` before attempting a feature deployment.
+- Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. The complete committed feature history through the payment conversion implementation plan is available on `origin/codex/model-pricing-motion`. Integrate/review that branch before attempting a `main` deployment.
 
 ## Stable Checkpoints
 
@@ -240,6 +240,15 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The selected design calculates credited USD only after selecting the concrete payment instance currency, applies `BALANCE_RECHARGE_MULTIPLIER` after conversion, excludes fees from credited balance, and rejects non-CNY/USD balance recharge instances.
 - Existing subscription behavior, gateway-currency webhook validation, and proportional/full refund behavior remain unchanged.
 - The written specification was approved and the implementation plan was recorded; implementation starts with backend conversion tests.
+
+### 2026-09-01 — Feature branch published for deployment preparation
+
+- Removed the uncommitted, partially implemented payment-conversion code before publishing; the approved design and implementation plan remain committed, but the exchange-rate behavior is not yet implemented and must not be described as production-ready.
+- Published the complete committed pricing, 44-model catalog, public motion Tasks 1–5, PackyAPI design, and payment conversion design/plan history to `origin/codex/model-pricing-motion`.
+- Full frontend validation passed immediately before publication: ESLint, `vue-tsc --noEmit`, 103 Vitest files / 608 tests, `vue-tsc -b`, and the Vite production build. Existing non-fatal router-link test-stub, stale Browserslist data, mixed-import, and large-chunk warnings remain.
+- GitHub Actions CI run `33489605102` started for the published branch. Record its final status before merging.
+- Do not deploy this branch as if the CNY/USD recharge conversion were complete. Merge the reviewed completed feature subset or finish and verify payment conversion first.
+- Production deployment remains blocked by the rejected `SERVER_SSH_KEY` for `SERVER_USER`; pushing source does not repair server authentication.
 
 ## Recovery Checklist
 
