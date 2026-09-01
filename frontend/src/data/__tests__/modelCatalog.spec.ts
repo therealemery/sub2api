@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
 import {
+  CATALOG_PROVIDER_ORDER,
   activeOfficialTier,
   buildModelCatalog,
   calculateOwnApiPricing,
   filterModelCatalog,
   formatCatalogPrice,
   findCatalogModel,
+  groupModelCatalog,
+  normalizeCatalogSearch,
   relatedCatalogModels,
+  scoreCatalogMatch,
   verifiedCatalogSeeds,
   verifiedModelSeedData,
 } from '../modelCatalog'
@@ -331,7 +335,54 @@ describe('modelCatalog', () => {
     expect(result.every((item) => item.endpoints.includes('anthropic'))).toBe(true)
   })
 
-  it('sorts by lowest OwnAPI input price with missing values last', () => {
+  it('normalizes separators and applies multi-token AND search semantics', () => {
+    const catalog = buildModelCatalog(emptyConfig)
+
+    expect(normalizeCatalogSearch('  GPT_5.4/Mini  ')).toBe('gpt 5 4 mini')
+    expect(filterModelCatalog(catalog, { query: 'gpt 5.4 mini' }).map((model) => model.modelId)).toContain('gpt-5.4-mini')
+    expect(filterModelCatalog(catalog, { query: 'google flash' }).every((model) => model.provider === 'Google')).toBe(true)
+    expect(filterModelCatalog(catalog, { query: '谷歌 flash' }).every((model) => model.provider === 'Google')).toBe(true)
+    expect(filterModelCatalog(catalog, { query: 'qwen coder' })[0]?.modelId).toBe('qwen3-coder-next')
+    expect(filterModelCatalog(catalog, { query: 'qwen nonexistent' })).toEqual([])
+  })
+
+  it('ranks exact, prefix, token-boundary, then substring matches', () => {
+    const base = buildModelCatalog(emptyConfig).find((model) => model.provider === 'OpenAI')!
+    const fixture = [
+      { ...base, modelId: 'substring', displayName: 'Superalpha Model', searchAliases: [] },
+      { ...base, modelId: 'boundary', displayName: 'Model Alpha Plus', searchAliases: [] },
+      { ...base, modelId: 'prefix', displayName: 'Alpha Preview', searchAliases: [] },
+      { ...base, modelId: 'exact', displayName: 'Exact Model', searchAliases: ['alpha'] },
+    ]
+
+    expect(fixture.map((entry) => scoreCatalogMatch(entry, 'alpha'))).toEqual([100, 200, 300, 400])
+    expect(filterModelCatalog(fixture, { query: 'alpha', sort: 'name' }).map((entry) => entry.modelId)).toEqual([
+      'exact', 'prefix', 'boundary', 'substring',
+    ])
+  })
+
+  it('keeps providers grouped in the approved order for every sort', () => {
+    const catalog = buildModelCatalog(emptyConfig)
+
+    expect(groupModelCatalog(filterModelCatalog(catalog, {})).map((group) => group.provider)).toEqual(CATALOG_PROVIDER_ORDER)
+    for (const sort of ['featured', 'name', 'input-price', 'output-price'] as const) {
+      expect(groupModelCatalog(filterModelCatalog(catalog, { sort })).map((group) => group.provider)).toEqual(CATALOG_PROVIDER_ORDER)
+    }
+  })
+
+  it('places backend-only providers alphabetically after known providers', () => {
+    const catalog = buildModelCatalog({
+      ...emptyConfig,
+      pricing_models: [
+        { model: 'zeta-model', platform: 'zeta', billing_mode: 'token', input_price: 1, output_price: 2, cache_write_price: null, cache_read_price: null, image_output_price: null, per_request_price: null, sort_order: 1 },
+        { model: 'alpha-model', platform: 'alpha', billing_mode: 'token', input_price: 1, output_price: 2, cache_write_price: null, cache_read_price: null, image_output_price: null, per_request_price: null, sort_order: 1 },
+      ],
+    })
+
+    expect(groupModelCatalog(filterModelCatalog(catalog, {})).map((group) => group.provider).slice(-2)).toEqual(['Alpha', 'Zeta'])
+  })
+
+  it('sorts by lowest OwnAPI input price inside each provider with missing values last', () => {
     const entries = buildModelCatalog(emptyConfig).map((item) => item.modelId === 'gpt-5.4'
       ? {
           ...item,
@@ -350,11 +401,15 @@ describe('modelCatalog', () => {
       sort: 'input-price',
     })
 
-    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['omni-moderation-latest', 'qwen3-vl-flash'])
-    expect(result.at(-1)?.pricingSource?.official.input ?? null).toBeNull()
+    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['omni-moderation-latest', 'gpt-5.6-luna'])
+    for (const group of groupModelCatalog(result)) {
+      const values = group.entries.map((entry) => entry.pricingSource?.official.input ?? null)
+      const firstMissing = values.indexOf(null)
+      if (firstMissing !== -1) expect(values.slice(firstMissing).every((value) => value == null)).toBe(true)
+    }
   })
 
-  it('sorts by lowest OwnAPI output price with missing values last', () => {
+  it('sorts by lowest OwnAPI output price inside each provider with missing values last', () => {
     const entries = buildModelCatalog(emptyConfig).map((item, index) => ({
       ...item,
       pricingSource: index === 0 ? null : item.pricingSource,
@@ -370,11 +425,15 @@ describe('modelCatalog', () => {
 
     expect(result.slice(0, 4).map((item) => item.modelId)).toEqual([
       'omni-moderation-latest',
-      'qwen3-vl-flash',
-      'qwen3.5-flash',
-      'qwen3.8-flash',
+      'gpt-5.6-luna',
+      'gpt-5.4-mini',
+      'gpt-5.6-terra',
     ])
-    expect(result.at(-1)?.pricingSource?.official.output ?? null).toBeNull()
+    for (const group of groupModelCatalog(result)) {
+      const values = group.entries.map((entry) => entry.pricingSource?.official.output ?? null)
+      const firstMissing = values.indexOf(null)
+      if (firstMissing !== -1) expect(values.slice(firstMissing).every((value) => value == null)).toBe(true)
+    }
   })
 
   it('resolves a model by a stable URL-safe slug and finds related entries', () => {

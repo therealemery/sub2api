@@ -24,6 +24,34 @@ export type {
 export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'ownapi'
 export type ModelCatalogSort = 'featured' | 'name' | 'input-price' | 'output-price'
 
+export const CATALOG_PROVIDER_ORDER = [
+  'OpenAI',
+  'Anthropic',
+  'xAI',
+  'Google',
+  'Qwen',
+  'Z.AI',
+  'Moonshot',
+  'MiniMax',
+] as const
+
+export interface ModelProviderGroup {
+  provider: string
+  providerLogo: string
+  entries: ModelCatalogEntry[]
+}
+
+const providerSearchAliases: Record<string, string[]> = {
+  OpenAI: ['open ai', '开放人工智能'],
+  Anthropic: ['claude', '克劳德'],
+  xAI: ['x ai', 'grok'],
+  Google: ['google', '谷歌'],
+  Qwen: ['qwen', '通义千问', '千问', 'alibaba', '阿里云'],
+  'Z.AI': ['z ai', 'zhipu', '智谱', 'glm'],
+  Moonshot: ['moonshot', '月之暗面', 'kimi'],
+  MiniMax: ['minimax', '稀宇科技'],
+}
+
 export function calculateOwnApiPricing(
   pricing: OfficialTokenPricing,
   multiplier = 0.7,
@@ -180,32 +208,77 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
 }
 
 export function filterModelCatalog(entries: ModelCatalogEntry[], filters: Partial<CatalogFilters>): ModelCatalogEntry[] {
-  const query = normalize(filters.query ?? '')
+  const query = normalizeCatalogSearch(filters.query ?? '')
   const provider = filters.provider ?? ''
   const modelClass = filters.modelClass ?? ''
   const endpoint = filters.endpoint ?? ''
   const sort = filters.sort ?? 'featured'
   const result = entries.filter((entry) => {
-    const queryTarget = normalize([
-      entry.modelId,
-      entry.displayName,
-      entry.provider,
-      ...entry.capabilities,
-      ...entry.modelClass,
-      ...entry.endpoints,
-    ].join(' '))
-    return (!query || queryTarget.includes(query))
+    return (!query || scoreCatalogMatch(entry, query) > 0)
       && (!provider || entry.provider === provider)
       && (!modelClass || entry.modelClass.includes(modelClass))
       && (!endpoint || entry.endpoints.includes(endpoint))
   })
 
   return [...result].sort((a, b) => {
-    if (sort === 'name') return a.displayName.localeCompare(b.displayName)
-    if (sort === 'input-price') return compareNullablePrice(ownApiSortPrice(a, 'input'), ownApiSortPrice(b, 'input'))
-    if (sort === 'output-price') return compareNullablePrice(ownApiSortPrice(a, 'output'), ownApiSortPrice(b, 'output'))
-    return compareFeatured(a, b)
+    const providerOrder = compareProviders(a.provider, b.provider)
+    if (providerOrder !== 0) return providerOrder
+    if (query) {
+      const relevance = scoreCatalogMatch(b, query) - scoreCatalogMatch(a, query)
+      if (relevance !== 0) return relevance
+    }
+    return compareCatalogSort(a, b, sort)
   })
+}
+
+export function normalizeCatalogSearch(value: string): string {
+  return value
+    .trim()
+    .toLocaleLowerCase()
+    .replace(/[\s._/\-]+/g, ' ')
+    .trim()
+}
+
+export function scoreCatalogMatch(entry: ModelCatalogEntry, query: string): number {
+  const tokens = normalizeCatalogSearch(query).split(' ').filter(Boolean)
+  if (tokens.length === 0) return 0
+  const fields = [
+    entry.modelId,
+    entry.displayName,
+    entry.provider,
+    ...entry.searchAliases,
+    ...entry.capabilities,
+    ...entry.modelClass,
+    ...entry.endpoints,
+  ].map(normalizeCatalogSearch).filter(Boolean)
+
+  let total = 0
+  for (const token of tokens) {
+    let best = 0
+    for (const field of fields) {
+      if (field === token) best = Math.max(best, 400)
+      else if (field.startsWith(`${token} `)) best = Math.max(best, 300)
+      else if (field.split(' ').includes(token)) best = Math.max(best, 200)
+      else if (field.includes(token)) best = Math.max(best, 100)
+    }
+    if (best === 0) return 0
+    total += best
+  }
+  return total
+}
+
+export function groupModelCatalog(entries: ModelCatalogEntry[]): ModelProviderGroup[] {
+  const groups = new Map<string, ModelProviderGroup>()
+  for (const entry of entries) {
+    const existing = groups.get(entry.provider)
+    if (existing) existing.entries.push(entry)
+    else groups.set(entry.provider, {
+      provider: entry.provider,
+      providerLogo: entry.providerLogo,
+      entries: [entry],
+    })
+  }
+  return [...groups.values()].sort((a, b) => compareProviders(a.provider, b.provider))
 }
 
 export function findCatalogModel(entries: ModelCatalogEntry[], slug: string): ModelCatalogEntry | undefined {
@@ -279,7 +352,7 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
       checkedAt: '2026-08-31',
       sourceUrl: 'https://www.packyapi.com/pricing',
     },
-    searchAliases: raw.searchAliases ?? [],
+    searchAliases: [...(providerSearchAliases[metadata.provider] ?? []), ...(raw.searchAliases ?? [])],
     modelClass: raw.modelClass,
     endpoints: raw.endpoints,
     isAlias: raw.isAlias ?? false,
@@ -369,6 +442,28 @@ function compareFeatured(a: ModelCatalogEntry, b: ModelCatalogEntry): number {
   if (a.featured !== b.featured) return a.featured ? -1 : 1
   if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder
   return a.displayName.localeCompare(b.displayName)
+}
+
+function compareCatalogSort(a: ModelCatalogEntry, b: ModelCatalogEntry, sort: ModelCatalogSort): number {
+  if (sort === 'name') return a.displayName.localeCompare(b.displayName)
+  if (sort === 'input-price') {
+    return compareNullablePrice(ownApiSortPrice(a, 'input'), ownApiSortPrice(b, 'input'))
+      || a.displayName.localeCompare(b.displayName)
+  }
+  if (sort === 'output-price') {
+    return compareNullablePrice(ownApiSortPrice(a, 'output'), ownApiSortPrice(b, 'output'))
+      || a.displayName.localeCompare(b.displayName)
+  }
+  return compareFeatured(a, b)
+}
+
+function compareProviders(a: string, b: string): number {
+  const aIndex = CATALOG_PROVIDER_ORDER.indexOf(a as typeof CATALOG_PROVIDER_ORDER[number])
+  const bIndex = CATALOG_PROVIDER_ORDER.indexOf(b as typeof CATALOG_PROVIDER_ORDER[number])
+  if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+  if (aIndex !== -1) return -1
+  if (bIndex !== -1) return 1
+  return a.localeCompare(b)
 }
 
 function compareNullablePrice(a: number | null | undefined, b: number | null | undefined): number {
