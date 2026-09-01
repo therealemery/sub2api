@@ -5,9 +5,13 @@
         <span>{{ t('publicModels.buildTitle') }}</span>
         <p>{{ t('publicModels.buildDescription') }}</p>
       </div>
-      <button type="button" @click="copyCode">
-        <Icon :name="copied ? 'check' : 'copy'" size="sm" />
-        {{ copied ? t('publicModels.code.copied') : t('publicModels.code.copy') }}
+      <button type="button" class="copy-feedback-button" aria-live="polite" @click="copyCode">
+        <Transition name="motion-fade" mode="out-in">
+          <span :key="copied ? 'copied' : 'copy'" class="copy-feedback">
+            <Icon :name="copied ? 'check' : 'copy'" size="sm" />
+            {{ copied ? t('publicModels.code.copied') : t('publicModels.code.copy') }}
+          </span>
+        </Transition>
       </button>
     </div>
 
@@ -35,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
 
@@ -43,6 +47,7 @@ const props = defineProps<{ modelId: string }>()
 const { t } = useI18n()
 const activeTab = ref<'python' | 'typescript' | 'curl'>('python')
 const copied = ref(false)
+let copyResetTimer: number | undefined
 const headingId = `model-code-${Math.random().toString(36).slice(2, 9)}`
 const baseUrl = computed(() => `${window.location.origin}/v1`)
 
@@ -63,11 +68,14 @@ const activeCode = computed(() => examples.value[activeTab.value])
 async function copyCode() {
   await navigator.clipboard.writeText(activeCode.value)
   copied.value = true
-  window.setTimeout(() => { copied.value = false }, 1600)
+  window.clearTimeout(copyResetTimer)
+  copyResetTimer = window.setTimeout(() => { copied.value = false }, 1500)
 }
+
+onBeforeUnmount(() => window.clearTimeout(copyResetTimer))
 </script>
 
 <style scoped>
-.model-code{overflow:hidden;border:1px solid #2f2f2f;border-radius:16px;background:#0c0c0c;color:#ededed}.model-code-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:24px 26px;border-bottom:1px solid #2f2f2f}.model-code-heading>div{display:grid;gap:6px}.model-code-heading span{font-size:15px;font-weight:620}.model-code-heading p{margin:0;color:#929292;font-size:13px}.model-code-heading button{display:inline-flex;align-items:center;gap:8px;border:1px solid #383838;border-radius:8px;background:#181818;padding:8px 11px;color:#ddd;font-size:12px;cursor:pointer}.code-tabs{display:flex;gap:4px;padding:12px 18px 0}.code-tabs button{border:0;border-radius:7px;background:transparent;padding:8px 10px;color:#818181;font:inherit;font-size:12px;cursor:pointer}.code-tabs button[aria-selected="true"]{background:#242424;color:#fff}.model-code pre{min-height:260px;margin:0;overflow:auto;padding:24px 26px 30px}.model-code code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.75;white-space:pre}
+.model-code{overflow:hidden;border:1px solid #2f2f2f;border-radius:16px;background:#0c0c0c;color:#ededed}.model-code-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:24px 26px;border-bottom:1px solid #2f2f2f}.model-code-heading>div{display:grid;gap:6px}.model-code-heading span{font-size:15px;font-weight:620}.model-code-heading p{margin:0;color:#929292;font-size:13px}.model-code-heading button{display:inline-flex;min-inline-size:88px;align-items:center;justify-content:center;border:1px solid #383838;border-radius:8px;background:#181818;padding:8px 11px;color:#ddd;font-size:12px;cursor:pointer}.copy-feedback{display:inline-flex;align-items:center;gap:8px}.code-tabs{display:flex;gap:4px;padding:12px 18px 0}.code-tabs button{border:0;border-radius:7px;background:transparent;padding:8px 10px;color:#818181;font:inherit;font-size:12px;cursor:pointer}.code-tabs button[aria-selected="true"]{background:#242424;color:#fff}.model-code pre{min-height:260px;margin:0;overflow:auto;padding:24px 26px 30px}.model-code code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.75;white-space:pre}
 @media(max-width:640px){.model-code-heading{align-items:stretch;flex-direction:column}.model-code-heading button{width:fit-content}.model-code pre{padding:20px;font-size:11px}}
 </style>
