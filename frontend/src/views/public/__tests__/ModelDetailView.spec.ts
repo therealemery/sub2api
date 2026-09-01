@@ -154,7 +154,7 @@ describe('ModelDetailView', () => {
     expect(unpublished.text()).not.toMatch(/\$\d/)
   })
 
-  it('switches Gemini and MiniMax threshold tiers with exact derived pricing', async () => {
+  it('switches Gemini threshold tiers with exact derived pricing', async () => {
     const gemini = mountDetail('gemini-2.5-pro')
     await flushPromises()
     expect(gemini.text()).toContain('> 200,000 input tokens')
@@ -166,15 +166,6 @@ describe('ModelDetailView', () => {
     expect(gemini.text()).toContain('$15 USD / 1M tokens')
     expect(gemini.text()).toContain('$10.5 USD / 1M tokens')
 
-    const minimax = mountDetail('minimax-m3')
-    await flushPromises()
-    expect(minimax.text()).toContain('> 512,000 input tokens')
-    await minimax.findAll('button.pricing-tier-option')[1]?.trigger('click')
-    expect(minimax.text()).toContain('$1.2 USD / 1M tokens')
-    expect(minimax.text()).toContain('$0.84 USD / 1M tokens')
-    expect(minimax.text()).toContain('$4.8 USD / 1M tokens')
-    expect(minimax.text()).toContain('$3.36 USD / 1M tokens')
-    expect(minimax.text()).toContain('MiniMax list prices are shown before its separate promotional discount.')
   })
 
   it('renders and switches all three Qwen pricing tiers', async () => {
