@@ -19,8 +19,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Canonical/main checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `bd19ddda`. This checkout does **not** contain the completed pricing/status feature yet. Its known untracked artifacts are `.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`; preserve and inspect them rather than cleaning blindly.
 - Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. Use this checkout for review or continuation of the pricing/status work; do not accidentally edit the parent checkout and assume the feature is present there.
-- Latest independently approved public-motion implementation/fix commit: `37967265` (`fix: complete docs motion behavior`); its review report checkpoint is `cd577adf`. Tasks 1–5 of the public/user motion plan are complete. Tasks 6–8 (authenticated user dashboard/interaction motion and final QA) remain.
-- The isolated worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed. A Vite preview from this worktree was verified at `http://127.0.0.1:3000` on 2026-09-01; confirm the current process before relying on it.
+- Latest committed catalog checkpoint: `1ab80f67` (`fix: remove loss-making catalog models`). The provider-grouped model expansion Tasks 1–7 and public/user motion Tasks 1–5 are complete. Motion Tasks 6–8 and final integrated QA remain.
+- The catalog now intentionally contains 44 models: loss-making `glm-5.3-flash` and `MiniMax-M3` were removed from the public seed on 2026-09-01 after comparing current manufacturer pricing with PackyAPI costs. The worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed.
+- A Vite preview from this worktree was verified at `http://127.0.0.1:3000` on 2026-09-01; confirm the current process before relying on it.
 - Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. Integrate/review `codex/model-pricing-motion` before attempting a feature deployment.
 
 ## Stable Checkpoints
@@ -54,6 +55,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `7ec99a26` and `d8ee4ba1` — restrained homepage motion and session-once Hero behavior.
 - `0792a4a8` and `37967265` — Models/Docs motion, real Docs copy feedback, and single moving Docs indicator.
 - `23eaca7a` and `ebda251f` — approved 46-model expansion design and implementation plan.
+- `0db8fcbf` — public pricing disclosure for free, unpublished, tiered, and generic prices.
+- `61119191` — homepage provider strip synchronized with the expanded catalog.
+- `1ab80f67` — loss-making GLM 5.3 Flash and MiniMax M3 entries removed from the public catalog.
 
 ## Required Reading
 
@@ -95,13 +99,14 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The pricing/status implementation and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
+The pricing/status implementation, 44-model catalog expansion, and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
 
-1. Execute Tasks 1–8 of `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`: expand the catalog from 16 to the exact 46 PackyAPI entries at 50% discount or better, preserve vendor-list-price × 0.7 pricing, group by provider, add ranked normalized search, then synchronize the homepage provider strip from the same catalog data.
-2. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
-3. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
-4. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-5. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
+1. Finish the PackyAPI integration design: OwnAPI customer balances and deductions remain USD; recharge uses `6.7 CNY = 1 USD`; customer model prices use current manufacturer price × 0.7; Packy balances remain an upstream CNY cost only. Do not store the Packy API key in Git or frontend code.
+2. Implement the approved PackyAPI upstream account/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting after the design is fully approved. The currently selected Packy token groups cover only part of the 44-model catalog and require expansion or catalog reduction before launch.
+3. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
+4. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
+5. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
+6. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
 
 ## Local Validation
 
@@ -216,6 +221,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Verification: Task 3 related routing/navigation tests 55/55; Task 4 focused/related homepage tests 14/14; Task 5 focused/related public tests 19/19; focused ESLint, `vue-tsc --noEmit`, and range `git diff --check` passed for each approved task. In-app browser checks on the live local worktree confirmed `/home`, `/models`, `/docs`, and the Docs 1500ms copy reset.
 - No administrator view changed. The pre-existing untracked `frontend/pnpm-workspace.yaml` remains untouched.
 - The exact 46-model, provider-grouped, ranked-search expansion is designed/planned but not yet implemented; continue from `docs/superpowers/plans/2026-08-31-ownapi-50-percent-model-expansion-plan.md`. Approved follow-up Task 7 replaces the homepage's hard-coded ChatGPT/Claude/Gemini/DeepSeek/Qwen/Mistral strip with the eight nonempty catalog families: ChatGPT, Claude, Grok, Gemini, Qwen, GLM, Kimi, and MiniMax, using real vendor marks and no “Soon” badges.
+
+### 2026-09-01 — Loss-making catalog entries removed
+
+- The user approved USD customer balances and deductions with a recharge rate of `6.7 CNY = 1 USD`; PackyAPI billing remains an upstream cost and must not define customer deductions.
+- Current manufacturer pricing and PackyAPI card costs showed that `glm-5.3-flash` and `MiniMax-M3` would lose money at the required manufacturer-price × 0.7 customer rate, so both were removed from the public catalog seed.
+- The curated catalog now contains 44 models. Z.AI and MiniMax each contain two public entries; all eight provider sections remain present.
+- Focused validation passed: model catalog, catalog view, and model detail tests (3 files / 30 tests), `vue-tsc --noEmit`, `git diff --check`, and browser verification of the 44-model count and removed MiniMax detail route.
+- The unrelated untracked `frontend/pnpm-workspace.yaml` remains untouched.
 
 ## Recovery Checklist
 
