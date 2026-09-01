@@ -8,6 +8,7 @@ import {
   filterModelCatalog,
   formatCatalogPrice,
   findCatalogModel,
+  getCatalogProviderSummaries,
   groupModelCatalog,
   normalizeCatalogSearch,
   relatedCatalogModels,
@@ -264,6 +265,22 @@ describe('modelCatalog', () => {
       expect(entry.available).toBeNull()
       expect(entry.providerLogo).toMatch(/^\/brand\/(openai|claude|grok|gemini|qwen|glm|kimi|minimax)\.svg$/)
     }
+  })
+
+  it('summarizes nonempty catalog providers for the homepage in stable order', () => {
+    expect(getCatalogProviderSummaries()).toEqual([
+      { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 9 },
+      { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 9 },
+      { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
+      { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 7 },
+      { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },
+      { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 3 },
+      { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 2 },
+      { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 3 },
+    ])
+
+    const subset = buildModelCatalog(emptyConfig).filter((entry) => ['Google', 'MiniMax'].includes(entry.provider))
+    expect(getCatalogProviderSummaries(subset).map((summary) => summary.provider)).toEqual(['Google', 'MiniMax'])
   })
 
   it('merges configured pricing into matching family metadata', () => {
