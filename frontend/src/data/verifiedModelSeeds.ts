@@ -60,12 +60,20 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
   seed('gpt-5.6-luna', 'GPT-5.6 Luna', 'gpt', ['fast', 'balanced'], ['openai'], { input: 0.2, cachedInput: 0.02, output: 1.2 }, 'https://developers.openai.com/api/docs/models/compare', 93, 40),
   seed('gpt-5.6-sol', 'GPT-5.6 Sol', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 4, cachedInput: 0.4, output: 20 }, 'https://developers.openai.com/api/docs/models/compare', 93, 50, { featured: true }),
   seed('gpt-5.6-terra', 'GPT-5.6 Terra', 'gpt', ['balanced', 'coding', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://developers.openai.com/api/docs/models/compare', 93, 60),
+  seed('gpt-daybreak-blue-latest', 'GPT Daybreak Blue', 'gpt', ['preview', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://developers.openai.com/api/docs/models/all', 91, 65, {
+    pricingStatus: 'unpublished', searchAliases: ['daybreak blue', 'gpt daybreak'],
+  }),
   seed('codex-auto-review', 'Codex Auto Review', 'gpt', ['coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://help.openai.com/en/articles/20001415', 93, 70, { isAlias: true, aliasNoteKey: 'publicModels.aliases.codexAutoReview', searchAliases: ['codex review'] }),
+  seed('omni-moderation-latest', 'Omni Moderation', 'gpt', ['moderation', 'fast'], ['openai'], { input: 0, cachedInput: 0, output: 0 }, 'https://developers.openai.com/api/docs/models/omni-moderation-latest', 86, 75, {
+    pricingStatus: 'free', searchAliases: ['moderation', 'omni moderation'], contextWindow: null,
+  }),
+  seed('claude-fable-5', 'Claude Fable 5', 'claude', ['flagship', 'reasoning', 'long-context'], ['anthropic'], { input: 10, cachedInput: 1, output: 50 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 71, 77, { contextWindow: '1M' }),
   seed('claude-haiku-4-5-20251001', 'Claude Haiku 4.5', 'claude', ['fast', 'balanced'], ['anthropic'], { input: 1, cachedInput: 0.1, output: 5 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 80, { contextWindow: '200K' }),
   seed('claude-opus-4-6', 'Claude Opus 4.6', 'claude', ['flagship', 'coding', 'reasoning'], ['anthropic'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 90, { featured: true }),
   seed('claude-opus-4-7', 'Claude Opus 4.7', 'claude', ['flagship', 'coding', 'reasoning'], ['anthropic'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 100),
   seed('claude-opus-4-8', 'Claude Opus 4.8', 'claude', ['flagship', 'coding', 'reasoning'], ['anthropic'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 110),
   seed('claude-opus-5', 'Claude Opus 5', 'claude', ['flagship', 'coding', 'reasoning'], ['anthropic'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 120),
+  seed('claude-sonnet-4-5-20250929', 'Claude Sonnet 4.5', 'claude', ['balanced', 'coding', 'reasoning'], ['anthropic'], { input: 3, cachedInput: 0.3, output: 15 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 71, 125, { contextWindow: '200K' }),
   seed('claude-sonnet-4-6', 'Claude Sonnet 4.6', 'claude', ['balanced', 'coding', 'reasoning'], ['anthropic'], { input: 3, cachedInput: 0.3, output: 15 }, 'https://platform.claude.com/docs/en/about-claude/pricing', 96, 130, { featured: true }),
   seed('claude-sonnet-5', 'Claude Sonnet 5', 'claude', ['balanced', 'coding', 'reasoning'], ['anthropic'], { input: 2, cachedInput: 0.2, output: 10 }, 'https://platform.claude.com/docs/en/release-notes/overview', 96, 140),
   seed('grok-4.5', 'Grok 4.5', 'grok', ['flagship', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.3, output: 6 }, 'https://docs.x.ai/developers/pricing', 99, 150, {
@@ -79,6 +87,7 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
 ]
 
 interface SeedOverrides {
+  pricingStatus?: ModelPricingStatus
   tiers?: OfficialPricingTier[]
   noteKey?: string
   searchAliases?: string[]
@@ -106,7 +115,7 @@ function seed(
     family,
     modelClass,
     endpoints,
-    pricingStatus: 'paid',
+    pricingStatus: overrides.pricingStatus ?? 'paid',
     official,
     sourceUrl,
     discountPercent,
