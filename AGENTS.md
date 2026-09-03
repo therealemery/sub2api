@@ -102,15 +102,13 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The pricing/status implementation, 44-model catalog expansion, and public motion Tasks 1–5 are complete on the isolated `codex/model-pricing-motion` branch, but that branch has not been integrated into the canonical parent checkout or pushed to `main`. Remaining work, in order:
+The pricing/status implementation, 44-model catalog expansion, public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
 
 1. Review the written payment-currency conversion spec, write its implementation plan, and implement the approved CNY/USD recharge conversion before resuming PackyAPI work.
 2. Review and approve `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md`, then write its implementation plan. The design reuses the existing OwnAPI group multiplier and per-user override: channel prices are already manufacturer list × 0.7, customers default to one standard 1.0 group, and Packy token groups remain account-level upstream routing/cost metadata.
 3. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
 4. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
-5. Review and integrate the current HEAD of `codex/model-pricing-motion` into the intended parent branch, then push the approved result to `main`. Do not treat `/Users/owen/apizhongzhuan/sub2api` at `bd19ddda` as already containing this work.
-6. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-7. Re-run the `Build and Deploy` workflow on the integrated `main`, then verify the confirmed production domain and record the result below.
+5. Verify the confirmed production domain and record `/home`, `/models`, `/models/gpt-5-4`, `/docs`, login, and payment results below.
 
 ## Local Validation
 
@@ -136,19 +134,26 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 ## Deployment Status
 
 - Required: yes.
-- Production URL: not yet confirmed.
-- Hosting method: not yet confirmed; repository supports Docker Compose and embedded Go binary deployment.
+- Production URL: not yet confirmed (server IP `18.181.192.3`, port 3000).
+- Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: not yet recorded.
-- Rollback revision: not yet recorded.
-- Production verification: blocked before server-side execution by rejected SSH public-key authentication; the existing online container was not replaced.
+- Last deployed revision: `c00e89274aa7dc669beb4755b80559045a2e4e42` (image `ownapi:c00e89274aa7`).
+- Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
+- Production verification: SSH recovered with the configured secret; `ownapi` is healthy and server-local `/health` and `/home` return HTTP 200.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `33353391215` successfully built image `ownapi:7d7b69c1c3fd`, then failed at SSH authentication before `docker load` or Compose execution.
+- Deployment build: run `33726735975` built and deployed `ownapi:c00e89274aa7`; it was marked failed only because health was checked before startup completed. `.github/workflows/deploy.yml` now retries health checks.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-03 — Production SSH recovery and deployment
+
+- Updated GitHub Secrets `SERVER_SSH_KEY`, `SERVER_HOST`, and `SERVER_USER` with the authorized Lightsail key (secret values are not recorded).
+- Run `33726735975` built and transferred `ownapi:c00e89274aa7` to `ubuntu@18.181.192.3` and recreated only `ownapi`; PostgreSQL and Redis remained running.
+- `ownapi` reached `healthy`; server-local `/health` and `/home` returned HTTP 200.
+- Added a bounded health-check retry loop to `.github/workflows/deploy.yml`.
 
 ### 2026-09-03 — Homepage FAQ answer clipping fix
 
