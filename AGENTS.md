@@ -150,6 +150,11 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-03 — Homepage FAQ answer clipping fix
+
+- Fixed the expanded FAQ answer text in `frontend/src/views/HomeView.vue` by replacing its negative top margin with a 12px positive gap, preventing the first line from being clipped by the animated overflow container.
+- Validation passed: Vue type checking, focused ESLint, `git diff --check`, and live browser measurement on `/home` in Chinese (`12px` gap and full first-line height).
+
 ### 2026-08-31 — Conversation-independent takeover
 
 - Added a repository-level handoff design and this agent entry point.
