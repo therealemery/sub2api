@@ -97,7 +97,17 @@ jobs:
             docker compose ps
             docker inspect ownapi --format "Running image: {{.Config.Image}}"
             docker exec ownapi /app/sub2api -version || true
-            wget -q -T 10 -O - http://127.0.0.1:${SERVER_PORT:-8080}/health
-            echo
+            echo "Waiting for application health..."
+            for attempt in $(seq 1 12); do
+              if wget -q -T 10 -O - http://127.0.0.1:${SERVER_PORT:-8080}/health; then
+                echo
+                break
+              fi
+              if [ "$attempt" -eq 12 ]; then
+                echo "Application did not become healthy in time" >&2
+                exit 1
+              fi
+              sleep 5
+            done
             docker compose logs --tail=20 ownapi
           '

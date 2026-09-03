@@ -19,7 +19,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Working directory: `/Users/owen/apizhongzhuan/sub2api`
 - Active branch: `codex/public-models-docs`
-- Latest source/deployment-build checkpoint: `7d7b69c1`
+- Latest source/deployment-build checkpoint: `c00e8927`
 - The tracked product work is committed. The worktree still contains untracked local QA/cache/workspace artifacts (`.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`); inspect them before deciding whether they belong in Git and do not discard them blindly.
 - A frontend-only Vite server was used for QA at `http://127.0.0.1:3000`; do not assume it is still running in a later session.
 
@@ -72,11 +72,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The public Models and Docs implementation and local QA are complete. Remaining work:
+The public Models and Docs implementation and local QA are complete. Production deployment is now successful; remaining work is post-deploy verification and future upstream integrations:
 
-1. Repair production SSH authentication. The server is reachable, but GitHub Actions secret `SERVER_SSH_KEY` is no longer accepted for `SERVER_USER` (`Permission denied (publickey)`). Update the secret with a currently authorized private key or correct the authorized key/user on the server.
-2. Re-run the `Build and Deploy` workflow on `main`. It builds a commit-SHA-tagged image, backs up `.env`, updates `APP_IMAGE`, recreates only `ownapi`, writes `.deployed-version`, and checks `/health`.
-3. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, and `/docs` and record the result below.
+1. Discover or obtain the public production domain, then verify `/home`, `/models`, `/models/gpt-5-4`, `/docs`, login, and payment flows and record the result below.
+2. Continue the PackyAPI upstream integration for language-model calls.
+3. Implement DC-API H3 video generation, including authenticated access, reference images, duration/resolution options, and billing.
 
 ## Local Validation
 
@@ -102,19 +102,34 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 ## Deployment Status
 
 - Required: yes.
-- Production URL: not yet confirmed.
-- Hosting method: not yet confirmed; repository supports Docker Compose and embedded Go binary deployment.
+- Production URL: not yet confirmed (server IP `18.181.192.3`; application mapped on port 3000).
+- Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: not yet recorded.
-- Rollback revision: not yet recorded.
-- Production verification: blocked before server-side execution by rejected SSH public-key authentication; the existing online container was not replaced.
+- Last deployed revision: `c00e89274aa7dc669beb4755b80559045a2e4e42` (image `ownapi:c00e89274aa7`).
+- Rollback revision: prior image remains available on the server; `.env` backup is created per deployment as `.env.backup.<short-sha>`.
+- Production verification: SSH recovered using the configured `SERVER_SSH_KEY`; `ownapi` is healthy and server-local `/health` and `/home` return HTTP 200.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `33353391215` successfully built image `ownapi:7d7b69c1c3fd`, then failed at SSH authentication before `docker load` or Compose execution.
+- Deployment build: run `33726735975` built and deployed image `ownapi:c00e89274aa7`; the job was marked failed because its health check ran before startup completed. A retry loop has now been added to `.github/workflows/deploy.yml`.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-03 — Production SSH recovery and deployment
+
+- Updated GitHub Secrets `SERVER_SSH_KEY`, `SERVER_HOST`, and `SERVER_USER` using the user's authorized Lightsail key (secret values are not recorded here).
+- Build and Deploy run `33726735975` successfully built and transferred `ownapi:c00e89274aa7` to `ubuntu@18.181.192.3` and recreated only the `ownapi` container.
+- PostgreSQL and Redis remained running; `ownapi` reached `healthy` after startup. Server-local `/health` and `/home` returned HTTP 200.
+- Added a bounded health-check retry loop to `.github/workflows/deploy.yml` so normal startup time does not produce a false workflow failure.
+
+### 2026-09-02 — Admin docs entry and local console preview
+
+- Verified `frontend/src/components/layout/AppSidebar.vue` bottom 文档入口 already targets the public `/docs` route, which resolves to `frontend/src/views/public/DocsView.vue`; no source change was necessary.
+- Confirmed the local Vite preview is responding at `http://127.0.0.1:3000`.
+- Opened `http://127.0.0.1:3000/admin/dashboard`; authentication guard correctly redirected the unauthenticated browser session to `/login?redirect=/admin/dashboard`.
+- Follow-up diagnosis: login requests return HTTP 500 because the Vite proxy targets `http://localhost:8080`, but no backend is listening locally; Docker, PostgreSQL, and Redis are also unavailable on this machine. No frontend login defect was identified.
+- Installed local development dependencies with Homebrew (Go, PostgreSQL 16, Redis), initialized the local `sub2api` database, and started the backend on `127.0.0.1:8080`; `/health` and the local admin login endpoint both return 200. The local admin test account is configured outside Git and credentials are not recorded here.
 
 ### 2026-08-31 — Conversation-independent takeover
 
