@@ -14,6 +14,45 @@ var (
 	ErrAccountNilInput = infraerrors.BadRequest("ACCOUNT_NIL_INPUT", "account input cannot be nil")
 )
 
+// ValidateManagedUpstreamCredentials validates the optional managed-upstream
+// metadata used by the OwnAPI control panel. Existing accounts without the
+// metadata remain fully backward compatible.
+func ValidateManagedUpstreamCredentials(platform, accountType string, credentials map[string]any, extra map[string]any) error {
+	provider := ""
+	if extra != nil {
+		if value, ok := extra["upstream_provider"].(string); ok {
+			provider = value
+		}
+	}
+	if provider == "" {
+		return nil
+	}
+	if provider != UpstreamProviderPackyAPI && provider != UpstreamProviderDCAPI {
+		return fmt.Errorf("unsupported upstream_provider %q", provider)
+	}
+	if credentials == nil {
+		return fmt.Errorf("managed upstream credentials are required")
+	}
+	for _, key := range []string{"base_url", "api_key"} {
+		value, _ := credentials[key].(string)
+		if value == "" {
+			return fmt.Errorf("managed upstream credential %s is required", key)
+		}
+	}
+	if provider == UpstreamProviderPackyAPI && platform != PlatformOpenAI {
+		return fmt.Errorf("PackyAPI accounts must use the openai platform")
+	}
+	if provider == UpstreamProviderDCAPI {
+		if accountType != AccountTypeUpstream && accountType != AccountTypeAPIKey {
+			return fmt.Errorf("DC-API accounts must use upstream or apikey type")
+		}
+		if model, _ := credentials["model"].(string); model == "" {
+			return fmt.Errorf("DC-API model is required")
+		}
+	}
+	return nil
+}
+
 const AccountListGroupUngrouped int64 = -1
 const AccountPrivacyModeUnsetFilter = "__unset__"
 
@@ -142,6 +181,9 @@ func NewAccountService(accountRepo AccountRepository, groupRepo GroupRepository)
 
 // Create 创建账号
 func (s *AccountService) Create(ctx context.Context, req CreateAccountRequest) (*Account, error) {
+	if err := ValidateManagedUpstreamCredentials(req.Platform, req.Type, req.Credentials, req.Extra); err != nil {
+		return nil, err
+	}
 	// 验证分组是否存在（如果指定了分组）
 	if len(req.GroupIDs) > 0 {
 		if err := s.validateGroupIDsExist(ctx, req.GroupIDs); err != nil {

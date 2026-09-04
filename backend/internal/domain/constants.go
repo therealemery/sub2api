@@ -10,6 +10,15 @@ const (
 	StatusExpired  = "expired"
 )
 
+// Upstream provider identifiers stored in account credentials/extra metadata.
+// They deliberately remain separate from the account platform: platform selects
+// the protocol compatibility layer, while provider identifies the commercial
+// upstream used by OwnAPI.
+const (
+	UpstreamProviderPackyAPI = "packyapi"
+	UpstreamProviderDCAPI    = "dc-api"
+)
+
 // Role constants
 const (
 	RoleAdmin = "admin"

@@ -12,6 +12,11 @@ const (
 	StatusExpired  = domain.StatusExpired
 )
 
+const (
+	UpstreamProviderPackyAPI = domain.UpstreamProviderPackyAPI
+	UpstreamProviderDCAPI    = domain.UpstreamProviderDCAPI
+)
+
 // Role constants
 const (
 	RoleAdmin = domain.RoleAdmin
