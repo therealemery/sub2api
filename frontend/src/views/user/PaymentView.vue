@@ -78,11 +78,11 @@
                 </div>
                 <div v-if="feeRate > 0" class="flex justify-between">
                   <span class="text-gray-500 dark:text-gray-400">{{ t('payment.fee') }} ({{ feeRate }}%)</span>
-                  <span class="text-gray-900 dark:text-white">{{ formatSelectedPaymentAmount(feeAmount) }}</span>
+                  <span class="text-gray-900 dark:text-white">{{ formatRechargeGatewayAmount(rechargeGatewayFee) }}</span>
                 </div>
                 <div v-if="feeRate > 0" class="flex justify-between border-t border-gray-200 pt-2 dark:border-dark-600">
                   <span class="font-medium text-gray-700 dark:text-gray-300">{{ t('payment.actualPay') }}</span>
-                  <span class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ formatSelectedPaymentAmount(totalAmount) }}</span>
+                  <span class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ formatRechargeGatewayAmount(rechargeGatewayTotal) }}</span>
                 </div>
                 <div v-if="selectedRechargeCurrencySupported" class="flex justify-between" :class="{ 'border-t border-gray-200 pt-2 dark:border-dark-600': feeRate <= 0 }">
                   <span class="text-gray-500 dark:text-gray-400">{{ t('payment.creditedBalance') }}</span>
@@ -98,7 +98,7 @@
                 <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                 {{ t('common.processing') }}
               </span>
-              <span v-else>{{ t('payment.createOrder') }} {{ formatSelectedPaymentAmount(totalAmount) }}</span>
+              <span v-else>{{ t('payment.createOrder') }} {{ formatRechargeGatewayAmount(rechargeGatewayTotal) }}</span>
             </button>
             </template>
           </template>
@@ -559,6 +559,10 @@ function formatSelectedPaymentAmount(value: number): string {
   return formatPaymentAmount(value, selectedCurrency.value, localeCode.value)
 }
 
+function formatRechargeGatewayAmount(value: number): string {
+  return formatPaymentAmount(value, gatewayCurrency.value, localeCode.value)
+}
+
 const methodOptions = computed<PaymentMethodOption[]>(() =>
   enabledMethods.value.map((type) => {
     const ml = visibleMethods.value[type]
@@ -573,16 +577,11 @@ const methodOptions = computed<PaymentMethodOption[]>(() =>
 )
 
 const feeRate = computed(() => checkout.value?.recharge_fee_rate ?? 0)
-const feeAmount = computed(() =>
-  feeRate.value > 0 && validAmount.value > 0
-    ? Math.ceil(((validAmount.value * feeRate.value) / 100) * 100) / 100
-    : 0
-)
-const totalAmount = computed(() =>
-  feeRate.value > 0 && validAmount.value > 0
-    ? Math.round((validAmount.value + feeAmount.value) * 100) / 100
-    : validAmount.value
-)
+const rechargeGatewayBase = computed(() => validAmount.value * (gatewayCurrency.value === 'CNY' ? 6.7 : 1))
+const rechargeGatewayFee = computed(() => feeRate.value > 0
+  ? Math.ceil(rechargeGatewayBase.value * feeRate.value * 100) / 100
+  : 0)
+const rechargeGatewayTotal = computed(() => Math.round((rechargeGatewayBase.value + rechargeGatewayFee.value) * 100) / 100)
 
 const amountError = computed(() => {
   if (validAmount.value <= 0) return ''
