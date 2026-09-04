@@ -103,10 +103,7 @@ describe('UserRouteTransition', () => {
       slots: { default: '<section data-test="page">Dashboard</section>' }
     })
 
-    expect(wrapper.get('transition-stub').attributes()).toMatchObject({
-      mode: 'out-in',
-      name: 'motion-fade'
-    })
+    expect(wrapper.get('transition-stub').attributes()).toMatchObject({ name: 'motion-fade' })
     expect(wrapper.get('[data-test="page"]').text()).toBe('Dashboard')
   })
 

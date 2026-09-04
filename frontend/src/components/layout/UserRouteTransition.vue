@@ -1,6 +1,6 @@
 <template>
   <slot v-if="isAdminRoute" />
-  <Transition v-else name="motion-fade" mode="out-in">
+  <Transition v-else name="motion-fade">
     <div :key="routePath" class="route-transition-shell">
       <slot />
     </div>

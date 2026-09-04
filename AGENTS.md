@@ -39,6 +39,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - `9cc01e91` — updated conversation-independent handoff after Models/Docs QA.
 - `d9cc9b06` — restored the previously successful traceable production deployment workflow.
 - `7d7b69c1` — pinned Docker builds to pnpm 9.15.9; the complete production image then built successfully.
+- `55ec8016` — added a keyed user-route transition shell; production QA later showed `mode="out-in"` could still leave authenticated pages blank during lazy route switches.
 - `604b7963` — approved model pricing and Status-navigation design.
 - `dfa59bc5` — pricing/status and public/user-motion implementation plans.
 - `bd19ddda` — isolated-worktree boundary; current parent checkout checkpoint.
@@ -109,6 +110,7 @@ The pricing/status implementation, 44-model catalog expansion, public motion Tas
 3. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
 4. Execute public/user motion Tasks 6–8: animated user statistics/loading, authenticated user interaction feedback, full normal/reduced-motion QA, and final durable handoff. Administrator UI remains excluded.
 5. Verify the confirmed production domain and record `/home`, `/models`, `/models/gpt-5-4`, `/docs`, login, and payment results below.
+6. Verify authenticated sidebar navigation after the non-blocking user-route transition fix is deployed.
 
 ## Local Validation
 
@@ -268,6 +270,12 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Local validation passed: focused payment tests (10/10), ESLint, `vue-tsc --noEmit`, the full frontend suite (108 files / 653 tests), production Vite build (864 modules), and `git diff --check`. Existing non-fatal test stderr, stale Browserslist, mixed-import, and large-chunk warnings remain.
 - Browser verification confirmed unauthenticated `/purchase` redirects to `/login?redirect=/purchase`. The frontend-only server had no backend session or payment configuration, so no real or mocked provider order was submitted; CNY/USD previews remain covered by focused tests.
 - This host has no Go toolchain or active Docker daemon. GitHub CI run `33502901887` passed Go lint, Go unit tests, Go integration tests, and the frontend job for implementation commit `a6c51542` after retrying one external golangci-lint JSON Schema timeout. The unrelated `frontend/pnpm-workspace.yaml` remains untouched.
+
+### 2026-09-04 — Authenticated route blank-state fix
+
+- Reproduced on production: sidebar URLs and active states changed, but `<main>` became empty after navigating between authenticated user pages; refreshing restored the page and no console errors were reported.
+- Removed `mode="out-in"` from `UserRouteTransition.vue` while retaining the keyed route shell and fade transition. This allows the lazy-loaded destination component to mount without an intermediate empty state.
+- Updated the focused transition test; `UserRouteTransition.spec.ts` passed (8 tests), `vue-tsc --noEmit` passed, and `git diff --check` passed. The change is ready to commit and deploy.
 
 ## Recovery Checklist
 
