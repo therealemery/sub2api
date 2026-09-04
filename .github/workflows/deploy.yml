@@ -99,7 +99,7 @@ jobs:
             docker exec ownapi /app/sub2api -version || true
             echo "Waiting for application health..."
             for attempt in $(seq 1 12); do
-              if wget -q -T 10 -O - http://127.0.0.1:${SERVER_PORT:-8080}/health; then
+              if wget -q -T 10 -O - http://127.0.0.1:${SERVER_PORT:-3000}/health; then
                 echo
                 break
               fi
