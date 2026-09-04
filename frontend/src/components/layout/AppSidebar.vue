@@ -699,6 +699,9 @@ onMounted(() => {
 }
 
 .sidebar-link {
+  width: 100%;
+  pointer-events: auto;
+  cursor: pointer;
   border-radius: var(--radius-lg) !important;
 }
 
@@ -766,6 +769,8 @@ onMounted(() => {
   background: var(--bg-surface) !important;
   color: var(--text-primary) !important;
   box-shadow: none;
+  isolation: isolate;
+  pointer-events: auto;
 }
 
 

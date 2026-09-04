@@ -2558,6 +2558,11 @@ body,
   scrollbar-gutter: stable !important;
 }
 
+.app-shell-content {
+  position: relative;
+  z-index: 0;
+}
+
 .modal-body,
 .dialog-body,
 .sidebar-nav,
