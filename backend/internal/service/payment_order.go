@@ -62,11 +62,14 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 			return nil, err
 		}
 	}
-	payAmountStr, payAmount, err := calculateCreateOrderPayAmount(limitAmount, feeRate, methodCurrency)
-	if err != nil {
-		return nil, err
+	initialAmount := limitAmount
+	if plan == nil && req.OrderType == payment.OrderTypeBalance {
+		initialAmount, err = calculateGatewayBalanceAmount(req.Amount, methodCurrency)
+		if err != nil { return nil, infraerrors.BadRequest("UNSUPPORTED_PAYMENT_CURRENCY", err.Error()) }
 	}
-	sel, err := s.selectCreateOrderInstance(ctx, req, cfg, payAmount)
+	_, initialPayAmount, err := calculateCreateOrderPayAmount(initialAmount, feeRate, methodCurrency)
+	if err != nil { return nil, err }
+	sel, err := s.selectCreateOrderInstance(ctx, req, cfg, initialPayAmount)
 	if err != nil {
 		return nil, err
 	}
@@ -77,18 +80,16 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 	if sel != nil {
 		selectedCurrency = paymentProviderConfigCurrency(sel.ProviderKey, sel.Config)
 	}
-	if selectedCurrency != methodCurrency {
-		payAmountStr, payAmount, err = calculateCreateOrderPayAmount(limitAmount, feeRate, selectedCurrency)
-		if err != nil {
-			return nil, err
-		}
-	}
+	gatewayAmount := limitAmount
 	if plan == nil && req.OrderType == payment.OrderTypeBalance {
-		orderAmount, err = calculateCreditedBalanceForCurrency(req.Amount, selectedCurrency, cfg.BalanceRechargeMultiplier)
+		gatewayAmount, err = calculateGatewayBalanceAmount(req.Amount, selectedCurrency)
 		if err != nil {
 			return nil, infraerrors.BadRequest("UNSUPPORTED_PAYMENT_CURRENCY", err.Error())
 		}
+		orderAmount = req.Amount * normalizeBalanceRechargeMultiplier(cfg.BalanceRechargeMultiplier)
 	}
+	payAmountStr, payAmount, err := calculateCreateOrderPayAmount(gatewayAmount, feeRate, selectedCurrency)
+	if err != nil { return nil, err }
 	if err := validateSelectedCreateOrderAmountCurrency(payAmountStr, sel); err != nil {
 		return nil, err
 	}
@@ -508,7 +509,7 @@ func (s *PaymentService) buildPaymentSubject(plan *dbent.SubscriptionPlan, limit
 		}
 		return "Sub2API Subscription " + plan.Name
 	}
-	currency := payment.DefaultPaymentCurrency
+	currency := "USD"
 	if sel != nil {
 		currency = paymentProviderConfigCurrency(sel.ProviderKey, sel.Config)
 	}

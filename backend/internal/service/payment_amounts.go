@@ -12,6 +12,15 @@ import (
 const defaultBalanceRechargeMultiplier = 1.0
 const cnyPerUsd = 6.7
 
+func calculateGatewayBalanceAmount(usdAmount float64, currency string) (float64, error) {
+	normalized, err := payment.NormalizePaymentCurrency(strings.TrimSpace(currency))
+	if err != nil { return 0, err }
+	if normalized != "CNY" && normalized != "USD" { return 0, fmt.Errorf("unsupported balance recharge currency: %s", normalized) }
+	amount := decimal.NewFromFloat(usdAmount)
+	if normalized == "CNY" { amount = amount.Mul(decimal.NewFromFloat(cnyPerUsd)) }
+	return amount.Round(int32(payment.CurrencyMaxFractionDigits(normalized))).InexactFloat64(), nil
+}
+
 func normalizeBalanceRechargeMultiplier(multiplier float64) float64 {
 	if math.IsNaN(multiplier) || math.IsInf(multiplier, 0) || multiplier <= 0 {
 		return defaultBalanceRechargeMultiplier

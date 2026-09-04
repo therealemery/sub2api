@@ -89,7 +89,7 @@
                   <span class="text-gray-900 dark:text-white">${{ creditedAmount.toFixed(2) }}</span>
                 </div>
                 <p v-if="selectedRechargeCurrencySupported" class="border-t border-gray-200 pt-2 text-xs text-gray-500 dark:border-dark-600 dark:text-gray-400">
-                  {{ t('payment.rechargeRatePreview', { currency: selectedCurrency, usd: calculateCreditedUsd(1, selectedCurrency, balanceRechargeMultiplier).toFixed(2) }) }}
+                  {{ t('payment.rechargeRatePreview', { currency: gatewayCurrency, usd: '1.00' }) }}
                 </p>
               </div>
             </div>
@@ -286,7 +286,7 @@ import { platformAccentBarClass, platformBadgeLightClass, platformBadgeClass, pl
 import SubscriptionPlanCard from '@/components/payment/SubscriptionPlanCard.vue'
 import PaymentStatusPanel from '@/components/payment/PaymentStatusPanel.vue'
 import Icon from '@/components/icons/Icon.vue'
-import { calculateCreditedUsd, formatPaymentAmount, normalizePaymentCurrency } from '@/components/payment/currency'
+import { formatPaymentAmount, normalizePaymentCurrency } from '@/components/payment/currency'
 import type { PaymentMethodOption } from '@/components/payment/PaymentMethodSelector.vue'
 import { buildPaymentErrorToastMessage, describePaymentScenarioError } from './paymentUx'
 import { hasWechatResumeQuery, parseWechatResumeRoute, stripWechatResumeQuery } from './paymentWechatResume'
@@ -540,10 +540,11 @@ const globalMaxAmount = computed(() => {
 
 // Selected method's limits (for validation and error messages)
 const selectedLimit = computed(() => visibleMethods.value[selectedMethod.value])
-const selectedCurrency = computed(() => normalizePaymentCurrency(selectedLimit.value?.currency))
-const selectedRechargeCurrencySupported = computed(() => ['CNY', 'USD'].includes(selectedCurrency.value))
+const gatewayCurrency = computed(() => normalizePaymentCurrency(selectedLimit.value?.currency))
+const selectedCurrency = computed(() => activeTab.value === 'recharge' ? 'USD' : gatewayCurrency.value)
+const selectedRechargeCurrencySupported = computed(() => ['CNY', 'USD'].includes(gatewayCurrency.value))
 const creditedAmount = computed(() => selectedRechargeCurrencySupported.value
-  ? calculateCreditedUsd(validAmount.value, selectedCurrency.value, balanceRechargeMultiplier.value)
+  ? validAmount.value * balanceRechargeMultiplier.value
   : 0)
 const localeCode = computed(() => {
   const raw = i18n.locale as unknown

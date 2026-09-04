@@ -26,3 +26,18 @@ func TestCalculateCreditedBalanceForCurrency(t *testing.T) {
 		t.Fatal("expected unsupported currency error")
 	}
 }
+
+func TestCalculateGatewayBalanceAmount(t *testing.T) {
+	for _, tt := range []struct {
+		currency string
+		want     float64
+	}{
+		{currency: "CNY", want: 67},
+		{currency: "USD", want: 10},
+	} {
+		got, err := calculateGatewayBalanceAmount(10, tt.currency)
+		if err != nil || got != tt.want {
+			t.Fatalf("currency %s: got %v, %v; want %v", tt.currency, got, err, tt.want)
+		}
+	}
+}
