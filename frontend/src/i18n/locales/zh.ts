@@ -6968,7 +6968,7 @@ export default {
     amountTooLow: '最低金额为 {min}',
     amountTooHigh: '最高金额为 {max}',
     amountNoMethod: '该金额没有可用的支付方式',
-    rechargeRatePreview: '支付 1 {currency} 可到账 {usd} USD，手续费不计入到账金额',
+    rechargeRatePreview: '人民币按 6.7:1 换算为 USD，手续费不计入到账金额',
     refundReason: '退款原因',
     refundReasonPlaceholder: '请描述您的退款原因',
     stripeLoadFailed: '支付组件加载失败，请刷新页面重试',

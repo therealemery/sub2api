@@ -6875,7 +6875,7 @@ export default {
     amountTooLow: 'Minimum amount is {min}',
     amountTooHigh: 'Maximum amount is {max}',
     amountNoMethod: 'No payment method available for this amount',
-    rechargeRatePreview: '1 {currency} payment credits {usd} USD before fees',
+    rechargeRatePreview: 'CNY is converted to USD at 6.7:1; fees are not credited',
     refundReason: 'Refund Reason',
     refundReasonPlaceholder: 'Please describe your refund reason',
     stripeLoadFailed: 'Failed to load payment component. Please refresh and try again.',
