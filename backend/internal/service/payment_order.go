@@ -65,10 +65,14 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 	initialAmount := limitAmount
 	if plan == nil && req.OrderType == payment.OrderTypeBalance {
 		initialAmount, err = calculateGatewayBalanceAmount(req.Amount, methodCurrency)
-		if err != nil { return nil, infraerrors.BadRequest("UNSUPPORTED_PAYMENT_CURRENCY", err.Error()) }
+		if err != nil {
+			return nil, infraerrors.BadRequest("UNSUPPORTED_PAYMENT_CURRENCY", err.Error())
+		}
 	}
 	_, initialPayAmount, err := calculateCreateOrderPayAmount(initialAmount, feeRate, methodCurrency)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	sel, err := s.selectCreateOrderInstance(ctx, req, cfg, initialPayAmount)
 	if err != nil {
 		return nil, err
@@ -89,7 +93,9 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 		orderAmount = req.Amount * normalizeBalanceRechargeMultiplier(cfg.BalanceRechargeMultiplier)
 	}
 	payAmountStr, payAmount, err := calculateCreateOrderPayAmount(gatewayAmount, feeRate, selectedCurrency)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	if err := validateSelectedCreateOrderAmountCurrency(payAmountStr, sel); err != nil {
 		return nil, err
 	}
