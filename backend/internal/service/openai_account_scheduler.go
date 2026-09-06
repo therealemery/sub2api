@@ -893,6 +893,10 @@ func (s *defaultOpenAIAccountScheduler) isAccountRequestCompatible(ctx context.C
 	if account == nil {
 		return false
 	}
+	// DC-API video accounts must never be selected by the text OpenAI gateway.
+	if account.ManagedUpstreamProvider() == UpstreamProviderDCAPI {
+		return false
+	}
 	if req.RequestedModel != "" && !account.IsModelSupported(req.RequestedModel) {
 		return false
 	}

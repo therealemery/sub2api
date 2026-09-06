@@ -223,6 +223,16 @@ func (a *Account) GetCredential(key string) string {
 	}
 }
 
+// ManagedUpstreamProvider identifies a control-panel configured commercial
+// upstream without changing the protocol platform used by the gateway.
+func (a *Account) ManagedUpstreamProvider() string {
+	if a == nil || a.Extra == nil {
+		return ""
+	}
+	provider, _ := a.Extra["upstream_provider"].(string)
+	return strings.TrimSpace(provider)
+}
+
 // GetCredentialAsTime 解析凭证中的时间戳字段，支持多种格式
 // 兼容以下格式：
 //   - RFC3339 字符串: "2025-01-01T00:00:00Z"
