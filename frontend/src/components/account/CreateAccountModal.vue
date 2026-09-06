@@ -1010,6 +1010,14 @@
 
       <!-- API Key input (only for apikey type, excluding Antigravity which has its own fields) -->
       <div v-if="form.type === 'apikey' && form.platform !== 'antigravity'" class="space-y-4">
+        <div v-if="form.platform === 'openai'" class="space-y-2">
+          <label class="input-label">上游用途 / Upstream provider</label>
+          <select v-model="managedUpstreamProvider" class="input">
+            <option value="">普通 OpenAI API Key</option>
+            <option value="packyapi">PackyAPI 文本模型</option>
+          </select>
+          <p class="input-hint">PackyAPI Key 仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
+        </div>
         <div>
           <label class="input-label">{{ t('admin.accounts.baseUrl') }}</label>
           <input
@@ -3255,6 +3263,7 @@ const accountCategory = ref<'oauth-based' | 'apikey' | 'bedrock' | 'service_acco
 const addMethod = ref<AddMethod>('oauth') // For oauth-based: 'oauth' or 'setup-token'
 const apiKeyBaseUrl = ref('https://api.anthropic.com')
 const apiKeyValue = ref('')
+const managedUpstreamProvider = ref<'' | 'packyapi'>('')
 const editQuotaLimit = ref<number | null>(null)
 const editQuotaDailyLimit = ref<number | null>(null)
 const editQuotaWeeklyLimit = ref<number | null>(null)
@@ -4014,6 +4023,7 @@ const resetForm = () => {
   addMethod.value = 'oauth'
   apiKeyBaseUrl.value = 'https://api.anthropic.com'
   apiKeyValue.value = ''
+  managedUpstreamProvider.value = ''
   editQuotaLimit.value = null
   editQuotaDailyLimit.value = null
   editQuotaWeeklyLimit.value = null
@@ -4416,6 +4426,11 @@ const handleSubmit = async () => {
     }
   }
 
+  const managedExtra: Record<string, unknown> = {}
+  if (form.platform === 'openai' && managedUpstreamProvider.value) {
+    managedExtra.upstream_provider = managedUpstreamProvider.value
+  }
+
   // Add pool mode if enabled
   if (poolModeEnabled.value) {
     credentials.pool_mode = true
@@ -4434,7 +4449,7 @@ const handleSubmit = async () => {
   }
 
   form.credentials = credentials
-  const extra = buildAnthropicExtra(buildOpenAIExtra())
+  const extra = buildAnthropicExtra(buildOpenAIExtra(Object.keys(managedExtra).length ? managedExtra : undefined))
 
   await doCreateAccount({
     ...form,
