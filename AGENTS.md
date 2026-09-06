@@ -277,6 +277,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Removed `mode="out-in"` from `UserRouteTransition.vue` while retaining the keyed route shell and fade transition. This allows the lazy-loaded destination component to mount without an intermediate empty state.
 - Updated the focused transition test; `UserRouteTransition.spec.ts` passed (8 tests), `vue-tsc --noEmit` passed, and `git diff --check` passed. The change is ready to commit and deploy.
 
+### 2026-09-06 — Managed upstream configuration and Packy routing
+
+- Added managed upstream provider identifiers and backend validation for control-panel configured PackyAPI/DC-API accounts. Legacy accounts remain compatible; managed accounts require `base_url` and `api_key`, while DC-API accounts also require an explicit model.
+- Added a PackyAPI provider selector to the OpenAI API-key account creation form. It stores only the provider metadata; no real credential is committed or exposed to the client.
+- PackyAPI accounts are forced through the raw OpenAI Chat Completions forwarder, replacing the customer Authorization header with the server-side account credential. DC-API-marked accounts are excluded from the text OpenAI scheduler.
+- Validation passed: targeted Go service tests, Vue type checking, and `git diff --check`. Commits `3506d7af`, `e0f86896`, and `d76b0742` are pushed to `main`.
+- DC-API H3 request/response mapping remains pending authenticated documentation verification; do not guess endpoint fields or configure production credentials until the official schema is confirmed.
+
 ## Recovery Checklist
 
 1. Read this file, every document listed under Required Reading, and `design-qa.md`.
