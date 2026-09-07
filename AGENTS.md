@@ -17,12 +17,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Canonical/main checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `bd19ddda`. This checkout does **not** contain the completed pricing/status feature yet. Its known untracked artifacts are `.codex-qa/`, `.vite/`, and `frontend/pnpm-workspace.yaml`; preserve and inspect them rather than cleaning blindly.
-- Active isolated feature worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `codex/model-pricing-motion`. The branch is published as `origin/codex/model-pricing-motion`; use this checkout for review or continuation of the pricing/status work and do not accidentally edit the parent checkout and assume the feature is present there.
-- Latest committed catalog checkpoint: `1ab80f67` (`fix: remove loss-making catalog models`). The provider-grouped model expansion Tasks 1–7 and public/user motion Tasks 1–5 are complete. Motion Tasks 6–8 and final integrated QA remain.
-- The catalog now intentionally contains 44 models: loss-making `glm-5.3-flash` and `MiniMax-M3` were removed from the public seed on 2026-09-01 after comparing current manufacturer pricing with PackyAPI costs. The worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed.
-- A Vite preview from this worktree was verified at `http://127.0.0.1:3000` on 2026-09-01; confirm the current process before relying on it.
-- Remote `origin/main` and `origin/codex/public-models-docs` were last observed at `ee96f156`; neither includes the isolated feature commits. The complete committed feature history through the payment conversion implementation plan is available on `origin/codex/model-pricing-motion`. Integrate/review that branch before attempting a `main` deployment.
+- Canonical deployed-source worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `main`, HEAD `6a4959d4`; it matches `origin/main` and contains the completed pricing, Packy routing, payment, and MiniMax H3 work. Use this checkout for deployment continuation.
+- Parent checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `17c1eb4d`; preserve its unrelated untracked artifacts and do not mistake it for the current `main` checkout.
+- The current catalog contains 44 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. Commit `4d57cf50` intentionally restored the first two after current Packy 50% pricing made them part of the profitable intersection; the older removal note is historical, not current policy.
+- The `main` worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed.
+- Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
 ## Stable Checkpoints
 
@@ -111,6 +110,7 @@ The pricing/status implementation, 43-model published catalog (48 verified seeds
 - Added authenticated `POST /v1/videos`, `GET /v1/videos/:taskID`, and `GET /v1/videos/:taskID/content` routes. The backend selects only the DC-API managed account whose private model credential is `MiniMax-H3`, uses the customer's OwnAPI API key for authentication/billing, seals upstream task IDs with the JWT secret, and sanitizes upstream responses/errors and content URLs.
 - Added the authenticated model-detail generator with prompt, duration, resolution, reference URL/upload, task polling, and video playback/download. The browser never receives the DC-API base URL or key.
 - Local validation passed: backend handler/service/routes tests, the full frontend suite (108 files / 655 tests), Vue type checking, frontend production build, and `git diff --check`. The full backend suite has one environment-only failure in `ent/schema` under local Go 1.27.1 (`package \"context\" without types`), which reproduces unchanged on `main`; all H3-related backend packages pass. Commit `1f299e79` is on `origin/main`. Deployment run `34118545773` built the image but could not reach the server on SSH port 22, so production was not changed; do not modify or recreate the existing DC-API account.
+- A fresh local SPA check searched for MiniMax H3 on `/models`, clicked the result, and reached `/models/minimax-h3` without a reload or blank route. The rendered page had the expected H3 heading and complete content. No paid generation request was submitted.
 
 ### 2026-09-07 — Packy live pricing and token-group checkpoint
 
