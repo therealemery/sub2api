@@ -67,7 +67,7 @@
                   </div>
                   <div class="pricing-tier-heading">
                     <strong>{{ selectedPricingTierLabel }}</strong>
-                    <span>{{ t('publicModels.officialSeventyPercent') }}</span>
+                    <span>{{ t(detailPricingSource.multiplier === 0.8 ? 'publicModels.officialEightyPercent' : 'publicModels.officialSeventyPercent') }}</span>
                   </div>
                   <Transition name="motion-fade" mode="out-in">
                     <div :key="pricingTierKey(model, selectedPricingTierId, selectedPricing)" class="pricing-tier-values">

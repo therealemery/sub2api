@@ -17,6 +17,8 @@
 //     pensieve/short-term/maxims/preserve-existing-runtime-behavior-when-replacing-logic-in-stateful-systems）
 package openai_compat
 
+import "strings"
+
 // AccountResponsesSupport 描述账号上游对 OpenAI Responses API 的支持状态。
 //
 // 仅用于 platform=openai + type=apikey 的账号；其他账号类型不应调用本包判定。
@@ -72,4 +74,17 @@ func ResolveResponsesSupport(extra map[string]any) AccountResponsesSupport {
 // （详见 internal/service/openai_gateway_chat_completions_raw.go）。
 func ShouldUseResponsesAPI(extra map[string]any) bool {
 	return ResolveResponsesSupport(extra) != ResponsesSupportNo
+}
+
+// PackyModelRequiresResponses reports models that Packy's live pricing catalog
+// exposes exclusively through the OpenAI Responses endpoint. Keep this list
+// deliberately narrow: all other Packy models continue through the raw Chat
+// Completions compatibility path.
+func PackyModelRequiresResponses(model string) bool {
+	switch strings.ToLower(strings.TrimSpace(model)) {
+	case "gpt-5.6-luna", "codex-auto-review":
+		return true
+	default:
+		return false
+	}
 }

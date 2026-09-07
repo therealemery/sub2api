@@ -32,6 +32,15 @@ describe('modelCatalog', () => {
     })
   })
 
+  it('applies the approved Packy profit policy and excludes unprofitable models', () => {
+    const catalog = buildModelCatalog(emptyConfig)
+    expect(catalog.find((entry) => entry.modelId === 'gpt-5.4')?.pricingSource?.multiplier).toBe(0.8)
+    expect(catalog.find((entry) => entry.modelId === 'gpt-5.4-mini')?.pricingSource?.multiplier).toBe(0.7)
+    for (const modelId of ['gpt-daybreak-blue-latest', 'claude-fable-5', 'gemini-3.7-flash', 'kimi-k3']) {
+      expect(catalog.some((entry) => entry.modelId === modelId)).toBe(false)
+    }
+  })
+
   it('distinguishes pricing states and selects generic official tiers', () => {
     expect(activeOfficialTier({
       status: 'paid',
@@ -65,7 +74,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(45)
+    expect(result).toHaveLength(43)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -74,19 +83,19 @@ describe('modelCatalog', () => {
 
   it('contains the complete verified catalog with traceable discounted pricing', () => {
     const requiredIds = [
-      'gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest',
-      'claude-fable-5', 'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
+      'gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review',
+      'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
       'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5', 'grok-4.5', 'grok-4.6',
     ]
     const catalog = buildModelCatalog(emptyConfig)
 
     expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(expect.arrayContaining(requiredIds))
     expect(requiredIds.every((id) => catalog.some((model) => model.modelId === id))).toBe(true)
-    expect(new Set(requiredIds).size).toBe(21)
+    expect(new Set(requiredIds).size).toBe(18)
     expect(Object.fromEntries(['OpenAI', 'Anthropic', 'xAI'].map((provider) => [
       provider,
       catalog.filter((model) => model.provider === provider).length,
-    ]))).toEqual({ OpenAI: 10, Anthropic: 9, xAI: 2 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2 })
 
     for (const modelId of requiredIds) {
       const model = catalog.find((entry) => entry.modelId === modelId)
@@ -95,7 +104,7 @@ describe('modelCatalog', () => {
         status: expect.stringMatching(/^(paid|free|unpublished)$/),
         sourceUrl: expect.stringMatching(/^https:\/\//),
         checkedAt: '2026-09-07',
-        multiplier: 0.7,
+        multiplier: expect.any(Number),
       })
       expect(model?.eligibilitySource).toMatchObject({
         source: 'packyapi',
@@ -125,10 +134,7 @@ describe('modelCatalog', () => {
       'gpt-5.6-luna': { input: 0.2, cachedInput: 0.02, output: 1.2 },
       'gpt-5.6-sol': { input: 4, cachedInput: 0.4, output: 20 },
       'gpt-5.6-terra': { input: 2, cachedInput: 0.2, output: 12 },
-      'gpt-daybreak-blue-latest': { input: null, cachedInput: null, output: null },
       'codex-auto-review': { input: 2.5, cachedInput: 0.25, output: 15 },
-      'omni-moderation-latest': { input: 0, cachedInput: 0, output: 0 },
-      'claude-fable-5': { input: 10, cachedInput: 1, output: 50 },
       'claude-haiku-4-5-20251001': { input: 1, cachedInput: 0.1, output: 5 },
       'claude-opus-4-6': { input: 5, cachedInput: 0.5, output: 25 },
       'claude-opus-4-7': { input: 5, cachedInput: 0.5, output: 25 },
@@ -152,10 +158,7 @@ describe('modelCatalog', () => {
       'gpt-5.6-luna': 'https://developers.openai.com/api/docs/models/compare',
       'gpt-5.6-sol': 'https://developers.openai.com/api/docs/models/compare',
       'gpt-5.6-terra': 'https://developers.openai.com/api/docs/models/compare',
-      'gpt-daybreak-blue-latest': 'https://developers.openai.com/api/docs/models/all',
       'codex-auto-review': 'https://help.openai.com/en/articles/20001415',
-      'omni-moderation-latest': 'https://developers.openai.com/api/docs/models/omni-moderation-latest',
-      'claude-fable-5': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-haiku-4-5-20251001': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-4-6': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-4-7': 'https://platform.claude.com/docs/en/about-claude/pricing',
@@ -174,14 +177,7 @@ describe('modelCatalog', () => {
     })
     expect(catalog.find((model) => model.modelId === 'claude-haiku-4-5-20251001')?.contextWindow).toBe('200K')
     expect(catalog.find((model) => model.modelId === 'gpt-5.4-mini')?.contextWindow).toBe('400K')
-    expect(catalog.find((model) => model.modelId === 'claude-fable-5')?.contextWindow).toBe('1M')
     expect(catalog.find((model) => model.modelId === 'claude-sonnet-4-5-20250929')?.contextWindow).toBe('200K')
-    expect(catalog.find((model) => model.modelId === 'omni-moderation-latest')?.pricingSource).toMatchObject({
-      status: 'free', official: { input: 0, cachedInput: 0, output: 0 },
-    })
-    expect(catalog.find((model) => model.modelId === 'gpt-daybreak-blue-latest')?.pricingSource).toMatchObject({
-      status: 'unpublished', official: { input: null, cachedInput: null, output: null },
-    })
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.6')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.tiers).toEqual([{
@@ -196,28 +192,28 @@ describe('modelCatalog', () => {
 
   it('contains the exact 45-model eligibility snapshot across eight providers', () => {
     const providerIds = {
-      OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest'],
-      Anthropic: ['claude-fable-5', 'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
+      OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
+      Anthropic: ['claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
       xAI: ['grok-4.5', 'grok-4.6'],
-      Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-3.7-flash'],
+      Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'],
       Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
-      'Z.AI': ['glm-5', 'glm-5.2'],
-      Moonshot: ['kimi-k2.5', 'kimi-k3'],
-      MiniMax: ['minimax-m2.5', 'MiniMax-M2.7'],
+      'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3', 'glm-5.3-flash'],
+      Moonshot: ['kimi-k2.5'],
+      MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3'],
     }
     const catalog = buildModelCatalog(emptyConfig)
     const expectedIds = Object.values(providerIds).flat()
 
-    expect(verifiedModelSeedData).toHaveLength(45)
-    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(45)
-    expect(new Set(expectedIds).size).toBe(45)
-    expect(verifiedModelSeedData.map((seed) => seed.modelId)).toEqual(expectedIds)
+    expect(verifiedModelSeedData).toHaveLength(48)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(48)
+    expect(new Set(expectedIds).size).toBe(43)
+    expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 10, Anthropic: 9, xAI: 2, Google: 7, Qwen: 11, 'Z.AI': 2, Moonshot: 2, MiniMax: 2 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 3 })
 
-    const addedIds = expectedIds.slice(21)
+    const addedIds = expectedIds.slice(18)
     expect(Object.fromEntries(addedIds.map((modelId) => [
       modelId,
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.official,
@@ -228,7 +224,6 @@ describe('modelCatalog', () => {
       'gemini-3-pro-preview': { input: null, cachedInput: null, output: null },
       'gemini-3.1-pro-preview': { input: 2, cachedInput: 0.2, output: 12 },
       'gemini-3.5-flash': { input: 1.5, cachedInput: 0.15, output: 9 },
-      'gemini-3.7-flash': { input: 1.5, cachedInput: 0.15, output: 7.5 },
       'qwen3-coder-next': { input: 0.144, cachedInput: null, output: 0.574 },
       'qwen3-max': { input: 1.2, cachedInput: null, output: 6 },
       'qwen3-vl-flash': { input: 0.022, cachedInput: null, output: 0.215 },
@@ -242,10 +237,12 @@ describe('modelCatalog', () => {
       'qwen3.8-max': { input: 2, cachedInput: null, output: 6 },
       'glm-5': { input: 1, cachedInput: 0.2, output: 3.2 },
       'glm-5.2': { input: null, cachedInput: null, output: null },
+      'glm-5.3': { input: 1.4, cachedInput: 0.26, output: 4.4 },
+      'glm-5.3-flash': { input: 0.15, cachedInput: 0.03, output: 0.5 },
       'kimi-k2.5': { input: null, cachedInput: null, output: null },
-      'kimi-k3': { input: 3, cachedInput: 0.3, output: 15 },
       'minimax-m2.5': { input: 0.3, cachedInput: 0.03, output: 1.2 },
       'MiniMax-M2.7': { input: 0.3, cachedInput: 0.06, output: 1.2 },
+      'MiniMax-M3': { input: 0.6, cachedInput: 0.12, output: 2.4 },
     })
     expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].map((modelId) =>
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
@@ -256,7 +253,7 @@ describe('modelCatalog', () => {
     })
     expect(catalog.find((entry) => entry.modelId === 'qwen3.5-plus')?.pricingSource?.tiers).toHaveLength(2)
     for (const entry of catalog) {
-      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(40)
+      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(28)
       expect(entry.available).toBeNull()
       expect(entry.providerLogo).toMatch(/^\/brand\/(openai|claude|grok|gemini|qwen|glm|kimi|minimax)\.svg$/)
     }
@@ -264,14 +261,14 @@ describe('modelCatalog', () => {
 
   it('summarizes nonempty catalog providers for the homepage in stable order', () => {
     expect(getCatalogProviderSummaries()).toEqual([
-      { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 10 },
-      { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 9 },
+      { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 8 },
+      { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 8 },
       { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
-      { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 7 },
+      { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 6 },
       { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },
-      { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 2 },
-      { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 2 },
-      { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 2 },
+      { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 4 },
+      { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 1 },
+      { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 3 },
     ])
 
     const subset = buildModelCatalog(emptyConfig).filter((entry) => ['Google', 'MiniMax'].includes(entry.provider))
@@ -413,7 +410,7 @@ describe('modelCatalog', () => {
       sort: 'input-price',
     })
 
-    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['omni-moderation-latest', 'gpt-5.6-luna'])
+    expect(result.slice(0, 2).map((item) => item.modelId)).toEqual(['gpt-5.6-luna', 'gpt-5.4-mini'])
     for (const group of groupModelCatalog(result)) {
       const values = group.entries.map((entry) => entry.pricingSource?.official.input ?? null)
       const firstMissing = values.indexOf(null)
@@ -436,10 +433,10 @@ describe('modelCatalog', () => {
     })
 
     expect(result.slice(0, 4).map((item) => item.modelId)).toEqual([
-      'omni-moderation-latest',
       'gpt-5.6-luna',
       'gpt-5.4-mini',
       'gpt-5.6-terra',
+      'codex-auto-review',
     ])
     for (const group of groupModelCatalog(result)) {
       const values = group.entries.map((entry) => entry.pricingSource?.official.output ?? null)

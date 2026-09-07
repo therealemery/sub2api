@@ -77,7 +77,7 @@ describe('ModelsCatalogView', () => {
 
     const wrapper = mountCatalog()
     await flushPromises()
-    expect(wrapper.get('#catalog-results-title').text()).toBe('44 models')
+    expect(wrapper.get('#catalog-results-title').text()).toBe('43 models')
   })
 
   it('renders all eight providers as ordered sections with correct model counts', async () => {
@@ -88,7 +88,7 @@ describe('ModelsCatalogView', () => {
     expect(sections.map((section) => section.get('h2').text())).toEqual([
       'OpenAI', 'Anthropic', 'xAI', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax',
     ])
-    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([9, 9, 2, 7, 11, 2, 2, 2])
+    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 8, 2, 6, 11, 4, 1, 3])
     for (const section of sections) {
       const provider = section.get('h2').text()
       expect(section.findAll('.provider-line').every((line) => line.text().includes(provider))).toBe(true)
@@ -130,15 +130,11 @@ describe('ModelsCatalogView', () => {
     expect(wrapper.findAll('section.provider-section')).toHaveLength(8)
   })
 
-  it('renders free and unpublished pricing without zero-value metric fallbacks', async () => {
+  it('renders unpublished pricing without zero-value metric fallbacks', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
-    const moderation = wrapper.findAll('.model-card').find((card) => card.text().includes('Omni Moderation'))!
-    const unpublished = wrapper.findAll('.model-card').find((card) => card.text().includes('GPT Daybreak Blue'))!
+    const unpublished = wrapper.findAll('.model-card').find((card) => card.text().includes('Gemini 3 Pro Preview'))!
 
-    expect(moderation.get('.pricing-card-status').text()).toContain('Free')
-    expect(moderation.findAll('.price-line')).toHaveLength(0)
-    expect(moderation.text()).not.toContain('$0')
     expect(unpublished.get('.pricing-card-status').text()).toContain('publicModels.notPublished')
     expect(unpublished.findAll('.price-line')).toHaveLength(0)
     expect(unpublished.text()).not.toContain('$0')

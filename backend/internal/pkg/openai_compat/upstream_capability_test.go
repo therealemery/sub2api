@@ -53,3 +53,16 @@ func TestShouldUseResponsesAPI(t *testing.T) {
 		})
 	}
 }
+
+func TestPackyModelRequiresResponses(t *testing.T) {
+	for _, model := range []string{"gpt-5.6-luna", "codex-auto-review", " GPT-5.6-LUNA "} {
+		if !PackyModelRequiresResponses(model) {
+			t.Fatalf("expected %q to require Responses", model)
+		}
+	}
+	for _, model := range []string{"gpt-6-astra", "gpt-5.6-sol", "glm-5.3"} {
+		if PackyModelRequiresResponses(model) {
+			t.Fatalf("expected %q to allow Chat Completions", model)
+		}
+	}
+}
