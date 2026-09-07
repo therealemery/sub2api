@@ -1192,6 +1192,7 @@ export default {
     officialListPrice: 'Official list price',
     ownApiPrice: 'OwnAPI price',
     officialSeventyPercent: 'Official price × 70%',
+    officialEightyPercent: 'Official price × 80%',
     priceType: 'Price type',
     viewOfficialPricing: 'View official pricing',
     cacheRead: 'Cache read',

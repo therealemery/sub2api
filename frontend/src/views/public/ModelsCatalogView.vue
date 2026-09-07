@@ -84,7 +84,7 @@
                       <span>{{ t('publicModels.ownApiPrice') }}</span>
                       <small>{{ t('publicModels.officialListPrice') }}</small>
                     </div>
-                    <div class="pricing-badge">{{ t('publicModels.officialSeventyPercent') }}</div>
+                    <div class="pricing-badge">{{ t(model.pricingSource.multiplier === 0.8 ? 'publicModels.officialEightyPercent' : 'publicModels.officialSeventyPercent') }}</div>
                     <div v-if="longPricingTier(model)" class="context-toggle" :aria-label="`${model.displayName} ${t('publicModels.longContextThreshold', { count: longPricingTier(model)?.minInputTokens.toLocaleString('en-US') })}`">
                       <button type="button" :class="{ active: contextMode(model) === 'short' }" :aria-pressed="contextMode(model) === 'short'" @click="setContextMode(model, 'short')">{{ t('publicModels.shortContext') }}</button>
                       <button type="button" :class="{ active: contextMode(model) === 'long' }" :aria-pressed="contextMode(model) === 'long'" @click="setContextMode(model, 'long')">{{ t('publicModels.longContext') }}</button>

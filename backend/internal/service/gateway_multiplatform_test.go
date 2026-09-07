@@ -1163,6 +1163,38 @@ func TestGatewayService_isModelSupportedByAccount(t *testing.T) {
 			model:    "gemini-2.5-pro",
 			expected: true,
 		},
+		{
+			name: "Packy账号误开透传仍拒绝白名单外模型",
+			account: &Account{
+				Platform: PlatformOpenAI,
+				Type:     AccountTypeAPIKey,
+				Credentials: map[string]any{
+					"model_mapping": map[string]any{"gpt-5.4": "gpt-5.4"},
+				},
+				Extra: map[string]any{
+					"upstream_provider":  UpstreamProviderPackyAPI,
+					"openai_passthrough": true,
+				},
+			},
+			model:    "gpt-5.6-sol",
+			expected: false,
+		},
+		{
+			name: "Packy账号误开透传仍允许白名单内模型",
+			account: &Account{
+				Platform: PlatformOpenAI,
+				Type:     AccountTypeAPIKey,
+				Credentials: map[string]any{
+					"model_mapping": map[string]any{"gpt-5.4": "gpt-5.4"},
+				},
+				Extra: map[string]any{
+					"upstream_provider":  UpstreamProviderPackyAPI,
+					"openai_passthrough": true,
+				},
+			},
+			model:    "gpt-5.4",
+			expected: true,
+		},
 	}
 
 	for _, tt := range tests {

@@ -61,9 +61,12 @@ func (s *OpenAIGatewayService) ForwardAsChatCompletions(
 	promptCacheKey string,
 	defaultMappedModel string,
 ) (*OpenAIForwardResult, error) {
+	requestedModel := gjson.GetBytes(body, "model").String()
+	isPacky := account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI
+	packyRawChat := isPacky && !openai_compat.PackyModelRequiresResponses(requestedModel)
 	// 入口分流：APIKey 账号 + 已探测且确认上游不支持 Responses，走 CC 直转。
 	// 标记缺失（未探测）按"现状即证据"原则继续走下方原 Responses 转换路径。
-	if account.Type == AccountTypeAPIKey && (account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI || !openai_compat.ShouldUseResponsesAPI(account.Extra)) {
+	if account.Type == AccountTypeAPIKey && (packyRawChat || (!isPacky && !openai_compat.ShouldUseResponsesAPI(account.Extra))) {
 		return s.forwardAsRawChatCompletions(ctx, c, account, body, defaultMappedModel)
 	}
 

@@ -7,6 +7,7 @@ import { verifiedModelSeedData } from './verifiedModelSeeds'
 import type {
   CatalogEligibilitySource,
   ModelPricingSource,
+  ModelPricingStatus,
   OfficialTokenPricing,
   RawVerifiedModelSeed,
 } from './verifiedModelSeeds'
@@ -195,7 +196,9 @@ const fallbackFamily: FamilyMetadata = {
   contextWindow: null,
 }
 
-export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData.map(seedFromRawData)
+export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData
+  .filter((raw) => raw.discountPercent >= 28)
+  .map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
   const featured = config?.featured_models ?? []
@@ -359,6 +362,12 @@ function family(
 function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
   const metadata = families.find((item) => item.family === raw.family)
   if (!metadata) throw new Error(`Missing model family metadata: ${raw.family}`)
+  const ownApiMultiplier: ModelPricingSource['multiplier'] = raw.discountPercent >= 40 ? 0.7 : 0.8
+  const pricingStatus: ModelPricingStatus = raw.pricingStatus === 'free'
+    ? 'free'
+    : raw.discountPercent >= 28
+      ? raw.pricingStatus
+      : 'unpublished'
   return {
     ...metadata,
     contextWindow: raw.contextWindow ?? metadata.contextWindow,
@@ -367,10 +376,10 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
     featured: raw.featured ?? false,
     sortOrder: raw.sortOrder,
     pricingSource: {
-      status: raw.pricingStatus,
+      status: pricingStatus,
       official: raw.official,
       tiers: raw.tiers ?? [],
-      multiplier: 0.7,
+      multiplier: ownApiMultiplier,
       sourceUrl: raw.sourceUrl,
       checkedAt: '2026-09-07',
       noteKey: raw.noteKey ?? null,

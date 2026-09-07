@@ -3718,6 +3718,12 @@ func (s *GatewayService) isModelSupportedByAccount(account *Account, requestedMo
 		_, ok := ResolveBedrockModelID(account, requestedModel)
 		return ok
 	}
+	// Packy accounts are always model-scoped. Even if passthrough is enabled by
+	// mistake, never bypass the mapping whitelist and risk routing to a token
+	// whose upstream group has a different cost.
+	if account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI {
+		return account.IsModelSupported(requestedModel)
+	}
 	// OpenAI 透传模式：仅替换认证，允许所有模型
 	if account.Platform == PlatformOpenAI && account.IsOpenAIPassthroughEnabled() {
 		return true

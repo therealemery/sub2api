@@ -103,7 +103,16 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-The pricing/status implementation, 44-model catalog expansion, public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
+The pricing/status implementation, 43-model published catalog (48 verified seeds before profitability filtering), public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
+
+### 2026-09-07 — Packy live pricing and token-group checkpoint
+
+- Rechecked Packy's signed-in pricing page. Current visible discounts include GPT-5.4 at 28% off (7.2 折), GPT-5.4 Mini/GPT-5.5/GPT-5.6/GPT-6 Astra at 93% off, Claude Opus/Sonnet 4.6+ at 88% off, Gemini at 57% off, and current GLM/Qwen/MiniMax/Kimi sale entries at 50% off.
+- Public catalog pricing now derives the OwnAPI multiplier from Packy's displayed discount: `0.7` at 40% off or better, `0.8` from 28% through 39% off, and unpublished below 28% off. Cards and detail pages show the matching 7 折 or 8 折 label.
+- Updated GPT-5.4 and Claude discount snapshots. Focused catalog/view tests (31 tests), Vue type checking, targeted Packy routing/validation Go tests, and `git diff --check` pass.
+- Four Packy tokens now cover the compatible group sets without storing their secret values in Git: the core token (`codex`, `minimax-officially`, `glm-sale`, `grok-sale`, `cc-sale`, `gemini-slb`), expansion token (`bailian`, `cc`, `grok-officially`, `image`), Z.AI token (`zai-officially`), and GPT-5.4 token (`azure-officially`). Packy disables overlapping groups in one token, so each token must be configured as a separate model-scoped OwnAPI upstream account.
+- Packy managed accounts now require a non-empty, exact-name `model_mapping` whitelist and reject wildcard/empty mappings. Scheduling enforces this whitelist even if OpenAI passthrough is accidentally enabled. Packy models known to require Responses (`gpt-5.6-luna`, `codex-auto-review`) use that endpoint; other Packy models retain raw Chat Completions forwarding.
+- Remaining: deploy the account-form/backend changes, configure the four Packy accounts with exact model whitelists, run authenticated routing/billing smoke tests, add image-request pricing support, then start DC-API MiniMax H3.
 
 ### 2026-09-07 — Packy pricing refresh and GPT-6 Astra catalog entry
 

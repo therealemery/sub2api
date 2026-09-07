@@ -139,14 +139,8 @@ describe('ModelDetailView', () => {
     expect(wrapper.find('a button').exists()).toBe(false)
   })
 
-  it('renders verified Free and Not published pricing states without numeric fallbacks', async () => {
-    const free = mountDetail('omni-moderation-latest')
-    await flushPromises()
-    expect(free.get('.pricing-state').text()).toContain('Free')
-    expect(free.findAll('.pricing-tier tbody td')).toHaveLength(0)
-    expect(free.text()).not.toContain('$0')
-
-    const unpublished = mountDetail('gpt-daybreak-blue-latest')
+  it('renders verified Not published pricing states without numeric fallbacks', async () => {
+    const unpublished = mountDetail('gemini-3-pro-preview')
     await flushPromises()
     expect(unpublished.get('.pricing-state').text()).toContain('Not published')
     expect(unpublished.text()).toContain('The provider has not published a verified public token price.')

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	infraerrors "github.com/Wei-Shaw/sub2api/internal/pkg/errors"
@@ -41,6 +42,20 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 	}
 	if provider == UpstreamProviderPackyAPI && platform != PlatformOpenAI {
 		return fmt.Errorf("PackyAPI accounts must use the openai platform")
+	}
+	if provider == UpstreamProviderPackyAPI {
+		mapping := stringMappingFromRaw(credentials["model_mapping"])
+		if len(mapping) == 0 {
+			return fmt.Errorf("PackyAPI accounts require a non-empty model_mapping whitelist")
+		}
+		for requestedModel, upstreamModel := range mapping {
+			if strings.Contains(requestedModel, "*") {
+				return fmt.Errorf("PackyAPI model_mapping must use exact model names, not wildcards")
+			}
+			if requestedModel == "" || upstreamModel == "" {
+				return fmt.Errorf("PackyAPI model_mapping entries cannot be empty")
+			}
+		}
 	}
 	if provider == UpstreamProviderDCAPI {
 		if accountType != AccountTypeUpstream && accountType != AccountTypeAPIKey {
