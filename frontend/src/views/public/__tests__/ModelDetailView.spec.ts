@@ -194,7 +194,7 @@ describe('ModelDetailView', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Alias for GPT-5.4 tuned for Codex automated review workflows.')
-    expect(wrapper.text()).toContain('Pricing checked 2026-08-31')
+    expect(wrapper.text()).toContain('Pricing checked 2026-09-07')
 
     const sourceLink = wrapper.find('a[href="https://developers.openai.com/api/docs/models/gpt-5.4"]')
     expect(sourceLink.exists()).toBe(true)

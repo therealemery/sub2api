@@ -28,6 +28,14 @@
 
       <!-- API Key fields (only for apikey type) -->
       <div v-if="account.type === 'apikey'" class="space-y-4">
+        <div v-if="account.platform === 'openai'" class="space-y-2">
+          <label class="input-label">上游用途 / Upstream provider</label>
+          <select v-model="managedUpstreamProvider" class="input">
+            <option value="">普通 OpenAI API Key</option>
+            <option value="packyapi">PackyAPI 文本模型</option>
+          </select>
+          <p class="input-hint">PackyAPI Key 仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
+        </div>
         <div>
           <label class="input-label">{{ t('admin.accounts.baseUrl') }}</label>
           <input
@@ -2256,6 +2264,7 @@ interface TempUnschedRuleForm {
 const submitting = ref(false)
 const editBaseUrl = ref('https://api.anthropic.com')
 const editApiKey = ref('')
+const managedUpstreamProvider = ref<'' | 'packyapi'>('')
 // Bedrock credentials
 const editBedrockAccessKeyId = ref('')
 const editBedrockSecretAccessKey = ref('')
@@ -2576,6 +2585,9 @@ const syncFormFromAccount = (newAccount: Account | null) => {
   mixedScheduling.value = false
   allowOverages.value = false
   const extra = newAccount.extra as Record<string, unknown> | undefined
+  managedUpstreamProvider.value = newAccount.platform === 'openai' && newAccount.type === 'apikey' && extra?.upstream_provider === 'packyapi'
+    ? 'packyapi'
+    : ''
   mixedScheduling.value = extra?.mixed_scheduling === true
   allowOverages.value = extra?.allow_overages === true
 
@@ -3720,6 +3732,12 @@ const handleSubmit = async () => {
         delete newExtra.openai_compact_mode
       } else {
         newExtra.openai_compact_mode = openAICompactMode.value
+      }
+
+      if (managedUpstreamProvider.value) {
+        newExtra.upstream_provider = managedUpstreamProvider.value
+      } else {
+        delete newExtra.upstream_provider
       }
 
       delete newExtra.codex_image_generation_bridge_enabled

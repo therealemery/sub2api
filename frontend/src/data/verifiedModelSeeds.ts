@@ -19,7 +19,7 @@ export interface OfficialPricingTier {
 export interface CatalogEligibilitySource {
   source: 'packyapi'
   discountPercent: number
-  checkedAt: '2026-08-31'
+  checkedAt: '2026-09-07'
   sourceUrl: 'https://www.packyapi.com/pricing'
 }
 
@@ -29,7 +29,7 @@ export interface ModelPricingSource {
   tiers: OfficialPricingTier[]
   multiplier: 0.7
   sourceUrl: string
-  checkedAt: '2026-08-31'
+  checkedAt: '2026-09-07'
   noteKey: string | null
 }
 
@@ -54,6 +54,11 @@ export interface RawVerifiedModelSeed {
 }
 
 export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
+  seed('gpt-6-astra', 'GPT-6 Astra', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://www.packyapi.com/pricing', 93, 5, {
+    contextWindow: '1M',
+    featured: true,
+    tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, output: 75 } }],
+  }),
   seed('gpt-5.4', 'GPT-5.4', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://developers.openai.com/api/docs/models/gpt-5.4', 93, 10, { featured: true }),
   seed('gpt-5.4-mini', 'GPT-5.4 Mini', 'gpt', ['balanced', 'fast', 'coding'], ['openai'], { input: 0.75, cachedInput: 0.075, output: 4.5 }, 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', 93, 20, { contextWindow: '400K' }),
   seed('gpt-5.5', 'GPT-5.5', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 30 }, 'https://developers.openai.com/api/docs/models/gpt-5.5', 93, 30, { featured: true }),

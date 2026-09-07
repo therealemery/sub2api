@@ -65,7 +65,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(44)
+    expect(result).toHaveLength(45)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -74,7 +74,7 @@ describe('modelCatalog', () => {
 
   it('contains the complete verified catalog with traceable discounted pricing', () => {
     const requiredIds = [
-      'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest',
+      'gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest',
       'claude-fable-5', 'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
       'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5', 'grok-4.5', 'grok-4.6',
     ]
@@ -82,11 +82,11 @@ describe('modelCatalog', () => {
 
     expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(expect.arrayContaining(requiredIds))
     expect(requiredIds.every((id) => catalog.some((model) => model.modelId === id))).toBe(true)
-    expect(new Set(requiredIds).size).toBe(20)
+    expect(new Set(requiredIds).size).toBe(21)
     expect(Object.fromEntries(['OpenAI', 'Anthropic', 'xAI'].map((provider) => [
       provider,
       catalog.filter((model) => model.provider === provider).length,
-    ]))).toEqual({ OpenAI: 9, Anthropic: 9, xAI: 2 })
+    ]))).toEqual({ OpenAI: 10, Anthropic: 9, xAI: 2 })
 
     for (const modelId of requiredIds) {
       const model = catalog.find((entry) => entry.modelId === modelId)
@@ -94,13 +94,13 @@ describe('modelCatalog', () => {
       expect(model?.pricingSource).toMatchObject({
         status: expect.stringMatching(/^(paid|free|unpublished)$/),
         sourceUrl: expect.stringMatching(/^https:\/\//),
-        checkedAt: '2026-08-31',
+        checkedAt: '2026-09-07',
         multiplier: 0.7,
       })
       expect(model?.eligibilitySource).toMatchObject({
         source: 'packyapi',
         discountPercent: expect.any(Number),
-        checkedAt: '2026-08-31',
+        checkedAt: '2026-09-07',
         sourceUrl: 'https://www.packyapi.com/pricing',
       })
       expect(model?.searchAliases).toEqual(expect.any(Array))
@@ -118,6 +118,7 @@ describe('modelCatalog', () => {
       const model = catalog.find((entry) => entry.modelId === modelId)
       return [modelId, model?.pricingSource?.official]
     }))).toEqual({
+      'gpt-6-astra': { input: 5, cachedInput: 0.5, output: 25 },
       'gpt-5.4': { input: 2.5, cachedInput: 0.25, output: 15 },
       'gpt-5.4-mini': { input: 0.75, cachedInput: 0.075, output: 4.5 },
       'gpt-5.5': { input: 5, cachedInput: 0.5, output: 30 },
@@ -144,6 +145,7 @@ describe('modelCatalog', () => {
       const model = catalog.find((entry) => entry.modelId === modelId)
       return [modelId, model?.pricingSource?.sourceUrl]
     }))).toEqual({
+      'gpt-6-astra': 'https://www.packyapi.com/pricing',
       'gpt-5.4': 'https://developers.openai.com/api/docs/models/gpt-5.4',
       'gpt-5.4-mini': 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
       'gpt-5.5': 'https://developers.openai.com/api/docs/models/gpt-5.5',
@@ -192,9 +194,9 @@ describe('modelCatalog', () => {
     }])
   })
 
-  it('contains the exact 44-model eligibility snapshot across eight providers', () => {
+  it('contains the exact 45-model eligibility snapshot across eight providers', () => {
     const providerIds = {
-      OpenAI: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest'],
+      OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-daybreak-blue-latest', 'codex-auto-review', 'omni-moderation-latest'],
       Anthropic: ['claude-fable-5', 'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
       xAI: ['grok-4.5', 'grok-4.6'],
       Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-3.7-flash'],
@@ -206,16 +208,16 @@ describe('modelCatalog', () => {
     const catalog = buildModelCatalog(emptyConfig)
     const expectedIds = Object.values(providerIds).flat()
 
-    expect(verifiedModelSeedData).toHaveLength(44)
-    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(44)
-    expect(new Set(expectedIds).size).toBe(44)
+    expect(verifiedModelSeedData).toHaveLength(45)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(45)
+    expect(new Set(expectedIds).size).toBe(45)
     expect(verifiedModelSeedData.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 9, Anthropic: 9, xAI: 2, Google: 7, Qwen: 11, 'Z.AI': 2, Moonshot: 2, MiniMax: 2 })
+    ]))).toEqual({ OpenAI: 10, Anthropic: 9, xAI: 2, Google: 7, Qwen: 11, 'Z.AI': 2, Moonshot: 2, MiniMax: 2 })
 
-    const addedIds = expectedIds.slice(20)
+    const addedIds = expectedIds.slice(21)
     expect(Object.fromEntries(addedIds.map((modelId) => [
       modelId,
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.official,
@@ -254,7 +256,7 @@ describe('modelCatalog', () => {
     })
     expect(catalog.find((entry) => entry.modelId === 'qwen3.5-plus')?.pricingSource?.tiers).toHaveLength(2)
     for (const entry of catalog) {
-      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(50)
+      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(40)
       expect(entry.available).toBeNull()
       expect(entry.providerLogo).toMatch(/^\/brand\/(openai|claude|grok|gemini|qwen|glm|kimi|minimax)\.svg$/)
     }
@@ -262,7 +264,7 @@ describe('modelCatalog', () => {
 
   it('summarizes nonempty catalog providers for the homepage in stable order', () => {
     expect(getCatalogProviderSummaries()).toEqual([
-      { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 9 },
+      { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 10 },
       { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 9 },
       { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
       { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 7 },
@@ -303,7 +305,7 @@ describe('modelCatalog', () => {
     expect(model?.pricingSource).toMatchObject({
       official: { input: 2.5, cachedInput: 0.25, output: 15 },
       sourceUrl: 'https://developers.openai.com/api/docs/models/gpt-5.4',
-      checkedAt: '2026-08-31',
+      checkedAt: '2026-09-07',
     })
   })
 

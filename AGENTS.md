@@ -105,6 +105,13 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation, 44-model catalog expansion, public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
 
+### 2026-09-07 — Packy pricing refresh and GPT-6 Astra catalog entry
+
+- Added `gpt-6-astra` to the curated public model catalog with Short Context pricing (`$5/$0.5/$25`) and Long Context pricing (`$20/$2/$75`). OwnAPI display pricing remains the official rate multiplied by `0.7`.
+- Refreshed catalog pricing metadata timestamps to `2026-09-07` and verified the model catalog/detail tests (23 tests) plus Vue type checking.
+- Packy’s public `ratio_config` endpoint was read-only inspected. Do not use its raw `model_ratio` or account-group multiplier to infer a customer-facing discount: Packy’s displayed discount already incorporates its RMB/USD conversion convention. Model pruning uses the displayed discount: retain models at 6 折 or lower, represented in seed metadata as at least 40% off. The current 44-model snapshot is all 5 折 or lower; GPT-6 Astra is approximately 0.7 折 (93% off).
+- The admin account editor now preserves and edits the PackyAPI provider flag for existing OpenAI API-key accounts, so a configured Packy account can be maintained without losing its managed-upstream routing metadata.
+
 1. Review the written payment-currency conversion spec, write its implementation plan, and implement the approved CNY/USD recharge conversion before resuming PackyAPI work.
 2. Review and approve `docs/superpowers/specs/2026-09-01-ownapi-packyapi-llm-upstream-design.md`, then write its implementation plan. The design reuses the existing OwnAPI group multiplier and per-user override: channel prices are already manufacturer list × 0.7, customers default to one standard 1.0 group, and Packy token groups remain account-level upstream routing/cost metadata.
 3. Implement the approved PackyAPI upstream accounts/channel, exact model mappings, USD customer billing, and normalized USD account-cost reporting. The six selected Packy token groups cover only part of the 44-model catalog; only the verified, profitable intersection is callable.
