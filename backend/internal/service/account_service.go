@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -58,11 +59,23 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 		}
 	}
 	if provider == UpstreamProviderDCAPI {
+		if platform != PlatformOpenAI {
+			return fmt.Errorf("DC-API accounts must use the openai platform")
+		}
 		if accountType != AccountTypeUpstream && accountType != AccountTypeAPIKey {
 			return fmt.Errorf("DC-API accounts must use upstream or apikey type")
 		}
-		if model, _ := credentials["model"].(string); model == "" {
-			return fmt.Errorf("DC-API model is required")
+		if model, _ := credentials["model"].(string); strings.TrimSpace(model) != "MiniMax-H3" {
+			return fmt.Errorf("DC-API model must be MiniMax-H3")
+		}
+		baseURL, _ := credentials["base_url"].(string)
+		parsed, err := url.Parse(strings.TrimSpace(baseURL))
+		if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+			return fmt.Errorf("DC-API base_url must be an absolute URL")
+		}
+		if parsed.Scheme != "https" || parsed.Host != "console.dc-api.com" ||
+			strings.TrimRight(parsed.EscapedPath(), "/") != "" || parsed.RawQuery != "" || parsed.Fragment != "" || parsed.User != nil {
+			return fmt.Errorf("DC-API base_url must be https://console.dc-api.com")
 		}
 	}
 	return nil

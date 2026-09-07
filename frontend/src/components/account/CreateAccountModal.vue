@@ -87,6 +87,7 @@
           <button
             type="button"
             @click="form.platform = 'openai'"
+            data-testid="platform-openai"
             :class="[
               'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
               form.platform === 'openai'
@@ -313,6 +314,7 @@
           <button
             type="button"
             @click="accountCategory = 'apikey'"
+            data-testid="account-type-apikey"
             :class="[
               'flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all',
               accountCategory === 'apikey'
@@ -1012,11 +1014,12 @@
       <div v-if="form.type === 'apikey' && form.platform !== 'antigravity'" class="space-y-4">
         <div v-if="form.platform === 'openai'" class="space-y-2">
           <label class="input-label">上游用途 / Upstream provider</label>
-          <select v-model="managedUpstreamProvider" class="input">
+          <select v-model="managedUpstreamProvider" class="input" data-testid="managed-upstream-provider">
             <option value="">普通 OpenAI API Key</option>
             <option value="packyapi">PackyAPI 文本模型</option>
+            <option value="dc-api">DC-API 视频模型</option>
           </select>
-          <p class="input-hint">PackyAPI Key 仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
+          <p class="input-hint">上游密钥仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
         </div>
         <div>
           <label class="input-label">{{ t('admin.accounts.baseUrl') }}</label>
@@ -1024,6 +1027,8 @@
             v-model="apiKeyBaseUrl"
             type="text"
             class="input"
+            data-testid="api-key-base-url"
+            :readonly="managedUpstreamProvider === 'dc-api'"
             :placeholder="
               form.platform === 'openai'
                 ? 'https://api.openai.com'
@@ -1041,6 +1046,7 @@
             type="password"
             required
             class="input font-mono"
+            data-testid="api-key-value"
             :placeholder="
               form.platform === 'openai'
                 ? 'sk-proj-...'
@@ -1067,7 +1073,17 @@
           <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
           <div
-            v-if="isOpenAIModelRestrictionDisabled"
+            v-if="managedUpstreamProvider === 'dc-api'"
+            class="mb-3 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20"
+            data-testid="dc-api-model-lock"
+          >
+            <p class="text-xs text-blue-700 dark:text-blue-400">
+              MiniMax-H3 → MiniMax-H3
+            </p>
+          </div>
+
+          <div
+            v-else-if="isOpenAIModelRestrictionDisabled"
             class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
           >
             <p class="text-xs text-amber-700 dark:text-amber-400">
@@ -2489,7 +2505,7 @@
 
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
-        v-if="form.platform === 'openai'"
+        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api'"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -2519,7 +2535,7 @@
 
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
       <div
-        v-if="form.platform === 'openai' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
+        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -2620,7 +2636,7 @@
 
       <!-- OpenAI Compact 能力配置 -->
       <div
-        v-if="form.platform === 'openai' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
+        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
       >
         <div class="flex items-center justify-between">
@@ -3141,6 +3157,12 @@ import GroupSelector from '@/components/common/GroupSelector.vue'
 import ModelWhitelistSelector from '@/components/account/ModelWhitelistSelector.vue'
 import QuotaLimitCard from '@/components/account/QuotaLimitCard.vue'
 import { applyInterceptWarmup } from '@/components/account/credentialsBuilder'
+import {
+  DC_API_BASE_URL,
+  applyManagedUpstreamCredentials,
+  applyManagedUpstreamExtra,
+  type ManagedUpstreamProvider
+} from '@/components/account/managedUpstream'
 import { formatDateTimeLocalInput, parseDateTimeLocalInput } from '@/utils/format'
 import { createStableObjectKeyResolver } from '@/utils/stableObjectKey'
 import { VERTEX_LOCATION_OPTIONS } from '@/constants/account'
@@ -3263,7 +3285,7 @@ const accountCategory = ref<'oauth-based' | 'apikey' | 'bedrock' | 'service_acco
 const addMethod = ref<AddMethod>('oauth') // For oauth-based: 'oauth' or 'setup-token'
 const apiKeyBaseUrl = ref('https://api.anthropic.com')
 const apiKeyValue = ref('')
-const managedUpstreamProvider = ref<'' | 'packyapi'>('')
+const managedUpstreamProvider = ref<ManagedUpstreamProvider>('')
 const editQuotaLimit = ref<number | null>(null)
 const editQuotaDailyLimit = ref<number | null>(null)
 const editQuotaWeeklyLimit = ref<number | null>(null)
@@ -3653,6 +3675,7 @@ watch(
       interceptWarmupRequests.value = false
     }
     if (newPlatform !== 'openai') {
+      managedUpstreamProvider.value = ''
       openaiPassthroughEnabled.value = false
       openaiOAuthResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
       openaiAPIKeyResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
@@ -3670,6 +3693,18 @@ watch(
     antigravityOAuth.resetState()
   }
 )
+
+watch(managedUpstreamProvider, (provider) => {
+  if (provider !== 'dc-api') return
+  apiKeyBaseUrl.value = DC_API_BASE_URL
+  openaiPassthroughEnabled.value = false
+  openAICompactMode.value = 'auto'
+  openAICompactModelMappings.value = []
+  openaiAPIKeyResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
+  modelRestrictionMode.value = 'whitelist'
+  allowedModels.value = ['MiniMax-H3']
+  modelMappings.value = []
+})
 
 // Gemini AI Studio OAuth availability (requires operator-configured OAuth client)
 watch(
@@ -3713,7 +3748,7 @@ const handleSelectGeminiOAuthType = (oauthType: 'code_assist' | 'google_one' | '
 watch(
   [modelRestrictionMode, () => form.platform],
   ([newMode]) => {
-    if (newMode === 'whitelist') {
+    if (newMode === 'whitelist' && managedUpstreamProvider.value !== 'dc-api') {
       allowedModels.value = [...getModelsByPlatform(form.platform)]
     }
   }
@@ -4448,8 +4483,11 @@ const handleSubmit = async () => {
     return
   }
 
-  form.credentials = credentials
-  const extra = buildAnthropicExtra(buildOpenAIExtra(Object.keys(managedExtra).length ? managedExtra : undefined))
+  form.credentials = applyManagedUpstreamCredentials(managedUpstreamProvider.value, credentials)
+  const builtExtra = buildAnthropicExtra(buildOpenAIExtra(Object.keys(managedExtra).length ? managedExtra : undefined))
+  const extra = form.platform === 'openai'
+    ? applyManagedUpstreamExtra(managedUpstreamProvider.value, builtExtra)
+    : builtExtra
 
   await doCreateAccount({
     ...form,

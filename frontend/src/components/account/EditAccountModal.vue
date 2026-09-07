@@ -30,11 +30,12 @@
       <div v-if="account.type === 'apikey'" class="space-y-4">
         <div v-if="account.platform === 'openai'" class="space-y-2">
           <label class="input-label">上游用途 / Upstream provider</label>
-          <select v-model="managedUpstreamProvider" class="input">
+          <select v-model="managedUpstreamProvider" class="input" data-testid="managed-upstream-provider">
             <option value="">普通 OpenAI API Key</option>
             <option value="packyapi">PackyAPI 文本模型</option>
+            <option value="dc-api">DC-API 视频模型</option>
           </select>
-          <p class="input-hint">PackyAPI Key 仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
+          <p class="input-hint">上游密钥仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
         </div>
         <div>
           <label class="input-label">{{ t('admin.accounts.baseUrl') }}</label>
@@ -42,6 +43,8 @@
             v-model="editBaseUrl"
             type="text"
             class="input"
+            data-testid="api-key-base-url"
+            :readonly="managedUpstreamProvider === 'dc-api'"
             :placeholder="
               account.platform === 'openai'
                 ? 'https://api.openai.com'
@@ -82,7 +85,17 @@
           <label class="input-label">{{ t('admin.accounts.modelRestriction') }}</label>
 
           <div
-            v-if="isOpenAIModelRestrictionDisabled"
+            v-if="managedUpstreamProvider === 'dc-api'"
+            class="mb-3 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20"
+            data-testid="dc-api-model-lock"
+          >
+            <p class="text-xs text-blue-700 dark:text-blue-400">
+              MiniMax-H3 → MiniMax-H3
+            </p>
+          </div>
+
+          <div
+            v-else-if="isOpenAIModelRestrictionDisabled"
             class="mb-3 rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20"
           >
             <p class="text-xs text-amber-700 dark:text-amber-400">
@@ -1297,7 +1310,7 @@
 
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
-        v-if="account?.platform === 'openai' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -1327,7 +1340,7 @@
 
       <!-- OpenAI Codex 图片生成桥接账号级覆盖 -->
       <div
-        v-if="account?.platform === 'openai' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="overflow-hidden rounded-lg border border-sky-100 bg-sky-50/60 shadow-sm dark:border-sky-900/50 dark:bg-sky-950/20">
@@ -1387,7 +1400,7 @@
 
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
       <div
-        v-if="account?.platform === 'openai' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -1590,7 +1603,7 @@
       </div>
 
       <div
-        v-if="account?.platform === 'openai' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
       >
         <div class="flex items-center justify-between">
@@ -2200,6 +2213,12 @@ import GroupSelector from '@/components/common/GroupSelector.vue'
 import ModelWhitelistSelector from '@/components/account/ModelWhitelistSelector.vue'
 import QuotaLimitCard from '@/components/account/QuotaLimitCard.vue'
 import { applyInterceptWarmup } from '@/components/account/credentialsBuilder'
+import {
+  DC_API_BASE_URL,
+  applyManagedUpstreamCredentials,
+  applyManagedUpstreamExtra,
+  type ManagedUpstreamProvider
+} from '@/components/account/managedUpstream'
 import { formatDateTime, formatDateTimeLocalInput, parseDateTimeLocalInput } from '@/utils/format'
 import { createStableObjectKeyResolver } from '@/utils/stableObjectKey'
 import { VERTEX_LOCATION_OPTIONS } from '@/constants/account'
@@ -2264,7 +2283,7 @@ interface TempUnschedRuleForm {
 const submitting = ref(false)
 const editBaseUrl = ref('https://api.anthropic.com')
 const editApiKey = ref('')
-const managedUpstreamProvider = ref<'' | 'packyapi'>('')
+const managedUpstreamProvider = ref<ManagedUpstreamProvider>('')
 // Bedrock credentials
 const editBedrockAccessKeyId = ref('')
 const editBedrockSecretAccessKey = ref('')
@@ -2585,8 +2604,10 @@ const syncFormFromAccount = (newAccount: Account | null) => {
   mixedScheduling.value = false
   allowOverages.value = false
   const extra = newAccount.extra as Record<string, unknown> | undefined
-  managedUpstreamProvider.value = newAccount.platform === 'openai' && newAccount.type === 'apikey' && extra?.upstream_provider === 'packyapi'
-    ? 'packyapi'
+  const upstreamProvider = extra?.upstream_provider
+  managedUpstreamProvider.value = newAccount.platform === 'openai' && newAccount.type === 'apikey' &&
+    (upstreamProvider === 'packyapi' || upstreamProvider === 'dc-api')
+    ? upstreamProvider
     : ''
   mixedScheduling.value = extra?.mixed_scheduling === true
   allowOverages.value = extra?.allow_overages === true
@@ -2723,6 +2744,9 @@ const syncFormFromAccount = (newAccount: Account | null) => {
           ? 'https://generativelanguage.googleapis.com'
           : 'https://api.anthropic.com'
     editBaseUrl.value = (credentials.base_url as string) || platformDefaultUrl
+    if (managedUpstreamProvider.value === 'dc-api') {
+      editBaseUrl.value = DC_API_BASE_URL
+    }
 
     // Load model mappings and detect mode
     const existingMappings = credentials.model_mapping as Record<string, string> | undefined
@@ -2903,6 +2927,19 @@ watch(
   },
   { immediate: true }
 )
+
+watch(managedUpstreamProvider, (provider) => {
+  if (provider !== 'dc-api') return
+  editBaseUrl.value = DC_API_BASE_URL
+  openaiPassthroughEnabled.value = false
+  openAICompactMode.value = 'auto'
+  openAICompactModelMappings.value = []
+  openaiAPIKeyResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
+  codexImageGenerationBridgeMode.value = 'inherit'
+  modelRestrictionMode.value = 'whitelist'
+  allowedModels.value = ['MiniMax-H3']
+  modelMappings.value = []
+})
 
 // Model mapping helpers
 const addModelMapping = () => {
@@ -3345,6 +3382,7 @@ const handleSubmit = async () => {
     // For apikey type, handle credentials update
     if (props.account.type === 'apikey') {
       const currentCredentials = (props.account.credentials as Record<string, unknown>) || {}
+      const currentManagedProvider = (props.account.extra as Record<string, unknown> | undefined)?.upstream_provider
       const newBaseUrl = editBaseUrl.value.trim() || defaultBaseUrl.value
       const shouldApplyModelMapping = !(props.account.platform === 'openai' && openaiPassthroughEnabled.value)
 
@@ -3410,7 +3448,11 @@ const handleSubmit = async () => {
         return
       }
 
-      updatePayload.credentials = newCredentials
+      updatePayload.credentials = applyManagedUpstreamCredentials(
+        managedUpstreamProvider.value,
+        newCredentials,
+        (currentManagedProvider === 'dc-api' ? 'dc-api' : currentManagedProvider === 'packyapi' ? 'packyapi' : '')
+      )
     } else if (props.account.type === 'upstream') {
       const currentCredentials = (props.account.credentials as Record<string, unknown>) || {}
       const newCredentials: Record<string, unknown> = { ...currentCredentials }
@@ -3734,12 +3776,6 @@ const handleSubmit = async () => {
         newExtra.openai_compact_mode = openAICompactMode.value
       }
 
-      if (managedUpstreamProvider.value) {
-        newExtra.upstream_provider = managedUpstreamProvider.value
-      } else {
-        delete newExtra.upstream_provider
-      }
-
       delete newExtra.codex_image_generation_bridge_enabled
       if (codexImageGenerationBridgeMode.value === 'inherit') {
         delete newExtra.codex_image_generation_bridge
@@ -3758,13 +3794,14 @@ const handleSubmit = async () => {
         }
       }
 
-      updatePayload.extra = newExtra
+      updatePayload.extra = applyManagedUpstreamExtra(managedUpstreamProvider.value, newExtra)
     }
 
     // For apikey/bedrock accounts, handle quota_limit in extra
     if (props.account.type === 'apikey' || props.account.type === 'bedrock') {
-      const currentExtra = (updatePayload.extra as Record<string, unknown>) ||
-        (props.account.extra as Record<string, unknown>) || {}
+      const currentExtra = Object.prototype.hasOwnProperty.call(updatePayload, 'extra')
+        ? (updatePayload.extra as Record<string, unknown> | undefined) || {}
+        : (props.account.extra as Record<string, unknown>) || {}
       const newExtra: Record<string, unknown> = { ...currentExtra }
       // Total quota
       if (editQuotaLimit.value != null && editQuotaLimit.value > 0) {

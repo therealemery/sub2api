@@ -163,6 +163,62 @@ function mountModal(account = buildAccount()) {
 }
 
 describe('EditAccountModal', () => {
+  it('preserves and repairs a DC-API MiniMax H3 account without replacing its key', async () => {
+    const account = buildAccount()
+    account.name = 'minimax-h3'
+    account.extra = { upstream_provider: 'dc-api' }
+    account.credentials = {
+      api_key: 'existing-dc-secret',
+      base_url: 'https://console.dc-api.com/v1/videos',
+      model_mapping: { 'MiniMax-H3': 'MiniMax-H3' }
+    }
+    updateAccountMock.mockReset()
+    checkMixedChannelRiskMock.mockReset()
+    checkMixedChannelRiskMock.mockResolvedValue({ has_risk: false })
+    updateAccountMock.mockResolvedValue(account)
+
+    const wrapper = mountModal(account)
+
+    expect((wrapper.get('[data-testid="managed-upstream-provider"]').element as HTMLSelectElement).value).toBe('dc-api')
+    expect((wrapper.get('[data-testid="api-key-base-url"]').element as HTMLInputElement).readOnly).toBe(true)
+    expect(wrapper.get('[data-testid="dc-api-model-lock"]').text()).toContain('MiniMax-H3')
+    await wrapper.get('form#edit-account-form').trigger('submit.prevent')
+
+    expect(updateAccountMock).toHaveBeenCalledTimes(1)
+    const payload = updateAccountMock.mock.calls[0]?.[1]
+    expect(payload.extra?.upstream_provider).toBe('dc-api')
+    expect(payload.credentials).toMatchObject({
+      api_key: 'existing-dc-secret',
+      base_url: 'https://console.dc-api.com',
+      model: 'MiniMax-H3',
+      model_mapping: { 'MiniMax-H3': 'MiniMax-H3' }
+    })
+  })
+
+  it('removes DC-API-only metadata when changing back to a normal OpenAI account', async () => {
+    const account = buildAccount()
+    account.extra = { upstream_provider: 'dc-api' }
+    account.credentials = {
+      api_key: 'existing-dc-secret',
+      base_url: 'https://console.dc-api.com',
+      model: 'MiniMax-H3',
+      model_mapping: { 'MiniMax-H3': 'MiniMax-H3' }
+    }
+    updateAccountMock.mockReset()
+    checkMixedChannelRiskMock.mockReset()
+    checkMixedChannelRiskMock.mockResolvedValue({ has_risk: false })
+    updateAccountMock.mockResolvedValue(account)
+
+    const wrapper = mountModal(account)
+    await wrapper.get('[data-testid="managed-upstream-provider"]').setValue('')
+    await wrapper.get('form#edit-account-form').trigger('submit.prevent')
+
+    expect(updateAccountMock).toHaveBeenCalledTimes(1)
+    const payload = updateAccountMock.mock.calls[0]?.[1]
+    expect(payload.extra).not.toHaveProperty('upstream_provider')
+    expect(payload.credentials).not.toHaveProperty('model')
+  })
+
   it('reopening the same account rehydrates the OpenAI whitelist from props', async () => {
     const account = buildAccount()
     updateAccountMock.mockReset()
