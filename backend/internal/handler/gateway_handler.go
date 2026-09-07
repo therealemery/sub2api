@@ -950,6 +950,7 @@ func (h *GatewayHandler) Models(c *gin.Context) {
 	availableModels := h.gatewayService.GetAvailableModels(c.Request.Context(), groupID, "")
 
 	if len(availableModels) > 0 {
+		availableModels = appendModelIfMissing(availableModels, miniMaxH3Model)
 		// Build model list from whitelist
 		models := make([]claude.Model, 0, len(availableModels))
 		for _, modelID := range availableModels {
@@ -969,9 +970,11 @@ func (h *GatewayHandler) Models(c *gin.Context) {
 
 	// Fallback to default models
 	if platform == "openai" {
+		models := append([]openai.Model(nil), openai.DefaultModels...)
+		models = append(models, openai.Model{ID: miniMaxH3Model, Object: "model", Type: "model", OwnedBy: "ownapi", DisplayName: miniMaxH3Model})
 		c.JSON(http.StatusOK, gin.H{
 			"object": "list",
-			"data":   openai.DefaultModels,
+			"data":   models,
 		})
 		return
 	}
@@ -980,6 +983,15 @@ func (h *GatewayHandler) Models(c *gin.Context) {
 		"object": "list",
 		"data":   claude.DefaultModels,
 	})
+}
+
+func appendModelIfMissing(models []string, model string) []string {
+	for _, existing := range models {
+		if strings.EqualFold(existing, model) {
+			return models
+		}
+	}
+	return append(models, model)
 }
 
 // AntigravityModels 返回 Antigravity 支持的全部模型

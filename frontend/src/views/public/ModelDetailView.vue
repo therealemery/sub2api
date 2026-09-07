@@ -37,12 +37,32 @@
                 <span class="section-label">{{ t('publicModels.capability') }}</span>
                 <div class="capability-list"><span v-for="capability in model.capabilities" :key="capability">{{ capability }}</span></div>
               </section>
-              <ModelCodeExamples :model-id="model.modelId" />
+              <ModelCodeExamples :model-id="model.modelId" :modality="model.modality" />
             </div>
 
             <aside class="pricing-panel">
               <span class="section-label">{{ t('publicModels.pricing') }}</span>
-              <template v-if="detailPricingSource">
+              <template v-if="model.videoPricing.length">
+                <div class="pricing-source">
+                  <span>{{ t('publicModels.videoPriceEstimate') }}</span>
+                  <a href="https://console.dc-api.com/integration-doc" target="_blank" rel="noopener noreferrer">{{ t('publicModels.viewProtocol') }}</a>
+                </div>
+                <div class="pricing-tier-heading">
+                  <strong>{{ t('publicModels.perSecondBilling') }}</strong>
+                  <span>{{ t('publicModels.officialSeventyFivePercent') }}</span>
+                </div>
+                <table>
+                  <thead><tr><th>{{ t('publicModels.resolution') }}</th><th>{{ t('publicModels.officialListPrice') }}</th><th>{{ t('publicModels.ownApiPrice') }}</th></tr></thead>
+                  <tbody>
+                    <tr v-for="tier in model.videoPricing" :key="tier.resolution">
+                      <th>{{ tier.resolution }}</th>
+                      <td>${{ formatVideoPrice(tier.officialPerSecond) }}{{ t('publicModels.perSecond') }}</td>
+                      <td>${{ formatVideoPrice(tier.ownApiPerSecond) }}{{ t('publicModels.perSecond') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+              <template v-else-if="detailPricingSource">
                 <p v-if="model.isAlias && model.aliasNoteKey" class="alias-note">{{ t(model.aliasNoteKey) }}</p>
                 <div class="pricing-source">
                   <span>{{ t('publicModels.pricingCheckedAt', { date: detailPricingSource.checkedAt }) }}</span>
@@ -103,6 +123,12 @@
               <p v-else>{{ t('publicModels.priceUnavailable') }}</p>
             </aside>
           </div>
+          <MiniMaxVideoGenerator
+            v-if="isAuthenticated && model.modelId === 'MiniMax-H3'"
+            :model-id="model.modelId"
+            :price768p="model.videoPricing.find((tier) => tier.resolution === '768p')?.ownApiPerSecond || 0.075"
+            :price2k="model.videoPricing.find((tier) => tier.resolution === '2K')?.ownApiPerSecond || 0.121875"
+          />
         </section>
 
         <section v-if="related.length" class="related-section">
@@ -130,6 +156,7 @@ import { useAuthStore } from '@/stores'
 import Icon from '@/components/icons/Icon.vue'
 import PublicSiteLayout from '@/components/public/PublicSiteLayout.vue'
 import ModelCodeExamples from '@/components/models/ModelCodeExamples.vue'
+import MiniMaxVideoGenerator from '@/components/models/MiniMaxVideoGenerator.vue'
 import modelDisplayAPI from '@/api/modelDisplay'
 import {
   buildModelCatalog,
@@ -217,6 +244,10 @@ async function copyModelId() {
 
 function formatPrice(value: number): string {
   return value.toLocaleString(undefined, { maximumFractionDigits: 6 })
+}
+
+function formatVideoPrice(value: number): string {
+  return value.toFixed(6).replace(/0+$/, '').replace(/\.$/, '')
 }
 
 function pricingSourceEntryFor(entry: ModelCatalogEntry): ModelCatalogEntry {

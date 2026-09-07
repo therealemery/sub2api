@@ -43,7 +43,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
 
-const props = defineProps<{ modelId: string }>()
+const props = defineProps<{ modelId: string; modality?: string }>()
 const { t } = useI18n()
 const activeTab = ref<'python' | 'typescript' | 'curl'>('python')
 const copied = ref(false)
@@ -57,11 +57,19 @@ const tabs = [
   { id: 'curl', labelKey: 'publicModels.code.curl' },
 ] as const
 
-const examples = computed(() => ({
+const textExamples = computed(() => ({
   python: `import os\n+from openai import OpenAI\n\nclient = OpenAI(\n    api_key=os.environ["OWNAPI_API_KEY"],\n    base_url="${baseUrl.value}"\n)\n\nresponse = client.chat.completions.create(\n    model="${props.modelId}",\n    messages=[{"role": "user", "content": "Hello"}]\n)`,
   typescript: `import OpenAI from "openai";\n\nconst client = new OpenAI({\n  apiKey: process.env.OWNAPI_API_KEY,\n  baseURL: "${baseUrl.value}"\n});\n\nconst response = await client.chat.completions.create({\n  model: "${props.modelId}",\n  messages: [{ role: "user", content: "Hello" }]\n});`,
   curl: `curl "${baseUrl.value}/chat/completions" \\\n  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "${props.modelId}",\n    "messages": [{"role": "user", "content": "Hello"}]\n  }'`,
 }))
+
+const videoExamples = computed(() => ({
+  python: `import os\nimport requests\n\nresponse = requests.post(\n    "${baseUrl.value}/videos",\n    headers={"Authorization": f"Bearer {os.environ['OWNAPI_API_KEY']}"},\n    json={\n        "model": "${props.modelId}",\n        "prompt": "A cinematic spacecraft moving through clouds",\n        "duration": 5,\n        "resolution": "768p",\n        "reference_images": [{"url": "https://example.com/reference.jpg"}]\n    }\n)\nprint(response.json())`,
+  typescript: `const response = await fetch("${baseUrl.value}/videos", {\n  method: "POST",\n  headers: {\n    "Authorization": \`Bearer \${process.env.OWNAPI_API_KEY}\`,\n    "Content-Type": "application/json"\n  },\n  body: JSON.stringify({\n    model: "${props.modelId}",\n    prompt: "A cinematic spacecraft moving through clouds",\n    duration: 5,\n    resolution: "768p",\n    reference_images: [{ url: "https://example.com/reference.jpg" }]\n  })\n});\nconsole.log(await response.json());`,
+  curl: `curl "${baseUrl.value}/videos" \\\n  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{\n    "model": "${props.modelId}",\n    "prompt": "A cinematic spacecraft moving through clouds",\n    "duration": 5,\n    "resolution": "768p",\n    "reference_images": [{"url": "https://example.com/reference.jpg"}]\n  }'`,
+}))
+
+const examples = computed(() => props.modality === 'Video' ? videoExamples.value : textExamples.value)
 
 const activeCode = computed(() => examples.value[activeTab.value])
 

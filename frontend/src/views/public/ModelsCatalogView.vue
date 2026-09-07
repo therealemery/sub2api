@@ -79,7 +79,23 @@
                   <p>{{ t(model.summaryKey) }}</p>
                   <div class="capability-row"><span v-for="capability in model.capabilities.slice(0, 3)" :key="capability">{{ capability }}</span></div>
                   <p v-if="model.isAlias && model.aliasNoteKey" class="alias-note">{{ t(model.aliasNoteKey) }}</p>
-                  <div v-if="model.pricingSource?.status === 'paid'" class="pricing-card">
+                  <div v-if="model.videoPricing.length" class="pricing-card">
+                    <div class="pricing-card-heading">
+                      <span>{{ t('publicModels.ownApiPrice') }}</span>
+                      <small>{{ t('publicModels.officialListPrice') }}</small>
+                    </div>
+                    <div class="pricing-badge">{{ t('publicModels.officialSeventyFivePercent') }}</div>
+                    <div class="price-lines">
+                      <div v-for="tier in model.videoPricing" :key="tier.resolution" class="price-line">
+                        <span>{{ tier.resolution }}</span>
+                        <div>
+                          <small>{{ t('publicModels.officialListPrice') }} <s>${{ formatVideoPrice(tier.officialPerSecond) }}</s></small>
+                          <strong>${{ formatVideoPrice(tier.ownApiPerSecond) }} <span class="price-unit">{{ t('publicModels.perSecond') }}</span></strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else-if="model.pricingSource?.status === 'paid'" class="pricing-card">
                     <div class="pricing-card-heading">
                       <span>{{ t('publicModels.ownApiPrice') }}</span>
                       <small>{{ t('publicModels.officialListPrice') }}</small>
@@ -242,6 +258,10 @@ function longPricingTier(model: ModelCatalogEntry) {
 function formatPriceValue(value: number | null): string {
   const formatted = formatCatalogPrice(value)
   return formatted == null ? t('publicModels.notPublished') : `$${formatted}`
+}
+
+function formatVideoPrice(value: number): string {
+  return value.toFixed(6).replace(/0+$/, '').replace(/\.$/, '')
 }
 
 function contextKey(model: ModelCatalogEntry): string {

@@ -77,7 +77,7 @@ describe('ModelsCatalogView', () => {
 
     const wrapper = mountCatalog()
     await flushPromises()
-    expect(wrapper.get('#catalog-results-title').text()).toBe('43 models')
+    expect(wrapper.get('#catalog-results-title').text()).toBe('44 models')
   })
 
   it('renders all eight providers as ordered sections with correct model counts', async () => {
@@ -88,7 +88,7 @@ describe('ModelsCatalogView', () => {
     expect(sections.map((section) => section.get('h2').text())).toEqual([
       'OpenAI', 'Anthropic', 'xAI', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax',
     ])
-    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 8, 2, 6, 11, 4, 1, 3])
+    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 8, 2, 6, 11, 4, 1, 4])
     for (const section of sections) {
       const provider = section.get('h2').text()
       expect(section.findAll('.provider-line').every((line) => line.text().includes(provider))).toBe(true)

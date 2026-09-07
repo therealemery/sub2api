@@ -18,7 +18,13 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.capability': 'Capability',
       'publicModels.officialListPrice': 'Official list price',
       'publicModels.officialSeventyPercent': 'Official price x 70%',
+      'publicModels.officialSeventyFivePercent': 'Official price x 75%',
       'publicModels.ownApiPrice': 'OwnAPI price',
+      'publicModels.perSecond': '/ second',
+      'publicModels.perSecondBilling': 'Billed by generated duration',
+      'publicModels.resolution': 'Resolution',
+      'publicModels.videoPriceEstimate': 'Video price estimate',
+      'publicModels.viewProtocol': 'View API protocol',
       'publicModels.input': 'Input',
       'publicModels.cachedInput': 'Cached input',
       'publicModels.output': 'Output',
@@ -205,6 +211,19 @@ describe('ModelDetailView', () => {
 
     expect(wrapper.text()).toContain('Anthropic cache-write pricing is separate from the cached-input rate shown above.')
     expect(wrapper.text()).toContain('Anthropic data-residency options may add provider charges.')
+  })
+
+  it('renders MiniMax H3 video pricing by resolution', async () => {
+    const wrapper = mountDetail('minimax-h3')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('MiniMax H3')
+    expect(wrapper.text()).toContain('Video')
+    expect(wrapper.text()).toContain('Official price x 75%')
+    expect(wrapper.text()).toContain('$0.1/ second')
+    expect(wrapper.text()).toContain('$0.075/ second')
+    expect(wrapper.text()).toContain('$0.1625/ second')
+    expect(wrapper.text()).toContain('$0.121875/ second')
   })
 
 })
