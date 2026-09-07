@@ -1,0 +1,114 @@
+<template>
+  <section class="video-generator">
+    <div class="generator-heading">
+      <div><span>{{ t('publicModels.videoGenerator.eyebrow') }}</span><h2>{{ t('publicModels.videoGenerator.title') }}</h2></div>
+      <strong>{{ estimatedPrice }}</strong>
+    </div>
+    <form @submit.prevent="generate">
+      <label>
+        <span>{{ t('publicModels.videoGenerator.apiKey') }}</span>
+        <input v-model.trim="apiKey" type="password" autocomplete="off" required placeholder="sk-…" />
+      </label>
+      <label class="prompt-field">
+        <span>{{ t('publicModels.videoGenerator.prompt') }}</span>
+        <textarea v-model.trim="prompt" required maxlength="100000" :placeholder="t('publicModels.videoGenerator.promptPlaceholder')"></textarea>
+      </label>
+      <div class="options-grid">
+        <label><span>{{ t('publicModels.videoGenerator.duration') }}</span><select v-model.number="duration"><option :value="5">5s</option><option :value="10">10s</option></select></label>
+        <label><span>{{ t('publicModels.videoGenerator.resolution') }}</span><select v-model="resolution"><option value="768p">768p</option><option value="2k">2K</option></select></label>
+      </div>
+      <label>
+        <span>{{ t('publicModels.videoGenerator.referenceUrl') }}</span>
+        <input v-model.trim="referenceURL" type="url" placeholder="https://…" />
+      </label>
+      <label>
+        <span>{{ t('publicModels.videoGenerator.referenceFile') }}</span>
+        <input type="file" accept="image/*" @change="selectReferenceFile" />
+      </label>
+      <button type="submit" :disabled="submitting">{{ submitting ? t('publicModels.videoGenerator.submitting') : t('publicModels.videoGenerator.submit') }}</button>
+    </form>
+    <p v-if="error" class="generator-error">{{ error }}</p>
+    <div v-if="task" class="task-result" aria-live="polite">
+      <div><span>{{ t('publicModels.videoGenerator.status') }}</span><strong>{{ task.status }}</strong></div>
+      <progress v-if="task.status !== 'completed' && task.status !== 'failed'" :value="task.progress || 0" max="100"></progress>
+      <video v-if="task.status === 'completed' && task.url" :src="task.url" controls playsinline></video>
+      <a v-if="task.status === 'completed' && task.url" :href="task.url" target="_blank" rel="noopener noreferrer">{{ t('publicModels.videoGenerator.download') }}</a>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+interface VideoTask { id: string; status: string; progress?: number; url?: string }
+const props = defineProps<{ modelId: string; price768p: number; price2k: number }>()
+const { t } = useI18n()
+const apiKey = ref('')
+const prompt = ref('')
+const duration = ref(5)
+const resolution = ref<'768p' | '2k'>('768p')
+const referenceURL = ref('')
+const referenceDataURL = ref('')
+const submitting = ref(false)
+const error = ref('')
+const task = ref<VideoTask | null>(null)
+let pollTimer: number | undefined
+const estimatedPrice = computed(() => `$${(duration.value * (resolution.value === '2k' ? props.price2k : props.price768p)).toFixed(6).replace(/0+$/, '').replace(/\.$/, '')}`)
+
+async function generate() {
+  window.clearTimeout(pollTimer)
+  submitting.value = true
+  error.value = ''
+  task.value = null
+  const body: Record<string, unknown> = { model: props.modelId, prompt: prompt.value, duration: duration.value, resolution: resolution.value }
+  if (referenceDataURL.value) body.first_frame_image = referenceDataURL.value
+  else if (referenceURL.value) body.reference_images = [{ url: referenceURL.value }]
+  try {
+    const response = await fetch('/v1/videos', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data?.error?.message || t('publicModels.videoGenerator.failed'))
+    task.value = data
+    schedulePoll()
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : t('publicModels.videoGenerator.failed')
+  } finally {
+    submitting.value = false
+  }
+}
+
+function schedulePoll() {
+  if (!task.value || ['completed', 'failed'].includes(task.value.status)) return
+  pollTimer = window.setTimeout(poll, 4000)
+}
+
+async function poll() {
+  if (!task.value) return
+  try {
+    const response = await fetch(`/v1/videos/${encodeURIComponent(task.value.id)}`, { headers: authHeaders() })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data?.error?.message || t('publicModels.videoGenerator.failed'))
+    task.value = data
+    schedulePoll()
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : t('publicModels.videoGenerator.failed')
+  }
+}
+
+function authHeaders() { return { Authorization: `Bearer ${apiKey.value}`, 'Content-Type': 'application/json' } }
+
+function selectReferenceFile(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  referenceDataURL.value = ''
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => { referenceDataURL.value = typeof reader.result === 'string' ? reader.result : '' }
+  reader.readAsDataURL(file)
+}
+
+onBeforeUnmount(() => window.clearTimeout(pollTimer))
+</script>
+
+<style scoped>
+.video-generator{margin-top:32px;border:1px solid #dedede;border-radius:18px;background:#fff;padding:28px}.generator-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}.generator-heading span{color:#777;font-size:11px}.generator-heading h2{margin:6px 0 0;font-size:25px;letter-spacing:-.04em}.generator-heading>strong{font-size:22px}.video-generator form{display:grid;gap:16px}.video-generator label{display:grid;gap:7px;color:#555;font-size:12px}.video-generator input,.video-generator textarea,.video-generator select{width:100%;box-sizing:border-box;border:1px solid #d8d8d8;border-radius:9px;background:#fafafa;padding:11px 12px;color:#171717;font:inherit}.video-generator textarea{min-height:130px;resize:vertical}.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.video-generator form>button{min-height:44px;border:0;border-radius:9px;background:#171717;color:#fff;font:inherit;font-weight:650;cursor:pointer}.video-generator form>button:disabled{opacity:.55}.generator-error{margin:16px 0 0;color:#b42318;font-size:12px}.task-result{display:grid;gap:12px;margin-top:22px;border-top:1px solid #e5e5e5;padding-top:20px}.task-result>div{display:flex;justify-content:space-between}.task-result video{width:100%;border-radius:10px;background:#111}.task-result a{width:fit-content;color:#171717;font-size:12px;font-weight:650}@media(max-width:620px){.video-generator{padding:20px}.generator-heading{align-items:flex-start;flex-direction:column}.options-grid{grid-template-columns:1fr}}
+</style>

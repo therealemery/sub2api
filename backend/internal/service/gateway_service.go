@@ -28,6 +28,7 @@ import (
 	"github.com/Wei-Shaw/sub2api/internal/pkg/claude"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/ctxkey"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/logger"
+	"github.com/Wei-Shaw/sub2api/internal/pkg/tlsfingerprint"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/usagestats"
 	"github.com/Wei-Shaw/sub2api/internal/util/responseheaders"
 	"github.com/Wei-Shaw/sub2api/internal/util/urlvalidator"
@@ -7922,6 +7923,85 @@ func (s *GatewayService) getUserGroupRateMultiplier(ctx context.Context, userID,
 		)
 	}
 	return resolver.Resolve(ctx, userID, groupID, groupDefaultMultiplier)
+}
+
+// ResolveUserGroupRateMultiplier exposes the effective customer multiplier for
+// non-token gateway surfaces such as video generation.
+func (s *GatewayService) ResolveUserGroupRateMultiplier(ctx context.Context, userID, groupID int64, groupDefaultMultiplier float64) float64 {
+	return s.getUserGroupRateMultiplier(ctx, userID, groupID, groupDefaultMultiplier)
+}
+
+// SelectDCVideoAccount returns a schedulable DC-API account dedicated to the
+// requested video model. Managed video accounts are global upstream resources;
+// customer access is controlled by the API key's OwnAPI group, not by exposing
+// or selecting the upstream account directly.
+func (s *GatewayService) SelectDCVideoAccount(ctx context.Context, requestedModel string) (*Account, error) {
+	accounts, err := s.accountRepo.ListSchedulableByPlatform(ctx, PlatformOpenAI)
+	if err != nil {
+		return nil, err
+	}
+	for i := range accounts {
+		account := &accounts[i]
+		if account.ManagedUpstreamProvider() != UpstreamProviderDCAPI {
+			continue
+		}
+		if !strings.EqualFold(strings.TrimSpace(account.GetCredential("model")), strings.TrimSpace(requestedModel)) {
+			continue
+		}
+		return s.hydrateSelectedAccount(ctx, account)
+	}
+	return nil, fmt.Errorf("no available video account")
+}
+
+// GetDCVideoAccount reloads and validates the account embedded in an opaque
+// OwnAPI video task id.
+func (s *GatewayService) GetDCVideoAccount(ctx context.Context, accountID int64, requestedModel string) (*Account, error) {
+	account, err := s.accountRepo.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderDCAPI ||
+		!strings.EqualFold(strings.TrimSpace(account.GetCredential("model")), strings.TrimSpace(requestedModel)) {
+		return nil, fmt.Errorf("video account is unavailable")
+	}
+	return account, nil
+}
+
+// ForwardDCVideo sends a video request through the configured DC-API account.
+// Credentials and upstream response headers never leave this service boundary.
+func (s *GatewayService) ForwardDCVideo(ctx context.Context, account *Account, method, requestPath string, body []byte) (*http.Response, error) {
+	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderDCAPI {
+		return nil, fmt.Errorf("invalid video account")
+	}
+	baseURL, err := s.validateUpstreamBaseURL(account.GetCredential("base_url"))
+	if err != nil {
+		return nil, err
+	}
+	baseURL = strings.TrimRight(baseURL, "/")
+	if strings.HasSuffix(baseURL, "/v1") && strings.HasPrefix(requestPath, "/v1/") {
+		requestPath = strings.TrimPrefix(requestPath, "/v1")
+	}
+	var reader io.Reader
+	if len(body) > 0 {
+		reader = bytes.NewReader(body)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, baseURL+requestPath, reader)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+account.GetCredential("api_key"))
+	if len(body) > 0 {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	proxyURL := ""
+	if account.ProxyID != nil && account.Proxy != nil {
+		proxyURL = account.Proxy.URL()
+	}
+	var tlsProfile *tlsfingerprint.Profile
+	if s.tlsFPProfileService != nil {
+		tlsProfile = s.tlsFPProfileService.ResolveTLSProfile(account)
+	}
+	return s.httpUpstream.DoWithTLS(req, proxyURL, account.ID, account.Concurrency, tlsProfile)
 }
 
 // RecordUsageInput 记录使用量的输入参数

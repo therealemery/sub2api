@@ -1193,6 +1193,13 @@ export default {
     ownApiPrice: 'OwnAPI price',
     officialSeventyPercent: 'Official price × 70%',
     officialEightyPercent: 'Official price × 80%',
+    officialSeventyFivePercent: 'Official price × 75%',
+    perSecond: '/ second',
+    perSecondBilling: 'Billed by generated duration',
+    resolution: 'Resolution',
+    videoPriceEstimate: 'Official pricing is inferred from a public 80%-of-list price; OwnAPI is shown at 75% of list.',
+    viewProtocol: 'View API protocol',
+    videoGenerator: { eyebrow: 'Signed-in users', title: 'Generate a MiniMax H3 video', apiKey: 'OwnAPI API key', prompt: 'Prompt', promptPlaceholder: 'Describe the scene, motion, camera and style…', duration: 'Duration', resolution: 'Resolution', referenceUrl: 'Reference image URL (optional)', referenceFile: 'Upload reference image (optional)', submit: 'Generate video', submitting: 'Creating task…', status: 'Task status', download: 'Open or download video', failed: 'Video request failed' },
     priceType: 'Price type',
     viewOfficialPricing: 'View official pricing',
     cacheRead: 'Cache read',
@@ -1227,7 +1234,7 @@ export default {
       qwen: { summary: 'Multilingual models spanning reasoning, code and vision.', description: 'A broad model family for multilingual assistants, coding, visual understanding and efficient production workloads.' },
       glm: { summary: 'Structured multilingual intelligence for real products.', description: 'A practical family for bilingual assistants, tool use, reasoning and multimodal enterprise applications.' },
       kimi: { summary: 'Long-context understanding for documents and research.', description: 'A family designed for extended documents, research synthesis and conversations that need substantial context.' },
-      minimax: { summary: 'Efficient reasoning and coding across long contexts.', description: 'A capable model family for reasoning, software tasks and long-context production workloads.' },
+      minimax: { summary: 'Long-context intelligence and high-quality video generation.', description: 'MiniMax models support reasoning, software work and reference-image video generation workflows.' },
       ownapi: { summary: 'A configured model available through the OwnAPI gateway.', description: 'This model uses shared OwnAPI routing, billing and OpenAI-compatible integration while catalog details are being expanded.' }
     },
     aliases: {

@@ -105,6 +105,13 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation, 43-model published catalog (48 verified seeds before profitability filtering), public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
 
+### 2026-09-07 — MiniMax H3 video integration checkpoint
+
+- Added `MiniMax-H3` to the public model catalog as a Video model with reference-image capabilities. The screenshot's public 8 折 prices imply official rates of `$0.10/s` (768p) and `$0.1625/s` (2K); OwnAPI displays and bills at official 75%: `$0.075/s` and `$0.121875/s`.
+- Added authenticated `POST /v1/videos`, `GET /v1/videos/:taskID`, and `GET /v1/videos/:taskID/content` routes. The backend selects only the DC-API managed account whose private model credential is `MiniMax-H3`, uses the customer's OwnAPI API key for authentication/billing, seals upstream task IDs with the JWT secret, and sanitizes upstream responses/errors and content URLs.
+- Added the authenticated model-detail generator with prompt, duration, resolution, reference URL/upload, task polling, and video playback/download. The browser never receives the DC-API base URL or key.
+- Local validation passed: backend handler/service/routes tests, the full frontend suite (108 files / 655 tests), Vue type checking, frontend production build, and `git diff --check`. The full backend suite has one environment-only failure in `ent/schema` under local Go 1.27.1 (`package \"context\" without types`), which reproduces unchanged on `main`; all H3-related backend packages pass. Production deployment is in progress for this checkpoint; do not modify or recreate the existing DC-API account.
+
 ### 2026-09-07 — Packy live pricing and token-group checkpoint
 
 - Rechecked Packy's signed-in pricing page. Current visible discounts include GPT-5.4 at 28% off (7.2 折), GPT-5.4 Mini/GPT-5.5/GPT-5.6/GPT-6 Astra at 93% off, Claude Opus/Sonnet 4.6+ at 88% off, Gemini at 57% off, and current GLM/Qwen/MiniMax/Kimi sale entries at 50% off.

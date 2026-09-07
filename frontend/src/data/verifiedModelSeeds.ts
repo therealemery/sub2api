@@ -17,10 +17,16 @@ export interface OfficialPricingTier {
 }
 
 export interface CatalogEligibilitySource {
-  source: 'packyapi'
+  source: 'packyapi' | 'dc-api'
   discountPercent: number
   checkedAt: '2026-09-07'
-  sourceUrl: 'https://www.packyapi.com/pricing'
+  sourceUrl: 'https://www.packyapi.com/pricing' | 'https://console.dc-api.com/integration-doc'
+}
+
+export interface VideoResolutionPricing {
+  resolution: '768p' | '2K'
+  officialPerSecond: number
+  ownApiPerSecond: number
 }
 
 export interface ModelPricingSource {
@@ -50,6 +56,9 @@ export interface RawVerifiedModelSeed {
   isAlias?: boolean
   aliasNoteKey?: string
   featured?: boolean
+  modality?: 'Text' | 'Multimodal' | 'Image' | 'Audio' | 'Video'
+  capabilities?: string[]
+  videoPricing?: VideoResolutionPricing[]
   sortOrder: number
 }
 
@@ -164,6 +173,17 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
     contextWindow: '1M',
     tiers: [{ id: 'over-512k', minInputTokens: 512_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 1.2, cachedInput: 0.24, output: 4.8 } }],
   }),
+  seed('MiniMax-H3', 'MiniMax H3', 'minimax', ['video', 'multimodal'], ['videos'], { input: null, cachedInput: null, output: null }, 'https://www.cometapi.com/models/minimax/minimax-h3/', 40, 430, {
+    pricingStatus: 'unpublished',
+    contextWindow: null,
+    featured: true,
+    modality: 'Video',
+    capabilities: ['Text to video', 'Image to video', 'Reference images'],
+    videoPricing: [
+      { resolution: '768p', officialPerSecond: 0.1, ownApiPerSecond: 0.075 },
+      { resolution: '2K', officialPerSecond: 0.1625, ownApiPerSecond: 0.121875 },
+    ],
+  }),
 ]
 
 interface SeedOverrides {
@@ -175,6 +195,9 @@ interface SeedOverrides {
   isAlias?: boolean
   aliasNoteKey?: string
   featured?: boolean
+  modality?: RawVerifiedModelSeed['modality']
+  capabilities?: string[]
+  videoPricing?: VideoResolutionPricing[]
 }
 
 function seed(

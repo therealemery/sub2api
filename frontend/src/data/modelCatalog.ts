@@ -10,6 +10,7 @@ import type {
   ModelPricingStatus,
   OfficialTokenPricing,
   RawVerifiedModelSeed,
+  VideoResolutionPricing,
 } from './verifiedModelSeeds'
 
 export { verifiedModelSeedData } from './verifiedModelSeeds'
@@ -20,6 +21,7 @@ export type {
   OfficialPricingTier,
   OfficialTokenPricing,
   RawVerifiedModelSeed,
+  VideoResolutionPricing,
 } from './verifiedModelSeeds'
 
 export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'ownapi'
@@ -132,6 +134,7 @@ export interface ModelCatalogEntry {
   isAlias: boolean
   aliasNoteKey: string | null
   available: boolean | null
+  videoPricing: VideoResolutionPricing[]
 }
 
 export interface CatalogFilters {
@@ -168,6 +171,7 @@ interface CuratedSeed extends FamilyMetadata {
   aliasNoteKey: string | null
   eligibilitySource: CatalogEligibilitySource
   searchAliases: string[]
+  videoPricing: VideoResolutionPricing[]
 }
 
 const families: FamilyMetadata[] = [
@@ -370,6 +374,8 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
       : 'unpublished'
   return {
     ...metadata,
+    modality: raw.modality ?? metadata.modality,
+    capabilities: raw.capabilities ?? metadata.capabilities,
     contextWindow: raw.contextWindow ?? metadata.contextWindow,
     modelId: raw.modelId,
     displayName: raw.displayName,
@@ -385,12 +391,13 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
       noteKey: raw.noteKey ?? null,
     },
     eligibilitySource: {
-      source: 'packyapi',
+      source: raw.modality === 'Video' ? 'dc-api' : 'packyapi',
       discountPercent: raw.discountPercent,
       checkedAt: '2026-09-07',
-      sourceUrl: 'https://www.packyapi.com/pricing',
+      sourceUrl: raw.modality === 'Video' ? 'https://console.dc-api.com/integration-doc' : 'https://www.packyapi.com/pricing',
     },
     searchAliases: [...(providerSearchAliases[metadata.provider] ?? []), ...(raw.searchAliases ?? [])],
+    videoPricing: raw.videoPricing ?? [],
     modelClass: raw.modelClass,
     endpoints: raw.endpoints,
     isAlias: raw.isAlias ?? false,
@@ -415,6 +422,7 @@ function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): Mode
     isAlias: item.isAlias,
     aliasNoteKey: item.aliasNoteKey,
     available: null,
+    videoPricing: item.videoPricing,
   }
 }
 
@@ -443,6 +451,7 @@ function entryFromConfigured(
     isAlias: false,
     aliasNoteKey: null,
     available: null,
+    videoPricing: [],
   }
 }
 

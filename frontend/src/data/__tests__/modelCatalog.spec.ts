@@ -74,7 +74,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(43)
+    expect(result).toHaveLength(44)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -190,7 +190,7 @@ describe('modelCatalog', () => {
     }])
   })
 
-  it('contains the exact 45-model eligibility snapshot across eight providers', () => {
+  it('contains the exact 44-model eligibility snapshot across eight providers', () => {
     const providerIds = {
       OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
       Anthropic: ['claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
@@ -199,19 +199,19 @@ describe('modelCatalog', () => {
       Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
       'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3', 'glm-5.3-flash'],
       Moonshot: ['kimi-k2.5'],
-      MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3'],
+      MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3', 'MiniMax-H3'],
     }
     const catalog = buildModelCatalog(emptyConfig)
     const expectedIds = Object.values(providerIds).flat()
 
-    expect(verifiedModelSeedData).toHaveLength(48)
-    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(48)
-    expect(new Set(expectedIds).size).toBe(43)
+    expect(verifiedModelSeedData).toHaveLength(49)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(49)
+    expect(new Set(expectedIds).size).toBe(44)
     expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 3 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4 })
 
     const addedIds = expectedIds.slice(18)
     expect(Object.fromEntries(addedIds.map((modelId) => [
@@ -243,6 +243,7 @@ describe('modelCatalog', () => {
       'minimax-m2.5': { input: 0.3, cachedInput: 0.03, output: 1.2 },
       'MiniMax-M2.7': { input: 0.3, cachedInput: 0.06, output: 1.2 },
       'MiniMax-M3': { input: 0.6, cachedInput: 0.12, output: 2.4 },
+      'MiniMax-H3': { input: null, cachedInput: null, output: null },
     })
     expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].map((modelId) =>
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
@@ -252,6 +253,14 @@ describe('modelCatalog', () => {
       official: { input: 2.5, cachedInput: 0.25, output: 15 },
     })
     expect(catalog.find((entry) => entry.modelId === 'qwen3.5-plus')?.pricingSource?.tiers).toHaveLength(2)
+    expect(catalog.find((entry) => entry.modelId === 'MiniMax-H3')).toMatchObject({
+      modality: 'Video',
+      endpoints: ['videos'],
+      videoPricing: [
+        { resolution: '768p', officialPerSecond: 0.1, ownApiPerSecond: 0.075 },
+        { resolution: '2K', officialPerSecond: 0.1625, ownApiPerSecond: 0.121875 },
+      ],
+    })
     for (const entry of catalog) {
       expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(28)
       expect(entry.available).toBeNull()
@@ -268,7 +277,7 @@ describe('modelCatalog', () => {
       { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },
       { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 4 },
       { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 1 },
-      { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 3 },
+      { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 4 },
     ])
 
     const subset = buildModelCatalog(emptyConfig).filter((entry) => ['Google', 'MiniMax'].includes(entry.provider))
