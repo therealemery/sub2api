@@ -1,0 +1,46 @@
+name: Diagnose H3 Billing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+
+      - name: Collect read-only H3 billing evidence
+        run: |
+          ssh -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i /tmp/ssh_key \
+            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" '
+              set -eu
+              cd /opt/ownapi/deploy
+
+              echo "== H3 billing error =="
+              docker compose logs --since=6h --no-color ownapi 2>&1 \
+                | grep -F "video.billing_failed" \
+                | tail -n 10 \
+                || true
+
+              echo "== usage_logs request_id schema =="
+              docker compose exec -T postgres sh -eu -c '''
+                psql -X -v ON_ERROR_STOP=1 \
+                  --username "$POSTGRES_USER" \
+                  --dbname "$POSTGRES_DB" \
+                  --command "SELECT data_type, character_maximum_length, is_nullable FROM information_schema.columns WHERE table_schema = '''''public''''' AND table_name = '''''usage_logs''''' AND column_name = '''''request_id''''';"
+              '''
+
+              echo "== Temporary key billing state =="
+              docker compose exec -T postgres sh -eu -c '''
+                psql -X -v ON_ERROR_STOP=1 \
+                  --username "$POSTGRES_USER" \
+                  --dbname "$POSTGRES_DB" \
+                  --command "SELECT k.id, k.name, k.quota, k.quota_used, u.balance, COUNT(l.id) AS h3_usage_rows, COALESCE(SUM(l.actual_cost), 0) AS h3_usage_cost FROM api_keys k JOIN users u ON u.id = k.user_id LEFT JOIN usage_logs l ON l.api_key_id = k.id AND l.model = '''''MiniMax-H3''''' WHERE k.name = '''''h3-smoke-20260907-2''''' GROUP BY k.id, k.name, k.quota, k.quota_used, u.balance;"
+              '''
+            '
