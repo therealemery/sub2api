@@ -110,7 +110,7 @@ The pricing/status implementation, 43-model published catalog (48 verified seeds
 - Added `MiniMax-H3` to the public model catalog as a Video model with reference-image capabilities. The screenshot's public 8 折 prices imply official rates of `$0.10/s` (768p) and `$0.1625/s` (2K); OwnAPI displays and bills at official 75%: `$0.075/s` and `$0.121875/s`.
 - Added authenticated `POST /v1/videos`, `GET /v1/videos/:taskID`, and `GET /v1/videos/:taskID/content` routes. The backend selects only the DC-API managed account whose private model credential is `MiniMax-H3`, uses the customer's OwnAPI API key for authentication/billing, seals upstream task IDs with the JWT secret, and sanitizes upstream responses/errors and content URLs.
 - Added the authenticated model-detail generator with prompt, duration, resolution, reference URL/upload, task polling, and video playback/download. The browser never receives the DC-API base URL or key.
-- Local validation passed: backend handler/service/routes tests, the full frontend suite (108 files / 655 tests), Vue type checking, frontend production build, and `git diff --check`. The full backend suite has one environment-only failure in `ent/schema` under local Go 1.27.1 (`package \"context\" without types`), which reproduces unchanged on `main`; all H3-related backend packages pass. Production deployment is in progress for this checkpoint; do not modify or recreate the existing DC-API account.
+- Local validation passed: backend handler/service/routes tests, the full frontend suite (108 files / 655 tests), Vue type checking, frontend production build, and `git diff --check`. The full backend suite has one environment-only failure in `ent/schema` under local Go 1.27.1 (`package \"context\" without types`), which reproduces unchanged on `main`; all H3-related backend packages pass. Commit `1f299e79` is on `origin/main`. Deployment run `34118545773` built the image but could not reach the server on SSH port 22, so production was not changed; do not modify or recreate the existing DC-API account.
 
 ### 2026-09-07 — Packy live pricing and token-group checkpoint
 
@@ -164,14 +164,20 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Credentials: never store here.
 - Last deployed revision: `c00e89274aa7dc669beb4755b80559045a2e4e42` (image `ownapi:c00e89274aa7`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
-- Production verification: SSH recovered with the configured secret; `ownapi` is healthy and server-local `/health` and `/home` return HTTP 200.
+- Production verification: previously healthy at `c00e8927`; on 2026-09-07 the server became unreachable on ports 22, 80, 443, and 3000 from both GitHub Actions and the local machine. The H3 deployment did not reach server-side execution.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `33726735975` built and deployed `ownapi:c00e89274aa7`; it was marked failed only because health was checked before startup completed. `.github/workflows/deploy.yml` now retries health checks.
+- Deployment build: run `34118545773` built `ownapi:1f299e79c7b6`, then SSH to `18.181.192.3:22` timed out before `docker load`; `.env`, containers, and production data were not changed. Check the Lightsail instance state/networking and retry once connectivity is restored.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-07 — MiniMax H3 deployment blocked by server reachability
+
+- Pushed H3 commit `17c1eb4d` to `origin/codex/public-models-docs`, cherry-picked it cleanly onto current `main` as `1f299e79`, reran the full frontend suite/type/build plus H3 backend package tests, and pushed `origin/main`.
+- GitHub Actions run `34118545773` successfully built the commit-tagged Docker image and configured SSH, but `18.181.192.3:22` timed out before the remote shell started. A bounded local SSH check and TCP checks for ports 22, 80, 443, and 3000 also timed out; `ownapi.dev` still resolves to that IP.
+- Because the remote command never started, no image was loaded and no `.env`, container, database, or production data changed. Restore the Lightsail instance/network/firewall reachability, then rerun `Build and Deploy` from `main` and verify `/health`, `/models`, and `/models/minimax-h3`.
 
 ### 2026-09-03 — Production SSH recovery and deployment
 
