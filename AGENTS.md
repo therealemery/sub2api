@@ -159,19 +159,26 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 ## Deployment Status
 
 - Required: yes.
-- Production URL: not yet confirmed (server IP `18.181.192.3`, port 3000).
+- Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `c00e89274aa7dc669beb4755b80559045a2e4e42` (image `ownapi:c00e89274aa7`).
+- Last deployed revision: `21a4d6975f85cbb6eef138f5a9b1d5def4cf86e2` (deployed by run `34131515881`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
-- Production verification: previously healthy at `c00e8927`; on 2026-09-07 the server became unreachable on ports 22, 80, 443, and 3000 from both GitHub Actions and the local machine. The H3 deployment did not reach server-side execution.
+- Production verification: healthy on 2026-09-07 after DNS and deployment recovery. `/health`, `/home`, `/models`, and `/models/minimax-h3` return HTTP 200; unauthenticated `POST /v1/videos` returns the expected HTTP 401 `API_KEY_REQUIRED`, confirming the H3 backend route is live without incurring a generation charge.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34118545773` built `ownapi:1f299e79c7b6`, then SSH to `18.181.192.3:22` timed out before `docker load`; `.env`, containers, and production data were not changed. Check the Lightsail instance state/networking and retry once connectivity is restored.
+- Deployment build: run `34131515881` successfully built and deployed current `main` to `13.159.10.43`. GitHub Actions SSH succeeded even though direct local SSH remained filtered; the application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-07 — New Lightsail IP recovery and H3 production deployment
+
+- The Lightsail public IP changed from `18.181.192.3` to `13.159.10.43`. The server and existing OwnAPI deployment were healthy on the new IP; the outage was caused by Cloudflare DNS still pointing at the old address.
+- Cloudflare DNS for `ownapi.dev` and `www.ownapi.dev` was updated by the domain owner to `13.159.10.43`. Both names now resolve correctly, and HTTPS health/home checks return HTTP 200.
+- Updated the GitHub repository secret `SERVER_HOST` to the new address without changing or exposing the SSH key. Run `34131515881` deployed commit `21a4d697` successfully.
+- Production verification passed for `/health`, `/home`, `/models`, `/models/minimax-h3`, and the authenticated H3 route boundary. No paid video request was submitted. Bind a Lightsail Static IP to prevent another address change after future stop/start cycles.
 
 ### 2026-09-07 — MiniMax H3 deployment blocked by server reachability
 
