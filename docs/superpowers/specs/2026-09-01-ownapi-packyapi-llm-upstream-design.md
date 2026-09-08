@@ -1,19 +1,23 @@
 # OwnAPI PackyAPI LLM Upstream Design
 
 Date: 2026-09-01
-Status: Approved in conversation; pending written-spec review
+Status: Approved in conversation; multi-protocol routing amendment approved 2026-09-08
 
 ## Objective
 
 Connect PackyAPI as the first production LLM upstream for OwnAPI without exposing Packy credentials to customers. Customers create and use OwnAPI API keys. OwnAPI authenticates those keys, restricts the available models, forwards supported Chat Completions requests through the correct Packy token, charges the customer in USD, and records upstream cost separately.
 
-The first release supports only:
+The first release supports the following customer-facing surface:
 
 - `GET /v1/models`
 - `POST /v1/chat/completions`
 - streaming and non-streaming Chat Completions
 
-Responses, images, audio, embeddings, reranking, and other protocols are out of scope for this release.
+Customers always use the OpenAI Chat Completions request and response shape. OwnAPI may use
+OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, or Gemini GenerateContent on the
+private Packy side according to an explicit model capability table. Direct customer-facing
+Responses, Anthropic, Gemini, images, audio, embeddings, reranking, and other protocols are out of
+scope for this release.
 
 ## Confirmed Business Rules
 
@@ -26,7 +30,9 @@ Responses, images, audio, embeddings, reranking, and other protocols are out of 
 - Administrators may create other OwnAPI customer groups or user-specific overrides with different billing multipliers.
 - Only models with a confirmed Packy route, confirmed customer price, and non-loss-making margin may be callable.
 - Models without a ready route may remain visible in the public catalog but must be marked unavailable for API use.
-- `glm-5.3-flash` and `MiniMax-M3` remain removed.
+- `glm-5.3-flash` and `MiniMax-M3` may be enabled because Packy's current 50% routes restore a
+  positive margin at OwnAPI's configured customer price. Availability remains fail-closed if the
+  verified route or margin changes.
 
 ## Terminology
 
@@ -77,27 +83,50 @@ Create one customer-facing language-model channel, provisionally named `OwnAPI L
 
 ### Packy accounts
 
-Create one OpenAI `api_key` account per Packy token group:
+Create one managed Packy account per Packy token. The four current production accounts are:
 
-| Account label | Packy token group |
+| Account label | Packy token groups |
 | --- | --- |
-| `Packy / aws-q` | `aws-q` |
-| `Packy / codex` | `codex` |
-| `Packy / kimi-sale` | `kimi-sale` |
-| `Packy / minimax-officially` | `minimax-officially` |
-| `Packy / glm-sale` | `glm-sale` |
-| `Packy / grok-sale` | `grok-sale` |
+| `Packy / Core` | `codex`, `minimax-officially`, `glm-sale`, `grok-sale`, `cc-sale`, `gemini-slb` |
+| `Packy / Expansion` | `bailian`, `cc`, `grok-officially`, `image` (text routes only in this release) |
+| `Packy / ZAI` | `zai-officially` |
+| `Packy / GPT-5.4` | `azure-officially` |
 
 Every account:
 
 - uses Packy's OpenAI-compatible base URL;
 - sends `Authorization: Bearer <Packy token>`;
-- is marked as not supporting the Responses API so Chat Completions uses the repository's raw `/v1/chat/completions` forwarder;
+- stores one exact upstream protocol per whitelisted model;
 - contains an exact account-level model mapping/allowlist for only that Packy token group;
 - binds to the same OwnAPI customer group or groups that may use its models;
 - has independent concurrency, priority, health, and enable/disable controls.
 
-The Packy token group does not become an OwnAPI customer group. Routing is selected by the requested model and the accounts' model allowlists within the customer's OwnAPI group.
+The Packy token group does not become an OwnAPI customer group. Routing is selected by the
+requested model and the accounts' model allowlists within the customer's OwnAPI group.
+
+### Private protocol routing
+
+Packy's model marketplace is the source of truth for endpoint support. OwnAPI stores an explicit,
+version-controlled mapping from canonical OwnAPI model ID to one of:
+
+- `openai_chat`: forward the normalized Chat Completions body to Packy's `/v1/chat/completions`;
+- `openai_responses`: convert Chat Completions to Responses, forward to Packy's `/v1/responses`,
+  then convert streaming or buffered output back to Chat Completions;
+- `anthropic_messages`: convert Chat Completions through the existing compatibility layer to
+  Anthropic Messages, forward to Packy's `/v1/messages`, then convert output back;
+- `gemini_generate_content`: convert Chat Completions to Gemini GenerateContent, forward to the
+  Packy Gemini endpoint, then normalize output back to Chat Completions.
+
+The mapping is exact-name and fail-closed. Model family, provider name, or account name must never
+be used to guess a protocol at request time. A model with no verified protocol entry is not
+schedulable. If Packy supports several protocols for one model, use the least-transforming stable
+route in this order: OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, then Gemini.
+An exception is recorded explicitly when live verification proves the higher-priority endpoint is
+unsupported or incompatible, as happened with `claude-sonnet-4-6` on Chat Completions.
+
+The customer always receives an OpenAI Chat Completions-compatible response regardless of the
+private route. The response and error sanitizer must remove Packy hostnames, token groups, account
+labels, credentials, and raw upstream task/request identifiers.
 
 ## Request Flow
 
@@ -106,7 +135,9 @@ The Packy token group does not become an OwnAPI customer group. Routing is selec
 3. Existing balance, quota, expiration, IP, and rate-limit checks run.
 4. The restricted channel verifies that the requested model is callable and resolves its canonical/billing model.
 5. The scheduler considers only accounts bound to the customer's OwnAPI group and supporting the requested model.
-6. The selected Packy account replaces the inbound credential with its server-side Packy token and forwards to Packy's `/v1/chat/completions` endpoint.
+6. The selected Packy account replaces the inbound credential with its server-side Packy token,
+   looks up the requested model's explicit protocol, converts the request when needed, and forwards
+   to the corresponding private Packy endpoint.
 7. Streaming requests force `stream_options.include_usage=true`; OwnAPI drains the upstream stream even if the client disconnects so usage can still be settled.
 8. On a successful response with usable usage data, OwnAPI calculates the configured 70%-of-list base cost and applies the effective customer multiplier.
 9. OwnAPI atomically records usage and deducts the customer's USD balance using the existing idempotent billing path.
@@ -135,15 +166,18 @@ The cost rules are configuration data based on the Packy pricing cards. They mus
 - Admin API responses must continue to mask saved credentials.
 - Local and production credentials are configured separately.
 - The existing multi-group Packy token remains untouched during implementation.
-- Six dedicated Packy tokens are created only after the code/configuration path is ready and the user confirms the live account action.
+- Four dedicated Packy tokens were created after the user confirmed the live account action.
 - Each dedicated token receives the minimum single Packy group required for its account.
 
 The current repository stores API-key account credentials in the server-side account credential record. This design does not claim that field is encrypted at rest. Database access, backups, logs, and administrator access must therefore be treated as secret-bearing infrastructure. Encrypting all account credentials at rest is a separate security project because it affects every existing upstream type and credential refresh path.
 
 ## Failure Behavior
 
-- Unknown or unconfigured model: return an OpenAI-compatible model-not-available error before contacting Packy.
+- Unknown model, missing protocol mapping, or model/account mismatch: return an OpenAI-compatible
+  model-not-available error before contacting Packy.
 - Insufficient OwnAPI balance or quota: reject before contacting Packy.
+- Packy `400` reporting an unsupported protocol: treat it as an operational configuration error,
+  fail closed, do not retry through a guessed protocol, and do not charge the customer.
 - Packy `401` or `403`: treat the account as a credential/configuration failure and do not charge the customer.
 - Packy `429`: apply existing account rate-limit handling; do not charge if no billable response was produced.
 - Retryable Packy `5xx` or transport failure: use existing failover behavior only when another eligible account exists; otherwise return a sanitized upstream error.
@@ -159,7 +193,7 @@ The first implementation reuses existing admin surfaces:
 - Groups: create and manage the standard `1.0` customer group and optional alternative multiplier groups relative to the OwnAPI base price.
 - Group user multipliers: override the multiplier for negotiated customers.
 - Channels: configure the callable model allowlist, mappings, and OwnAPI USD base prices (official × `0.7`).
-- Accounts: configure six dedicated Packy accounts, credentials, mappings, concurrency, and status.
+- Accounts: configure four dedicated Packy accounts, credentials, mappings, concurrency, and status.
 - Usage: inspect customer charge and normalized account cost.
 
 Any Packy-specific convenience UI should be deferred until the underlying configuration and end-to-end request path are proven. Packy tokens are not created automatically by OwnAPI.
@@ -169,7 +203,7 @@ Any Packy-specific convenience UI should be deferred until the underlying config
 The first-release allowlist is generated from the intersection of:
 
 1. models currently present in the 44-model public catalog;
-2. models present in one of the six selected Packy token groups;
+2. models present in one of the selected Packy token groups represented by the four production tokens;
 3. models with verified current manufacturer list pricing;
 4. models whose 70% customer price is greater than their normalized Packy cost.
 
@@ -196,6 +230,8 @@ Automated validation must cover:
 - model allowlist and exact account selection for every Packy token group;
 - the Packy authorization header replaces, and never leaks, the OwnAPI customer key;
 - raw streaming and non-streaming Chat Completions forwarding;
+- request and response conversion for every configured private protocol;
+- exact model-to-protocol selection and fail-closed behavior for missing mappings;
 - forced streaming usage collection;
 - customer charge equals the OwnAPI 70%-of-list base cost multiplied by the effective group/user multiplier;
 - upstream account cost uses Packy CNY cost divided by `6.7`;
@@ -204,12 +240,15 @@ Automated validation must cover:
 - sanitized errors and credential masking;
 - the existing non-Packy routes and billing tests remain green.
 
-After automated tests, perform local end-to-end checks with dedicated low-risk Packy tokens for one non-streaming request and one streaming request per enabled Packy group. Verify the Packy consumption log, OwnAPI usage log, customer balance delta, and calculated margin before production deployment.
+After automated tests, perform one minimum-cost production smoke request per Packy account and at
+least one representative request per private protocol. Verify the selected account and protocol,
+Packy consumption log, OwnAPI usage log, customer balance delta, account cost, calculated margin,
+and sanitized response before enabling the remaining models.
 
 ## Rollout
 
 1. Implement and test the configuration/routing/billing behavior without live Packy tokens.
-2. Create six dedicated single-group Packy tokens after explicit user confirmation.
+2. Configure the four user-approved Packy tokens only in server-side managed accounts.
 3. Configure the local OwnAPI group, channel, accounts, model mappings, pricing, and normalized cost rules.
 4. Run local end-to-end calls and reconcile both systems' usage records.
 5. Keep unverified models unavailable.
