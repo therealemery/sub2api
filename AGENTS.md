@@ -162,7 +162,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `21a4d6975f85cbb6eef138f5a9b1d5def4cf86e2` (deployed by run `34131515881`).
+- Last deployed revision: `c21871b3746ece935a0f8a6f7c4ec8e524d05293` (image `ownapi:c21871b3746e`, deployed by run `34211297259`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
 - Production verification: healthy on 2026-09-07 after DNS and deployment recovery. `/health`, `/home`, `/models`, and `/models/minimax-h3` return HTTP 200; unauthenticated `POST /v1/videos` returns the expected HTTP 401 `API_KEY_REQUIRED`, confirming the H3 backend route is live without incurring a generation charge.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
