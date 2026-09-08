@@ -45,6 +45,17 @@ func TestVideoTaskIDIsOpaqueAndAuthenticated(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestVideoUsageRequestIDFitsUsageLogColumn(t *testing.T) {
+	publicTaskID := "video_" + strings.Repeat("opaque-task-token", 20)
+
+	requestID := videoUsageRequestID(publicTaskID)
+
+	require.Len(t, requestID, 64)
+	require.Equal(t, requestID, videoUsageRequestID(publicTaskID))
+	require.NotContains(t, requestID, publicTaskID)
+	require.NotEqual(t, requestID, videoUsageRequestID(publicTaskID+"x"))
+}
+
 func TestPositiveWholeNumber(t *testing.T) {
 	value, ok := positiveWholeNumber(float64(5))
 	require.True(t, ok)

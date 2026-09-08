@@ -145,7 +145,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		UserID:         apiKey.User.ID,
 		APIKeyID:       apiKey.ID,
 		AccountID:      account.ID,
-		RequestID:      publicTaskID,
+		RequestID:      videoUsageRequestID(publicTaskID),
 		Model:          miniMaxH3Model,
 		TotalCost:      cost,
 		ActualCost:     cost,
@@ -163,6 +163,13 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sanitizedVideoResponse(c, upstream, publicTaskID))
+}
+
+// videoUsageRequestID derives a stable idempotency key that fits the
+// usage_logs.request_id VARCHAR(64) column without exposing the sealed task ID.
+func videoUsageRequestID(publicTaskID string) string {
+	sum := sha256.Sum256([]byte("ownapi-video-usage:" + publicTaskID))
+	return fmt.Sprintf("%x", sum)
 }
 
 func (h *GatewayHandler) VideosGet(c *gin.Context) {
