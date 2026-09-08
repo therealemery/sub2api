@@ -32,6 +32,33 @@ func TestBuildSchedulerMetadataAccount_KeepsOpenAIWSFlags(t *testing.T) {
 	require.Nil(t, got.Extra["unused_large_field"])
 }
 
+func TestBuildSchedulerMetadataAccount_KeepsManagedUpstreamRoutingFields(t *testing.T) {
+	account := service.Account{
+		ID:       43,
+		Platform: service.PlatformOpenAI,
+		Type:     service.AccountTypeAPIKey,
+		Credentials: map[string]any{
+			"api_key":       "packy-token",
+			"base_url":      "https://cf.api.fan/v1",
+			"model_mapping": map[string]any{"gpt-5.4-mini": "gpt-5.4-mini"},
+			"unused_secret": "drop-me",
+		},
+		Extra: map[string]any{
+			"upstream_provider":  service.UpstreamProviderPackyAPI,
+			"unused_large_field": "drop-me",
+		},
+	}
+
+	got := buildSchedulerMetadataAccount(account)
+
+	require.Equal(t, "packy-token", got.GetCredential("api_key"))
+	require.Equal(t, "https://cf.api.fan/v1", got.GetCredential("base_url"))
+	require.Equal(t, service.UpstreamProviderPackyAPI, got.ManagedUpstreamProvider())
+	require.NotEmpty(t, got.GetModelMapping())
+	require.Empty(t, got.GetCredential("unused_secret"))
+	require.Nil(t, got.Extra["unused_large_field"])
+}
+
 func TestBuildSchedulerMetadataAccount_KeepsSlimGroupMembership(t *testing.T) {
 	account := service.Account{
 		ID:       42,

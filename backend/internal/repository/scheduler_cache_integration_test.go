@@ -36,6 +36,7 @@ func TestSchedulerCacheSnapshotUsesSlimMetadataButKeepsFullAccount(t *testing.T)
 		LastUsedAt:  &now,
 		Credentials: map[string]any{
 			"api_key":       "gemini-api-key",
+			"base_url":      "https://gemini.example/v1",
 			"access_token":  "secret-access-token",
 			"project_id":    "proj-1",
 			"oauth_type":    "ai_studio",
@@ -43,6 +44,7 @@ func TestSchedulerCacheSnapshotUsesSlimMetadataButKeepsFullAccount(t *testing.T)
 			"huge_blob":     strings.Repeat("x", 4096),
 		},
 		Extra: map[string]any{
+			"upstream_provider":            service.UpstreamProviderPackyAPI,
 			"mixed_scheduling":             true,
 			"window_cost_limit":            12.5,
 			"window_cost_sticky_reserve":   8.0,
@@ -77,12 +79,14 @@ func TestSchedulerCacheSnapshotUsesSlimMetadataButKeepsFullAccount(t *testing.T)
 	got := snapshot[0]
 	require.NotNil(t, got)
 	require.Equal(t, "gemini-api-key", got.GetCredential("api_key"))
+	require.Equal(t, "https://gemini.example/v1", got.GetCredential("base_url"))
 	require.Equal(t, "proj-1", got.GetCredential("project_id"))
 	require.Equal(t, "ai_studio", got.GetCredential("oauth_type"))
 	require.NotEmpty(t, got.GetModelMapping())
 	require.Empty(t, got.GetCredential("access_token"))
 	require.Empty(t, got.GetCredential("huge_blob"))
 	require.Equal(t, true, got.Extra["mixed_scheduling"])
+	require.Equal(t, service.UpstreamProviderPackyAPI, got.ManagedUpstreamProvider())
 	require.Equal(t, 12.5, got.GetWindowCostLimit())
 	require.Equal(t, 8.0, got.GetWindowCostStickyReserve())
 	require.Equal(t, 4, got.GetMaxSessions())

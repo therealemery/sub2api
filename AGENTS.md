@@ -173,6 +173,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-08 — Packy production accounts and scheduler-cache fix
+
+- Created four production Packy managed-upstream accounts without changing the existing DC-API MiniMax H3 account: `Packy / Core`, `Packy / Expansion`, `Packy / ZAI`, and `Packy / GPT-5.4`. They use the documented `https://cf.api.fan/v1` OpenAI-compatible base URL, exact non-wildcard model whitelists, and the existing `OwnAPI` customer group at `1x`. Secret values remain only in production account credentials.
+- The account scopes are non-overlapping: Core owns the profitable Codex, MiniMax M3, Grok sale, Claude sale, and Gemini SLB routes; Expansion owns the profitable Bailian and legacy CC routes; ZAI owns only `glm-5`; GPT-5.4 owns only `gpt-5.4`. Image groups remain excluded until image-request pricing is implemented.
+- Production smoke tests exposed a scheduler metadata bug: `filterSchedulerCredentials` discarded managed `base_url`, and `filterSchedulerExtra` discarded `upstream_provider`. Cached Packy accounts therefore fell back to the official OpenAI URL and were treated as ordinary OpenAI accounts even though the full database account was correct.
+- Added both routing fields to the deliberately slim scheduler metadata allowlists with unit and Redis integration regression coverage. Targeted repository unit tests, the scheduler-cache integration test, Packy/managed-upstream service tests, and `git diff --check` pass.
+- All four Packy accounts were paused while this code fix awaits deployment. MiniMax H3 remains active. After deployment, refresh scheduler snapshots, enable the four accounts, then repeat one low-cost request per account and reconcile customer charge, Packy consumption, account cost, and upstream sanitization.
+
 ### 2026-09-08 — MiniMax H3 usage history repair ready for deployment
 
 - Root cause of the empty authenticated `/usage` table: H3 usage rows legitimately store `duration_ms = NULL`, while `UsageView.vue` called `toFixed()` on that value during rendering. The page now renders missing duration as `-` and safely formats nullable cost fields.
