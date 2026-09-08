@@ -17,10 +17,10 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Canonical deployed-source worktree: `/Users/owen/apizhongzhuan/sub2api/.worktrees/model-pricing-motion`, branch `main`, HEAD `6a4959d4`; it matches `origin/main` and contains the completed pricing, Packy routing, payment, and MiniMax H3 work. Use this checkout for deployment continuation.
-- Parent checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/public-models-docs`, HEAD `17c1eb4d`; preserve its unrelated untracked artifacts and do not mistake it for the current `main` checkout.
+- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`, based on `origin/main` at `efc6983d`. It contains the pending MiniMax H3 usage-history repair; use this checkout until that change is committed, merged, and deployed.
+- Local `main` and `origin/main` were both at `efc6983d` before the video-history branch began.
 - The current catalog contains 44 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. Commit `4d57cf50` intentionally restored the first two after current Packy 50% pricing made them part of the profitable intersection; the older removal note is historical, not current policy.
-- The `main` worktree is clean except for the pre-existing untracked `frontend/pnpm-workspace.yaml`, which must not be changed or committed.
+- Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
 ## Stable Checkpoints
@@ -172,6 +172,15 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-08 — MiniMax H3 usage history repair ready for deployment
+
+- Root cause of the empty authenticated `/usage` table: H3 usage rows legitimately store `duration_ms = NULL`, while `UsageView.vue` called `toFixed()` on that value during rendering. The page now renders missing duration as `-` and safely formats nullable cost fields.
+- Added an owner-scoped video-history mapping table keyed by usage-log ID. New H3 usage creation stores the sealed OwnAPI video task token in the same billing transaction; the general usage DTO still does not expose that token.
+- Added authenticated console endpoints that accept only a numeric usage ID, verify the logged-in user owns the mapping and the sealed task envelope, then proxy status/content through OwnAPI. The browser receives neither the DC-API account, base URL, credential, nor upstream task ID.
+- The usage page now refreshes after returning to it and offers `查看视频` / `View video` for H3 rows. Completed video bytes are fetched with the user's JWT and played from a revocable local Blob URL; polling and stale requests are bounded and cleaned up.
+- Three historical H3 task tokens were recovered locally and can be backfilled after deployment by matching their existing SHA-256 billing request IDs. The backfill must insert mappings only, without changing usage rows or balances, and must not print task tokens in CI logs.
+- Validation passed: focused H3 usage tests (5/5), full frontend suite (110 files / 665 tests), Vue type checking, focused ESLint, production frontend build (868 modules), targeted backend handler/service/routes tests, owner-scope unit test, migration runner tests, and `git diff --check`. Existing non-fatal frontend test/build warnings remain unchanged.
 
 ### 2026-09-07 — New Lightsail IP recovery and H3 production deployment
 

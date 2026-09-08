@@ -1022,7 +1022,13 @@ export default {
     exportExcelSuccess: 'Usage data exported successfully (Excel format)',
     exportExcelFailed: 'Failed to export usage data',
     imageUnit: ' images',
-    userAgent: 'User-Agent'
+    userAgent: 'User-Agent',
+    viewVideo: 'View video',
+    videoResult: 'Generated video',
+    videoStatus: 'Status',
+    videoLoading: 'Loading video…',
+    videoUnavailable: 'This video is not available from usage history.',
+    downloadVideo: 'Download video'
   },
 
   // Shared keys for channel monitor (admin + user views)

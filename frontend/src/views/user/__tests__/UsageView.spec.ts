@@ -4,9 +4,11 @@ import { nextTick } from 'vue'
 
 import UsageView from '../UsageView.vue'
 
-const { query, getStatsByDateRange, list, showError, showWarning, showSuccess, showInfo } = vi.hoisted(() => ({
+const { query, getStatsByDateRange, getVideo, getVideoContent, list, showError, showWarning, showSuccess, showInfo } = vi.hoisted(() => ({
   query: vi.fn(),
   getStatsByDateRange: vi.fn(),
+  getVideo: vi.fn(),
+  getVideoContent: vi.fn(),
   list: vi.fn(),
   showError: vi.fn(),
   showWarning: vi.fn(),
@@ -47,6 +49,8 @@ vi.mock('@/api', () => ({
   usageAPI: {
     query,
     getStatsByDateRange,
+    getVideo,
+    getVideoContent,
   },
   keysAPI: {
     list,
@@ -76,6 +80,8 @@ describe('user UsageView tooltip', () => {
   beforeEach(() => {
     query.mockReset()
     getStatsByDateRange.mockReset()
+    getVideo.mockReset()
+    getVideoContent.mockReset()
     list.mockReset()
     showError.mockReset()
     showWarning.mockReset()
@@ -273,5 +279,166 @@ describe('user UsageView tooltip', () => {
     window.URL.createObjectURL = originalCreateObjectURL
     window.URL.revokeObjectURL = originalRevokeObjectURL
     clickSpy.mockRestore()
+  })
+
+  it('renders a MiniMax H3 usage row when timing values are null', async () => {
+    query.mockResolvedValue({
+      items: [
+        {
+          id: 41,
+          request_id: 'video-usage-hash',
+          model: 'MiniMax-H3',
+          actual_cost: 0.375,
+          total_cost: 0.375,
+          rate_multiplier: 1,
+          input_cost: 0,
+          output_cost: 0,
+          cache_creation_cost: 0,
+          cache_read_cost: 0,
+          input_tokens: 0,
+          output_tokens: 0,
+          cache_creation_tokens: 0,
+          cache_read_tokens: 0,
+          cache_creation_5m_tokens: 0,
+          cache_creation_1h_tokens: 0,
+          image_count: 0,
+          image_size: null,
+          first_token_ms: null,
+          duration_ms: null,
+          created_at: '2026-09-08T03:00:00Z',
+          api_key: { name: 'video-key' },
+        },
+      ],
+      total: 1,
+      pages: 1,
+    })
+    getStatsByDateRange.mockResolvedValue({
+      total_requests: 1,
+      total_tokens: 0,
+      total_cost: 0.375,
+      total_actual_cost: 0.375,
+      average_duration_ms: 0,
+    })
+    list.mockResolvedValue({ items: [] })
+
+    const errorHandler = vi.fn()
+    const wrapper = mount(UsageView, {
+      global: {
+        config: { errorHandler },
+        stubs: {
+          AppLayout: AppLayoutStub,
+          TablePageLayout: TablePageLayoutStub,
+          Pagination: true,
+          EmptyState: true,
+          Select: true,
+          DateRangePicker: true,
+          Icon: true,
+          Teleport: true,
+        },
+      },
+    })
+
+    await flushPromises()
+    await nextTick()
+
+    expect(errorHandler).not.toHaveBeenCalled()
+    const setupState = (wrapper.vm as any).$?.setupState
+    expect(setupState.usageLogs).toHaveLength(1)
+    expect(setupState.usageLogs[0].model).toBe('MiniMax-H3')
+    expect(setupState.formatDuration(null)).toBe('-')
+  })
+
+  it('loads completed video content from an H3 usage record', async () => {
+    query.mockResolvedValue({ items: [], total: 0, pages: 0 })
+    getStatsByDateRange.mockResolvedValue({ total_requests: 0, total_tokens: 0, total_cost: 0, average_duration_ms: 0 })
+    list.mockResolvedValue({ items: [] })
+    getVideo.mockResolvedValue({ id: 'opaque', status: 'completed', progress: 100 })
+    getVideoContent.mockResolvedValue(new Blob(['video'], { type: 'video/mp4' }))
+    const originalCreateObjectURL = window.URL.createObjectURL
+    const originalRevokeObjectURL = window.URL.revokeObjectURL
+    window.URL.createObjectURL = vi.fn(() => 'blob:owned-video')
+    window.URL.revokeObjectURL = vi.fn()
+
+    const wrapper = mount(UsageView, {
+      global: {
+        stubs: {
+          AppLayout: AppLayoutStub,
+          TablePageLayout: TablePageLayoutStub,
+          Pagination: true,
+          EmptyState: true,
+          Select: true,
+          DateRangePicker: true,
+          Icon: true,
+          Teleport: true,
+          BaseDialog: { template: '<div><slot /></div>' },
+        },
+      },
+    })
+    await flushPromises()
+
+    const setupState = (wrapper.vm as any).$?.setupState
+    setupState.openVideo({ id: 41, model: 'MiniMax-H3' })
+    await flushPromises()
+    await nextTick()
+
+    expect(getVideo).toHaveBeenCalledWith(41)
+    expect(getVideoContent).toHaveBeenCalledWith(41)
+    expect(setupState.videoObjectURL).toBe('blob:owned-video')
+
+    wrapper.unmount()
+    window.URL.createObjectURL = originalCreateObjectURL
+    window.URL.revokeObjectURL = originalRevokeObjectURL
+  })
+
+  it('refreshes usage data again when the page is re-activated', async () => {
+    query.mockResolvedValue({
+      items: [],
+      total: 0,
+      pages: 0,
+    })
+    getStatsByDateRange.mockResolvedValue({
+      total_requests: 0,
+      total_tokens: 0,
+      total_cost: 0,
+      avg_duration_ms: 0,
+    })
+    list.mockResolvedValue({ items: [] })
+
+    const addEventListenerSpy = vi.spyOn(document, 'addEventListener')
+    const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener')
+
+    const wrapper = mount(UsageView, {
+      global: {
+        stubs: {
+          AppLayout: AppLayoutStub,
+          TablePageLayout: TablePageLayoutStub,
+          Pagination: true,
+          EmptyState: true,
+          Select: true,
+          DateRangePicker: true,
+          Icon: true,
+          Teleport: true,
+        },
+      },
+    })
+
+    await flushPromises()
+    await nextTick()
+
+    const initialQueryCalls = query.mock.calls.length
+    const initialStatsCalls = getStatsByDateRange.mock.calls.length
+
+    const visibilityHandler = addEventListenerSpy.mock.calls.find((call) => call[0] === 'visibilitychange')?.[1] as (() => void) | undefined
+    expect(visibilityHandler).toBeTypeOf('function')
+
+    visibilityHandler?.call(document)
+    await flushPromises()
+    await nextTick()
+
+    expect(query.mock.calls.length).toBeGreaterThan(initialQueryCalls)
+    expect(getStatsByDateRange.mock.calls.length).toBeGreaterThan(initialStatsCalls)
+
+    wrapper.unmount()
+    expect(removeEventListenerSpy.mock.calls.some((call) => call[0] === 'visibilitychange')).toBe(true)
   })
 })

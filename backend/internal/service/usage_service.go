@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	dbent "github.com/Wei-Shaw/sub2api/ent"
@@ -38,6 +39,7 @@ type CreateUsageLogRequest struct {
 	RateMultiplier        float64 `json:"rate_multiplier"`
 	Stream                bool    `json:"stream"`
 	DurationMs            *int    `json:"duration_ms"`
+	VideoTaskID           *string `json:"-"`
 }
 
 // UsageStats 使用统计
@@ -128,6 +130,24 @@ func (s *UsageService) Create(ctx context.Context, req CreateUsageLogRequest) (*
 		balanceUpdated = true
 	}
 
+	if inserted && req.VideoTaskID != nil && strings.TrimSpace(*req.VideoTaskID) != "" {
+		if s.entClient == nil {
+			return nil, errors.New("video task storage is unavailable")
+		}
+		client := s.entClient
+		if tx != nil {
+			client = tx.Client()
+		}
+		if _, err := client.ExecContext(txCtx, `
+			INSERT INTO usage_video_tasks (usage_log_id, user_id, task_id)
+			VALUES ($1, $2, $3)
+			ON CONFLICT (usage_log_id) DO UPDATE
+			SET task_id = EXCLUDED.task_id
+		`, usageLog.ID, req.UserID, strings.TrimSpace(*req.VideoTaskID)); err != nil {
+			return nil, fmt.Errorf("store video task: %w", err)
+		}
+	}
+
 	if tx != nil {
 		if err := tx.Commit(); err != nil {
 			return nil, fmt.Errorf("commit transaction: %w", err)
@@ -137,6 +157,34 @@ func (s *UsageService) Create(ctx context.Context, req CreateUsageLogRequest) (*
 	s.invalidateUsageCaches(ctx, req.UserID, balanceUpdated)
 
 	return usageLog, nil
+}
+
+// GetVideoTaskID returns the opaque task token only when it belongs to the
+// authenticated user and the requested usage record.
+func (s *UsageService) GetVideoTaskID(ctx context.Context, usageLogID, userID int64) (string, error) {
+	if s.entClient == nil {
+		return "", ErrUsageLogNotFound
+	}
+	rows, err := s.entClient.QueryContext(ctx, `
+		SELECT task_id
+		FROM usage_video_tasks
+		WHERE usage_log_id = $1 AND user_id = $2
+	`, usageLogID, userID)
+	if err != nil {
+		return "", fmt.Errorf("query video task: %w", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
+			return "", fmt.Errorf("query video task: %w", err)
+		}
+		return "", ErrUsageLogNotFound
+	}
+	var taskID string
+	if err := rows.Scan(&taskID); err != nil {
+		return "", fmt.Errorf("scan video task: %w", err)
+	}
+	return taskID, nil
 }
 
 func (s *UsageService) invalidateUsageCaches(ctx context.Context, userID int64, balanceUpdated bool) {

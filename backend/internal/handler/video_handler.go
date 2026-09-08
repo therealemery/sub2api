@@ -150,6 +150,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		TotalCost:      cost,
 		ActualCost:     cost,
 		RateMultiplier: multiplier,
+		VideoTaskID:    &publicTaskID,
 	}); err != nil {
 		logger.L().With(zap.Int64("user_id", apiKey.User.ID), zap.Int64("account_id", account.ID)).Error("video.billing_failed", zap.Error(err))
 		h.errorResponse(c, http.StatusInternalServerError, "billing_error", "Video task was created but billing could not be finalized; contact support")
@@ -186,9 +187,42 @@ func (h *GatewayHandler) forwardVideoTaskRequest(c *gin.Context, content bool) {
 		h.errorResponse(c, http.StatusUnauthorized, "authentication_error", "Invalid API key")
 		return
 	}
-	publicTaskID := c.Param("taskID")
+	h.forwardOwnedVideoTask(c, c.Param("taskID"), apiKey.User.ID, content, "")
+}
+
+// UserVideoGet lets an authenticated console user reopen a video from an
+// owned usage record without entering or exposing the API key used to create it.
+func (h *GatewayHandler) UserVideoGet(c *gin.Context) {
+	h.forwardUserUsageVideo(c, false)
+}
+
+// UserVideoContent proxies video bytes for an authenticated console user.
+func (h *GatewayHandler) UserVideoContent(c *gin.Context) {
+	h.forwardUserUsageVideo(c, true)
+}
+
+func (h *GatewayHandler) forwardUserUsageVideo(c *gin.Context, content bool) {
+	subject, ok := middleware2.GetAuthSubjectFromContext(c)
+	if !ok {
+		h.errorResponse(c, http.StatusUnauthorized, "authentication_error", "User not authenticated")
+		return
+	}
+	usageLogID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil || usageLogID <= 0 {
+		h.errorResponse(c, http.StatusNotFound, "video_not_found", "Video task not found")
+		return
+	}
+	publicTaskID, err := h.usageService.GetVideoTaskID(c.Request.Context(), usageLogID, subject.UserID)
+	if err != nil {
+		h.errorResponse(c, http.StatusNotFound, "video_not_found", "Video task not found")
+		return
+	}
+	h.forwardOwnedVideoTask(c, publicTaskID, subject.UserID, content, strconv.FormatInt(usageLogID, 10))
+}
+
+func (h *GatewayHandler) forwardOwnedVideoTask(c *gin.Context, publicTaskID string, userID int64, content bool, historyID string) {
 	envelope, err := h.openVideoTask(publicTaskID)
-	if err != nil || envelope.UserID != apiKey.User.ID || envelope.ExpiresAt < time.Now().Unix() {
+	if err != nil || envelope.UserID != userID || envelope.ExpiresAt < time.Now().Unix() {
 		h.errorResponse(c, http.StatusNotFound, "video_not_found", "Video task not found")
 		return
 	}
@@ -229,7 +263,12 @@ func (h *GatewayHandler) forwardVideoTaskRequest(c *gin.Context, content bool) {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Invalid video provider response")
 		return
 	}
-	c.JSON(http.StatusOK, sanitizedVideoResponse(c, upstream, publicTaskID))
+	response := sanitizedVideoResponse(c, upstream, publicTaskID)
+	if historyID != "" {
+		response["id"] = historyID
+		delete(response, "url")
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func positiveWholeNumber(value any) (int, bool) {

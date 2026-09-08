@@ -1026,7 +1026,13 @@ export default {
     exportExcelSuccess: '使用数据导出成功（Excel格式）',
     exportExcelFailed: '使用数据导出失败',
     imageUnit: '张',
-    userAgent: 'User-Agent'
+    userAgent: 'User-Agent',
+    viewVideo: '查看视频',
+    videoResult: '生成的视频',
+    videoStatus: '状态',
+    videoLoading: '正在加载视频…',
+    videoUnavailable: '无法从使用记录中找回该视频。',
+    downloadVideo: '下载视频'
   },
 
   // Shared keys for channel monitor (admin + user views)

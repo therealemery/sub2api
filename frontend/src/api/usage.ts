@@ -13,6 +13,13 @@ import type {
   ModelStat
 } from '@/types'
 
+export interface VideoTaskStatus {
+  id: string
+  status: string
+  progress?: number
+  url?: string
+}
+
 // ==================== Dashboard Types ====================
 
 export interface UserDashboardStats {
@@ -179,6 +186,18 @@ export async function getByDateRange(
   return data
 }
 
+export async function getVideo(usageLogId: number): Promise<VideoTaskStatus> {
+  const { data } = await apiClient.get<VideoTaskStatus>(`/usage/${usageLogId}/video`)
+  return data
+}
+
+export async function getVideoContent(usageLogId: number): Promise<Blob> {
+  const { data } = await apiClient.get<Blob>(`/usage/${usageLogId}/video/content`, {
+    responseType: 'blob'
+  })
+  return data
+}
+
 /**
  * Get detailed usage log by ID
  * @param id - Usage log ID
@@ -264,6 +283,8 @@ export const usageAPI = {
   getStatsByDateRange,
   getByDateRange,
   getById,
+  getVideo,
+  getVideoContent,
   // Dashboard
   getDashboardStats,
   getDashboardTrend,

@@ -80,6 +80,8 @@ func RegisterUserRoutes(
 		usage := authenticated.Group("/usage")
 		{
 			usage.GET("", h.Usage.List)
+			usage.GET("/:id/video", h.Gateway.UserVideoGet)
+			usage.GET("/:id/video/content", h.Gateway.UserVideoContent)
 			usage.GET("/:id", h.Usage.GetByID)
 			usage.GET("/stats", h.Usage.Stats)
 			// User dashboard endpoints

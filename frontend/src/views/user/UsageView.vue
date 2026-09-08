@@ -163,8 +163,18 @@
             }}</span>
           </template>
 
-          <template #cell-model="{ value }">
-            <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+          <template #cell-model="{ row, value }">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-gray-900 dark:text-white">{{ value }}</span>
+              <button
+                v-if="isVideoUsage(row)"
+                type="button"
+                class="rounded-md border border-gray-200 px-2 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-950 dark:border-dark-600 dark:text-dark-300 dark:hover:border-dark-400 dark:hover:text-white"
+                @click="openVideo(row)"
+              >
+                {{ t('usage.viewVideo') }}
+              </button>
+            </div>
           </template>
 
           <template #cell-reasoning_effort="{ row }">
@@ -279,7 +289,7 @@
           <template #cell-cost="{ row }">
             <div class="flex items-center gap-1.5 text-sm">
               <span class="font-medium text-green-600 dark:text-green-400">
-                ${{ row.actual_cost.toFixed(6) }}
+                ${{ formatCost(row.actual_cost) }}
               </span>
               <!-- Cost Detail Tooltip -->
               <div
@@ -344,6 +354,29 @@
         />
       </template>
     </TablePageLayout>
+
+  <BaseDialog :show="videoDialogVisible" :title="t('usage.videoResult')" width="wide" @close="closeVideo">
+    <div class="space-y-4">
+      <div v-if="videoLoading" class="py-10 text-center text-sm text-gray-500 dark:text-dark-400">
+        {{ t('usage.videoLoading') }}
+      </div>
+      <div v-else-if="videoError" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
+        {{ videoError }}
+      </div>
+      <template v-else-if="videoTask">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-500 dark:text-dark-400">{{ t('usage.videoStatus') }}</span>
+          <span class="font-medium text-gray-950 dark:text-white">{{ videoTask.status }}</span>
+        </div>
+        <progress v-if="!isVideoFinished" class="w-full" :value="videoTask.progress || 0" max="100"></progress>
+        <div v-if="videoTask.status === 'completed' && videoContentLoading" class="py-8 text-center text-sm text-gray-500 dark:text-dark-400">{{ t('usage.videoLoading') }}</div>
+        <video v-if="videoTask.status === 'completed' && videoObjectURL" class="w-full rounded-xl bg-black" :src="videoObjectURL" controls playsinline></video>
+        <a v-if="videoTask.status === 'completed' && videoObjectURL" class="btn btn-primary inline-flex" :href="videoObjectURL" download="ownapi-minimax-h3.mp4">
+          {{ t('usage.downloadVideo') }}
+        </a>
+      </template>
+    </div>
+  </BaseDialog>
 
   <!-- Token Tooltip Portal -->
   <Teleport to="body">
@@ -439,11 +472,11 @@
             <div class="text-xs font-semibold text-gray-300 mb-1">{{ t('usage.costDetails') }}</div>
             <div v-if="tooltipData && tooltipData.input_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.inputCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.input_cost.toFixed(6) }}</span>
+              <span class="font-medium text-white">${{ formatCost(tooltipData.input_cost) }}</span>
             </div>
             <div v-if="tooltipData && tooltipData.output_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.outputCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.output_cost.toFixed(6) }}</span>
+              <span class="font-medium text-white">${{ formatCost(tooltipData.output_cost) }}</span>
             </div>
             <!-- Token billing: show unit prices per 1M tokens -->
             <template v-if="!tooltipData?.billing_mode || tooltipData.billing_mode === 'token'">
@@ -477,11 +510,11 @@
             </div>
             <div v-if="tooltipData && tooltipData.cache_creation_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.cacheCreationCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.cache_creation_cost.toFixed(6) }}</span>
+              <span class="font-medium text-white">${{ formatCost(tooltipData.cache_creation_cost) }}</span>
             </div>
             <div v-if="tooltipData && tooltipData.cache_read_cost > 0" class="flex items-center justify-between gap-4">
               <span class="text-gray-400">{{ t('admin.usage.cacheReadCost') }}</span>
-              <span class="font-medium text-white">${{ tooltipData.cache_read_cost.toFixed(6) }}</span>
+              <span class="font-medium text-white">${{ formatCost(tooltipData.cache_read_cost) }}</span>
             </div>
           </div>
           <!-- Rate and Summary -->
@@ -497,12 +530,12 @@
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.original') }}</span>
-            <span class="font-medium text-white">${{ tooltipData?.total_cost.toFixed(6) }}</span>
+            <span class="font-medium text-white">${{ formatCost(tooltipData?.total_cost) }}</span>
           </div>
           <div class="flex items-center justify-between gap-6 border-t border-gray-700 pt-1.5">
             <span class="text-gray-400">{{ t('usage.billed') }}</span>
             <span class="font-semibold text-green-400"
-              >${{ tooltipData?.actual_cost.toFixed(6) }}</span
+              >${{ formatCost(tooltipData?.actual_cost) }}</span
             >
           </div>
         </div>
@@ -516,7 +549,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted, onActivated, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { usageAPI, keysAPI } from '@/api'
@@ -527,6 +560,8 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import Select from '@/components/common/Select.vue'
 import DateRangePicker from '@/components/common/DateRangePicker.vue'
 import Icon from '@/components/icons/Icon.vue'
+import BaseDialog from '@/components/common/BaseDialog.vue'
+import type { VideoTaskStatus } from '@/api/usage'
 import type { UsageLog, ApiKey, UsageQueryParams, UsageStatsResponse } from '@/types'
 import type { Column } from '@/components/common/types'
 import { formatDateTime, formatReasoningEffort } from '@/utils/format'
@@ -541,6 +576,8 @@ const { t } = useI18n()
 const appStore = useAppStore()
 
 let abortController: AbortController | null = null
+let visibilityHandlerRegistered = false
+let hasActivatedOnce = false
 
 // Tooltip state
 const tooltipVisible = ref(false)
@@ -574,6 +611,75 @@ const usageLogs = ref<UsageLog[]>([])
 const apiKeys = ref<ApiKey[]>([])
 const loading = ref(false)
 const exporting = ref(false)
+const videoDialogVisible = ref(false)
+const videoLoading = ref(false)
+const videoError = ref('')
+const videoTask = ref<VideoTaskStatus | null>(null)
+const selectedVideoUsageID = ref<number | null>(null)
+const videoContentLoading = ref(false)
+const videoObjectURL = ref('')
+let videoPollTimer: number | undefined
+let videoLoadGeneration = 0
+
+const isVideoUsage = (row: UsageLog): boolean => row.model === 'MiniMax-H3'
+const isVideoFinished = computed(() => !!videoTask.value && ['completed', 'failed'].includes(videoTask.value.status))
+
+const revokeVideoObjectURL = () => {
+  if (videoObjectURL.value) window.URL.revokeObjectURL(videoObjectURL.value)
+  videoObjectURL.value = ''
+}
+
+const closeVideo = () => {
+  videoLoadGeneration += 1
+  window.clearTimeout(videoPollTimer)
+  revokeVideoObjectURL()
+  videoDialogVisible.value = false
+  videoTask.value = null
+  selectedVideoUsageID.value = null
+  videoContentLoading.value = false
+  videoError.value = ''
+}
+
+const loadVideo = async () => {
+  const usageLogID = selectedVideoUsageID.value
+  const generation = videoLoadGeneration
+  if (!usageLogID) return
+  videoLoading.value = videoTask.value == null
+  try {
+    const task = await usageAPI.getVideo(usageLogID)
+    if (generation !== videoLoadGeneration || selectedVideoUsageID.value !== usageLogID) return
+    videoTask.value = task
+    if (videoTask.value.status === 'completed') {
+      videoContentLoading.value = true
+      const content = await usageAPI.getVideoContent(usageLogID)
+      if (generation !== videoLoadGeneration || selectedVideoUsageID.value !== usageLogID) return
+      revokeVideoObjectURL()
+      videoObjectURL.value = window.URL.createObjectURL(content)
+      videoContentLoading.value = false
+    } else if (!isVideoFinished.value) {
+      videoPollTimer = window.setTimeout(loadVideo, 4000)
+    }
+  } catch {
+    if (generation !== videoLoadGeneration || selectedVideoUsageID.value !== usageLogID) return
+    videoContentLoading.value = false
+    videoError.value = t('usage.videoUnavailable')
+  } finally {
+    if (generation === videoLoadGeneration && selectedVideoUsageID.value === usageLogID) {
+      videoLoading.value = false
+    }
+  }
+}
+
+const openVideo = (row: UsageLog) => {
+  videoLoadGeneration += 1
+  window.clearTimeout(videoPollTimer)
+  selectedVideoUsageID.value = row.id
+  videoTask.value = null
+  videoContentLoading.value = false
+  videoError.value = ''
+  videoDialogVisible.value = true
+  loadVideo()
+}
 
 const apiKeyOptions = computed(() => {
   return [
@@ -631,9 +737,14 @@ const sortState = reactive({
   sort_order: 'desc' as 'asc' | 'desc'
 })
 
-const formatDuration = (ms: number): string => {
+const formatDuration = (ms: number | null | undefined): string => {
+  if (ms == null || !Number.isFinite(ms)) return '-'
   if (ms < 1000) return `${ms.toFixed(0)}ms`
   return `${(ms / 1000).toFixed(2)}s`
+}
+
+const formatCost = (value: number | null | undefined, digits = 6): string => {
+  return Number.isFinite(value) ? (value as number).toFixed(digits) : (0).toFixed(digits)
 }
 
 const imageUnitPrice = (row: UsageLog | null): number => {
@@ -736,6 +847,17 @@ const loadUsageLogs = async () => {
   }
 }
 
+const refreshUsageData = () => {
+  loadUsageLogs()
+  loadUsageStats()
+}
+
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    refreshUsageData()
+  }
+}
+
 const loadApiKeys = async () => {
   try {
     const response = await keysAPI.list(1, 100)
@@ -761,8 +883,7 @@ const loadUsageStats = async () => {
 
 const applyFilters = () => {
   pagination.page = 1
-  loadUsageLogs()
-  loadUsageStats()
+  refreshUsageData()
 }
 
 const resetFilters = () => {
@@ -780,8 +901,7 @@ const resetFilters = () => {
   filters.value.start_date = startDate.value
   filters.value.end_date = endDate.value
   pagination.page = 1
-  loadUsageLogs()
-  loadUsageStats()
+  refreshUsageData()
 }
 
 const handlePageChange = (page: number) => {
@@ -880,8 +1000,8 @@ const exportToCSV = async () => {
         log.cache_read_tokens,
         log.cache_creation_tokens,
         log.rate_multiplier,
-        log.actual_cost.toFixed(8),
-        log.total_cost.toFixed(8),
+        formatCost(log.actual_cost, 8),
+        formatCost(log.total_cost, 8),
         log.first_token_ms ?? '',
         log.duration_ms
       ].map(escapeCSVValue)
@@ -944,8 +1064,32 @@ const hideTokenTooltip = () => {
 
 onMounted(() => {
   loadApiKeys()
-  loadUsageLogs()
-  loadUsageStats()
+  refreshUsageData()
+  if (!visibilityHandlerRegistered) {
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    visibilityHandlerRegistered = true
+  }
+})
+
+onActivated(() => {
+  if (hasActivatedOnce) {
+    refreshUsageData()
+  }
+  hasActivatedOnce = true
+})
+
+onBeforeUnmount(() => {
+  videoLoadGeneration += 1
+  window.clearTimeout(videoPollTimer)
+  revokeVideoObjectURL()
+  if (visibilityHandlerRegistered) {
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+    visibilityHandlerRegistered = false
+  }
+  if (abortController) {
+    abortController.abort()
+    abortController = null
+  }
 })
 </script>
 
