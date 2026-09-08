@@ -22,4 +22,12 @@ jobs:
         run: |
           set -euo pipefail
           ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key "$SERVER_USER@$SERVER_HOST" \
-            'docker exec ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -F "|" -c "SELECT id, request_id, actual_cost, created_at FROM usage_logs WHERE model = '\''MiniMax-H3'\'' ORDER BY created_at; SELECT '\''mapping_count'\'', COUNT(*), 0, NOW() FROM usage_video_tasks;"'\'''
+            'docker exec ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -F "|"'\'' <<'\''SQL'\''
+          SELECT id, request_id, actual_cost, created_at
+          FROM usage_logs
+          WHERE model = '\''MiniMax-H3'\''
+          ORDER BY created_at;
+
+          SELECT '\''mapping_count'\'', COUNT(*), 0, NOW()
+          FROM usage_video_tasks;
+          SQL
