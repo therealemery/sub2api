@@ -17,8 +17,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`, based on `origin/main` at `efc6983d`. It contains the pending MiniMax H3 usage-history repair; use this checkout until that change is committed, merged, and deployed.
-- Local `main` and `origin/main` were both at `efc6983d` before the video-history branch began.
+- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
+- Production is running feature image `ownapi:c21871b3746e`. Later `main` commits only created and then removed the one-time backfill workflow; they do not require another application deployment.
 - The current catalog contains 44 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. Commit `4d57cf50` intentionally restored the first two after current Packy 50% pricing made them part of the profitable intersection; the older removal note is historical, not current policy.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
@@ -181,6 +181,8 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The usage page now refreshes after returning to it and offers `查看视频` / `View video` for H3 rows. Completed video bytes are fetched with the user's JWT and played from a revocable local Blob URL; polling and stale requests are bounded and cleaned up.
 - Three historical H3 task tokens were recovered locally and can be backfilled after deployment by matching their existing SHA-256 billing request IDs. The backfill must insert mappings only, without changing usage rows or balances, and must not print task tokens in CI logs.
 - Validation passed: focused H3 usage tests (5/5), full frontend suite (110 files / 665 tests), Vue type checking, focused ESLint, production frontend build (868 modules), targeted backend handler/service/routes tests, owner-scope unit test, migration runner tests, and `git diff --check`. Existing non-fatal frontend test/build warnings remain unchanged.
+- Feature commit `c21871b3` was fast-forwarded to `origin/main` and deployment run `34211297259` succeeded. Production is healthy on image `ownapi:c21871b3746e` and migration `136_add_usage_log_video_task_id.sql` applied during startup.
+- A read-only production check verified three H3 usage rows and initially zero video mappings. A one-time workflow then matched all three recovered task tokens to their existing SHA-256 request IDs and verified exactly three H3 mappings. It did not alter balances or usage rows. The temporary task-ID GitHub secret was deleted and the temporary workflow was removed from source.
 
 ### 2026-09-07 — New Lightsail IP recovery and H3 production deployment
 
