@@ -104,6 +104,29 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 The pricing/status implementation, 43-model published catalog (48 verified seeds before profitability filtering), public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
 
+### 2026-09-08 — Packy multi-protocol routing ready for deployment
+
+- The user approved one customer-facing OwnAPI `POST /v1/chat/completions` contract with private
+  per-model Packy protocol routing. Packy's signed-in model marketplace was checked by token group
+  and endpoint, not inferred from provider names.
+- The four production token sets require three private routes: Codex and Grok sale models use OpenAI
+  Responses; Claude models use Anthropic Messages; GPT-5.4, GLM, MiniMax, Kimi, Qwen, and Gemini use
+  OpenAI Chat Completions when their selected token group supports it. Gemini's native endpoint is
+  not needed for this release because `gemini-slb` exposes OpenAI Chat.
+- Added an exact, fail-closed Packy model-to-protocol table. Unknown models cannot fall back to a
+  guessed protocol. Usage records now report the real private endpoint.
+- Reused the existing Chat → Responses → Anthropic and Anthropic SSE → Chat converters for Packy
+  Claude routes. The Packy `/v1/messages` request uses the managed server-side Bearer token; customer
+  credentials remain replaced and private.
+- Packy Anthropic error bodies are always replaced with a generic customer error, preventing the
+  Packy hostname, token, token-group name, or raw error from escaping.
+- Validation passed: protocol tests, Packy Anthropic URL/auth/usage/sanitization tests, endpoint
+  metadata tests, full unit-tagged service and handler packages, server package, and
+  `git diff --check`.
+- All four Packy accounts remain unschedulable pending deployment and credential verification.
+  After deployment, safely refill and enable one account at a time, add the three omitted Core GLM
+  mappings, run minimum-cost routing/billing smoke tests, and rotate the four Packy tokens.
+
 ### 2026-09-07 — MiniMax H3 video integration checkpoint
 
 - Added `MiniMax-H3` to the public model catalog as a Video model with reference-image capabilities. The screenshot's public 8 折 prices imply official rates of `$0.10/s` (768p) and `$0.1625/s` (2K); OwnAPI displays and bills at official 75%: `$0.075/s` and `$0.121875/s`.

@@ -1281,3 +1281,14 @@ func runOpenAIResponsesWebSocketUsageLogCase(t *testing.T, tc openAIResponsesWSU
 func testStringPtr(v string) *string {
 	return &v
 }
+
+func TestResolveRawCCUpstreamEndpoint_PackyProtocol(t *testing.T) {
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/chat/completions", nil)
+	account := &service.Account{Platform: service.PlatformOpenAI, Type: service.AccountTypeAPIKey, Extra: map[string]any{"upstream_provider": service.UpstreamProviderPackyAPI}}
+
+	require.Equal(t, "/v1/messages", resolveRawCCUpstreamEndpoint(c, account, "claude-sonnet-4-6"))
+	require.Equal(t, "/v1/responses", resolveRawCCUpstreamEndpoint(c, account, "gpt-6-astra"))
+	require.Equal(t, "/v1/chat/completions", resolveRawCCUpstreamEndpoint(c, account, "glm-5.3"))
+	require.Empty(t, resolveRawCCUpstreamEndpoint(c, account, "unknown-model"))
+}

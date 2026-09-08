@@ -19,6 +19,30 @@ package openai_compat
 
 import "strings"
 
+// PackyUpstreamProtocol is the verified private protocol used for a Packy
+// model. Customer requests and responses remain OpenAI Chat Completions.
+type PackyUpstreamProtocol string
+
+const (
+	PackyProtocolUnknown           PackyUpstreamProtocol = ""
+	PackyProtocolOpenAIChat        PackyUpstreamProtocol = "openai_chat"
+	PackyProtocolOpenAIResponses   PackyUpstreamProtocol = "openai_responses"
+	PackyProtocolAnthropicMessages PackyUpstreamProtocol = "anthropic_messages"
+)
+
+func (p PackyUpstreamProtocol) Endpoint() string {
+	switch p {
+	case PackyProtocolOpenAIChat:
+		return "/v1/chat/completions"
+	case PackyProtocolOpenAIResponses:
+		return "/v1/responses"
+	case PackyProtocolAnthropicMessages:
+		return "/v1/messages"
+	default:
+		return ""
+	}
+}
+
 // AccountResponsesSupport 描述账号上游对 OpenAI Responses API 的支持状态。
 //
 // 仅用于 platform=openai + type=apikey 的账号；其他账号类型不应调用本包判定。
@@ -76,15 +100,29 @@ func ShouldUseResponsesAPI(extra map[string]any) bool {
 	return ResolveResponsesSupport(extra) != ResponsesSupportNo
 }
 
-// PackyModelRequiresResponses reports models that Packy's live pricing catalog
-// exposes exclusively through the OpenAI Responses endpoint. Keep this list
-// deliberately narrow: all other Packy models continue through the raw Chat
-// Completions compatibility path.
-func PackyModelRequiresResponses(model string) bool {
-	switch strings.ToLower(strings.TrimSpace(model)) {
-	case "gpt-5.6-luna", "codex-auto-review":
-		return true
+// ResolvePackyModelProtocol returns the exact protocol verified against the
+// Packy token-group and endpoint filters on 2026-09-08. Unknown models fail
+// closed; callers must not infer a protocol from a provider or model prefix.
+func ResolvePackyModelProtocol(model string) (PackyUpstreamProtocol, bool) {
+	normalized := strings.ToLower(strings.TrimSpace(model))
+	switch normalized {
+	case "gpt-5.4-mini", "gpt-5.5", "gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-6-astra", "codex-auto-review",
+		"grok-4.5", "grok-4.6":
+		return PackyProtocolOpenAIResponses, true
+	case "claude-fable-5", "claude-haiku-4-5-20251001", "claude-opus-4-5-20251101", "claude-opus-4-6", "claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-sonnet-4-5-20250929", "claude-sonnet-4-6", "claude-sonnet-5":
+		return PackyProtocolAnthropicMessages, true
+	case "gpt-5.4", "minimax-m3", "glm-5", "glm-5.2", "glm-5.3", "glm-5.3-flash", "kimi-k2.5", "minimax-m2.5", "minimax-m2.7",
+		"qwen3-coder-next", "qwen3-max", "qwen3-vl-flash", "qwen3.5-flash", "qwen3.5-plus", "qwen3.6-max-preview", "qwen3.6-plus", "qwen3.7-max", "qwen3.7-plus", "qwen3.8-flash", "qwen3.8-max", "qwen3.8-max-0902",
+		"gemini-2.5-flash", "gemini-2.5-pro", "gemini-3-flash-preview", "gemini-3-pro-preview", "gemini-3.1-pro-preview", "gemini-3.5-flash":
+		return PackyProtocolOpenAIChat, true
 	default:
-		return false
+		return PackyProtocolUnknown, false
 	}
+}
+
+// PackyModelRequiresResponses remains as a compatibility helper for existing
+// routing call sites while protocol-aware dispatch is introduced.
+func PackyModelRequiresResponses(model string) bool {
+	protocol, ok := ResolvePackyModelProtocol(model)
+	return ok && protocol == PackyProtocolOpenAIResponses
 }

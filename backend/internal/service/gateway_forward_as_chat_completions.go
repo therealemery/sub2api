@@ -174,7 +174,11 @@ func (s *GatewayService) ForwardAsChatCompletions(
 			}
 		}
 
-		writeGatewayCCError(c, mapUpstreamStatusCode(resp.StatusCode), "server_error", upstreamMsg)
+		if account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI {
+			writeGatewayCCError(c, mapUpstreamStatusCode(resp.StatusCode), "server_error", "Upstream request failed")
+		} else {
+			writeGatewayCCError(c, mapUpstreamStatusCode(resp.StatusCode), "server_error", upstreamMsg)
+		}
 		return nil, fmt.Errorf("upstream error: %d %s", resp.StatusCode, upstreamMsg)
 	}
 

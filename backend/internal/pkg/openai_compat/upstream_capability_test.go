@@ -54,15 +54,40 @@ func TestShouldUseResponsesAPI(t *testing.T) {
 	}
 }
 
-func TestPackyModelRequiresResponses(t *testing.T) {
-	for _, model := range []string{"gpt-5.6-luna", "codex-auto-review", " GPT-5.6-LUNA "} {
-		if !PackyModelRequiresResponses(model) {
-			t.Fatalf("expected %q to require Responses", model)
-		}
+func TestResolvePackyModelProtocol(t *testing.T) {
+	tests := []struct {
+		model string
+		want  PackyUpstreamProtocol
+		ok    bool
+	}{
+		{"gpt-5.6-luna", PackyProtocolOpenAIResponses, true},
+		{"codex-auto-review", PackyProtocolOpenAIResponses, true},
+		{" GPT-6-ASTRA ", PackyProtocolOpenAIResponses, true},
+		{"grok-4.6", PackyProtocolOpenAIResponses, true},
+		{"gpt-5.4", PackyProtocolOpenAIChat, true},
+		{"claude-sonnet-4-6", PackyProtocolAnthropicMessages, true},
+		{"CLAUDE-OPUS-4-6", PackyProtocolAnthropicMessages, true},
+		{"MiniMax-M3", PackyProtocolOpenAIChat, true},
+		{"glm-5.3", PackyProtocolOpenAIChat, true},
+		{"gemini-3.1-pro-preview", PackyProtocolOpenAIChat, true},
+		{"qwen3.8-max", PackyProtocolOpenAIChat, true},
+		{"not-configured", PackyProtocolUnknown, false},
+		{"", PackyProtocolUnknown, false},
 	}
-	for _, model := range []string{"gpt-6-astra", "gpt-5.6-sol", "glm-5.3"} {
-		if PackyModelRequiresResponses(model) {
-			t.Fatalf("expected %q to allow Chat Completions", model)
-		}
+
+	for _, tc := range tests {
+		t.Run(tc.model, func(t *testing.T) {
+			got, ok := ResolvePackyModelProtocol(tc.model)
+			if got != tc.want || ok != tc.ok {
+				t.Fatalf("ResolvePackyModelProtocol(%q) = (%q, %v), want (%q, %v)", tc.model, got, ok, tc.want, tc.ok)
+			}
+		})
+	}
+
+	if endpoint := PackyProtocolOpenAIResponses.Endpoint(); endpoint != "/v1/responses" {
+		t.Fatalf("Responses endpoint = %q", endpoint)
+	}
+	if endpoint := PackyProtocolAnthropicMessages.Endpoint(); endpoint != "/v1/messages" {
+		t.Fatalf("Anthropic endpoint = %q", endpoint)
 	}
 }

@@ -176,7 +176,7 @@ func (h *OpenAIGatewayHandler) ChatCompletions(c *gin.Context) {
 		if channelMapping.Mapped {
 			forwardBody = h.gatewayService.ReplaceModelInBody(body, channelMapping.MappedModel)
 		}
-		result, err := h.gatewayService.ForwardAsChatCompletions(c.Request.Context(), c, account, forwardBody, promptCacheKey, "")
+		result, err := h.forwardPackyAwareChatCompletions(c, account, forwardBody, promptCacheKey)
 
 		forwardDurationMs := time.Since(forwardStart).Milliseconds()
 		if accountReleaseFunc != nil {
@@ -256,7 +256,7 @@ func (h *OpenAIGatewayHandler) ChatCompletions(c *gin.Context) {
 		userAgent := c.GetHeader("User-Agent")
 		clientIP := ip.GetClientIP(c)
 		inboundEndpoint := GetInboundEndpoint(c)
-		upstreamEndpoint := resolveRawCCUpstreamEndpoint(c, account)
+		upstreamEndpoint := resolveRawCCUpstreamEndpoint(c, account, reqModel)
 
 		h.submitOpenAIUsageRecordTask(result, func(ctx context.Context) {
 			if err := h.gatewayService.RecordUsage(ctx, &service.OpenAIRecordUsageInput{
@@ -295,10 +295,60 @@ func (h *OpenAIGatewayHandler) ChatCompletions(c *gin.Context) {
 // has been probed to not support the Responses API, the request is
 // forwarded directly to /v1/chat/completions — not through the default
 // CC→Responses conversion path.
-func resolveRawCCUpstreamEndpoint(c *gin.Context, account *service.Account) string {
+func resolveRawCCUpstreamEndpoint(c *gin.Context, account *service.Account, model string) string {
+	if account != nil && account.ManagedUpstreamProvider() == service.UpstreamProviderPackyAPI {
+		if protocol, ok := openai_compat.ResolvePackyModelProtocol(model); ok {
+			return protocol.Endpoint()
+		}
+		return ""
+	}
 	if account != nil && account.Type == service.AccountTypeAPIKey &&
 		!openai_compat.ShouldUseResponsesAPI(account.Extra) {
 		return "/v1/chat/completions"
 	}
 	return GetUpstreamEndpoint(c, account.Platform)
+}
+
+func (h *OpenAIGatewayHandler) forwardPackyAwareChatCompletions(
+	c *gin.Context,
+	account *service.Account,
+	body []byte,
+	promptCacheKey string,
+) (*service.OpenAIForwardResult, error) {
+	if account == nil || account.ManagedUpstreamProvider() != service.UpstreamProviderPackyAPI {
+		return h.gatewayService.ForwardAsChatCompletions(c.Request.Context(), c, account, body, promptCacheKey, "")
+	}
+	model := gjson.GetBytes(body, "model").String()
+	protocol, ok := openai_compat.ResolvePackyModelProtocol(model)
+	if !ok {
+		h.errorResponse(c, http.StatusBadRequest, "model_not_available", "The requested model is not available")
+		return nil, errors.New("packy model protocol is not configured")
+	}
+	if protocol != openai_compat.PackyProtocolAnthropicMessages {
+		return h.gatewayService.ForwardAsChatCompletions(c.Request.Context(), c, account, body, promptCacheKey, "")
+	}
+	if h.compatGatewayService == nil {
+		h.errorResponse(c, http.StatusServiceUnavailable, "api_error", "Service temporarily unavailable")
+		return nil, errors.New("packy anthropic compatibility service is unavailable")
+	}
+	compatResult, err := h.compatGatewayService.ForwardAsChatCompletions(c.Request.Context(), c, account, body, nil)
+	if err != nil || compatResult == nil {
+		return nil, err
+	}
+	return &service.OpenAIForwardResult{
+		RequestID: compatResult.RequestID,
+		Usage: service.OpenAIUsage{
+			InputTokens:              compatResult.Usage.InputTokens,
+			OutputTokens:             compatResult.Usage.OutputTokens,
+			CacheCreationInputTokens: compatResult.Usage.CacheCreationInputTokens,
+			CacheReadInputTokens:     compatResult.Usage.CacheReadInputTokens,
+		},
+		Model:           compatResult.Model,
+		BillingModel:    compatResult.Model,
+		UpstreamModel:   compatResult.UpstreamModel,
+		ReasoningEffort: compatResult.ReasoningEffort,
+		Stream:          compatResult.Stream,
+		Duration:        compatResult.Duration,
+		FirstTokenMs:    compatResult.FirstTokenMs,
+	}, nil
 }

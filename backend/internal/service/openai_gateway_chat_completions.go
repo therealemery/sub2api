@@ -63,7 +63,12 @@ func (s *OpenAIGatewayService) ForwardAsChatCompletions(
 ) (*OpenAIForwardResult, error) {
 	requestedModel := gjson.GetBytes(body, "model").String()
 	isPacky := account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI
-	packyRawChat := isPacky && !openai_compat.PackyModelRequiresResponses(requestedModel)
+	packyProtocol, packyProtocolKnown := openai_compat.ResolvePackyModelProtocol(requestedModel)
+	if isPacky && !packyProtocolKnown {
+		writeChatCompletionsError(c, http.StatusBadRequest, "model_not_available", "The requested model is not available")
+		return nil, fmt.Errorf("packy model protocol is not configured")
+	}
+	packyRawChat := isPacky && packyProtocol == openai_compat.PackyProtocolOpenAIChat
 	// 入口分流：APIKey 账号 + 已探测且确认上游不支持 Responses，走 CC 直转。
 	// 标记缺失（未探测）按"现状即证据"原则继续走下方原 Responses 转换路径。
 	if account.Type == AccountTypeAPIKey && (packyRawChat || (!isPacky && !openai_compat.ShouldUseResponsesAPI(account.Extra))) {
