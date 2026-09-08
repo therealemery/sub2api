@@ -34,16 +34,16 @@ jobs:
 
           printf '%s' "$payload" | ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key "$SERVER_USER@$SERVER_HOST" \
             'set -euo pipefail
-             sql="BEGIN;"
              count=0
              while IFS="|" read -r request_id task_b64; do
                [ -n "$request_id" ] || continue
                task_id="$(printf "%s" "$task_b64" | base64 -d)"
-               sql+="INSERT INTO usage_video_tasks (usage_log_id, user_id, task_id) SELECT id, user_id, '\''${task_id}'\'' FROM usage_logs WHERE model = '\''MiniMax-H3'\'' AND request_id = '\''${request_id}'\'' ON CONFLICT (usage_log_id) DO NOTHING;"
+               result="$(docker exec ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -F "|"'\'' \
+                 -c "WITH matched AS (SELECT id, user_id FROM usage_logs WHERE model = '\''MiniMax-H3'\'' AND request_id = '\''${request_id}'\''), inserted AS (INSERT INTO usage_video_tasks (usage_log_id, user_id, task_id) SELECT id, user_id, '\''${task_id}'\'' FROM matched ON CONFLICT (usage_log_id) DO NOTHING RETURNING 1) SELECT (SELECT COUNT(*) FROM matched), (SELECT COUNT(*) FROM inserted);")"
+               [ "${result%%|*}" = "1" ] || { echo "Expected one verified H3 usage match" >&2; exit 1; }
                count=$((count + 1))
              done
              [ "$count" -eq 3 ] || { echo "Expected three payload rows" >&2; exit 1; }
-             sql+="DO \\\$\\\$ BEGIN IF (SELECT COUNT(*) FROM usage_video_tasks vt JOIN usage_logs ul ON ul.id = vt.usage_log_id WHERE ul.model = '\''MiniMax-H3'\'') <> 3 THEN RAISE EXCEPTION '\''H3 mapping verification failed'\''; END IF; END \\\$\\\$; COMMIT;"
-             printf "%s" "$sql" | docker exec -i ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -q'\''
-             total="$(docker exec ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -c "SELECT COUNT(*) FROM usage_video_tasks;"'\'')"
+             total="$(docker exec ownapi-postgres sh -lc '\''psql -X -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -At -c "SELECT COUNT(*) FROM usage_video_tasks vt JOIN usage_logs ul ON ul.id = vt.usage_log_id WHERE ul.model = '\''MiniMax-H3'\'';"'\'')"
+             [ "$total" -ge 3 ] || { echo "H3 mapping verification failed" >&2; exit 1; }
              echo "Verified H3 mappings: $total"'
