@@ -196,6 +196,13 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-09 — Packy pricing migration deployed; upstream credentials invalid
+
+- Commit `58df872f` was pushed to `origin/main` and deployed successfully by Actions run `34304164749`; the production container is healthy as `ownapi:58df872f20c3`.
+- Production read-only verification confirmed migration `137_seed_ownapi_packy_text_pricing.sql` is applied, `OwnAPI LLM` is active with `channel_mapped` billing, 39 distinct callable text models are present, and four Packy account-cost rules were created. The five fail-closed models remain absent, including `MiniMax-H3`, which stays on the independent DC-API video route.
+- All four Packy credentials currently return upstream HTTP 401 `无效的令牌`; the scheduler has made them non-schedulable (`Packy / Core` status remains active but `schedulable=false`; Expansion, GPT-5.4, and ZAI are in error). Do not enable, test, or change production account data until the user supplies newly issued valid tokens. ZAI remains paused by policy.
+- Public production checks passed: `/health`, `/home`, `/models`, `/models/minimax-h3`, and `/docs` returned HTTP 200 (with the expected `/docs` redirect).
+
 ### 2026-09-08 — Packy customer pricing and normalized cost rules
 
 - Added migration `137_seed_ownapi_packy_text_pricing.sql`, which creates the fail-closed `OwnAPI LLM` channel, binds the existing `OwnAPI` OpenAI customer group at its existing `1x` multiplier, and seeds 39 callable Packy text models at the approved customer prices. GPT-5.4 uses manufacturer list × `0.8`; the remaining callable models use manufacturer list × `0.7`.
