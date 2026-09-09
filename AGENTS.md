@@ -196,6 +196,13 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-09 — Packy pricing-cache fix deployed; final billing check pending SSH
+
+- Commit `f51337ee` added migration `138_backfill_account_stats_tier_labels.sql` and a repository-side `COALESCE` safeguard. The production deployment workflow `34321863987` completed successfully and replaced the application image.
+- The previous zero-charge test was traced to `channel_account_stats_pricing_intervals.tier_label` being NULL, which caused channel-cache construction to fail while the upstream request itself still succeeded. The fix is designed to restore channel ID, customer pricing, and Packy account-cost resolution without modifying historical usage rows or balances.
+- The administrator UI now shows `Packy / Core` normal and schedulable after the new token was entered. Expansion, GPT-5.4, and ZAI remain disabled/error until their tokens are replaced and verified.
+- Two bounded direct SSH checks to `13.159.10.43:22` after deployment timed out. Do not claim the post-fix customer charge, account cost, or profit until server SSH access returns and the minimum-cost Core smoke request is reconciled from production data.
+
 ### 2026-09-09 — Packy pricing migration deployed; upstream credentials invalid
 
 - Commit `58df872f` was pushed to `origin/main` and deployed successfully by Actions run `34304164749`; the production container is healthy as `ownapi:58df872f20c3`.
