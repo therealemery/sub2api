@@ -68,12 +68,22 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
     featured: true,
     tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, output: 75 } }],
   }),
-  seed('gpt-5.4', 'GPT-5.4', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://developers.openai.com/api/docs/models/gpt-5.4', 28, 10, { featured: true }),
+  seed('gpt-5.4', 'GPT-5.4', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://developers.openai.com/api/docs/models/gpt-5.4', 28, 10, {
+    contextWindow: '1.05M', featured: true,
+    tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 5, cachedInput: 0.5, output: 22.5 } }],
+  }),
   seed('gpt-5.4-mini', 'GPT-5.4 Mini', 'gpt', ['balanced', 'fast', 'coding'], ['openai'], { input: 0.75, cachedInput: 0.075, output: 4.5 }, 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', 93, 20, { contextWindow: '400K' }),
   seed('gpt-5.5', 'GPT-5.5', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 30 }, 'https://developers.openai.com/api/docs/models/gpt-5.5', 93, 30, { featured: true }),
-  seed('gpt-5.6-luna', 'GPT-5.6 Luna', 'gpt', ['fast', 'balanced'], ['openai'], { input: 0.2, cachedInput: 0.02, output: 1.2 }, 'https://developers.openai.com/api/docs/models/compare', 93, 40),
-  seed('gpt-5.6-sol', 'GPT-5.6 Sol', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 4, cachedInput: 0.4, output: 20 }, 'https://developers.openai.com/api/docs/models/compare', 93, 50, { featured: true }),
-  seed('gpt-5.6-terra', 'GPT-5.6 Terra', 'gpt', ['balanced', 'coding', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://developers.openai.com/api/docs/models/compare', 93, 60),
+  seed('gpt-5.6-luna', 'GPT-5.6 Luna', 'gpt', ['fast', 'balanced'], ['openai'], { input: 0.2, cachedInput: 0.02, output: 1.2 }, 'https://developers.openai.com/api/docs/models/compare', 93, 40, {
+    tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 0.4, cachedInput: 0.04, output: 1.8 } }],
+  }),
+  seed('gpt-5.6-sol', 'GPT-5.6 Sol', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 4, cachedInput: 0.4, output: 20 }, 'https://developers.openai.com/api/docs/models/compare', 93, 50, {
+    featured: true,
+    tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 8, cachedInput: 0.8, output: 30 } }],
+  }),
+  seed('gpt-5.6-terra', 'GPT-5.6 Terra', 'gpt', ['balanced', 'coding', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://developers.openai.com/api/docs/models/compare', 93, 60, {
+    tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 0.4, output: 18 } }],
+  }),
   seed('gpt-daybreak-blue-latest', 'GPT Daybreak Blue', 'gpt', ['preview', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://developers.openai.com/api/docs/models/all', 0, 65, {
     pricingStatus: 'unpublished', searchAliases: ['daybreak blue', 'gpt daybreak'],
   }),

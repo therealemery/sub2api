@@ -185,7 +185,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `c21871b3746ece935a0f8a6f7c4ec8e524d05293` (image `ownapi:c21871b3746e`, deployed by run `34211297259`).
+- Last deployed revision: `e36afc8e` (image `ownapi:e36afc8e`, deployed by run `34234153951`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
 - Production verification: healthy on 2026-09-07 after DNS and deployment recovery. `/health`, `/home`, `/models`, and `/models/minimax-h3` return HTTP 200; unauthenticated `POST /v1/videos` returns the expected HTTP 401 `API_KEY_REQUIRED`, confirming the H3 backend route is live without incurring a generation charge.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
@@ -195,6 +195,14 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-08 — Packy customer pricing and normalized cost rules
+
+- Added migration `137_seed_ownapi_packy_text_pricing.sql`, which creates the fail-closed `OwnAPI LLM` channel, binds the existing `OwnAPI` OpenAI customer group at its existing `1x` multiplier, and seeds 39 callable Packy text models at the approved customer prices. GPT-5.4 uses manufacturer list × `0.8`; the remaining callable models use manufacturer list × `0.7`.
+- Kept `glm-5`, `glm-5.2`, `gemini-3-pro-preview`, and `kimi-k2.5` outside the callable text channel. The latter three lack confirmed manufacturer prices; `glm-5` is excluded because the current `zai-officially` output cost, normalized to USD, exceeds OwnAPI's 70%-of-list output price. The `Packy / ZAI` account must remain paused. MiniMax H3 remains on the independent DC-API video path.
+- Re-read Packy's public live `/api/pricing` data on 2026-09-08. Account-statistics rules use the exact token-group scopes of `Packy / Core`, `Packy / Expansion`, and `Packy / GPT-5.4`; Packy CNY cost is normalized to USD with `/6.7`. The low-price account-statistics columns were widened to 12 decimal places so normalization does not introduce material rounding error.
+- Added complete customer and upstream-cost tiers for the verified context breakpoints. Fixed account-cost tier selection to use input plus cache-read context, matching customer billing and upstream behavior; output/cache-write tokens can no longer prematurely select a higher cost tier.
+- Validation passed: migration model-set/price assertions, relevant service/repository/handler/protocol tests, unit-tag suites, a real PostgreSQL migration double-execution test with four mock Packy accounts, and `git diff --check` pending final commit. All real Packy accounts remain paused until deployment and one-account-at-a-time smoke tests.
 
 ### 2026-09-08 — Packy production accounts and scheduler-cache fix
 

@@ -186,8 +186,11 @@ func calculatePerRequestStatsCost(pricing *ChannelModelPricing, requestCount int
 func calculateTokenStatsCost(pricing *ChannelModelPricing, tokens UsageTokens) *float64 {
 	p := pricing
 	if len(pricing.Intervals) > 0 {
-		totalTokens := tokens.InputTokens + tokens.OutputTokens + tokens.CacheCreationTokens + tokens.CacheReadTokens
-		if iv := FindMatchingInterval(pricing.Intervals, totalTokens); iv != nil {
+		// Context-priced upstreams choose their tier from input context only.
+		// Output and cache-write tokens must not push a request into a higher
+		// tier; customer channel billing uses the same input + cache-read basis.
+		totalContextTokens := tokens.InputTokens + tokens.CacheReadTokens
+		if iv := FindMatchingInterval(pricing.Intervals, totalContextTokens); iv != nil {
 			p = &ChannelModelPricing{
 				InputPrice:      iv.InputPrice,
 				OutputPrice:     iv.OutputPrice,

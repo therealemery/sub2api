@@ -227,6 +227,28 @@ func TestCalculateStatsCost_TokenBilling_WithCache(t *testing.T) {
 	require.InDelta(t, 0.95, *result, 1e-12)
 }
 
+func TestCalculateStatsCost_TierUsesInputContextNotOutput(t *testing.T) {
+	pricing := &ChannelModelPricing{
+		BillingMode: BillingModeToken,
+		InputPrice:  testPtrFloat64(0.001),
+		OutputPrice: testPtrFloat64(0.002),
+		Intervals: []PricingInterval{
+			{MinTokens: 0, MaxTokens: testPtrInt(200), InputPrice: testPtrFloat64(0.001), OutputPrice: testPtrFloat64(0.002)},
+			{MinTokens: 200, InputPrice: testPtrFloat64(0.01), OutputPrice: testPtrFloat64(0.02)},
+		},
+	}
+
+	// A long output does not change the input-context pricing tier.
+	result := calculateStatsCost(pricing, UsageTokens{InputTokens: 100, OutputTokens: 500}, 1)
+	require.NotNil(t, result)
+	require.InDelta(t, 1.1, *result, 1e-12)
+
+	// Cached input is part of the context and does select the long tier.
+	result = calculateStatsCost(pricing, UsageTokens{InputTokens: 100, CacheReadTokens: 101, OutputTokens: 1}, 1)
+	require.NotNil(t, result)
+	require.InDelta(t, 1.02, *result, 1e-12)
+}
+
 func TestCalculateStatsCost_TokenBilling_WithImageOutput(t *testing.T) {
 	pricing := &ChannelModelPricing{
 		BillingMode:      BillingModeToken,

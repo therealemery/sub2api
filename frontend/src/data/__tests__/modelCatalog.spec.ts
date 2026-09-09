@@ -188,6 +188,17 @@ describe('modelCatalog', () => {
       id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true,
       official: { input: 4, cachedInput: 1, output: 12 },
     }])
+    expect(catalog.find((model) => model.modelId === 'gpt-5.4')?.pricingSource?.tiers).toEqual([{
+      id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true,
+      official: { input: 5, cachedInput: 0.5, output: 22.5 },
+    }])
+    expect(['gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra'].map((modelId) =>
+      catalog.find((model) => model.modelId === modelId)?.pricingSource?.tiers[0],
+    )).toEqual([
+      { id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 0.4, cachedInput: 0.04, output: 1.8 } },
+      { id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 8, cachedInput: 0.8, output: 30 } },
+      { id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 0.4, output: 18 } },
+    ])
   })
 
   it('contains the exact 44-model eligibility snapshot across eight providers', () => {
