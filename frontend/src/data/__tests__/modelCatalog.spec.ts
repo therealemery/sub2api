@@ -42,7 +42,7 @@ describe('modelCatalog', () => {
   })
 
   it('never publishes Claude Code-only upstream models, including live config entries', () => {
-    const restricted = ['claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929']
+    const restricted = ['Claude-Haiku-4-5-20251001', 'CLAUDE_SONNET_4_5_20250929']
     const catalog = buildModelCatalog({
       featured_models: [],
       reference_discount: null,
@@ -60,9 +60,32 @@ describe('modelCatalog', () => {
       })),
     })
 
-    for (const modelId of restricted) {
-      expect(catalog.some((entry) => entry.modelId === modelId)).toBe(false)
-    }
+    expect(catalog).toHaveLength(42)
+    expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-haiku-4-5'))).toBe(false)
+    expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-sonnet-4-5'))).toBe(false)
+  })
+
+  it('merges dotted live Claude aliases into their canonical catalog entries', () => {
+    const catalog = buildModelCatalog({
+      featured_models: [],
+      reference_discount: null,
+      pricing_models: [{
+        model: 'Claude-Opus-4.7',
+        platform: 'anthropic',
+        billing_mode: 'token',
+        input_price: 0.000003,
+        output_price: 0.000015,
+        cache_write_price: 0.00000375,
+        cache_read_price: 0.0000003,
+        image_output_price: null,
+        per_request_price: null,
+        sort_order: 1,
+      }],
+    })
+
+    expect(catalog).toHaveLength(42)
+    expect(catalog.filter((entry) => entry.slug === 'claude-opus-4-7')).toHaveLength(1)
+    expect(catalog.find((entry) => entry.slug === 'claude-opus-4-7')?.modelId).toBe('claude-opus-4-7')
   })
 
   it('distinguishes pricing states and selects generic official tiers', () => {

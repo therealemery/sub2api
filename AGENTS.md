@@ -202,6 +202,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Removed `claude-haiku-4-5-20251001` and `claude-sonnet-4-5-20250929` from the curated and live-config public catalog paths. The public catalog now has 42 entries and six Anthropic models.
 - Added migration `139_remove_claude_code_only_packy_models.sql` to remove both models from OwnAPI customer pricing, Packy account-cost pricing, and every managed Packy account whitelist. After migration, the `OwnAPI LLM` channel has 37 callable text models.
 - Kept all six `cc-sale` Claude models and added localized detail-page guidance that OwnAPI-compatible third-party clients are supported and transient prompt-cache failures should be retried.
+- Canonicalized model identity punctuation so live dotted aliases such as `Claude-Opus-4.7` merge into the curated hyphenated entry instead of creating duplicate public cards.
 - Focused frontend tests, Vue type checks, focused lint, the production frontend build, migration tests, and `git diff --check` pass. Deployment and production verification remain pending.
 
 ### 2026-09-09 — Packy pricing-cache fix deployed; final billing check pending SSH

@@ -80,7 +80,7 @@ const providerSearchAliases: Record<string, string[]> = {
 const restrictedThirdPartyModelIds = new Set([
   'claude-haiku-4-5-20251001',
   'claude-sonnet-4-5-20250929',
-])
+].map(normalizeModelIdentity))
 
 export function calculateOwnApiPricing(
   pricing: OfficialTokenPricing,
@@ -210,7 +210,7 @@ const fallbackFamily: FamilyMetadata = {
 }
 
 export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData
-  .filter((raw) => raw.discountPercent >= 28 && !restrictedThirdPartyModelIds.has(raw.modelId))
+  .filter((raw) => raw.discountPercent >= 28 && !isRestrictedThirdPartyModel(raw.modelId))
   .map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
@@ -223,7 +223,7 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
   }
 
   for (const [index, pricing] of configured.entries()) {
-    if (restrictedThirdPartyModelIds.has(pricing.model)) continue
+    if (isRestrictedThirdPartyModel(pricing.model)) continue
     const metadata = metadataFor(pricing.model, pricing.platform)
     const key = identity(normalizePlatform(pricing.platform, metadata), pricing.model)
     const existing = byIdentity.get(key)
@@ -543,7 +543,15 @@ function relationScore(candidate: ModelCatalogEntry, entry: ModelCatalogEntry): 
 }
 
 function identity(platform: string, modelId: string): string {
-  return `${normalize(platform)}:${normalize(modelId)}`
+  return `${normalize(platform)}:${normalizeModelIdentity(modelId)}`
+}
+
+function isRestrictedThirdPartyModel(modelId: string): boolean {
+  return restrictedThirdPartyModelIds.has(normalizeModelIdentity(modelId))
+}
+
+function normalizeModelIdentity(value: string): string {
+  return normalize(value).replace(/[^a-z0-9]+/g, '-')
 }
 
 function normalize(value: string): string {
