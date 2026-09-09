@@ -18,8 +18,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:f51337eef745`. The Claude Code-only model removal described below is locally verified but not deployed yet.
-- The pending catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
+- Production is running image `ownapi:84d60a57100c`. The Claude Code-only model removal and catalog identity normalization are deployed and verified.
+- The current catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -196,14 +196,17 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
-### 2026-09-09 — Claude Code-only Packy models removed locally
+### 2026-09-09 — Claude Code-only Packy models removed and deployed
 
 - Packy's group documentation confirms that `cc` is restricted to the Claude Code client and may suspend third-party integrations, while `cc-sale` explicitly permits third-party API clients with an occasional prompt-cache instability caveat.
 - Removed `claude-haiku-4-5-20251001` and `claude-sonnet-4-5-20250929` from the curated and live-config public catalog paths. The public catalog now has 42 entries and six Anthropic models.
 - Added migration `139_remove_claude_code_only_packy_models.sql` to remove both models from OwnAPI customer pricing, Packy account-cost pricing, and every managed Packy account whitelist. After migration, the `OwnAPI LLM` channel has 37 callable text models.
 - Kept all six `cc-sale` Claude models and added localized detail-page guidance that OwnAPI-compatible third-party clients are supported and transient prompt-cache failures should be retried.
 - Canonicalized model identity punctuation so live dotted aliases such as `Claude-Opus-4.7` merge into the curated hyphenated entry instead of creating duplicate public cards.
-- Focused frontend tests, Vue type checks, focused lint, the production frontend build, migration tests, and `git diff --check` pass. Deployment and production verification remain pending.
+- Focused frontend tests (27/27), Vue type checks, focused lint, the production frontend build, migration tests, and `git diff --check` pass. The Docker-backed integration harness was unavailable locally because Docker Desktop was not running and correctly skipped outside CI.
+- Commits `2aae65af` and `84d60a57` are on `origin/main`. Deployment run `34346283759` succeeded; production is healthy on image `ownapi:84d60a57100c`.
+- Read-only production verification confirmed migration 139 is applied, `OwnAPI LLM` contains 37 callable text models, and no restricted customer-pricing row or Packy model mapping remains. Core, Expansion, and GPT-5.4 stayed active/schedulable; ZAI stayed paused in error as intended.
+- Browser verification confirmed 42 public models, six Anthropic models, zero search results for both restricted IDs, and the new third-party/cache guidance on a retained Claude detail page.
 
 ### 2026-09-09 — Packy pricing-cache fix deployed; final billing check pending SSH
 
