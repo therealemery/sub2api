@@ -1181,6 +1181,8 @@ export default {
       openAiRegional: '区域处理和不同服务档位可能产生额外的原厂费用。',
       anthropicCacheWrite: 'Anthropic 缓存写入价格与上方展示的缓存读取价格分开计算。',
       anthropicDataResidency: 'Anthropic 数据驻留选项可能产生额外的原厂费用。',
+      claudeThirdPartyUsage: '使用规则：此模型支持通过 OwnAPI 兼容的第三方 API 客户端调用。',
+      claudeCacheStability: '提示词缓存偶尔可能不稳定；如遇临时缓存异常，请重试请求。',
       googleIntroductory: '当前展示标准官方标价；原厂可能另行提供限时优惠价。',
       alibabaGlobal: '当前展示阿里云国际地区标价及上下文分档。',
       minimaxPromotion: '当前展示 MiniMax 促销折扣前的官方标价。',

@@ -214,6 +214,8 @@ const pricingNotes = computed(() => {
   if (model.value.provider === 'Anthropic') {
     notes.push(t('publicModels.pricingNotes.anthropicCacheWrite'))
     notes.push(t('publicModels.pricingNotes.anthropicDataResidency'))
+    notes.push(t('publicModels.pricingNotes.claudeThirdPartyUsage'))
+    notes.push(t('publicModels.pricingNotes.claudeCacheStability'))
   }
   if (model.value.pricingSource?.noteKey) notes.push(t(model.value.pricingSource.noteKey))
   if (model.value.pricingSource?.status === 'unpublished') notes.push(t('publicModels.pricingNotes.unpublishedDecision'))

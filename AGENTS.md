@@ -18,8 +18,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running feature image `ownapi:c21871b3746e`. Later `main` commits only created and then removed the one-time backfill workflow; they do not require another application deployment.
-- The current catalog contains 44 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. Commit `4d57cf50` intentionally restored the first two after current Packy 50% pricing made them part of the profitable intersection; the older removal note is historical, not current policy.
+- Production is running image `ownapi:f51337eef745`. The Claude Code-only model removal described below is locally verified but not deployed yet.
+- The pending catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -195,6 +195,14 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-09 — Claude Code-only Packy models removed locally
+
+- Packy's group documentation confirms that `cc` is restricted to the Claude Code client and may suspend third-party integrations, while `cc-sale` explicitly permits third-party API clients with an occasional prompt-cache instability caveat.
+- Removed `claude-haiku-4-5-20251001` and `claude-sonnet-4-5-20250929` from the curated and live-config public catalog paths. The public catalog now has 42 entries and six Anthropic models.
+- Added migration `139_remove_claude_code_only_packy_models.sql` to remove both models from OwnAPI customer pricing, Packy account-cost pricing, and every managed Packy account whitelist. After migration, the `OwnAPI LLM` channel has 37 callable text models.
+- Kept all six `cc-sale` Claude models and added localized detail-page guidance that OwnAPI-compatible third-party clients are supported and transient prompt-cache failures should be retried.
+- Focused frontend tests, Vue type checks, focused lint, the production frontend build, migration tests, and `git diff --check` pass. Deployment and production verification remain pending.
 
 ### 2026-09-09 — Packy pricing-cache fix deployed; final billing check pending SSH
 

@@ -73,6 +73,15 @@ const providerSearchAliases: Record<string, string[]> = {
   MiniMax: ['minimax', '稀宇科技'],
 }
 
+// These upstream SKUs are contractually limited to the Claude Code client and
+// cannot be offered through the OwnAPI gateway. Keep the exclusion here as
+// well as in the backend channel migration so live display configuration
+// cannot accidentally publish them again.
+const restrictedThirdPartyModelIds = new Set([
+  'claude-haiku-4-5-20251001',
+  'claude-sonnet-4-5-20250929',
+])
+
 export function calculateOwnApiPricing(
   pricing: OfficialTokenPricing,
   multiplier = 0.7,
@@ -201,7 +210,7 @@ const fallbackFamily: FamilyMetadata = {
 }
 
 export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData
-  .filter((raw) => raw.discountPercent >= 28)
+  .filter((raw) => raw.discountPercent >= 28 && !restrictedThirdPartyModelIds.has(raw.modelId))
   .map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
@@ -214,6 +223,7 @@ export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCata
   }
 
   for (const [index, pricing] of configured.entries()) {
+    if (restrictedThirdPartyModelIds.has(pricing.model)) continue
     const metadata = metadataFor(pricing.model, pricing.platform)
     const key = identity(normalizePlatform(pricing.platform, metadata), pricing.model)
     const existing = byIdentity.get(key)

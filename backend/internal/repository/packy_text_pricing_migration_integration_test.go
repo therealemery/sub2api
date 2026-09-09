@@ -30,8 +30,8 @@ func TestPackyTextPricingMigrationIsIdempotentAndFailClosed(t *testing.T) {
 	_, err = tx.ExecContext(ctx, `
 		INSERT INTO accounts (name, platform, type, credentials, extra, status)
 		VALUES
-		  ('Packy / Core', 'openai', 'apikey', '{}', '{}', 'disabled'),
-		  ('Packy / Expansion', 'openai', 'apikey', '{}', '{}', 'disabled'),
+		  ('Packy / Core', 'openai', 'apikey', '{"model_mapping":{"claude-haiku-4-5-20251001":"claude-haiku-4-5-20251001","claude-opus-4-6":"claude-opus-4-6"}}', '{"upstream_provider":"packyapi"}', 'disabled'),
+		  ('Packy / Expansion', 'openai', 'apikey', '{"model_mapping":{"claude-sonnet-4-5-20250929":"claude-sonnet-4-5-20250929","qwen3.5-flash":"qwen3.5-flash"}}', '{"upstream_provider":"packyapi"}', 'disabled'),
 		  ('Packy / ZAI', 'openai', 'apikey', '{}', '{}', 'disabled'),
 		  ('Packy / GPT-5.4', 'openai', 'apikey', '{}', '{}', 'disabled')
 	`)
@@ -101,6 +101,40 @@ func TestPackyTextPricingMigrationIsIdempotentAndFailClosed(t *testing.T) {
 	require.Equal(t, 4, costRuleCount)
 	assertPackyAccountCost(t, tx, "Packy cost / Core", "glm-5.3-flash", 0.4/6.7e6, 1.4/6.7e6)
 	assertPackyAccountCostTier(t, tx, "Packy cost / GPT-5.4", "gpt-5.4", 272000, nil, 25.0/6.7e6, 112.5/6.7e6)
+
+	removeCCOnlySQL, err := migrations.FS.ReadFile("139_remove_claude_code_only_packy_models.sql")
+	require.NoError(t, err)
+	requireExecTwice(t, tx, string(removeCCOnlySQL))
+
+	require.NoError(t, tx.QueryRowContext(ctx, `
+		SELECT COUNT(DISTINCT model_id)
+		FROM channels c
+		JOIN channel_model_pricing cmp ON cmp.channel_id = c.id
+		CROSS JOIN LATERAL jsonb_array_elements_text(cmp.models) AS models(model_id)
+		WHERE c.name = 'OwnAPI LLM'
+	`).Scan(&modelCount))
+	require.Equal(t, 37, modelCount)
+
+	require.NoError(t, tx.QueryRowContext(ctx, `
+		SELECT COUNT(*)
+		FROM channels c
+		JOIN channel_model_pricing cmp ON cmp.channel_id = c.id
+		CROSS JOIN LATERAL jsonb_array_elements_text(cmp.models) AS models(model_id)
+		WHERE c.name = 'OwnAPI LLM'
+		  AND model_id IN ('claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929')
+	`).Scan(&forbiddenCount))
+	require.Zero(t, forbiddenCount)
+
+	var restrictedMappings, allowedMappings int
+	require.NoError(t, tx.QueryRowContext(ctx, `
+		SELECT
+		  COUNT(*) FILTER (WHERE credentials->'model_mapping' ?| ARRAY['claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929']),
+		  COUNT(*) FILTER (WHERE credentials->'model_mapping' ?| ARRAY['claude-opus-4-6', 'qwen3.5-flash'])
+		FROM accounts
+		WHERE extra->>'upstream_provider' = 'packyapi'
+	`).Scan(&restrictedMappings, &allowedMappings))
+	require.Zero(t, restrictedMappings)
+	require.Equal(t, 2, allowedMappings)
 }
 
 func requireExecTwice(t *testing.T, tx *sql.Tx, migrationSQL string) {

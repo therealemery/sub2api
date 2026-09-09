@@ -41,6 +41,30 @@ describe('modelCatalog', () => {
     }
   })
 
+  it('never publishes Claude Code-only upstream models, including live config entries', () => {
+    const restricted = ['claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929']
+    const catalog = buildModelCatalog({
+      featured_models: [],
+      reference_discount: null,
+      pricing_models: restricted.map((model) => ({
+        model,
+        platform: 'anthropic',
+        billing_mode: 'token',
+        input_price: 0.000001,
+        output_price: 0.000005,
+        cache_write_price: null,
+        cache_read_price: null,
+        image_output_price: null,
+        per_request_price: null,
+        sort_order: 1,
+      })),
+    })
+
+    for (const modelId of restricted) {
+      expect(catalog.some((entry) => entry.modelId === modelId)).toBe(false)
+    }
+  })
+
   it('distinguishes pricing states and selects generic official tiers', () => {
     expect(activeOfficialTier({
       status: 'paid',
@@ -74,7 +98,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(44)
+    expect(result).toHaveLength(42)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -84,18 +108,18 @@ describe('modelCatalog', () => {
   it('contains the complete verified catalog with traceable discounted pricing', () => {
     const requiredIds = [
       'gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review',
-      'claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
-      'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5', 'grok-4.5', 'grok-4.6',
+      'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
+      'claude-sonnet-4-6', 'claude-sonnet-5', 'grok-4.5', 'grok-4.6',
     ]
     const catalog = buildModelCatalog(emptyConfig)
 
     expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(expect.arrayContaining(requiredIds))
     expect(requiredIds.every((id) => catalog.some((model) => model.modelId === id))).toBe(true)
-    expect(new Set(requiredIds).size).toBe(18)
+    expect(new Set(requiredIds).size).toBe(16)
     expect(Object.fromEntries(['OpenAI', 'Anthropic', 'xAI'].map((provider) => [
       provider,
       catalog.filter((model) => model.provider === provider).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2 })
 
     for (const modelId of requiredIds) {
       const model = catalog.find((entry) => entry.modelId === modelId)
@@ -135,12 +159,10 @@ describe('modelCatalog', () => {
       'gpt-5.6-sol': { input: 4, cachedInput: 0.4, output: 20 },
       'gpt-5.6-terra': { input: 2, cachedInput: 0.2, output: 12 },
       'codex-auto-review': { input: 2.5, cachedInput: 0.25, output: 15 },
-      'claude-haiku-4-5-20251001': { input: 1, cachedInput: 0.1, output: 5 },
       'claude-opus-4-6': { input: 5, cachedInput: 0.5, output: 25 },
       'claude-opus-4-7': { input: 5, cachedInput: 0.5, output: 25 },
       'claude-opus-4-8': { input: 5, cachedInput: 0.5, output: 25 },
       'claude-opus-5': { input: 5, cachedInput: 0.5, output: 25 },
-      'claude-sonnet-4-5-20250929': { input: 3, cachedInput: 0.3, output: 15 },
       'claude-sonnet-4-6': { input: 3, cachedInput: 0.3, output: 15 },
       'claude-sonnet-5': { input: 2, cachedInput: 0.2, output: 10 },
       'grok-4.5': { input: 2, cachedInput: 0.3, output: 6 },
@@ -159,12 +181,10 @@ describe('modelCatalog', () => {
       'gpt-5.6-sol': 'https://developers.openai.com/api/docs/models/compare',
       'gpt-5.6-terra': 'https://developers.openai.com/api/docs/models/compare',
       'codex-auto-review': 'https://help.openai.com/en/articles/20001415',
-      'claude-haiku-4-5-20251001': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-4-6': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-4-7': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-4-8': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-opus-5': 'https://platform.claude.com/docs/en/about-claude/pricing',
-      'claude-sonnet-4-5-20250929': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-sonnet-4-6': 'https://platform.claude.com/docs/en/about-claude/pricing',
       'claude-sonnet-5': 'https://platform.claude.com/docs/en/release-notes/overview',
       'grok-4.5': 'https://docs.x.ai/developers/pricing',
@@ -175,9 +195,7 @@ describe('modelCatalog', () => {
       isAlias: true,
       aliasNoteKey: 'publicModels.aliases.codexAutoReview',
     })
-    expect(catalog.find((model) => model.modelId === 'claude-haiku-4-5-20251001')?.contextWindow).toBe('200K')
     expect(catalog.find((model) => model.modelId === 'gpt-5.4-mini')?.contextWindow).toBe('400K')
-    expect(catalog.find((model) => model.modelId === 'claude-sonnet-4-5-20250929')?.contextWindow).toBe('200K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.6')?.contextWindow).toBe('500K')
     expect(catalog.find((model) => model.modelId === 'grok-4.5')?.pricingSource?.tiers).toEqual([{
@@ -201,10 +219,10 @@ describe('modelCatalog', () => {
     ])
   })
 
-  it('contains the exact 44-model eligibility snapshot across eight providers', () => {
+  it('contains the exact 42-model eligibility snapshot across eight providers', () => {
     const providerIds = {
       OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
-      Anthropic: ['claude-haiku-4-5-20251001', 'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-5-20250929', 'claude-sonnet-4-6', 'claude-sonnet-5'],
+      Anthropic: ['claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-6', 'claude-sonnet-5'],
       xAI: ['grok-4.5', 'grok-4.6'],
       Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'],
       Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
@@ -217,14 +235,14 @@ describe('modelCatalog', () => {
 
     expect(verifiedModelSeedData).toHaveLength(49)
     expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(49)
-    expect(new Set(expectedIds).size).toBe(44)
+    expect(new Set(expectedIds).size).toBe(42)
     expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 8, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4 })
 
-    const addedIds = expectedIds.slice(18)
+    const addedIds = expectedIds.slice(16)
     expect(Object.fromEntries(addedIds.map((modelId) => [
       modelId,
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.official,
@@ -282,7 +300,7 @@ describe('modelCatalog', () => {
   it('summarizes nonempty catalog providers for the homepage in stable order', () => {
     expect(getCatalogProviderSummaries()).toEqual([
       { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 8 },
-      { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 8 },
+      { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 6 },
       { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
       { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 6 },
       { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },

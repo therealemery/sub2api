@@ -54,6 +54,8 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.pricingNotes.openAiRegional': 'Regional processing and service tiers may add provider charges.',
       'publicModels.pricingNotes.anthropicCacheWrite': 'Anthropic cache-write pricing is separate from the cached-input rate shown above.',
       'publicModels.pricingNotes.anthropicDataResidency': 'Anthropic data-residency options may add provider charges.',
+      'publicModels.pricingNotes.claudeThirdPartyUsage': 'Usage rule: This model supports OwnAPI-compatible third-party API clients.',
+      'publicModels.pricingNotes.claudeCacheStability': 'Prompt caching can occasionally be inconsistent. Retry the request if a transient cache issue occurs.',
       'publicModels.pricingNotes.alibabaGlobal': 'Alibaba Cloud international-region list prices and context tiers are shown.',
       'publicModels.pricingNotes.minimaxPromotion': 'MiniMax list prices are shown before its separate promotional discount.',
       'publicModels.pricingNotes.unpublishedDecision': 'The provider has not published a verified public token price.',
@@ -211,6 +213,8 @@ describe('ModelDetailView', () => {
 
     expect(wrapper.text()).toContain('Anthropic cache-write pricing is separate from the cached-input rate shown above.')
     expect(wrapper.text()).toContain('Anthropic data-residency options may add provider charges.')
+    expect(wrapper.text()).toContain('Usage rule: This model supports OwnAPI-compatible third-party API clients.')
+    expect(wrapper.text()).toContain('Prompt caching can occasionally be inconsistent.')
   })
 
   it('renders MiniMax H3 video pricing by resolution', async () => {

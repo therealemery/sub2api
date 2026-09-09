@@ -1251,6 +1251,8 @@ export default {
       openAiRegional: 'Regional processing and service tiers may add provider charges.',
       anthropicCacheWrite: 'Anthropic cache-write pricing is separate from the cached-input rate shown above.',
       anthropicDataResidency: 'Anthropic data-residency options may add provider charges.',
+      claudeThirdPartyUsage: 'Usage rule: This model supports OwnAPI-compatible third-party API clients.',
+      claudeCacheStability: 'Prompt caching can occasionally be inconsistent. Retry the request if a transient cache issue occurs.',
       googleIntroductory: 'The standard list price is shown; a separate introductory price may currently apply.',
       alibabaGlobal: 'Alibaba Cloud international-region list prices and context tiers are shown.',
       minimaxPromotion: 'MiniMax list prices are shown before its separate promotional discount.',
