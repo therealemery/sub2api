@@ -405,6 +405,12 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - OwnAPI's `/v1/videos` customer contract remains JSON and now converts privately to multipart for DC-API. Model-page controls and code examples cover reference images, reference video, reference audio, first frame, and last frame; task polling and content download remain OwnAPI-proxied.
 - Focused backend handler/service tests, model catalog/detail tests, Vue type checking, frontend production build, and `git diff --check` passed. No upstream credentials or untracked key/temp files were staged.
 
+### 2026-09-10 — MiniMax H3 Docs lifecycle split
+
+- Public Docs now presents H3 as three explicit steps: create (`POST /v1/videos`), retrieve/poll (`GET /v1/videos/{task_id}`), and download (`GET /v1/videos/{task_id}/content`).
+- The Docs page lists reference image/video/audio and first/last-frame fields, provider media limits, and the rule that frame inputs cannot be mixed with other reference media.
+- English and Chinese copy were added for the lifecycle steps; responsive Docs styling keeps the cards readable on mobile. Vue type checking, H3 model-detail tests, production build, and `git diff --check` passed.
+
 ## Recovery Checklist
 
 1. Read this file, every document listed under Required Reading, and `design-qa.md`.
