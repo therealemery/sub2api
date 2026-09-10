@@ -102,6 +102,12 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-10 — MiniMax H3 lifecycle examples completed
+
+- The public MiniMax H3 model-page code panel now documents the complete OwnAPI lifecycle in Python, TypeScript, and cURL: create an asynchronous task, poll `GET /v1/videos/{task_id}` until completion, then download the MP4 from `GET /v1/videos/{task_id}/content`.
+- Examples include reference image/video/audio and first/last-frame inputs while keeping the private DC-API upstream hidden.
+- Local Vue type checking, Model Detail tests, production frontend build, and `git diff --check` pass. The change is ready to commit and deploy.
+
 The pricing/status implementation, 43-model published catalog (48 verified seeds before profitability filtering), public motion Tasks 1–5, and production deployment are complete. Remaining work, in order:
 
 ### 2026-09-08 — Packy multi-protocol routing ready for deployment
