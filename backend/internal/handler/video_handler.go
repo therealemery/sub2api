@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -10,8 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -96,7 +93,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
 		return
 	}
-	body, contentType, err := buildH3MultipartRequest(request, duration, resolution)
+	body, err = buildH3JSONRequest(request, duration, resolution)
 	if err != nil {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_media", err.Error())
 		return
@@ -118,7 +115,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusServiceUnavailable, "video_unavailable", "MiniMax-H3 is temporarily unavailable")
 		return
 	}
-	resp, err := h.gatewayService.ForwardDCVideoWithContentType(c.Request.Context(), account, http.MethodPost, "/v1/videos", body, contentType)
+	resp, err := h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
@@ -293,61 +290,39 @@ func positiveWholeNumber(value any) (int, bool) {
 	return int(n), true
 }
 
-// buildH3MultipartRequest translates OwnAPI's JSON convenience contract into
-// CometAPI's multipart H3 request. URL strings remain text fields; data URIs
-// are decoded into file parts so callers may use either form.
-func buildH3MultipartRequest(request map[string]any, duration int, resolution string) ([]byte, string, error) {
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-	addField := func(name, value string) error { return writer.WriteField(name, value) }
-	if err := addField("model", "minimax-h3"); err != nil {
-		return nil, "", err
-	}
+// buildH3JSONRequest translates OwnAPI's stable JSON contract into the JSON
+// protocol accepted by the configured console.dc-api.com account. The public
+// endpoint remains JSON; upstream media fields use the provider's names.
+func buildH3JSONRequest(request map[string]any, duration int, resolution string) ([]byte, error) {
+	upstream := map[string]any{"model": "minimax-h3", "seconds": duration}
 	prompt, _ := request["prompt"].(string)
 	if strings.TrimSpace(prompt) == "" {
-		return nil, "", fmt.Errorf("prompt is required")
+		return nil, fmt.Errorf("prompt is required")
 	}
-	if err := addField("prompt", prompt); err != nil {
-		return nil, "", err
-	}
-	if err := addField("seconds", strconv.Itoa(duration)); err != nil {
-		return nil, "", err
-	}
+	upstream["prompt"] = prompt
 	if size, _ := request["size"].(string); strings.TrimSpace(size) != "" {
-		if err := addField("size", strings.TrimSpace(size)); err != nil {
-			return nil, "", err
-		}
+		upstream["size"] = strings.TrimSpace(size)
 	} else {
 		size := "1344x768"
 		if resolution == "2k" {
 			size = "2544x1456"
 		}
-		if err := addField("size", size); err != nil {
-			return nil, "", err
-		}
+		upstream["size"] = size
 	}
-
-	for _, field := range []struct{ own, upstream string }{
-		{"input_reference", "input_reference"},
-		{"reference_images", "input_reference"},
-		{"reference_videos", "reference_videos"},
-		{"reference_audios", "reference_audios"},
-		{"first_frame", "first_frame"},
-		{"last_frame", "last_frame"},
-		{"first_frame_image", "first_frame"},
-		{"last_frame_image", "last_frame"},
+	for _, field := range []struct{ own, provider string }{
+		{"input_reference", "input_reference"}, {"reference_images", "input_reference"},
+		{"reference_videos", "reference_videos"}, {"reference_audios", "reference_audios"},
+		{"first_frame", "first_frame"}, {"last_frame", "last_frame"},
+		{"first_frame_image", "first_frame"}, {"last_frame_image", "last_frame"},
 	} {
 		values := stringValues(request[field.own])
-		for _, value := range values {
-			if err := addH3MediaPart(writer, field.upstream, value); err != nil {
-				return nil, "", err
-			}
+		if len(values) == 1 {
+			upstream[field.provider] = values[0]
+		} else if len(values) > 1 {
+			upstream[field.provider] = values
 		}
 	}
-	if err := writer.Close(); err != nil {
-		return nil, "", err
-	}
-	return body.Bytes(), writer.FormDataContentType(), nil
+	return json.Marshal(upstream)
 }
 
 func stringValues(value any) []string {
@@ -374,39 +349,6 @@ func stringValues(value any) []string {
 		}
 	}
 	return out
-}
-
-func addH3MediaPart(writer *multipart.Writer, field, value string) error {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return nil
-	}
-	if !strings.HasPrefix(value, "data:") {
-		return writer.WriteField(field, value)
-	}
-	comma := strings.IndexByte(value, ',')
-	if comma <= 5 {
-		return fmt.Errorf("invalid data URI for %s", field)
-	}
-	header, encoded := value[:comma], value[comma+1:]
-	if !strings.Contains(header, ";base64") {
-		return fmt.Errorf("media data URI for %s must be base64 encoded", field)
-	}
-	mediaType := strings.TrimPrefix(strings.SplitN(header[5:], ";", 2)[0], "")
-	data, err := base64.StdEncoding.DecodeString(encoded)
-	if err != nil {
-		return fmt.Errorf("invalid base64 media for %s", field)
-	}
-	ext := ".bin"
-	if exts, _ := mime.ExtensionsByType(mediaType); len(exts) > 0 {
-		ext = exts[0]
-	}
-	part, err := writer.CreateFormFile(field, field+ext)
-	if err != nil {
-		return err
-	}
-	_, err = part.Write(data)
-	return err
 }
 
 func normalizeH3Resolution(request map[string]any) (string, bool) {
