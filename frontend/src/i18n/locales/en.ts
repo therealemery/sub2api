@@ -1203,9 +1203,9 @@ export default {
     perSecond: '/ second',
     perSecondBilling: 'Billed by generated duration',
     resolution: 'Resolution',
-    videoPriceEstimate: 'Official pricing is inferred from a public 80%-of-list price; OwnAPI is shown at 75% of list.',
+    videoPriceEstimate: 'Official pricing is 0.5 CNY/s (768p) and 0.8 CNY/s (2K). Converted at 6.7 CNY/USD; OwnAPI charges 75% of list.',
     viewProtocol: 'View API protocol',
-    videoGenerator: { eyebrow: 'Signed-in users', title: 'Generate a MiniMax H3 video', apiKey: 'OwnAPI API key', prompt: 'Prompt', promptPlaceholder: 'Describe the scene, motion, camera and style…', duration: 'Duration', resolution: 'Resolution', referenceUrl: 'Reference image URL (optional)', referenceFile: 'Upload reference image (optional)', submit: 'Generate video', submitting: 'Creating task…', status: 'Task status', download: 'Open or download video', failed: 'Video request failed' },
+    videoGenerator: { eyebrow: 'Signed-in users', title: 'Generate a MiniMax H3 video', apiKey: 'OwnAPI API key', prompt: 'Prompt', promptPlaceholder: 'Describe the scene, motion, camera and style…', duration: 'Duration', resolution: 'Resolution', referenceUrl: 'Reference image URL (optional)', referenceFile: 'Upload reference image (optional)', firstFrameUrl: 'First frame URL (optional)', firstFrameFile: 'Upload first frame (optional)', lastFrameUrl: 'Last frame URL (optional)', lastFrameFile: 'Upload last frame (optional)', referenceVideoUrl: 'Reference video URL (optional)', referenceVideoFile: 'Upload reference video (optional)', referenceAudioUrl: 'Reference audio URL (optional)', referenceAudioFile: 'Upload reference audio (optional)', submit: 'Generate video', submitting: 'Creating task…', status: 'Task status', download: 'Open or download video', failed: 'Video request failed' },
     priceType: 'Price type',
     viewOfficialPricing: 'View official pricing',
     cacheRead: 'Cache read',
@@ -1279,7 +1279,8 @@ export default {
     integrationsTitle: 'Integration guides', integrationsDescription: 'Connect OpenAI-compatible SDKs, editors and automation tools.',
     statusTitle: 'Model status', statusDescription: 'Check availability before investigating an application-side issue.',
     navGroups: { start: 'Start here', api: 'Model API quickstarts', guides: 'Core API guides', support: 'Support' },
-    navItems: { overview: 'Documentation overview', key: 'Create an API key', models: 'List models', text: 'Text APIs', images: 'Image APIs', sdk: 'Use OpenAI SDKs', baseUrl: 'Change base URL', fallback: 'Model fallback', errors: 'Handle errors', limits: 'Rate limits', help: 'Help center' }
+    navItems: { overview: 'Documentation overview', key: 'Create an API key', models: 'List models', text: 'Text APIs', images: 'Image APIs', videos: 'Video APIs', sdk: 'Use OpenAI SDKs', baseUrl: 'Change base URL', fallback: 'Model fallback', errors: 'Handle errors', limits: 'Rate limits', help: 'Help center' },
+    videoTitle: 'MiniMax H3 video API', videoDescription: 'Create, poll and download MiniMax H3 videos through the OwnAPI gateway. Customers only use an OwnAPI key; upstream provider credentials stay private.', videoCreateTitle: 'Create a task', videoCreateDescription: 'Use the MiniMax-H3 model ID. The request accepts JSON and is converted privately to the upstream media request.', videoInputsTitle: 'Reference inputs', videoInputsDescription: 'Reference media URLs or data URIs can be combined within the provider limits.', videoImagesHint: 'up to 9 PNG/JPEG references', videoVideosHint: 'MP4 references, 2–15 seconds each', videoAudiosHint: 'MP3 references, pair audio with an image', videoFramesHint: 'optional first/last frame data or URLs'
   },
 
   modelPricing: {

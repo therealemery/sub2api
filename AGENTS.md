@@ -397,6 +397,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Validation passed: targeted Go service tests, Vue type checking, and `git diff --check`. Commits `3506d7af`, `e0f86896`, and `d76b0742` are pushed to `main`.
 - DC-API H3 request/response mapping remains pending authenticated documentation verification; do not guess endpoint fields or configure production credentials until the official schema is confirmed.
 
+### 2026-09-10 — MiniMax H3 pricing and media contract update ready to commit
+
+- Corrected MiniMax H3 pricing to the user-confirmed official rates of `0.5 CNY/s` for 768p and `0.8 CNY/s` for 2K. OwnAPI converts at `6.7 CNY = 1 USD` and charges 75% of the converted list price: approximately `$0.0559701493/s` and `$0.0895522388/s` respectively.
+- Updated both the public model catalog/detail pricing and the authenticated video billing constants; existing user/group rate multipliers still apply on top of the corrected OwnAPI unit price.
+- Verified CometAPI's MiniMax H3 create contract from `https://apidoc.cometapi.com/api/video/minimax-h3/create.md`: multipart upstream fields include `seconds`, `size`, `input_reference`, `reference_videos`, `reference_audios`, `first_frame`, and `last_frame`, with documented media limits.
+- OwnAPI's `/v1/videos` customer contract remains JSON and now converts privately to multipart for DC-API. Model-page controls and code examples cover reference images, reference video, reference audio, first frame, and last frame; task polling and content download remain OwnAPI-proxied.
+- Focused backend handler/service tests, model catalog/detail tests, Vue type checking, frontend production build, and `git diff --check` passed. No upstream credentials or untracked key/temp files were staged.
+
 ## Recovery Checklist
 
 1. Read this file, every document listed under Required Reading, and `design-qa.md`.

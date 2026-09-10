@@ -23,6 +23,7 @@ export const docsNavigation: DocsNavigationGroup[] = [
     items: [
       { id: 'text-api', labelKey: 'publicDocs.navItems.text', href: '#quick-start' },
       { id: 'image-api', labelKey: 'publicDocs.navItems.images', href: '#model-types' },
+      { id: 'video-api', labelKey: 'publicDocs.navItems.videos', href: '#video-api' },
       { id: 'openai-sdk', labelKey: 'publicDocs.navItems.sdk', href: '#quick-start' },
     ],
   },
@@ -47,6 +48,7 @@ export const docsOnThisPage: DocsNavigationItem[] = [
   { id: 'overview', labelKey: 'publicDocs.navItems.overview', href: '#overview' },
   { id: 'model-types', labelKey: 'publicDocs.typesTitle', href: '#model-types' },
   { id: 'quick-start', labelKey: 'publicDocs.startTitle', href: '#quick-start' },
+  { id: 'video-api', labelKey: 'publicDocs.videoTitle', href: '#video-api' },
   { id: 'base-url', labelKey: 'publicDocs.baseUrlTitle', href: '#base-url' },
   { id: 'production', labelKey: 'publicDocs.whyTitle', href: '#production' },
   { id: 'errors', labelKey: 'publicDocs.errorsTitle', href: '#errors' },

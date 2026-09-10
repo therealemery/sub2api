@@ -7973,6 +7973,12 @@ func (s *GatewayService) GetDCVideoAccount(ctx context.Context, accountID int64,
 // ForwardDCVideo sends a video request through the configured DC-API account.
 // Credentials and upstream response headers never leave this service boundary.
 func (s *GatewayService) ForwardDCVideo(ctx context.Context, account *Account, method, requestPath string, body []byte) (*http.Response, error) {
+	return s.ForwardDCVideoWithContentType(ctx, account, method, requestPath, body, "application/json")
+}
+
+// ForwardDCVideoWithContentType sends a private DC-API video request while
+// preserving the caller-provided media type (JSON or multipart form data).
+func (s *GatewayService) ForwardDCVideoWithContentType(ctx context.Context, account *Account, method, requestPath string, body []byte, contentType string) (*http.Response, error) {
 	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderDCAPI {
 		return nil, fmt.Errorf("invalid video account")
 	}
@@ -7994,7 +8000,10 @@ func (s *GatewayService) ForwardDCVideo(ctx context.Context, account *Account, m
 	}
 	req.Header.Set("Authorization", "Bearer "+account.GetCredential("api_key"))
 	if len(body) > 0 {
-		req.Header.Set("Content-Type", "application/json")
+		if strings.TrimSpace(contentType) == "" {
+			contentType = "application/json"
+		}
+		req.Header.Set("Content-Type", contentType)
 	}
 	proxyURL := ""
 	if account.ProxyID != nil && account.Proxy != nil {

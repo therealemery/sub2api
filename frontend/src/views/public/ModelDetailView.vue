@@ -126,8 +126,8 @@
           <MiniMaxVideoGenerator
             v-if="isAuthenticated && model.modelId === 'MiniMax-H3'"
             :model-id="model.modelId"
-            :price768p="model.videoPricing.find((tier) => tier.resolution === '768p')?.ownApiPerSecond || 0.075"
-            :price2k="model.videoPricing.find((tier) => tier.resolution === '2K')?.ownApiPerSecond || 0.121875"
+            :price768p="model.videoPricing.find((tier) => tier.resolution === '768p')?.ownApiPerSecond || 0.0559701493"
+            :price2k="model.videoPricing.find((tier) => tier.resolution === '2K')?.ownApiPerSecond || 0.0895522388"
           />
         </section>
 

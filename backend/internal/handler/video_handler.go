@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -9,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -23,10 +26,12 @@ import (
 )
 
 const (
-	miniMaxH3Model       = "MiniMax-H3"
-	miniMaxH3768PriceUSD = 0.075
-	miniMaxH32KPriceUSD  = 0.121875
-	maxVideoJSONBody     = 8 << 20
+	miniMaxH3Model = "MiniMax-H3"
+	// MiniMax H3 official prices are 0.5 CNY/s (768p) and 0.8 CNY/s (2K).
+	// OwnAPI converts at 6.7 CNY/USD and sells at 75% of the converted list price.
+	miniMaxH3768PriceUSD = 0.0559701493
+	miniMaxH32KPriceUSD  = 0.0895522388
+	maxVideoJSONBody     = 64 << 20
 )
 
 type videoTaskEnvelope struct {
@@ -73,9 +78,17 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "unsupported_model", "Only MiniMax-H3 is supported by this video endpoint")
 		return
 	}
-	duration, ok := positiveWholeNumber(request["duration"])
+	durationValue := request["duration"]
+	if durationValue == nil {
+		durationValue = request["seconds"]
+	}
+	duration, ok := positiveWholeNumber(durationValue)
 	if !ok {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", "duration must be a positive whole number of seconds")
+		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", "duration must be a whole number of seconds from 5 through 15")
+		return
+	}
+	if duration < 5 || duration > 15 {
+		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", "duration must be a whole number of seconds from 5 through 15")
 		return
 	}
 	resolution, ok := normalizeH3Resolution(request)
@@ -83,10 +96,11 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
 		return
 	}
-	request["model"] = miniMaxH3Model
-	request["resolution"] = resolution
-	delete(request, "size")
-	body, _ = json.Marshal(request)
+	body, contentType, err := buildH3MultipartRequest(request, duration, resolution)
+	if err != nil {
+		h.errorResponse(c, http.StatusBadRequest, "invalid_media", err.Error())
+		return
+	}
 
 	multiplier := h.gatewayService.ResolveUserGroupRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, apiKey.Group.RateMultiplier)
 	unitPrice := miniMaxH3768PriceUSD
@@ -104,7 +118,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusServiceUnavailable, "video_unavailable", "MiniMax-H3 is temporarily unavailable")
 		return
 	}
-	resp, err := h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
+	resp, err := h.gatewayService.ForwardDCVideoWithContentType(c.Request.Context(), account, http.MethodPost, "/v1/videos", body, contentType)
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
@@ -277,6 +291,122 @@ func positiveWholeNumber(value any) (int, bool) {
 		return 0, false
 	}
 	return int(n), true
+}
+
+// buildH3MultipartRequest translates OwnAPI's JSON convenience contract into
+// CometAPI's multipart H3 request. URL strings remain text fields; data URIs
+// are decoded into file parts so callers may use either form.
+func buildH3MultipartRequest(request map[string]any, duration int, resolution string) ([]byte, string, error) {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	addField := func(name, value string) error { return writer.WriteField(name, value) }
+	if err := addField("model", "minimax-h3"); err != nil {
+		return nil, "", err
+	}
+	prompt, _ := request["prompt"].(string)
+	if strings.TrimSpace(prompt) == "" {
+		return nil, "", fmt.Errorf("prompt is required")
+	}
+	if err := addField("prompt", prompt); err != nil {
+		return nil, "", err
+	}
+	if err := addField("seconds", strconv.Itoa(duration)); err != nil {
+		return nil, "", err
+	}
+	if size, _ := request["size"].(string); strings.TrimSpace(size) != "" {
+		if err := addField("size", strings.TrimSpace(size)); err != nil {
+			return nil, "", err
+		}
+	} else {
+		size := "1344x768"
+		if resolution == "2k" {
+			size = "2544x1456"
+		}
+		if err := addField("size", size); err != nil {
+			return nil, "", err
+		}
+	}
+
+	for _, field := range []struct{ own, upstream string }{
+		{"input_reference", "input_reference"},
+		{"reference_images", "input_reference"},
+		{"reference_videos", "reference_videos"},
+		{"reference_audios", "reference_audios"},
+		{"first_frame", "first_frame"},
+		{"last_frame", "last_frame"},
+		{"first_frame_image", "first_frame"},
+		{"last_frame_image", "last_frame"},
+	} {
+		values := stringValues(request[field.own])
+		for _, value := range values {
+			if err := addH3MediaPart(writer, field.upstream, value); err != nil {
+				return nil, "", err
+			}
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return nil, "", err
+	}
+	return body.Bytes(), writer.FormDataContentType(), nil
+}
+
+func stringValues(value any) []string {
+	if value == nil {
+		return nil
+	}
+	if s, ok := value.(string); ok {
+		return []string{s}
+	}
+	values, ok := value.([]any)
+	if !ok {
+		return nil
+	}
+	out := make([]string, 0, len(values))
+	for _, item := range values {
+		if obj, ok := item.(map[string]any); ok {
+			if s, ok := obj["url"].(string); ok {
+				out = append(out, s)
+			}
+			continue
+		}
+		if s, ok := item.(string); ok {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func addH3MediaPart(writer *multipart.Writer, field, value string) error {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return nil
+	}
+	if !strings.HasPrefix(value, "data:") {
+		return writer.WriteField(field, value)
+	}
+	comma := strings.IndexByte(value, ',')
+	if comma <= 5 {
+		return fmt.Errorf("invalid data URI for %s", field)
+	}
+	header, encoded := value[:comma], value[comma+1:]
+	if !strings.Contains(header, ";base64") {
+		return fmt.Errorf("media data URI for %s must be base64 encoded", field)
+	}
+	mediaType := strings.TrimPrefix(strings.SplitN(header[5:], ";", 2)[0], "")
+	data, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return fmt.Errorf("invalid base64 media for %s", field)
+	}
+	ext := ".bin"
+	if exts, _ := mime.ExtensionsByType(mediaType); len(exts) > 0 {
+		ext = exts[0]
+	}
+	part, err := writer.CreateFormFile(field, field+ext)
+	if err != nil {
+		return err
+	}
+	_, err = part.Write(data)
+	return err
 }
 
 func normalizeH3Resolution(request map[string]any) (string, bool) {

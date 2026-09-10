@@ -309,8 +309,8 @@ describe('modelCatalog', () => {
       modality: 'Video',
       endpoints: ['videos'],
       videoPricing: [
-        { resolution: '768p', officialPerSecond: 0.1, ownApiPerSecond: 0.075 },
-        { resolution: '2K', officialPerSecond: 0.1625, ownApiPerSecond: 0.121875 },
+        { resolution: '768p', officialPerSecond: 0.0746268657, ownApiPerSecond: 0.0559701493 },
+        { resolution: '2K', officialPerSecond: 0.1194029851, ownApiPerSecond: 0.0895522388 },
       ],
     })
     for (const entry of catalog) {

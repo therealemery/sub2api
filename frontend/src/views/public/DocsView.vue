@@ -41,13 +41,23 @@
             <DocsCodeExamples />
           </section>
 
+          <section id="video-api" class="docs-section video-docs-section">
+            <span class="section-index">03</span><h2>{{ t('publicDocs.videoTitle') }}</h2>
+            <p>{{ t('publicDocs.videoDescription') }}</p>
+            <div class="video-docs-grid">
+              <div><h3>{{ t('publicDocs.videoCreateTitle') }}</h3><p>{{ t('publicDocs.videoCreateDescription') }}</p><pre><code>{{ h3CreateExample }}</code></pre></div>
+              <div><h3>{{ t('publicDocs.videoInputsTitle') }}</h3><p>{{ t('publicDocs.videoInputsDescription') }}</p><ul><li><code>reference_images</code> — {{ t('publicDocs.videoImagesHint') }}</li><li><code>reference_videos</code> — {{ t('publicDocs.videoVideosHint') }}</li><li><code>reference_audios</code> — {{ t('publicDocs.videoAudiosHint') }}</li><li><code>first_frame_image</code> / <code>last_frame_image</code> — {{ t('publicDocs.videoFramesHint') }}</li></ul></div>
+            </div>
+            <div class="video-docs-flow"><code>POST /v1/videos</code><span>→</span><code>GET /v1/videos/{task_id}</code><span>→</span><code>GET /v1/videos/{task_id}/content</code></div>
+          </section>
+
           <section id="base-url" class="docs-section split-section">
-            <div><span class="section-index">03</span><h2>{{ t('publicDocs.baseUrlTitle') }}</h2><p>{{ t('publicDocs.baseUrlDescription') }}</p></div>
+            <div><span class="section-index">04</span><h2>{{ t('publicDocs.baseUrlTitle') }}</h2><p>{{ t('publicDocs.baseUrlDescription') }}</p></div>
             <div class="config-card"><span>baseURL</span><code>{{ baseUrl }}</code><span>apiKey</span><code>process.env.OWNAPI_API_KEY</code></div>
           </section>
 
           <section id="production" class="docs-section">
-            <span class="section-index">04</span><h2>{{ t('publicDocs.whyTitle') }}</h2>
+            <span class="section-index">05</span><h2>{{ t('publicDocs.whyTitle') }}</h2>
             <div class="guide-grid">
               <article><Icon name="cube" size="lg" /><h3>{{ t('publicDocs.unifiedTitle') }}</h3><p>{{ t('publicDocs.unifiedDescription') }}</p></article>
               <article><Icon name="chartBar" size="lg" /><h3>{{ t('publicDocs.billingTitle') }}</h3><p>{{ t('publicDocs.billingDescription') }}</p></article>
@@ -56,7 +66,7 @@
           </section>
 
           <section id="errors" class="docs-section split-section">
-            <div><span class="section-index">05</span><h2>{{ t('publicDocs.errorsTitle') }}</h2><p>{{ t('publicDocs.errorsDescription') }}</p></div>
+            <div><span class="section-index">06</span><h2>{{ t('publicDocs.errorsTitle') }}</h2><p>{{ t('publicDocs.errorsDescription') }}</p></div>
             <div class="error-list">
               <div><code>401</code><span>{{ t('publicDocs.authErrorDescription') }}</span></div>
               <div><code>429</code><span>{{ t('publicDocs.rateLimitDescription') }}</span></div>
@@ -65,7 +75,7 @@
           </section>
 
           <section id="resources" class="docs-section resources-section">
-            <span class="section-index">06</span><h2>{{ t('publicDocs.resourcesTitle') }}</h2>
+            <span class="section-index">07</span><h2>{{ t('publicDocs.resourcesTitle') }}</h2>
             <div class="resource-links">
               <a href="/docs/ownapi-usage-guide.html"><div><strong>{{ t('publicDocs.integrationsTitle') }}</strong><p>{{ t('publicDocs.integrationsDescription') }}</p></div><Icon name="arrowRight" size="sm" /></a>
             </div>
@@ -98,6 +108,18 @@ const authStore = useAuthStore()
 const navigationOpen = ref(false)
 const activeSection = ref(window.location.hash.slice(1) || 'overview')
 const baseUrl = `${window.location.origin}/v1`
+const h3CreateExample = `curl "${baseUrl}/videos" \\
+  -H "Authorization: Bearer $OWNAPI_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "MiniMax-H3",
+    "prompt": "Animate the reference image and follow the reference audio.",
+    "duration": 5,
+    "resolution": "768p",
+    "reference_images": ["https://example.com/reference.png"],
+    "reference_videos": ["https://example.com/reference.mp4"],
+    "reference_audios": ["https://example.com/reference.mp3"]
+  }'`
 const dashboardPath = computed(() => authStore.isAuthenticated ? (authStore.isAdmin ? '/admin/dashboard' : '/dashboard') : '/login')
 const activeSectionIndex = computed(() => Math.max(0, docsOnThisPage.findIndex(item => sectionId(item.href) === activeSection.value)))
 let sectionObserver: IntersectionObserver | null = null
