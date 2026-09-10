@@ -107,6 +107,12 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - A lowest-cost production smoke test showed that the configured `console.dc-api.com` account accepts JSON at `/v1/videos` and returns a task, while multipart requests return a generic 500 before task creation. The H3 gateway was temporarily changed to multipart in `530c9337`; restore the upstream JSON protocol while retaining OwnAPI's private media-field mapping before the next deployment.
 - Do not repeat paid smoke tests until this correction is deployed. Two direct, invalid-duration JSON probes created upstream tasks outside OwnAPI billing; they were not created through the customer gateway.
 
+### 2026-09-10 — H3 JSON protocol fix deployed and verified
+
+- Restored JSON forwarding to the configured `console.dc-api.com` H3 account after confirming multipart returned a provider-side 500 while JSON was accepted.
+- Commit `b3172225` was pushed to `origin/main` and deployed successfully by Actions run `34433065226`.
+- One minimum-cost OwnAPI smoke test (768p, 5 seconds, text-only) returned HTTP 200, completed successfully, and downloaded a valid MP4 through the opaque OwnAPI task and content endpoints. No upstream host or task ID was exposed to the customer.
+
 ### 2026-09-10 — MiniMax H3 lifecycle examples completed
 
 - The public MiniMax H3 model-page code panel now documents the complete OwnAPI lifecycle in Python, TypeScript, and cURL: create an asynchronous task, poll `GET /v1/videos/{task_id}` until completion, then download the MP4 from `GET /v1/videos/{task_id}/content`.
