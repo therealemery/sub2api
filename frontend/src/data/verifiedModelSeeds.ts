@@ -4,6 +4,7 @@ export type ModelPricingStatus = 'paid' | 'free' | 'unpublished'
 export interface OfficialTokenPricing {
   input: number | null
   cachedInput: number | null
+  cacheWrite?: number | null
   output: number | null
 }
 
@@ -33,7 +34,7 @@ export interface ModelPricingSource {
   status: ModelPricingStatus
   official: OfficialTokenPricing
   tiers: OfficialPricingTier[]
-  multiplier: 0.7 | 0.8
+  multiplier: 0.7 | 0.75 | 0.8
   sourceUrl: string
   checkedAt: '2026-09-07' | '2026-09-11'
   noteKey: string | null
@@ -51,7 +52,7 @@ export interface RawVerifiedModelSeed {
   sourceUrl: string
   noteKey?: string
   discountPercent: number
-  customerMultiplier?: 0.7 | 0.8
+  customerMultiplier?: 0.7 | 0.75 | 0.8
   checkedAt?: '2026-09-07' | '2026-09-11'
   searchAliases?: string[]
   contextWindow?: string | null
@@ -65,10 +66,10 @@ export interface RawVerifiedModelSeed {
 }
 
 export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
-  seed('gpt-6-astra', 'GPT-6 Astra', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 25 }, 'https://www.packyapi.com/pricing', 93, 5, {
+  seed('gpt-6-astra', 'GPT-6 Astra', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 10, cachedInput: 1, cacheWrite: 12.5, output: 50 }, 'https://www.packyapi.com/pricing', 93, 5, {
     contextWindow: '1M',
     featured: true,
-    tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, output: 75 } }],
+    tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, cacheWrite: 25, output: 75 } }],
   }),
   seed('gpt-5.4', 'GPT-5.4', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://developers.openai.com/api/docs/models/gpt-5.4', 28, 10, {
     contextWindow: '1.05M', featured: true,
@@ -109,6 +110,12 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
   seed('grok-4.6', 'Grok 4.6', 'grok', ['flagship', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.5, output: 6 }, 'https://docs.x.ai/developers/pricing', 99, 160, {
     contextWindow: '500K',
     tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 1, output: 12 } }],
+  }),
+  seed('deepseek-v4.1-flash', 'DeepSeek V4.1 Flash', 'deepseek', ['fast', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 40, 165, {
+    customerMultiplier: 0.75, checkedAt: '2026-09-11', contextWindow: null,
+  }),
+  seed('deepseek-v4-pro', 'DeepSeek V4 Pro', 'deepseek', ['flagship', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 40, 166, {
+    customerMultiplier: 0.75, checkedAt: '2026-09-11', contextWindow: null,
   }),
   seed('gemini-2.5-flash', 'Gemini 2.5 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 2.5 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 170, { contextWindow: '1M' }),
   seed('gemini-2.5-pro', 'Gemini 2.5 Pro', 'gemini', ['flagship', 'reasoning', 'multimodal'], ['openai'], { input: 1.25, cachedInput: 0.125, output: 10 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 180, {

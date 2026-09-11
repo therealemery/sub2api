@@ -4,6 +4,8 @@ package service
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestMatchWildcard(t *testing.T) {
@@ -408,6 +410,29 @@ func TestAccountResolveMappedModel(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAccountResolveMappedModel_DeepSeekSaleUsesPrivateFlashAlias(t *testing.T) {
+	account := &Account{
+		Platform: PlatformOpenAI,
+		Credentials: map[string]any{
+			"model_mapping": map[string]any{
+				"deepseek-v4.1-flash": "deepseek-v4-flash",
+				"deepseek-v4-pro":     "deepseek-v4-pro",
+			},
+		},
+		Extra: map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+	}
+
+	flash, matched := account.ResolveMappedModel("deepseek-v4.1-flash")
+	require.True(t, matched)
+	require.Equal(t, "deepseek-v4-flash", flash)
+	pro, matched := account.ResolveMappedModel("deepseek-v4-pro")
+	require.True(t, matched)
+	require.Equal(t, "deepseek-v4-pro", pro)
+	unknown, matched := account.ResolveMappedModel("deepseek-v4-reasoner")
+	require.False(t, matched)
+	require.Equal(t, "deepseek-v4-reasoner", unknown)
 }
 
 func TestAccountGetModelMapping_AntigravityEnsuresGeminiDefaultPassthroughs(t *testing.T) {

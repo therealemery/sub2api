@@ -12,6 +12,8 @@ const { getModelDisplayConfig, navigate, t } = vi.hoisted(() => ({
     const messages: Record<string, string> = {
       'publicModels.officialListPrice': 'Official list price',
       'publicModels.officialSeventyPercent': 'Official price × 70%',
+      'publicModels.officialSeventyFivePercent': 'Official price × 75%',
+      'publicModels.officialEightyPercent': 'Official price × 80%',
       'publicModels.ownApiPrice': 'OwnAPI price',
       'publicModels.resultCount': `${String(params?.count ?? '')} models`,
       'publicModels.providerModelCount': `${String(params?.count ?? '')} models`,
@@ -20,6 +22,7 @@ const { getModelDisplayConfig, navigate, t } = vi.hoisted(() => ({
       'publicModels.free': 'Free',
       'publicModels.input': 'Input',
       'publicModels.cachedInput': 'Cached input',
+      'publicModels.cacheWrite': 'Cache write',
       'publicModels.output': 'Output',
       'publicModels.perMillion': '/ 1M tokens',
       'publicModels.shortContext': 'Short context',
@@ -77,18 +80,18 @@ describe('ModelsCatalogView', () => {
 
     const wrapper = mountCatalog()
     await flushPromises()
-    expect(wrapper.get('#catalog-results-title').text()).toBe('44 models')
+    expect(wrapper.get('#catalog-results-title').text()).toBe('46 models')
   })
 
-  it('renders all nine providers as ordered sections with correct model counts', async () => {
+  it('renders all ten providers as ordered sections with correct model counts', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
     const sections = wrapper.findAll('section.provider-section')
 
     expect(sections.map((section) => section.get('h2').text())).toEqual([
-      'OpenAI', 'Anthropic', 'xAI', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax', 'Alibaba',
+      'OpenAI', 'Anthropic', 'xAI', 'DeepSeek', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax', 'Alibaba',
     ])
-    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 6, 11, 4, 1, 4, 2])
+    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 2, 6, 11, 4, 1, 4, 2])
     for (const section of sections) {
       const provider = section.get('h2').text()
       expect(section.findAll('.provider-line').every((line) => line.text().includes(provider))).toBe(true)
@@ -127,7 +130,7 @@ describe('ModelsCatalogView', () => {
     await wrapper.get('.reset-all').trigger('click')
     expect((wrapper.get('input[type="search"]').element as HTMLInputElement).value).toBe('')
     expect((wrapper.get('select').element as HTMLSelectElement).value).toBe('featured')
-    expect(wrapper.findAll('section.provider-section')).toHaveLength(9)
+    expect(wrapper.findAll('section.provider-section')).toHaveLength(10)
   })
 
   it('treats provider, model class, and endpoint as mutually exclusive category filters', async () => {

@@ -28,6 +28,7 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.viewProtocol': 'View API protocol',
       'publicModels.input': 'Input',
       'publicModels.cachedInput': 'Cached input',
+      'publicModels.cacheWrite': 'Cache write',
       'publicModels.output': 'Output',
       'publicModels.perMillion': '/ 1M tokens',
       'publicModels.usdPerMillion': 'USD / 1M tokens',

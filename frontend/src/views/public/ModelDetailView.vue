@@ -87,7 +87,7 @@
                   </div>
                   <div class="pricing-tier-heading">
                     <strong>{{ selectedPricingTierLabel }}</strong>
-                    <span>{{ t(detailPricingSource.multiplier === 0.8 ? 'publicModels.officialEightyPercent' : 'publicModels.officialSeventyPercent') }}</span>
+                    <span>{{ t(pricingMultiplierLabel(detailPricingSource.multiplier)) }}</span>
                   </div>
                   <Transition name="motion-fade" mode="out-in">
                     <div :key="pricingTierKey(model, selectedPricingTierId, selectedPricing)" class="pricing-tier-values">
@@ -287,12 +287,19 @@ function pricingRows(pricing: OfficialTokenPricing, multiplier: ModelPricingSour
   return [
     priceRow('input', t('publicModels.input'), pricing.input, ownApi.input),
     priceRow('cachedInput', t('publicModels.cachedInput'), pricing.cachedInput, ownApi.cachedInput),
+    ...('cacheWrite' in pricing ? [priceRow('cacheWrite', t('publicModels.cacheWrite'), pricing.cacheWrite ?? null, ownApi.cacheWrite ?? null)] : []),
     priceRow('output', t('publicModels.output'), pricing.output, ownApi.output),
   ]
 }
 
 function pricingTierKey(entry: ModelCatalogEntry, tier: string, pricing: OfficialTokenPricing): string {
-  return [entry.platform, entry.modelId, tier, pricing.input, pricing.cachedInput, pricing.output].join(':')
+  return [entry.platform, entry.modelId, tier, pricing.input, pricing.cachedInput, pricing.cacheWrite, pricing.output].join(':')
+}
+
+function pricingMultiplierLabel(multiplier: ModelPricingSource['multiplier']) {
+  if (multiplier === 0.8) return 'publicModels.officialEightyPercent'
+  if (multiplier === 0.75) return 'publicModels.officialSeventyFivePercent'
+  return 'publicModels.officialSeventyPercent'
 }
 
 function priceRow(key: string, label: string, official: number | null, ownApi: number | null) {

@@ -225,14 +225,14 @@ describe('HomeView motion', () => {
     const providers = wrapper.findAll('.provider-wordmark')
 
     expect(providers.map(provider => provider.text())).toEqual([
-      'ChatGPT', 'Claude', 'Grok', 'Gemini', 'Qwen', 'GLM', 'Kimi', 'MiniMax', 'Wan',
+      'ChatGPT', 'Claude', 'Grok', 'DeepSeek', 'Gemini', 'Qwen', 'GLM', 'Kimi', 'MiniMax', 'Wan',
     ])
     expect(providers.map(provider => provider.get('img').attributes('src'))).toEqual([
-      '/brand/openai.svg', '/brand/claude.svg', '/brand/grok.svg', '/brand/gemini.svg',
+      '/brand/openai.svg', '/brand/claude.svg', '/brand/grok.svg', '/brand/deepseek.svg', '/brand/gemini.svg',
       '/brand/qwen.svg', '/brand/glm.svg', '/brand/kimi.svg', '/brand/minimax.svg', '/brand/qwen.svg',
     ])
     expect(wrapper.get('[data-motion-section="providers"]').classes()).toContain('reveal-item')
-    expect(wrapper.text()).not.toContain('DeepSeek')
+    expect(wrapper.text()).toContain('DeepSeek')
     expect(wrapper.text()).not.toContain('Mistral')
     expect(wrapper.text()).not.toContain('home.providers.soon')
 

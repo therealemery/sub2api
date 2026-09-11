@@ -31,6 +31,7 @@ export const CATALOG_PROVIDER_ORDER = [
   'OpenAI',
   'Anthropic',
   'xAI',
+  'DeepSeek',
   'Google',
   'Qwen',
   'Z.AI',
@@ -56,6 +57,7 @@ const catalogProviderPresentation: Record<typeof CATALOG_PROVIDER_ORDER[number],
   OpenAI: { label: 'ChatGPT', logo: '/brand/openai.svg' },
   Anthropic: { label: 'Claude', logo: '/brand/claude.svg' },
   xAI: { label: 'Grok', logo: '/brand/grok.svg' },
+  DeepSeek: { label: 'DeepSeek', logo: '/brand/deepseek.svg' },
   Google: { label: 'Gemini', logo: '/brand/gemini.svg' },
   Qwen: { label: 'Qwen', logo: '/brand/qwen.svg' },
   'Z.AI': { label: 'GLM', logo: '/brand/glm.svg' },
@@ -68,6 +70,7 @@ const providerSearchAliases: Record<string, string[]> = {
   OpenAI: ['open ai', '开放人工智能'],
   Anthropic: ['claude', '克劳德'],
   xAI: ['x ai', 'grok'],
+  DeepSeek: ['deepseek', '深度求索'],
   Google: ['google', '谷歌'],
   Qwen: ['qwen', '通义千问', '千问', 'alibaba', '阿里云'],
   'Z.AI': ['z ai', 'zhipu', '智谱', 'glm'],
@@ -90,11 +93,13 @@ export function calculateOwnApiPricing(
   multiplier = 0.7,
 ): OfficialTokenPricing {
   const multiply = (value: number | null) => value == null ? null : value * multiplier
-  return {
+  const result: OfficialTokenPricing = {
     input: multiply(pricing.input),
     cachedInput: multiply(pricing.cachedInput),
     output: multiply(pricing.output),
   }
+  if ('cacheWrite' in pricing) result.cacheWrite = multiply(pricing.cacheWrite ?? null)
+  return result
 }
 
 export function activeOfficialTier(

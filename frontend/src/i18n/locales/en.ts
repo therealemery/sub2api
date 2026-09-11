@@ -1200,6 +1200,7 @@ export default {
     officialSeventyPercent: 'Official price × 70%',
     officialEightyPercent: 'Official price × 80%',
     officialSeventyFivePercent: 'Official price × 75%',
+    cacheWrite: 'Cache write',
     perSecond: '/ second',
     perSecondBilling: 'Billed by generated duration',
     resolution: 'Resolution',

@@ -100,7 +100,7 @@
                       <span>{{ t('publicModels.ownApiPrice') }}</span>
                       <small>{{ t('publicModels.officialListPrice') }}</small>
                     </div>
-                    <div class="pricing-badge">{{ t(model.pricingSource.multiplier === 0.8 ? 'publicModels.officialEightyPercent' : 'publicModels.officialSeventyPercent') }}</div>
+                    <div class="pricing-badge">{{ t(pricingMultiplierLabel(model.pricingSource.multiplier)) }}</div>
                     <div v-if="longPricingTier(model)" class="context-toggle" :aria-label="`${model.displayName} ${t('publicModels.longContextThreshold', { count: longPricingTier(model)?.minInputTokens.toLocaleString('en-US') })}`">
                       <button type="button" :class="{ active: contextMode(model) === 'short' }" :aria-pressed="contextMode(model) === 'short'" @click="setContextMode(model, 'short')">{{ t('publicModels.shortContext') }}</button>
                       <button type="button" :class="{ active: contextMode(model) === 'long' }" :aria-pressed="contextMode(model) === 'long'" @click="setContextMode(model, 'long')">{{ t('publicModels.longContext') }}</button>
@@ -150,6 +150,7 @@ import {
   formatCatalogPrice,
   groupModelCatalog,
   type ModelCatalogEntry,
+  type ModelPricingSource,
   type CatalogFilters,
   type OfficialTokenPricing,
 } from '@/data/modelCatalog'
@@ -240,8 +241,15 @@ function pricingMetrics(model: ModelCatalogEntry) {
   return [
     priceMetric('input', t('publicModels.input'), official.input, ownApi.input),
     priceMetric('cachedInput', t('publicModels.cachedInput'), official.cachedInput, ownApi.cachedInput),
+    ...('cacheWrite' in official ? [priceMetric('cacheWrite', t('publicModels.cacheWrite'), official.cacheWrite ?? null, ownApi.cacheWrite ?? null)] : []),
     priceMetric('output', t('publicModels.output'), official.output, ownApi.output),
   ]
+}
+
+function pricingMultiplierLabel(multiplier: ModelPricingSource['multiplier']) {
+  if (multiplier === 0.8) return 'publicModels.officialEightyPercent'
+  if (multiplier === 0.75) return 'publicModels.officialSeventyFivePercent'
+  return 'publicModels.officialSeventyPercent'
 }
 
 function priceMetric(

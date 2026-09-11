@@ -77,6 +77,13 @@ func TestResolveOpenAIForwardModel(t *testing.T) {
 			expectedModel:      "gpt-5.4",
 		},
 		{
+			name: "uses private DeepSeek sale alias",
+			account: &Account{Credentials: map[string]any{"model_mapping": map[string]any{
+				"deepseek-v4.1-flash": "deepseek-v4-flash",
+			}}},
+			requestedModel: "deepseek-v4.1-flash", expectedModel: "deepseek-v4-flash",
+		},
+		{
 			name: "preserves codex spark instead of group default",
 			account: &Account{
 				Credentials: map[string]any{},

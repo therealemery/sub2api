@@ -112,6 +112,7 @@ func ResolvePackyModelProtocol(model string) (PackyUpstreamProtocol, bool) {
 	case "claude-fable-5", "claude-haiku-4-5-20251001", "claude-opus-4-5-20251101", "claude-opus-4-6", "claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-sonnet-4-5-20250929", "claude-sonnet-4-6", "claude-sonnet-5":
 		return PackyProtocolAnthropicMessages, true
 	case "gpt-5.4", "minimax-m3", "glm-5", "glm-5.2", "glm-5.3", "glm-5.3-flash", "kimi-k2.5", "minimax-m2.5", "minimax-m2.7",
+		"deepseek-v4.1-flash", "deepseek-v4-pro",
 		"qwen3-coder-next", "qwen3-max", "qwen3-vl-flash", "qwen3.5-flash", "qwen3.5-plus", "qwen3.6-max-preview", "qwen3.6-plus", "qwen3.7-max", "qwen3.7-plus", "qwen3.8-flash", "qwen3.8-max", "qwen3.8-max-0902",
 		"gemini-2.5-flash", "gemini-2.5-pro", "gemini-3-flash-preview", "gemini-3-pro-preview", "gemini-3.1-pro-preview", "gemini-3.5-flash":
 		return PackyProtocolOpenAIChat, true

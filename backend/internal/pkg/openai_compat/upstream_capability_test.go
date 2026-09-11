@@ -71,6 +71,9 @@ func TestResolvePackyModelProtocol(t *testing.T) {
 		{"glm-5.3", PackyProtocolOpenAIChat, true},
 		{"gemini-3.1-pro-preview", PackyProtocolOpenAIChat, true},
 		{"qwen3.8-max", PackyProtocolOpenAIChat, true},
+		{"deepseek-v4.1-flash", PackyProtocolOpenAIChat, true},
+		{"deepseek-v4-pro", PackyProtocolOpenAIChat, true},
+		{"deepseek-v4-flash", PackyProtocolUnknown, false},
 		{"not-configured", PackyProtocolUnknown, false},
 		{"", PackyProtocolUnknown, false},
 	}
