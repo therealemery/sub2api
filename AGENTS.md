@@ -117,6 +117,14 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Design: `docs/superpowers/specs/2026-09-11-ownapi-wan3-video-integration-design.md`.
 - No application code or production data has been changed at this checkpoint.
 
+### 2026-09-11 — Wan 3.0 implementation plan approved for execution
+
+- The user approved the written design. The implementation sequence is recorded in
+  `docs/superpowers/plans/2026-09-11-ownapi-wan3-video-integration-plan.md`.
+- Work proceeds test-first across the private Alibaba adapter, billing/account-cost reporting,
+  public catalog, authenticated playground, account editor, and Docs. Paid upstream testing remains
+  gated on a separate confirmation of the exact minimum charge.
+
 ### 2026-09-10 — H3 upstream protocol correction in progress
 
 - A lowest-cost production smoke test showed that the configured `console.dc-api.com` account accepts JSON at `/v1/videos` and returns a task, while multipart requests return a generic 500 before task creation. The H3 gateway was temporarily changed to multipart in `530c9337`; restore the upstream JSON protocol while retaining OwnAPI's private media-field mapping before the next deployment.
