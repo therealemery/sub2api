@@ -102,6 +102,21 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-11 — Wan 3.0 integration design ready for review
+
+- Finalized the pricing basis for `wan3.0-video` and `wan3.0-video-prime`: public comparison
+  prices use US (Virginia) manufacturer list prices and OwnAPI sells both at list × 0.8. The
+  standard model's temporary manufacturer discount does not change the public pricing basis.
+- The approved customer contract reuses OwnAPI's opaque `POST /v1/videos`, retrieve, and content
+  endpoints. A private provider adapter routes MiniMax H3 to DC-API and both Wan models to a
+  dedicated Alibaba DashScope video account without exposing credentials, Workspace metadata,
+  upstream task IDs, errors, or result URLs.
+- The proposed first release supports explicit 2–30 second durations and rejects smart duration so
+  customer billing is known before a paid request. Customer/model rate overrides remain applicable;
+  account cost uses the quoted RMB rates normalized at 6.7 CNY/USD.
+- Design: `docs/superpowers/specs/2026-09-11-ownapi-wan3-video-integration-design.md`.
+- No application code or production data has been changed at this checkpoint.
+
 ### 2026-09-10 — H3 upstream protocol correction in progress
 
 - A lowest-cost production smoke test showed that the configured `console.dc-api.com` account accepts JSON at `/v1/videos` and returns a task, while multipart requests return a generic 500 before task creation. The H3 gateway was temporarily changed to multipart in `530c9337`; restore the upstream JSON protocol while retaining OwnAPI's private media-field mapping before the next deployment.
