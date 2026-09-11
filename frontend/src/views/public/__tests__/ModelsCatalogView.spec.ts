@@ -130,6 +130,32 @@ describe('ModelsCatalogView', () => {
     expect(wrapper.findAll('section.provider-section')).toHaveLength(9)
   })
 
+  it('treats provider, model class, and endpoint as mutually exclusive category filters', async () => {
+    const wrapper = mountCatalog()
+    await flushPromises()
+
+    const filterInput = (fieldsetIndex: number, value: string) => wrapper
+      .findAll('.filter-rail fieldset')[fieldsetIndex]!
+      .findAll('input')
+      .find((input) => input.attributes('value') === value)!
+
+    await wrapper.get('input[type="search"]').setValue('wan')
+    await filterInput(1, 'video').setValue()
+    expect((wrapper.get('input[type="search"]').element as HTMLInputElement).value).toBe('')
+    expect(wrapper.findAll('.model-card')).toHaveLength(3)
+
+    await filterInput(0, 'Anthropic').setValue()
+    expect((filterInput(1, '').element as HTMLInputElement).checked).toBe(true)
+    expect((filterInput(2, '').element as HTMLInputElement).checked).toBe(true)
+    expect(wrapper.findAll('section.provider-section').map((section) => section.get('h2').text())).toEqual(['Anthropic'])
+    expect(wrapper.findAll('.model-card')).toHaveLength(6)
+
+    await filterInput(2, 'videos').setValue()
+    expect((filterInput(0, '').element as HTMLInputElement).checked).toBe(true)
+    expect((filterInput(1, '').element as HTMLInputElement).checked).toBe(true)
+    expect(wrapper.findAll('.model-card')).toHaveLength(3)
+  })
+
   it('renders unpublished pricing without zero-value metric fallbacks', async () => {
     const wrapper = mountCatalog()
     await flushPromises()

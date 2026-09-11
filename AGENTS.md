@@ -102,6 +102,19 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-11 — Public model filter category switching ready for deployment
+
+- Reproduced the apparent all-provider empty state: a model class or endpoint selected farther down
+  the sticky rail remained active while the user clicked a provider, so every provider could appear
+  empty until `Reset all` or a full page reload cleared the hidden condition.
+- Provider, model-class, and endpoint radio selections now act as mutually exclusive category
+  switches. Selecting one clears the search and the other two category filters while preserving the
+  chosen sort order. Explicit `All` selections follow the same predictable switching rule.
+- Added interaction coverage for search -> video -> Anthropic -> videos and verified the expected
+  3 -> 6 -> 3 model results without reloading. Focused catalog/view tests (28), all 112 frontend test
+  files / 677 tests, Vue type checks, focused ESLint, production frontend build, and
+  `git diff --check` pass. Ready to commit and deploy.
+
 ### 2026-09-11 — Wan 3.0 integration deployed and production verified
 
 - Added private Alibaba Workspace routing for `wan3.0-video` and `wan3.0-video-prime` behind the

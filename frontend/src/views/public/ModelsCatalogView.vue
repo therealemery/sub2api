@@ -32,18 +32,18 @@
             <div class="filter-heading"><strong>{{ t('publicModels.filters') }}</strong><button type="button" class="reset-all" @click="resetFilters">{{ t('publicModels.resetAll') }}</button></div>
             <fieldset>
               <legend>{{ t('publicModels.provider') }}</legend>
-              <label><input v-model="filters.provider" type="radio" value="" />{{ t('publicModels.allProviders') }}</label>
-              <label v-for="provider in providers" :key="provider"><input v-model="filters.provider" type="radio" :value="provider" />{{ provider }}</label>
+              <label><input v-model="filters.provider" type="radio" value="" @change="activateProviderFilter" />{{ t('publicModels.allProviders') }}</label>
+              <label v-for="provider in providers" :key="provider"><input v-model="filters.provider" type="radio" :value="provider" @change="activateProviderFilter" />{{ provider }}</label>
             </fieldset>
             <fieldset>
               <legend>{{ t('publicModels.modelClass') }}</legend>
-              <label><input v-model="filters.modelClass" type="radio" value="" />{{ t('publicModels.allClasses') }}</label>
-              <label v-for="modelClass in modelClasses" :key="modelClass"><input v-model="filters.modelClass" type="radio" :value="modelClass" />{{ formatFilterLabel(modelClass) }}</label>
+              <label><input v-model="filters.modelClass" type="radio" value="" @change="activateModelClassFilter" />{{ t('publicModels.allClasses') }}</label>
+              <label v-for="modelClass in modelClasses" :key="modelClass"><input v-model="filters.modelClass" type="radio" :value="modelClass" @change="activateModelClassFilter" />{{ formatFilterLabel(modelClass) }}</label>
             </fieldset>
             <fieldset>
               <legend>{{ t('publicModels.endpoint') }}</legend>
-              <label><input v-model="filters.endpoint" type="radio" value="" />{{ t('publicModels.allEndpoints') }}</label>
-              <label v-for="endpoint in endpoints" :key="endpoint"><input v-model="filters.endpoint" type="radio" :value="endpoint" />{{ formatFilterLabel(endpoint) }}</label>
+              <label><input v-model="filters.endpoint" type="radio" value="" @change="activateEndpointFilter" />{{ t('publicModels.allEndpoints') }}</label>
+              <label v-for="endpoint in endpoints" :key="endpoint"><input v-model="filters.endpoint" type="radio" :value="endpoint" @change="activateEndpointFilter" />{{ formatFilterLabel(endpoint) }}</label>
             </fieldset>
           </aside>
 
@@ -183,6 +183,24 @@ onMounted(async () => {
 
 function clearSearch() {
   filters.query = ''
+}
+
+function activateProviderFilter() {
+  filters.query = ''
+  filters.modelClass = ''
+  filters.endpoint = ''
+}
+
+function activateModelClassFilter() {
+  filters.query = ''
+  filters.provider = ''
+  filters.endpoint = ''
+}
+
+function activateEndpointFilter() {
+  filters.query = ''
+  filters.provider = ''
+  filters.modelClass = ''
 }
 
 function resetFilters() {
