@@ -102,6 +102,18 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-11 — Wan detail-page code examples corrected and verified
+
+- Corrected the Wan Python examples to use native `True`/`False` values. The previous JSON-style
+  lowercase booleans caused an immediate Python `NameError` when copied verbatim.
+- Both Wan model pages now default to a prompt-only request that can be submitted as shown after the
+  customer sets `OWNAPI_API_KEY`. Reference image, video, and audio fields remain visible as optional
+  commented templates and no longer send invalid `example.com` placeholders by default. TypeScript
+  and cURL use the same prompt-only request while retaining valid JSON/JavaScript booleans.
+- New component coverage verifies both `wan3.0-video` and `wan3.0-video-prime` across Python,
+  TypeScript, and cURL. All 113 frontend test files / 679 tests, Vue type checks, focused ESLint,
+  production frontend build, and `git diff --check` pass. Ready to commit and deploy.
+
 ### 2026-09-11 — Public model filter category switching deployed and verified
 
 - Reproduced the apparent all-provider empty state: a model class or endpoint selected farther down
