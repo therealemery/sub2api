@@ -102,7 +102,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-11 — Wan detail-page code examples corrected and verified
+### 2026-09-11 — Wan detail-page code examples corrected, deployed, and verified
 
 - Corrected the Wan Python examples to use native `True`/`False` values. The previous JSON-style
   lowercase booleans caused an immediate Python `NameError` when copied verbatim.
@@ -112,7 +112,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
   and cURL use the same prompt-only request while retaining valid JSON/JavaScript booleans.
 - New component coverage verifies both `wan3.0-video` and `wan3.0-video-prime` across Python,
   TypeScript, and cURL. All 113 frontend test files / 679 tests, Vue type checks, focused ESLint,
-  production frontend build, and `git diff --check` pass. Ready to commit and deploy.
+  production frontend build, and `git diff --check` pass.
+- Commit `71318190` was pushed to `origin/main` and deployed by Actions run `34592604921` as image
+  `ownapi:71318190cd6b`. The container and public health endpoint are healthy. Production browser QA
+  confirmed the corrected Python examples on both Wan pages and the valid TypeScript/cURL examples
+  on the Prime page. No paid task was created during this documentation-only verification.
 
 ### 2026-09-11 — Public model filter category switching deployed and verified
 
@@ -279,7 +283,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `69565437` (image `ownapi:695654376a84`, deployed by run `34588561790`).
+- Last deployed revision: `71318190` (image `ownapi:71318190cd6b`, deployed by run `34592604921`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
 - Production verification: healthy on 2026-09-11. The container health check and fixed-IP `/health`
   request pass; both Wan model pages are deployed. The `Alibaba / Wan 3` account is normal and
@@ -288,7 +292,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
   also verified across five consecutive category switches without a reload or empty result state.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34588561790` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
+- Deployment build: run `34592604921` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
