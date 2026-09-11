@@ -322,6 +322,21 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - GPT-6 Astra short/long customer billing will be corrected to the approved 70-percent values,
   including cache-read and cache-write charges. No paid request is authorized at this checkpoint.
 
+### 2026-09-11 — DeepSeek Sale and GPT-6 implementation pushed
+
+- Commit `6f329354` adds public `deepseek-v4.1-flash` and `deepseek-v4-pro`, explicit 75-percent
+  catalog pricing, Packy OpenAI Chat routing, private flash alias rewriting, and migration 141.
+- GPT-6 Astra now exposes official short `$10/$1/$50` plus cache-write `$12.5` pricing and long
+  `$20/$2/$75` pricing; public and customer prices are multiplied by 0.7 and migration 141 updates
+  both channel defaults and complete context intervals.
+- Migration 141 is idempotent, never creates accounts or stores tokens, and only configures the
+  exact `Packy / DeepSeek Sale` account if it already exists. DeepSeek remains unavailable until a
+  valid `deepseek-sale` token is entered and that dedicated account is created/configured.
+- Validation passed: all 113 frontend test files / 679 tests, Vue type checking, production build,
+  focused Go protocol/mapping/migration tests, the PostgreSQL Packy migration integration test, and
+  `git diff --check`. Changes were pushed to `origin/codex/video-usage-history`; protected untracked
+  files remain untouched.
+
 ### 2026-09-11 — Public model filter switching production verification
 
 - Commit `69565437` deployed successfully in Actions run `34588561790`; production is healthy on
