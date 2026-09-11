@@ -18,8 +18,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:950cb96cc792`. Customer/model rate overrides and the admin modal's model-source correction are deployed and verified.
-- The verified local catalog contains 44 models after adding `wan3.0-video` and `wan3.0-video-prime`; production still contains the previously deployed 42-model catalog until the Wan release is pushed and deployed. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
+- Production is running image `ownapi:171ec90e7907`. The private Wan 3.0 gateway, customer/model rate overrides, and the admin modal's model-source correction are deployed and verified.
+- The verified local and production catalog contains 44 models after adding `wan3.0-video` and `wan3.0-video-prime`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -102,7 +102,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-11 — Wan 3.0 integration implemented and locally verified
+### 2026-09-11 — Wan 3.0 integration deployed and production verified
 
 - Added private Alibaba Workspace routing for `wan3.0-video` and `wan3.0-video-prime` behind the
   existing OwnAPI video lifecycle. Customer credentials and responses expose only OwnAPI; account
@@ -123,11 +123,22 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Validation passed: backend service/handler/repository packages; all 112 frontend test files / 676
   tests; Vue type checking; focused ESLint; production frontend build; Go formatting;
   `git diff --check`; and credential-pattern scanning. The known unit-tag test-stub compilation
-  issue in the pre-existing user-group-rate tests remains unchanged. No paid task, production
-  account mutation, push, merge, or deployment has occurred at this checkpoint.
-- The minimum paid verification is `wan3.0-video`, 480P, 2 seconds: customer base charge
-  `$0.0660096` at multiplier 1.0 and expected normalized account cost about `$0.0492537314`.
-  Obtain explicit confirmation immediately before sending this task upstream.
+  issue in the pre-existing user-group-rate tests remains unchanged.
+- Commit `171ec90e` was fast-forwarded to `origin/main` and deployed successfully by Actions run
+  `34578849249`. Production is healthy on image `ownapi:171ec90e7907`.
+- Created the production `Alibaba / Wan 3` managed account through the authenticated admin UI with
+  the Workspace `/api/v1` root, exact two-model whitelist, and the existing `OwnAPI` 1x group. The
+  credential remains only in encrypted production account storage. The non-billing connection test
+  passed before any paid request was attempted.
+- The single approved minimum paid test used `wan3.0-video`, 480P, 2 seconds, text only. It progressed
+  `queued` -> `in_progress` -> `completed` and downloaded a 2,743,354-byte ISO MP4 at 854x480 with a
+  two-second duration. Usage log 3282 records customer charge `$0.0660096000`, normalized account
+  cost `$0.0492537314`, multiplier `1.0000`, API key 52, account 13, and public endpoint `/v1/videos`.
+  The usage page shows the same model, endpoint, duration, and `$0.066010` charge.
+- The customer task token is a 184-character `video_` encrypted OwnAPI envelope; the browser and
+  customer-facing usage data do not expose the Alibaba task ID, Workspace hostname, credential, or
+  result URL. Production logs contain no Alibaba hostname, billing failure, or upstream failure for
+  the verified request. Do not repeat this paid smoke test unless a later change requires it.
 - Design: `docs/superpowers/specs/2026-09-11-ownapi-wan3-video-integration-design.md`; plan:
   `docs/superpowers/plans/2026-09-11-ownapi-wan3-video-integration-plan.md`.
 
@@ -239,16 +250,33 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `950cb96c` (image `ownapi:950cb96cc792`, deployed by run `34556009483`).
+- Last deployed revision: `171ec90e` (image `ownapi:171ec90e7907`, deployed by run `34578849249`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
-- Production verification: healthy on 2026-09-11. `/health`, `/home`, `/admin/users`, and `/models/minimax-h3` return HTTP 200. The new admin model-rate endpoint returns the expected unauthenticated HTTP 401, migration 140 created `user_model_rate_overrides`, and no customer overrides were written during deployment verification.
+- Production verification: healthy on 2026-09-11. The container health check and fixed-IP `/health`
+  request pass; both Wan model pages are deployed. The `Alibaba / Wan 3` account is normal and
+  schedulable, and the minimum `wan3.0-video` lifecycle, MP4 download, customer charge, account cost,
+  usage history, and private-upstream boundary were verified end to end.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34556009483` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
+- Deployment build: run `34578849249` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-11 — Wan 3.0 production deployment and minimum paid verification
+
+- Fast-forwarded the approved design, plan, and implementation commits through `171ec90e` to
+  `origin/main`; Actions run `34578849249` built and deployed `ownapi:171ec90e7907` successfully.
+- Created and non-billing-tested the model-scoped `Alibaba / Wan 3` production account without
+  exposing or committing its credential. It is bound only to the `OwnAPI` 1x group and the exact
+  `wan3.0-video` / `wan3.0-video-prime` mappings.
+- One explicitly approved 480P, two-second `wan3.0-video` request completed through the customer
+  OwnAPI lifecycle. The downloaded MP4 is 2,743,354 bytes, 854x480, and two seconds long.
+- Production billing reconciliation passed exactly: `$0.0660096000` customer charge,
+  `$0.0492537314` normalized upstream account cost, and `1.0000` effective customer multiplier.
+  The customer usage table shows the request as `/v1/videos`; the stored task token is an encrypted
+  OwnAPI envelope and no upstream identifier or host is present in customer-visible records.
 
 ### 2026-09-11 — Complete model-rate modal source ready for deployment
 
