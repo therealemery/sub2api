@@ -102,6 +102,18 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
+
+- Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's
+  `deepseek-v4-flash`) and `deepseek-v4-pro` on a dedicated `Packy / DeepSeek Sale` account. Both
+  customer models use official `$0.15/$0.60/$0.003` input/output/cache-read prices multiplied by
+  `0.75`; no official Packy group or existing Packy account may serve them.
+- GPT-6 Astra's corrected official short tier is `$10/$50/$12.50/$1` for
+  input/output/cache-write/cache-read and the existing long tier is `$20/$75/$25/$2`. Customer
+  billing remains official price multiplied by `0.7`, with the existing 200,000-token boundary.
+- Design: `docs/superpowers/specs/2026-09-11-ownapi-deepseek-sale-gpt6-pricing-design.md`. No pricing,
+  routing, account, production data, or secret has been modified at this checkpoint.
+
 ### 2026-09-11 — Wan detail-page code examples corrected, deployed, and verified
 
 - Corrected the Wan Python examples to use native `True`/`False` values. The previous JSON-style
