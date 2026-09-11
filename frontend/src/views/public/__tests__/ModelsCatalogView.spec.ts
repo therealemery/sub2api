@@ -77,18 +77,18 @@ describe('ModelsCatalogView', () => {
 
     const wrapper = mountCatalog()
     await flushPromises()
-    expect(wrapper.get('#catalog-results-title').text()).toBe('42 models')
+    expect(wrapper.get('#catalog-results-title').text()).toBe('44 models')
   })
 
-  it('renders all eight providers as ordered sections with correct model counts', async () => {
+  it('renders all nine providers as ordered sections with correct model counts', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
     const sections = wrapper.findAll('section.provider-section')
 
     expect(sections.map((section) => section.get('h2').text())).toEqual([
-      'OpenAI', 'Anthropic', 'xAI', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax',
+      'OpenAI', 'Anthropic', 'xAI', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax', 'Alibaba',
     ])
-    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 6, 11, 4, 1, 4])
+    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 6, 11, 4, 1, 4, 2])
     for (const section of sections) {
       const provider = section.get('h2').text()
       expect(section.findAll('.provider-line').every((line) => line.text().includes(provider))).toBe(true)
@@ -127,7 +127,7 @@ describe('ModelsCatalogView', () => {
     await wrapper.get('.reset-all').trigger('click')
     expect((wrapper.get('input[type="search"]').element as HTMLInputElement).value).toBe('')
     expect((wrapper.get('select').element as HTMLSelectElement).value).toBe('featured')
-    expect(wrapper.findAll('section.provider-section')).toHaveLength(8)
+    expect(wrapper.findAll('section.provider-section')).toHaveLength(9)
   })
 
   it('renders unpublished pricing without zero-value metric fallbacks', async () => {

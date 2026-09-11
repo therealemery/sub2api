@@ -1,7 +1,8 @@
-export type ManagedUpstreamProvider = '' | 'packyapi' | 'dc-api'
+export type ManagedUpstreamProvider = '' | 'packyapi' | 'dc-api' | 'alibaba-video'
 
 export const DC_API_BASE_URL = 'https://console.dc-api.com'
 export const DC_API_VIDEO_MODEL = 'MiniMax-H3'
+export const ALIBABA_VIDEO_MODELS = ['wan3.0-video', 'wan3.0-video-prime'] as const
 
 export function normalizeDCAPIBaseURL(value: string): string {
   const normalized = value.trim().replace(/\/+$/, '')
@@ -9,6 +10,20 @@ export function normalizeDCAPIBaseURL(value: string): string {
     return normalized.replace(/\/v1\/videos$/i, '')
   }
   return normalized || DC_API_BASE_URL
+}
+
+export function normalizeAlibabaVideoBaseURL(value: string): string {
+  const normalized = value.trim().replace(/\/+$/, '')
+  if (/\/compatible-mode\/v1$/i.test(normalized)) {
+    return normalized.replace(/\/compatible-mode\/v1$/i, '/api/v1')
+  }
+  const serviceIndex = normalized.toLowerCase().indexOf('/api/v1/services/')
+  if (serviceIndex >= 0) return normalized.slice(0, serviceIndex + '/api/v1'.length)
+  return normalized
+}
+
+export function isManagedVideoProvider(provider: ManagedUpstreamProvider): boolean {
+  return provider === 'dc-api' || provider === 'alibaba-video'
 }
 
 export function applyManagedUpstreamCredentials(
@@ -24,7 +39,14 @@ export function applyManagedUpstreamCredentials(
     delete next.compact_model_mapping
     return next
   }
-  if (previousProvider === 'dc-api') {
+  if (provider === 'alibaba-video') {
+    next.base_url = normalizeAlibabaVideoBaseURL(String(next.base_url || ''))
+    next.model_mapping = Object.fromEntries(ALIBABA_VIDEO_MODELS.map(model => [model, model]))
+    delete next.model
+    delete next.compact_model_mapping
+    return next
+  }
+  if (isManagedVideoProvider(previousProvider)) {
     delete next.model
   }
   return next
@@ -41,7 +63,7 @@ export function applyManagedUpstreamExtra(
     delete next.upstream_provider
   }
 
-  if (provider === 'dc-api') {
+  if (isManagedVideoProvider(provider)) {
     delete next.openai_passthrough
     delete next.openai_oauth_passthrough
     delete next.openai_compact_mode

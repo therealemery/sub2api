@@ -13,8 +13,9 @@ const (
 )
 
 const (
-	UpstreamProviderPackyAPI = domain.UpstreamProviderPackyAPI
-	UpstreamProviderDCAPI    = domain.UpstreamProviderDCAPI
+	UpstreamProviderPackyAPI     = domain.UpstreamProviderPackyAPI
+	UpstreamProviderDCAPI        = domain.UpstreamProviderDCAPI
+	UpstreamProviderAlibabaVideo = domain.UpstreamProviderAlibabaVideo
 )
 
 // Role constants

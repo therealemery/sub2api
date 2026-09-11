@@ -60,7 +60,7 @@ describe('modelCatalog', () => {
       })),
     })
 
-    expect(catalog).toHaveLength(42)
+    expect(catalog).toHaveLength(44)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-haiku-4-5'))).toBe(false)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-sonnet-4-5'))).toBe(false)
   })
@@ -83,7 +83,7 @@ describe('modelCatalog', () => {
       }],
     })
 
-    expect(catalog).toHaveLength(42)
+    expect(catalog).toHaveLength(44)
     expect(catalog.filter((entry) => entry.slug === 'claude-opus-4-7')).toHaveLength(1)
     expect(catalog.find((entry) => entry.slug === 'claude-opus-4-7')?.modelId).toBe('claude-opus-4-7')
   })
@@ -121,7 +121,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(42)
+    expect(result).toHaveLength(44)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -242,7 +242,7 @@ describe('modelCatalog', () => {
     ])
   })
 
-  it('contains the exact 42-model eligibility snapshot across eight providers', () => {
+  it('contains the exact 44-model eligibility snapshot across nine providers', () => {
     const providerIds = {
       OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
       Anthropic: ['claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-6', 'claude-sonnet-5'],
@@ -252,18 +252,19 @@ describe('modelCatalog', () => {
       'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3', 'glm-5.3-flash'],
       Moonshot: ['kimi-k2.5'],
       MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3', 'MiniMax-H3'],
+      Alibaba: ['wan3.0-video', 'wan3.0-video-prime'],
     }
     const catalog = buildModelCatalog(emptyConfig)
     const expectedIds = Object.values(providerIds).flat()
 
-    expect(verifiedModelSeedData).toHaveLength(49)
-    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(49)
-    expect(new Set(expectedIds).size).toBe(42)
+    expect(verifiedModelSeedData).toHaveLength(51)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(51)
+    expect(new Set(expectedIds).size).toBe(44)
     expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4, Alibaba: 2 })
 
     const addedIds = expectedIds.slice(16)
     expect(Object.fromEntries(addedIds.map((modelId) => [
@@ -296,6 +297,8 @@ describe('modelCatalog', () => {
       'MiniMax-M2.7': { input: 0.3, cachedInput: 0.06, output: 1.2 },
       'MiniMax-M3': { input: 0.6, cachedInput: 0.12, output: 2.4 },
       'MiniMax-H3': { input: null, cachedInput: null, output: null },
+      'wan3.0-video': { input: null, cachedInput: null, output: null },
+      'wan3.0-video-prime': { input: null, cachedInput: null, output: null },
     })
     expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].map((modelId) =>
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
@@ -313,6 +316,25 @@ describe('modelCatalog', () => {
         { resolution: '2K', officialPerSecond: 0.1194029851, ownApiPerSecond: 0.0895522388 },
       ],
     })
+    expect(catalog.find((entry) => entry.modelId === 'wan3.0-video')).toMatchObject({
+      provider: 'Alibaba', modality: 'Video', endpoints: ['videos'],
+      videoPricing: [
+        { resolution: '480P', officialPerSecond: 0.041256, ownApiPerSecond: 0.0330048 },
+        { resolution: '720P', officialPerSecond: 0.082513, ownApiPerSecond: 0.0660104 },
+        { resolution: '1080P', officialPerSecond: 0.165025, ownApiPerSecond: 0.13202 },
+      ],
+    })
+    expect(catalog.find((entry) => entry.modelId === 'wan3.0-video-prime')?.videoPricing).toEqual([
+      { resolution: '480P', officialPerSecond: 0.0636, ownApiPerSecond: 0.05088 },
+      { resolution: '720P', officialPerSecond: 0.127199, ownApiPerSecond: 0.1017592 },
+      { resolution: '1080P', officialPerSecond: 0.254399, ownApiPerSecond: 0.2035192 },
+    ])
+    for (const modelId of ['wan3.0-video', 'wan3.0-video-prime']) {
+      const entry = catalog.find((model) => model.modelId === modelId)
+      expect(entry?.pricingSource.multiplier).toBe(0.8)
+      expect(entry?.pricingSource.checkedAt).toBe('2026-09-11')
+      expect(entry?.eligibilitySource.checkedAt).toBe('2026-09-11')
+    }
     for (const entry of catalog) {
       expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(28)
       expect(entry.available).toBeNull()
@@ -330,6 +352,7 @@ describe('modelCatalog', () => {
       { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 4 },
       { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 1 },
       { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 4 },
+      { provider: 'Alibaba', label: 'Wan', logo: '/brand/qwen.svg', count: 2 },
     ])
 
     const subset = buildModelCatalog(emptyConfig).filter((entry) => ['Google', 'MiniMax'].includes(entry.provider))

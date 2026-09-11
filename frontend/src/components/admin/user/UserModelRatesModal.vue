@@ -72,7 +72,9 @@ const load = async () => {
       .filter(item => item.group_ids.includes(selectedGroupId.value as number))
       .flatMap(item => item.model_pricing)
       .flatMap(pricing => pricing.models)
-    if (group?.name.trim().toLowerCase() === 'ownapi') modelIds.push('MiniMax-H3')
+    if (group?.name.trim().toLowerCase() === 'ownapi') {
+      modelIds.push('MiniMax-H3', 'wan3.0-video', 'wan3.0-video-prime')
+    }
     modelIds.push(...overrides.map(item => item.model_id))
 
     const uniqueModels = new Map<string, string>()

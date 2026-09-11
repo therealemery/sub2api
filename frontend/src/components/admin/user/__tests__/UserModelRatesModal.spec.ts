@@ -72,16 +72,18 @@ describe('UserModelRatesModal', () => {
     expect(setModelRateOverrides).not.toHaveBeenCalled()
   })
 
-  it('merges all selected-group channel models and adds independent MiniMax H3', async () => {
+  it('merges all selected-group channel models and adds independent video models', async () => {
     const wrapper = mountModal()
     await flushPromises()
 
     const labels = wrapper.findAll('input[type="number"]').map(input => input.element.getAttribute('placeholder'))
-    expect(labels).toHaveLength(4)
+    expect(labels).toHaveLength(6)
     expect(wrapper.text()).toContain('GPT-5.4 Mini')
     expect(wrapper.text()).toContain('GPT-5.5')
     expect(wrapper.text()).toContain('Qwen3.8 Max')
     expect(wrapper.text()).toContain('MiniMax H3')
+    expect(wrapper.text()).toContain('Wan 3.0 Video')
+    expect(wrapper.text()).toContain('Wan 3.0 Video Prime')
     expect(wrapper.text()).not.toContain('GPT-6 Astra')
   })
 
@@ -91,6 +93,6 @@ describe('UserModelRatesModal', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('retired-model')
-    expect(wrapper.findAll('input[type="number"]')).toHaveLength(5)
+    expect(wrapper.findAll('input[type="number"]')).toHaveLength(7)
   })
 })

@@ -45,11 +45,11 @@
               <template v-if="model.videoPricing.length">
                 <div class="pricing-source">
                   <span>{{ t('publicModels.videoPriceEstimate') }}</span>
-                  <a href="https://console.dc-api.com/integration-doc" target="_blank" rel="noopener noreferrer">{{ t('publicModels.viewProtocol') }}</a>
+                  <a :href="model.family === 'wan' ? 'https://www.alibabacloud.com/help/en/model-studio/wan3-video-generation-api-reference' : 'https://console.dc-api.com/integration-doc'" target="_blank" rel="noopener noreferrer">{{ t('publicModels.viewProtocol') }}</a>
                 </div>
                 <div class="pricing-tier-heading">
                   <strong>{{ t('publicModels.perSecondBilling') }}</strong>
-                  <span>{{ t('publicModels.officialSeventyFivePercent') }}</span>
+                  <span>{{ t(model.family === 'wan' ? 'publicModels.officialEightyPercent' : 'publicModels.officialSeventyFivePercent') }}</span>
                 </div>
                 <table>
                   <thead><tr><th>{{ t('publicModels.resolution') }}</th><th>{{ t('publicModels.officialListPrice') }}</th><th>{{ t('publicModels.ownApiPrice') }}</th></tr></thead>
@@ -124,10 +124,9 @@
             </aside>
           </div>
           <MiniMaxVideoGenerator
-            v-if="isAuthenticated && model.modelId === 'MiniMax-H3'"
+            v-if="isAuthenticated && model.modality === 'Video'"
             :model-id="model.modelId"
-            :price768p="model.videoPricing.find((tier) => tier.resolution === '768p')?.ownApiPerSecond || 0.0559701493"
-            :price2k="model.videoPricing.find((tier) => tier.resolution === '2K')?.ownApiPerSecond || 0.0895522388"
+            :pricing="model.videoPricing"
           />
         </section>
 

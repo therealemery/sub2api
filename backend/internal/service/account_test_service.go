@@ -22,6 +22,7 @@ import (
 	"github.com/Wei-Shaw/sub2api/internal/pkg/geminicli"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/openai"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/openai_compat"
+	"github.com/Wei-Shaw/sub2api/internal/pkg/tlsfingerprint"
 	"github.com/Wei-Shaw/sub2api/internal/util/urlvalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -496,6 +497,9 @@ func (s *AccountTestService) testOpenAIAccountConnection(c *gin.Context, account
 	ctx := c.Request.Context()
 	_ = prompt
 	mode = normalizeAccountTestMode(mode)
+	if account.ManagedUpstreamProvider() == UpstreamProviderAlibabaVideo {
+		return s.testAlibabaVideoAccountConnection(c, ctx, account)
+	}
 
 	// Default to openai.DefaultTestModel for OpenAI testing
 	testModelID := modelID
@@ -635,6 +639,55 @@ func (s *AccountTestService) testOpenAIAccountConnection(c *gin.Context, account
 
 	// Process SSE stream
 	return s.processOpenAIStream(c, resp.Body)
+}
+
+// testAlibabaVideoAccountConnection verifies connectivity and authentication
+// without creating a paid generation task. A lookup for a reserved nonexistent
+// task ID is safe: 400/404 proves that authentication reached the task API,
+// while 401/403 means the managed credential was rejected.
+func (s *AccountTestService) testAlibabaVideoAccountConnection(c *gin.Context, ctx context.Context, account *Account) error {
+	const probeTaskID = "00000000-0000-4000-8000-000000000000"
+	baseURL, err := s.validateUpstreamBaseURL(account.GetCredential("base_url"))
+	if err != nil {
+		return s.sendErrorAndEnd(c, "Invalid Alibaba Workspace base URL")
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, strings.TrimRight(baseURL, "/")+"/tasks/"+probeTaskID, nil)
+	if err != nil {
+		return s.sendErrorAndEnd(c, "Failed to create account test request")
+	}
+	req.Header.Set("Authorization", "Bearer "+account.GetCredential("api_key"))
+	proxyURL := ""
+	if account.ProxyID != nil && account.Proxy != nil {
+		proxyURL = account.Proxy.URL()
+	}
+	var tlsProfile *tlsfingerprint.Profile
+	if s.tlsFPProfileService != nil {
+		tlsProfile = s.tlsFPProfileService.ResolveTLSProfile(account)
+	}
+	resp, err := s.httpUpstream.DoWithTLS(req, proxyURL, account.ID, account.Concurrency, tlsProfile)
+	if err != nil {
+		return s.sendErrorAndEnd(c, "Alibaba video account test failed")
+	}
+	defer func() { _ = resp.Body.Close() }()
+	validProbe := resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusNotFound
+	if resp.StatusCode == http.StatusOK {
+		var probe struct {
+			Output struct {
+				TaskID     string `json:"task_id"`
+				TaskStatus string `json:"task_status"`
+			} `json:"output"`
+		}
+		if body, readErr := io.ReadAll(io.LimitReader(resp.Body, 1<<20)); readErr == nil && json.Unmarshal(body, &probe) == nil {
+			validProbe = strings.EqualFold(strings.TrimSpace(probe.Output.TaskStatus), "UNKNOWN") &&
+				strings.TrimSpace(probe.Output.TaskID) == probeTaskID
+		}
+	}
+	if !validProbe {
+		return s.sendErrorAndEnd(c, fmt.Sprintf("Alibaba video account test returned HTTP %d", resp.StatusCode))
+	}
+	s.sendEvent(c, TestEvent{Type: "test_start", Model: "wan3.0-video"})
+	s.sendEvent(c, TestEvent{Type: "test_complete", Success: true})
+	return nil
 }
 
 // testOpenAICompactConnection probes /responses/compact and persists the

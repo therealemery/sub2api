@@ -34,6 +34,7 @@
             <option value="">普通 OpenAI API Key</option>
             <option value="packyapi">PackyAPI 文本模型</option>
             <option value="dc-api">DC-API 视频模型</option>
+            <option value="alibaba-video">Alibaba Video / Wan 3.0</option>
           </select>
           <p class="input-hint">上游密钥仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
         </div>
@@ -91,6 +92,16 @@
           >
             <p class="text-xs text-blue-700 dark:text-blue-400">
               MiniMax-H3 → MiniMax-H3
+            </p>
+          </div>
+
+          <div
+            v-else-if="managedUpstreamProvider === 'alibaba-video'"
+            class="mb-3 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20"
+            data-testid="alibaba-video-model-lock"
+          >
+            <p class="text-xs text-blue-700 dark:text-blue-400">
+              wan3.0-video → wan3.0-video<br />wan3.0-video-prime → wan3.0-video-prime
             </p>
           </div>
 
@@ -1310,7 +1321,7 @@
 
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
-        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -1340,7 +1351,7 @@
 
       <!-- OpenAI Codex 图片生成桥接账号级覆盖 -->
       <div
-        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="overflow-hidden rounded-lg border border-sky-100 bg-sky-50/60 shadow-sm dark:border-sky-900/50 dark:bg-sky-950/20">
@@ -1400,7 +1411,7 @@
 
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
       <div
-        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -1603,7 +1614,7 @@
       </div>
 
       <div
-        v-if="account?.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (account?.type === 'oauth' || account?.type === 'apikey')"
+        v-if="account?.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (account?.type === 'oauth' || account?.type === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
       >
         <div class="flex items-center justify-between">
@@ -2214,9 +2225,11 @@ import ModelWhitelistSelector from '@/components/account/ModelWhitelistSelector.
 import QuotaLimitCard from '@/components/account/QuotaLimitCard.vue'
 import { applyInterceptWarmup } from '@/components/account/credentialsBuilder'
 import {
+  ALIBABA_VIDEO_MODELS,
   DC_API_BASE_URL,
   applyManagedUpstreamCredentials,
   applyManagedUpstreamExtra,
+  isManagedVideoProvider,
   type ManagedUpstreamProvider
 } from '@/components/account/managedUpstream'
 import { formatDateTime, formatDateTimeLocalInput, parseDateTimeLocalInput } from '@/utils/format'
@@ -2606,7 +2619,7 @@ const syncFormFromAccount = (newAccount: Account | null) => {
   const extra = newAccount.extra as Record<string, unknown> | undefined
   const upstreamProvider = extra?.upstream_provider
   managedUpstreamProvider.value = newAccount.platform === 'openai' && newAccount.type === 'apikey' &&
-    (upstreamProvider === 'packyapi' || upstreamProvider === 'dc-api')
+    (upstreamProvider === 'packyapi' || upstreamProvider === 'dc-api' || upstreamProvider === 'alibaba-video')
     ? upstreamProvider
     : ''
   mixedScheduling.value = extra?.mixed_scheduling === true
@@ -2929,15 +2942,15 @@ watch(
 )
 
 watch(managedUpstreamProvider, (provider) => {
-  if (provider !== 'dc-api') return
-  editBaseUrl.value = DC_API_BASE_URL
+	if (!isManagedVideoProvider(provider)) return
+	if (provider === 'dc-api') editBaseUrl.value = DC_API_BASE_URL
   openaiPassthroughEnabled.value = false
   openAICompactMode.value = 'auto'
   openAICompactModelMappings.value = []
   openaiAPIKeyResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
   codexImageGenerationBridgeMode.value = 'inherit'
   modelRestrictionMode.value = 'whitelist'
-  allowedModels.value = ['MiniMax-H3']
+	allowedModels.value = provider === 'dc-api' ? ['MiniMax-H3'] : [...ALIBABA_VIDEO_MODELS]
   modelMappings.value = []
 })
 
@@ -3451,7 +3464,7 @@ const handleSubmit = async () => {
       updatePayload.credentials = applyManagedUpstreamCredentials(
         managedUpstreamProvider.value,
         newCredentials,
-        (currentManagedProvider === 'dc-api' ? 'dc-api' : currentManagedProvider === 'packyapi' ? 'packyapi' : '')
+        (currentManagedProvider === 'dc-api' || currentManagedProvider === 'packyapi' || currentManagedProvider === 'alibaba-video' ? currentManagedProvider : '')
       )
     } else if (props.account.type === 'upstream') {
       const currentCredentials = (props.account.credentials as Record<string, unknown>) || {}

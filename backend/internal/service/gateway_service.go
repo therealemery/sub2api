@@ -8027,6 +8027,128 @@ func (s *GatewayService) ForwardDCVideoWithContentType(ctx context.Context, acco
 	return s.httpUpstream.DoWithTLS(req, proxyURL, account.ID, account.Concurrency, tlsProfile)
 }
 
+// SelectAlibabaVideoAccount returns a schedulable, exact-model Alibaba video account.
+func (s *GatewayService) SelectAlibabaVideoAccount(ctx context.Context, requestedModel string) (*Account, error) {
+	accounts, err := s.accountRepo.ListSchedulableByPlatform(ctx, PlatformOpenAI)
+	if err != nil {
+		return nil, err
+	}
+	for i := range accounts {
+		account := &accounts[i]
+		if account.ManagedUpstreamProvider() != UpstreamProviderAlibabaVideo || !account.IsModelSupported(requestedModel) {
+			continue
+		}
+		mapped, matched := account.ResolveMappedModel(requestedModel)
+		if !matched || !strings.EqualFold(strings.TrimSpace(mapped), strings.TrimSpace(requestedModel)) {
+			continue
+		}
+		return s.hydrateSelectedAccount(ctx, account)
+	}
+	return nil, fmt.Errorf("no available video account")
+}
+
+// GetAlibabaVideoAccount validates the account bound into an opaque task token.
+func (s *GatewayService) GetAlibabaVideoAccount(ctx context.Context, accountID int64, requestedModel string) (*Account, error) {
+	account, err := s.accountRepo.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderAlibabaVideo || !account.IsModelSupported(requestedModel) {
+		return nil, fmt.Errorf("video account is unavailable")
+	}
+	mapped, matched := account.ResolveMappedModel(requestedModel)
+	if !matched || !strings.EqualFold(strings.TrimSpace(mapped), strings.TrimSpace(requestedModel)) {
+		return nil, fmt.Errorf("video account is unavailable")
+	}
+	return account, nil
+}
+
+// ForwardAlibabaVideo sends create/retrieve requests using server-managed credentials.
+func (s *GatewayService) ForwardAlibabaVideo(ctx context.Context, account *Account, method, requestPath string, body []byte) (*http.Response, error) {
+	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderAlibabaVideo {
+		return nil, fmt.Errorf("invalid video account")
+	}
+	if err := ValidateManagedUpstreamCredentials(account.Platform, account.Type, account.Credentials, account.Extra); err != nil {
+		return nil, fmt.Errorf("invalid video account")
+	}
+	baseURL, err := s.validateUpstreamBaseURL(account.GetCredential("base_url"))
+	if err != nil {
+		return nil, err
+	}
+	var reader io.Reader
+	if len(body) > 0 {
+		reader = bytes.NewReader(body)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, strings.TrimRight(baseURL, "/")+requestPath, reader)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+account.GetCredential("api_key"))
+	if len(body) > 0 {
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-DashScope-Async", "enable")
+	}
+	proxyURL := ""
+	if account.ProxyID != nil && account.Proxy != nil {
+		proxyURL = account.Proxy.URL()
+	}
+	var tlsProfile *tlsfingerprint.Profile
+	if s.tlsFPProfileService != nil {
+		tlsProfile = s.tlsFPProfileService.ResolveTLSProfile(account)
+	}
+	return s.httpUpstream.DoWithTLS(req, proxyURL, account.ID, account.Concurrency, tlsProfile)
+}
+
+// FetchAlibabaVideoContent proxies only HTTPS Alibaba-owned result URLs.
+func (s *GatewayService) FetchAlibabaVideoContent(ctx context.Context, account *Account, rawURL string) (*http.Response, error) {
+	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderAlibabaVideo {
+		return nil, fmt.Errorf("invalid video account")
+	}
+	parsed, err := ValidateAlibabaVideoContentURL(rawURL)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, parsed.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(WithAlibabaVideoContentRedirectPolicy(req.Context()))
+	return s.httpUpstream.Do(req, "", account.ID, account.Concurrency)
+}
+
+type alibabaVideoContentRedirectPolicyKey struct{}
+
+// WithAlibabaVideoContentRedirectPolicy marks a server-side Wan result download.
+// The HTTP transport uses this marker to re-validate every redirect even when
+// the deployment's general URL allowlist validation is disabled.
+func WithAlibabaVideoContentRedirectPolicy(ctx context.Context) context.Context {
+	return context.WithValue(ctx, alibabaVideoContentRedirectPolicyKey{}, true)
+}
+
+// HasAlibabaVideoContentRedirectPolicy reports whether strict Wan result URL
+// redirect validation is required for this request.
+func HasAlibabaVideoContentRedirectPolicy(ctx context.Context) bool {
+	enabled, _ := ctx.Value(alibabaVideoContentRedirectPolicyKey{}).(bool)
+	return enabled
+}
+
+// ValidateAlibabaVideoContentURL permits only public HTTPS URLs owned by
+// Alibaba Cloud. It is used for the initial result URL and every redirect.
+func ValidateAlibabaVideoContentURL(rawURL string) (*url.URL, error) {
+	parsed, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil || parsed.Scheme != "https" || parsed.Hostname() == "" || parsed.User != nil || parsed.RawQuery == "" {
+		return nil, fmt.Errorf("invalid video content URL")
+	}
+	host := strings.ToLower(parsed.Hostname())
+	if host != "aliyuncs.com" && !strings.HasSuffix(host, ".aliyuncs.com") {
+		return nil, fmt.Errorf("invalid video content host")
+	}
+	if err := urlvalidator.ValidateResolvedIP(host); err != nil {
+		return nil, fmt.Errorf("invalid video content host: %w", err)
+	}
+	return parsed, nil
+}
+
 // RecordUsageInput 记录使用量的输入参数
 type RecordUsageInput struct {
 	Result             *ForwardResult
@@ -9505,8 +9627,12 @@ func (s *GatewayService) buildCustomRelayURL(baseURL, path string, account *Acco
 }
 
 func (s *GatewayService) validateUpstreamBaseURL(raw string) (string, error) {
-	if s.cfg != nil && !s.cfg.Security.URLAllowlist.Enabled {
-		normalized, err := urlvalidator.ValidateURLFormat(raw, s.cfg.Security.URLAllowlist.AllowInsecureHTTP)
+	if s.cfg == nil || !s.cfg.Security.URLAllowlist.Enabled {
+		allowInsecureHTTP := false
+		if s.cfg != nil {
+			allowInsecureHTTP = s.cfg.Security.URLAllowlist.AllowInsecureHTTP
+		}
+		normalized, err := urlvalidator.ValidateURLFormat(raw, allowInsecureHTTP)
 		if err != nil {
 			return "", fmt.Errorf("invalid base_url: %w", err)
 		}

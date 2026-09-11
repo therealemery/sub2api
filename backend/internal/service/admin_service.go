@@ -2512,9 +2512,6 @@ func (s *adminServiceImpl) UpdateAccount(ctx context.Context, id int64, input *U
 			}
 		}
 		account.Extra = input.Extra
-		if err := ValidateManagedUpstreamCredentials(account.Platform, account.Type, account.Credentials, account.Extra); err != nil {
-			return nil, err
-		}
 		if account.Platform == PlatformAntigravity && wasOveragesEnabled && !account.IsOveragesEnabled() {
 			delete(account.Extra, "antigravity_credits_overages") // 清理旧版 overages 运行态
 			// 清除 AICredits 限流 key
@@ -2577,6 +2574,13 @@ func (s *adminServiceImpl) UpdateAccount(ctx context.Context, id int64, input *U
 	}
 	if input.AutoPauseOnExpired != nil {
 		account.AutoPauseOnExpired = *input.AutoPauseOnExpired
+	}
+	// Validate the merged account state even when the request updates only
+	// credentials or only metadata. Otherwise a direct admin API request could
+	// bypass the managed-upstream base URL and exact model whitelist checks by
+	// omitting extra from the payload.
+	if err := ValidateManagedUpstreamCredentials(account.Platform, account.Type, account.Credentials, account.Extra); err != nil {
+		return nil, err
 	}
 
 	// 先验证分组是否存在（在任何写操作之前）

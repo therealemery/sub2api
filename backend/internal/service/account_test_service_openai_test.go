@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Wei-Shaw/sub2api/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 
@@ -131,6 +132,74 @@ func TestAccountTestService_OpenAISuccessPersistsSnapshotFromHeaders(t *testing.
 	require.Equal(t, 42.0, repo.updatedExtra["codex_5h_used_percent"])
 	require.Equal(t, 88.0, repo.updatedExtra["codex_7d_used_percent"])
 	require.Contains(t, recorder.Body.String(), "test_complete")
+}
+
+func TestAccountTestService_AlibabaVideoUsesNonBillableMissingTaskProbe(t *testing.T) {
+	ctx, recorder := newTestContext()
+	account := &Account{
+		ID:       41,
+		Platform: PlatformOpenAI,
+		Type:     AccountTypeAPIKey,
+		Credentials: map[string]any{
+			"base_url": "https://ws-example.us-east-1.maas.aliyuncs.com/api/v1",
+			"api_key":  "private-secret",
+		},
+		Extra: map[string]any{"upstream_provider": UpstreamProviderAlibabaVideo},
+	}
+	repo := &openAIAccountTestRepo{mockAccountRepoForGemini: mockAccountRepoForGemini{accountsByID: map[int64]*Account{41: account}}}
+	upstream := &queuedHTTPUpstream{responses: []*http.Response{newJSONResponse(http.StatusNotFound, `{"message":"private upstream detail"}`)}}
+	svc := &AccountTestService{accountRepo: repo, httpUpstream: upstream, cfg: &config.Config{}}
+
+	require.NoError(t, svc.TestAccountConnection(ctx, 41, "", "", ""))
+	require.Len(t, upstream.requests, 1)
+	require.Equal(t, http.MethodGet, upstream.requests[0].Method)
+	require.Equal(t, "/api/v1/tasks/00000000-0000-4000-8000-000000000000", upstream.requests[0].URL.Path)
+	require.Empty(t, upstream.requests[0].URL.RawQuery)
+	require.Equal(t, "Bearer private-secret", upstream.requests[0].Header.Get("Authorization"))
+	require.NotContains(t, recorder.Body.String(), "private-secret")
+	require.NotContains(t, recorder.Body.String(), "private upstream detail")
+	require.Contains(t, recorder.Body.String(), `"success":true`)
+}
+
+func TestAccountTestService_AlibabaVideoAcceptsAuthenticatedUnknownTask(t *testing.T) {
+	ctx, recorder := newTestContext()
+	account := &Account{
+		ID: 43, Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+		Credentials: map[string]any{
+			"base_url": "https://ws-example.us-east-1.maas.aliyuncs.com/api/v1",
+			"api_key":  "private-secret",
+		},
+		Extra: map[string]any{"upstream_provider": UpstreamProviderAlibabaVideo},
+	}
+	repo := &openAIAccountTestRepo{mockAccountRepoForGemini: mockAccountRepoForGemini{accountsByID: map[int64]*Account{43: account}}}
+	upstream := &queuedHTTPUpstream{responses: []*http.Response{newJSONResponse(http.StatusOK, `{"output":{"task_id":"00000000-0000-4000-8000-000000000000","task_status":"UNKNOWN"},"request_id":"private"}`)}}
+	svc := &AccountTestService{accountRepo: repo, httpUpstream: upstream, cfg: &config.Config{}}
+
+	require.NoError(t, svc.TestAccountConnection(ctx, 43, "", "", ""))
+	require.Contains(t, recorder.Body.String(), `"success":true`)
+	require.NotContains(t, recorder.Body.String(), "private")
+}
+
+func TestAccountTestService_AlibabaVideoRejectsUnexpectedStatusWithoutLeakingBody(t *testing.T) {
+	ctx, recorder := newTestContext()
+	account := &Account{
+		ID:       42,
+		Platform: PlatformOpenAI,
+		Type:     AccountTypeAPIKey,
+		Credentials: map[string]any{
+			"base_url": "https://ws-example.us-east-1.maas.aliyuncs.com/api/v1",
+			"api_key":  "private-secret",
+		},
+		Extra: map[string]any{"upstream_provider": UpstreamProviderAlibabaVideo},
+	}
+	repo := &openAIAccountTestRepo{mockAccountRepoForGemini: mockAccountRepoForGemini{accountsByID: map[int64]*Account{42: account}}}
+	upstream := &queuedHTTPUpstream{responses: []*http.Response{newJSONResponse(http.StatusUnauthorized, `{"message":"private authentication detail"}`)}}
+	svc := &AccountTestService{accountRepo: repo, httpUpstream: upstream, cfg: &config.Config{}}
+
+	require.Error(t, svc.TestAccountConnection(ctx, 42, "", "", ""))
+	require.NotContains(t, recorder.Body.String(), "private authentication detail")
+	require.NotContains(t, recorder.Body.String(), "private-secret")
+	require.Contains(t, recorder.Body.String(), "HTTP 401")
 }
 
 func TestAccountTestService_OpenAIStreamEOFBeforeCompletedFails(t *testing.T) {

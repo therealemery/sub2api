@@ -219,6 +219,32 @@ describe('EditAccountModal', () => {
     expect(payload.credentials).not.toHaveProperty('model')
   })
 
+  it('preserves an Alibaba video account and normalizes its Workspace root', async () => {
+    const account = buildAccount()
+    account.name = 'wan-video'
+    account.extra = { upstream_provider: 'alibaba-video' }
+    account.credentials = {
+      api_key: 'existing-alibaba-secret',
+      base_url: 'https://ws-example.us-east-1.maas.aliyuncs.com/compatible-mode/v1',
+      model_mapping: { 'wan3.0-video': 'wan3.0-video', 'wan3.0-video-prime': 'wan3.0-video-prime' }
+    }
+    updateAccountMock.mockReset().mockResolvedValue(account)
+    checkMixedChannelRiskMock.mockReset().mockResolvedValue({ has_risk: false })
+
+    const wrapper = mountModal(account)
+    expect((wrapper.get('[data-testid="managed-upstream-provider"]').element as HTMLSelectElement).value).toBe('alibaba-video')
+    expect(wrapper.get('[data-testid="alibaba-video-model-lock"]').text()).toContain('wan3.0-video-prime')
+    await wrapper.get('form#edit-account-form').trigger('submit.prevent')
+
+    const payload = updateAccountMock.mock.calls[0]?.[1]
+    expect(payload.extra?.upstream_provider).toBe('alibaba-video')
+    expect(payload.credentials).toMatchObject({
+      api_key: 'existing-alibaba-secret',
+      base_url: 'https://ws-example.us-east-1.maas.aliyuncs.com/api/v1',
+      model_mapping: { 'wan3.0-video': 'wan3.0-video', 'wan3.0-video-prime': 'wan3.0-video-prime' }
+    })
+  })
+
   it('reopening the same account rehydrates the OpenAI whitelist from props', async () => {
     const account = buildAccount()
     updateAccountMock.mockReset()

@@ -19,7 +19,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
 - Production is running image `ownapi:950cb96cc792`. Customer/model rate overrides and the admin modal's model-source correction are deployed and verified.
-- The current catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
+- The verified local catalog contains 44 models after adding `wan3.0-video` and `wan3.0-video-prime`; production still contains the previously deployed 42-model catalog until the Wan release is pushed and deployed. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -102,20 +102,34 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-11 — Wan 3.0 integration design ready for review
+### 2026-09-11 — Wan 3.0 integration implemented and locally verified
 
-- Finalized the pricing basis for `wan3.0-video` and `wan3.0-video-prime`: public comparison
-  prices use US (Virginia) manufacturer list prices and OwnAPI sells both at list × 0.8. The
-  standard model's temporary manufacturer discount does not change the public pricing basis.
-- The approved customer contract reuses OwnAPI's opaque `POST /v1/videos`, retrieve, and content
-  endpoints. A private provider adapter routes MiniMax H3 to DC-API and both Wan models to a
-  dedicated Alibaba DashScope video account without exposing credentials, Workspace metadata,
-  upstream task IDs, errors, or result URLs.
-- The proposed first release supports explicit 2–30 second durations and rejects smart duration so
-  customer billing is known before a paid request. Customer/model rate overrides remain applicable;
-  account cost uses the quoted RMB rates normalized at 6.7 CNY/USD.
-- Design: `docs/superpowers/specs/2026-09-11-ownapi-wan3-video-integration-design.md`.
-- No application code or production data has been changed at this checkpoint.
+- Added private Alibaba Workspace routing for `wan3.0-video` and `wan3.0-video-prime` behind the
+  existing OwnAPI video lifecycle. Customer credentials and responses expose only OwnAPI; account
+  selection is exact-model and Alibaba video accounts are excluded from text scheduling.
+- Wan task envelopes bind user, account, model, adapter, and expiry. Retrieve responses normalize
+  provider states, and completed content is streamed server-side only after the initial result URL
+  and every redirect pass HTTPS, Alibaba-domain, and public-IP validation. Existing H3 envelopes
+  without an adapter remain compatible.
+- Customer billing uses US manufacturer list × 0.8 at 480P, 720P, and 1080P, with customer/model
+  overrides applied. Independent account cost uses the quoted RMB rates normalized at 6.7 CNY/USD.
+  Usage history records the public endpoint, model, resolution, requested generation duration,
+  customer cost, and account cost without private upstream identifiers.
+- The public catalog, model details, authenticated playground, lifecycle code examples, Docs model
+  switcher, admin account editor, and customer/model multiplier modal now include both Wan models.
+  The account editor normalizes `/compatible-mode/v1` to the Workspace `/api/v1` root and locks the
+  exact two-model whitelist. Both account update paths validate the fully merged managed-upstream
+  state so a credentials-only admin request cannot bypass the restriction.
+- Validation passed: backend service/handler/repository packages; all 112 frontend test files / 676
+  tests; Vue type checking; focused ESLint; production frontend build; Go formatting;
+  `git diff --check`; and credential-pattern scanning. The known unit-tag test-stub compilation
+  issue in the pre-existing user-group-rate tests remains unchanged. No paid task, production
+  account mutation, push, merge, or deployment has occurred at this checkpoint.
+- The minimum paid verification is `wan3.0-video`, 480P, 2 seconds: customer base charge
+  `$0.0660096` at multiplier 1.0 and expected normalized account cost about `$0.0492537314`.
+  Obtain explicit confirmation immediately before sending this task upstream.
+- Design: `docs/superpowers/specs/2026-09-11-ownapi-wan3-video-integration-design.md`; plan:
+  `docs/superpowers/plans/2026-09-11-ownapi-wan3-video-integration-plan.md`.
 
 ### 2026-09-11 — Wan 3.0 implementation plan approved for execution
 

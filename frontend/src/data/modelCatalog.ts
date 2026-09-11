@@ -24,7 +24,7 @@ export type {
   VideoResolutionPricing,
 } from './verifiedModelSeeds'
 
-export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'ownapi'
+export type ModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'wan' | 'ownapi'
 export type ModelCatalogSort = 'featured' | 'name' | 'input-price' | 'output-price'
 
 export const CATALOG_PROVIDER_ORDER = [
@@ -36,6 +36,7 @@ export const CATALOG_PROVIDER_ORDER = [
   'Z.AI',
   'Moonshot',
   'MiniMax',
+  'Alibaba',
 ] as const
 
 export interface ModelProviderGroup {
@@ -60,6 +61,7 @@ const catalogProviderPresentation: Record<typeof CATALOG_PROVIDER_ORDER[number],
   'Z.AI': { label: 'GLM', logo: '/brand/glm.svg' },
   Moonshot: { label: 'Kimi', logo: '/brand/kimi.svg' },
   MiniMax: { label: 'MiniMax', logo: '/brand/minimax.svg' },
+  Alibaba: { label: 'Wan', logo: '/brand/qwen.svg' },
 }
 
 const providerSearchAliases: Record<string, string[]> = {
@@ -71,6 +73,7 @@ const providerSearchAliases: Record<string, string[]> = {
   'Z.AI': ['z ai', 'zhipu', '智谱', 'glm'],
   Moonshot: ['moonshot', '月之暗面', 'kimi'],
   MiniMax: ['minimax', '稀宇科技'],
+  Alibaba: ['alibaba', 'aliyun', '阿里云', '万相', 'wan'],
 }
 
 // These upstream SKUs are contractually limited to the Claude Code client and
@@ -193,6 +196,7 @@ const families: FamilyMetadata[] = [
   family('glm', 'Z.AI', 'zhipu', /glm|chatglm/i, 'glm', 'Multimodal', ['Reasoning', 'Coding', 'Vision'], '128K'),
   family('kimi', 'Moonshot', 'moonshot', /kimi|moonshot/i, 'kimi', 'Text', ['Long context', 'Reasoning', 'Text'], '128K'),
   family('minimax', 'MiniMax', 'minimax', /minimax/i, 'minimax', 'Text', ['Reasoning', 'Coding', 'Text'], '1M', 'ownapi'),
+  family('wan', 'Alibaba', 'openai', /^wan3/i, 'qwen', 'Video', ['Text to video', 'Reference media'], '', 'qwen'),
 ]
 
 const fallbackFamily: FamilyMetadata = {
@@ -376,7 +380,8 @@ function family(
 function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
   const metadata = families.find((item) => item.family === raw.family)
   if (!metadata) throw new Error(`Missing model family metadata: ${raw.family}`)
-  const ownApiMultiplier: ModelPricingSource['multiplier'] = raw.discountPercent >= 40 ? 0.7 : 0.8
+  const ownApiMultiplier: ModelPricingSource['multiplier'] = raw.customerMultiplier ?? (raw.discountPercent >= 40 ? 0.7 : 0.8)
+  const checkedAt = raw.checkedAt ?? '2026-09-07'
   const pricingStatus: ModelPricingStatus = raw.pricingStatus === 'free'
     ? 'free'
     : raw.discountPercent >= 28
@@ -397,14 +402,16 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
       tiers: raw.tiers ?? [],
       multiplier: ownApiMultiplier,
       sourceUrl: raw.sourceUrl,
-      checkedAt: '2026-09-07',
+      checkedAt,
       noteKey: raw.noteKey ?? null,
     },
     eligibilitySource: {
-      source: raw.modality === 'Video' ? 'dc-api' : 'packyapi',
+      source: raw.family === 'wan' ? 'alibaba' : raw.modality === 'Video' ? 'dc-api' : 'packyapi',
       discountPercent: raw.discountPercent,
-      checkedAt: '2026-09-07',
-      sourceUrl: raw.modality === 'Video' ? 'https://console.dc-api.com/integration-doc' : 'https://www.packyapi.com/pricing',
+      checkedAt,
+      sourceUrl: raw.family === 'wan'
+        ? 'https://www.alibabacloud.com/help/en/model-studio/model-pricing'
+        : raw.modality === 'Video' ? 'https://console.dc-api.com/integration-doc' : 'https://www.packyapi.com/pricing',
     },
     searchAliases: [...(providerSearchAliases[metadata.provider] ?? []), ...(raw.searchAliases ?? [])],
     videoPricing: raw.videoPricing ?? [],

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"sync/atomic"
@@ -8,9 +9,23 @@ import (
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
+	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
+
+func TestAlibabaVideoRedirectPolicyRejectsNonAlibabaHost(t *testing.T) {
+	svc := &httpUpstreamService{cfg: &config.Config{}}
+	initial, err := http.NewRequestWithContext(service.WithAlibabaVideoContentRedirectPolicy(context.Background()), http.MethodGet, "https://result.aliyuncs.com/video.mp4?Expires=1&Signature=test", nil)
+	require.NoError(t, err)
+	redirect, err := http.NewRequest(http.MethodGet, "https://example.com/stolen.mp4", nil)
+	require.NoError(t, err)
+
+	require.Error(t, svc.redirectChecker(redirect, []*http.Request{initial}))
+	validRedirect, err := http.NewRequest(http.MethodGet, "https://aliyuncs.com/video.mp4?Expires=2&Signature=test", nil)
+	require.NoError(t, err)
+	require.NoError(t, svc.redirectChecker(validRedirect, []*http.Request{initial}))
+}
 
 // HTTPUpstreamSuite HTTP 上游服务测试套件
 // 使用 testify/suite 组织测试，支持 SetupTest 初始化

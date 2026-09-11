@@ -29,7 +29,7 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 	if provider == "" {
 		return nil
 	}
-	if provider != UpstreamProviderPackyAPI && provider != UpstreamProviderDCAPI {
+	if provider != UpstreamProviderPackyAPI && provider != UpstreamProviderDCAPI && provider != UpstreamProviderAlibabaVideo {
 		return fmt.Errorf("unsupported upstream_provider %q", provider)
 	}
 	if credentials == nil {
@@ -45,6 +45,11 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 		return fmt.Errorf("PackyAPI accounts must use the openai platform")
 	}
 	if provider == UpstreamProviderPackyAPI {
+		baseURL, _ := credentials["base_url"].(string)
+		parsed, err := url.Parse(strings.TrimSpace(baseURL))
+		if err != nil || parsed == nil || parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil {
+			return fmt.Errorf("PackyAPI base_url must be an HTTPS URL")
+		}
 		mapping := stringMappingFromRaw(credentials["model_mapping"])
 		if len(mapping) == 0 {
 			return fmt.Errorf("PackyAPI accounts require a non-empty model_mapping whitelist")
@@ -76,6 +81,30 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 		if parsed.Scheme != "https" || parsed.Host != "console.dc-api.com" ||
 			strings.TrimRight(parsed.EscapedPath(), "/") != "" || parsed.RawQuery != "" || parsed.Fragment != "" || parsed.User != nil {
 			return fmt.Errorf("DC-API base_url must be https://console.dc-api.com")
+		}
+	}
+	if provider == UpstreamProviderAlibabaVideo {
+		if platform != PlatformOpenAI || (accountType != AccountTypeUpstream && accountType != AccountTypeAPIKey) {
+			return fmt.Errorf("Alibaba video accounts must use the openai platform and upstream or apikey type")
+		}
+		mapping := stringMappingFromRaw(credentials["model_mapping"])
+		if len(mapping) == 0 {
+			return fmt.Errorf("Alibaba video accounts require an exact model_mapping whitelist")
+		}
+		allowed := map[string]bool{"wan3.0-video": true, "wan3.0-video-prime": true}
+		for requestedModel, upstreamModel := range mapping {
+			if !allowed[requestedModel] || upstreamModel != requestedModel {
+				return fmt.Errorf("Alibaba video model_mapping supports only exact Wan 3.0 model names")
+			}
+		}
+		baseURL, _ := credentials["base_url"].(string)
+		parsed, err := url.Parse(strings.TrimSpace(baseURL))
+		if err != nil || parsed == nil {
+			return fmt.Errorf("Alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
+		}
+		path := strings.TrimRight(parsed.EscapedPath(), "/")
+		if parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" || path != "/api/v1" || !strings.HasSuffix(strings.ToLower(parsed.Hostname()), ".maas.aliyuncs.com") {
+			return fmt.Errorf("Alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
 		}
 	}
 	return nil
@@ -345,6 +374,9 @@ func (s *AccountService) Update(ctx context.Context, id int64, req UpdateAccount
 	}
 	if req.AutoPauseOnExpired != nil {
 		account.AutoPauseOnExpired = *req.AutoPauseOnExpired
+	}
+	if err := ValidateManagedUpstreamCredentials(account.Platform, account.Type, account.Credentials, account.Extra); err != nil {
+		return nil, infraerrors.BadRequest("INVALID_MANAGED_UPSTREAM", err.Error())
 	}
 
 	// 先验证分组是否存在（在任何写操作之前）

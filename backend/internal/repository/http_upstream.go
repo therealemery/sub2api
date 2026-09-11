@@ -280,10 +280,7 @@ func (s *httpUpstreamService) getClientEntryWithTLS(proxyURL string, accountID i
 		return nil, fmt.Errorf("build TLS fingerprint transport: %w", err)
 	}
 
-	client := &http.Client{Transport: transport}
-	if s.shouldValidateResolvedIP() {
-		client.CheckRedirect = s.redirectChecker
-	}
+	client := &http.Client{Transport: transport, CheckRedirect: s.redirectChecker}
 
 	entry := &upstreamClientEntry{
 		client:   client,
@@ -332,6 +329,15 @@ func (s *httpUpstreamService) validateRequestHost(req *http.Request) error {
 func (s *httpUpstreamService) redirectChecker(req *http.Request, via []*http.Request) error {
 	if len(via) >= 10 {
 		return errors.New("stopped after 10 redirects")
+	}
+	if len(via) > 0 && service.HasAlibabaVideoContentRedirectPolicy(via[0].Context()) {
+		if req == nil || req.URL == nil {
+			return errors.New("redirect url is nil")
+		}
+		if _, err := service.ValidateAlibabaVideoContentURL(req.URL.String()); err != nil {
+			return err
+		}
+		return nil
 	}
 	return s.validateRequestHost(req)
 }
@@ -424,10 +430,7 @@ func (s *httpUpstreamService) getClientEntry(proxyURL string, accountID int64, a
 		s.mu.Unlock()
 		return nil, fmt.Errorf("build transport: %w", err)
 	}
-	client := &http.Client{Transport: transport}
-	if s.shouldValidateResolvedIP() {
-		client.CheckRedirect = s.redirectChecker
-	}
+	client := &http.Client{Transport: transport, CheckRedirect: s.redirectChecker}
 	entry := &upstreamClientEntry{
 		client:   client,
 		proxyKey: proxyKey,

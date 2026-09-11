@@ -19,6 +19,7 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.officialListPrice': 'Official list price',
       'publicModels.officialSeventyPercent': 'Official price x 70%',
       'publicModels.officialSeventyFivePercent': 'Official price x 75%',
+      'publicModels.officialEightyPercent': 'Official price x 80%',
       'publicModels.ownApiPrice': 'OwnAPI price',
       'publicModels.perSecond': '/ second',
       'publicModels.perSecondBilling': 'Billed by generated duration',
@@ -49,6 +50,7 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.families.gemini.description': 'Gemini model family',
       'publicModels.families.qwen.description': 'Qwen model family',
       'publicModels.families.minimax.description': 'MiniMax model family',
+      'publicModels.families.wan.description': 'Wan video model family',
       'publicModels.aliases.codexAutoReview': 'Alias for GPT-5.4 tuned for Codex automated review workflows.',
       'publicModels.pricingNotes.openAiLongContext': 'Inputs over 272K tokens may use OpenAI long-context rates.',
       'publicModels.pricingNotes.openAiRegional': 'Regional processing and service tiers may add provider charges.',
@@ -228,6 +230,19 @@ describe('ModelDetailView', () => {
     expect(wrapper.text()).toContain('$0.05597/ second')
     expect(wrapper.text()).toContain('$0.119403/ second')
     expect(wrapper.text()).toContain('$0.089552/ second')
+  })
+
+  it('renders Wan 3.0 US list prices and OwnAPI 80% prices', async () => {
+    const wrapper = mountDetail('wan3-0-video-prime')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Wan 3.0 Video Prime')
+    expect(wrapper.text()).toContain('Official price x 80%')
+    expect(wrapper.text()).toContain('$0.0636/ second')
+    expect(wrapper.text()).toContain('$0.05088/ second')
+    expect(wrapper.text()).toContain('$0.254399/ second')
+    expect(wrapper.text()).toContain('$0.203519/ second')
+    expect(wrapper.find('a[href="https://www.alibabacloud.com/help/en/model-studio/wan3-video-generation-api-reference"]').exists()).toBe(true)
   })
 
 })

@@ -33,7 +33,7 @@ The release does not add a customer-visible Alibaba-compatible endpoint, expose 
 The existing JSON endpoint accepts these Wan fields:
 
 - `model`: `wan3.0-video` or `wan3.0-video-prime`.
-- `prompt`: required non-empty string.
+- `prompt`: conditionally required; either a non-empty prompt or at least one media input must be present.
 - `duration`: required whole number from 2 through 30 seconds.
 - `resolution`: `480P`, `720P`, or `1080P`.
 - `ratio`: `adaptive`, `16:9`, `4:3`, `1:1`, `3:4`, or `9:16`.
@@ -52,7 +52,7 @@ The API accepts URL or data-URI media values where the existing OwnAPI request-s
 - At most 5 reference audio files.
 - At most 20 multimodal reference items in total.
 - First/last-frame inputs cannot be combined with reference, file, or link inputs.
-- First/last-frame mode cannot include audio.
+- First/last-frame mode cannot include any other media type. The output-audio parameter may still be set because it controls generated audio rather than an input asset.
 - `file` and `link` are mutually exclusive.
 
 The first release rejects `duration=-1`. Smart duration cannot be billed accurately before task creation and therefore requires a future completion-time adjustment design.

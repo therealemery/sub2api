@@ -120,4 +120,34 @@ describe('CreateAccountModal', () => {
       model_mapping: { 'MiniMax-H3': 'MiniMax-H3' }
     })
   })
+
+  it('creates an Alibaba Workspace account locked to both Wan models', async () => {
+    createAccountMock.mockReset().mockResolvedValue({})
+    const wrapper = mountModal()
+
+    await wrapper.get('input[data-tour="account-form-name"]').setValue('wan-video')
+    await wrapper.get('[data-testid="platform-openai"]').trigger('click')
+    await wrapper.get('[data-testid="account-type-apikey"]').trigger('click')
+    await wrapper.get('[data-testid="managed-upstream-provider"]').setValue('alibaba-video')
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="alibaba-video-model-lock"]').text()).toContain('wan3.0-video-prime')
+    await wrapper.get('[data-testid="api-key-base-url"]').setValue('https://ws-example.us-east-1.maas.aliyuncs.com/compatible-mode/v1')
+    await wrapper.get('[data-testid="api-key-value"]').setValue('test-alibaba-secret')
+    await wrapper.get('form#create-account-form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(createAccountMock).toHaveBeenCalledTimes(1)
+    expect(createAccountMock.mock.calls[0]?.[0]).toMatchObject({
+      extra: { upstream_provider: 'alibaba-video' },
+      credentials: {
+        api_key: 'test-alibaba-secret',
+        base_url: 'https://ws-example.us-east-1.maas.aliyuncs.com/api/v1',
+        model_mapping: {
+          'wan3.0-video': 'wan3.0-video',
+          'wan3.0-video-prime': 'wan3.0-video-prime'
+        }
+      }
+    })
+  })
 })

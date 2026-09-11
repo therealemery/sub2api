@@ -1,4 +1,4 @@
-export type VerifiedModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax'
+export type VerifiedModelFamily = 'gpt' | 'claude' | 'gemini' | 'deepseek' | 'grok' | 'qwen' | 'glm' | 'kimi' | 'minimax' | 'wan'
 export type ModelPricingStatus = 'paid' | 'free' | 'unpublished'
 
 export interface OfficialTokenPricing {
@@ -17,14 +17,14 @@ export interface OfficialPricingTier {
 }
 
 export interface CatalogEligibilitySource {
-  source: 'packyapi' | 'dc-api'
+  source: 'packyapi' | 'dc-api' | 'alibaba'
   discountPercent: number
-  checkedAt: '2026-09-07'
-  sourceUrl: 'https://www.packyapi.com/pricing' | 'https://console.dc-api.com/integration-doc'
+  checkedAt: '2026-09-07' | '2026-09-11'
+  sourceUrl: 'https://www.packyapi.com/pricing' | 'https://console.dc-api.com/integration-doc' | 'https://www.alibabacloud.com/help/en/model-studio/model-pricing'
 }
 
 export interface VideoResolutionPricing {
-  resolution: '768p' | '2K'
+  resolution: '480P' | '720P' | '768p' | '1080P' | '2K'
   officialPerSecond: number
   ownApiPerSecond: number
 }
@@ -35,7 +35,7 @@ export interface ModelPricingSource {
   tiers: OfficialPricingTier[]
   multiplier: 0.7 | 0.8
   sourceUrl: string
-  checkedAt: '2026-09-07'
+  checkedAt: '2026-09-07' | '2026-09-11'
   noteKey: string | null
 }
 
@@ -51,6 +51,8 @@ export interface RawVerifiedModelSeed {
   sourceUrl: string
   noteKey?: string
   discountPercent: number
+  customerMultiplier?: 0.7 | 0.8
+  checkedAt?: '2026-09-07' | '2026-09-11'
   searchAliases?: string[]
   contextWindow?: string | null
   isAlias?: boolean
@@ -194,6 +196,26 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
       { resolution: '2K', officialPerSecond: 0.1194029851, ownApiPerSecond: 0.0895522388 },
     ],
   }),
+  seed('wan3.0-video', 'Wan 3.0 Video', 'wan', ['video', 'multimodal'], ['videos'], { input: null, cachedInput: null, output: null }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 45, 440, {
+    pricingStatus: 'unpublished', contextWindow: null, featured: true, modality: 'Video',
+    customerMultiplier: 0.8, checkedAt: '2026-09-11',
+    capabilities: ['Text to video', 'Image to video', 'Video reference', 'Audio reference'],
+    videoPricing: [
+      { resolution: '480P', officialPerSecond: 0.041256, ownApiPerSecond: 0.0330048 },
+      { resolution: '720P', officialPerSecond: 0.082513, ownApiPerSecond: 0.0660104 },
+      { resolution: '1080P', officialPerSecond: 0.165025, ownApiPerSecond: 0.13202 },
+    ],
+  }),
+  seed('wan3.0-video-prime', 'Wan 3.0 Video Prime', 'wan', ['video', 'multimodal', 'fast'], ['videos'], { input: null, cachedInput: null, output: null }, 'https://www.alibabacloud.com/help/en/model-studio/model-pricing', 35, 450, {
+    pricingStatus: 'unpublished', contextWindow: null, modality: 'Video',
+    customerMultiplier: 0.8, checkedAt: '2026-09-11',
+    capabilities: ['Fast generation', 'Text to video', 'Video reference', 'Audio reference'],
+    videoPricing: [
+      { resolution: '480P', officialPerSecond: 0.0636, ownApiPerSecond: 0.05088 },
+      { resolution: '720P', officialPerSecond: 0.127199, ownApiPerSecond: 0.1017592 },
+      { resolution: '1080P', officialPerSecond: 0.254399, ownApiPerSecond: 0.2035192 },
+    ],
+  }),
 ]
 
 interface SeedOverrides {
@@ -208,6 +230,8 @@ interface SeedOverrides {
   modality?: RawVerifiedModelSeed['modality']
   capabilities?: string[]
   videoPricing?: VideoResolutionPricing[]
+  customerMultiplier?: RawVerifiedModelSeed['customerMultiplier']
+  checkedAt?: RawVerifiedModelSeed['checkedAt']
 }
 
 function seed(

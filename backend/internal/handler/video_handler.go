@@ -23,7 +23,11 @@ import (
 )
 
 const (
-	miniMaxH3Model = "MiniMax-H3"
+	miniMaxH3Model      = "MiniMax-H3"
+	wanVideoModel       = "wan3.0-video"
+	wanVideoPrimeModel  = "wan3.0-video-prime"
+	videoAdapterDCAPI   = "dc-api"
+	videoAdapterAlibaba = "alibaba"
 	// MiniMax H3 official prices are 0.5 CNY/s (768p) and 0.8 CNY/s (2K).
 	// OwnAPI converts at 6.7 CNY/USD and sells at 75% of the converted list price.
 	miniMaxH3768PriceUSD = 0.0559701493
@@ -31,16 +35,27 @@ const (
 	maxVideoJSONBody     = 64 << 20
 )
 
+var wanCustomerPricesUSD = map[string]map[string]float64{
+	wanVideoModel:      {"480P": 0.0330048, "720P": 0.0660104, "1080P": 0.1320200},
+	wanVideoPrimeModel: {"480P": 0.05088, "720P": 0.1017592, "1080P": 0.2035192},
+}
+
+var wanUpstreamCostsUSD = map[string]map[string]float64{
+	wanVideoModel:      {"480P": 0.0246268657, "720P": 0.0492537313, "1080P": 0.0985074627},
+	wanVideoPrimeModel: {"480P": 0.0436567164, "720P": 0.0873134328, "1080P": 0.1746268657},
+}
+
 type videoTaskEnvelope struct {
 	UpstreamID string `json:"u"`
 	AccountID  int64  `json:"a"`
 	UserID     int64  `json:"n"`
 	Model      string `json:"m"`
+	Adapter    string `json:"p,omitempty"`
 	ExpiresAt  int64  `json:"e"`
 }
 
-// VideosCreate creates an asynchronous MiniMax H3 task through the private
-// DC-API upstream. Clients authenticate only with their OwnAPI key.
+// VideosCreate creates an asynchronous video task through the model's private
+// managed upstream. Clients authenticate only with their OwnAPI key.
 func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	apiKey, ok := middleware2.GetAPIKeyFromContext(c)
 	if !ok || apiKey.User == nil || apiKey.Group == nil {
@@ -70,9 +85,9 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Invalid JSON body")
 		return
 	}
-	model, _ := request["model"].(string)
-	if !strings.EqualFold(strings.TrimSpace(model), miniMaxH3Model) {
-		h.errorResponse(c, http.StatusBadRequest, "unsupported_model", "Only MiniMax-H3 is supported by this video endpoint")
+	model := canonicalVideoModel(request["model"])
+	if model == "" {
+		h.errorResponse(c, http.StatusBadRequest, "unsupported_model", "Unsupported video model")
 		return
 	}
 	durationValue := request["duration"]
@@ -81,42 +96,69 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 	duration, ok := positiveWholeNumber(durationValue)
 	if !ok {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", "duration must be a whole number of seconds from 5 through 15")
+		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", videoDurationMessage(model))
 		return
 	}
-	if duration < 5 || duration > 15 {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", "duration must be a whole number of seconds from 5 through 15")
+	if (model == miniMaxH3Model && (duration < 5 || duration > 15)) || (model != miniMaxH3Model && (duration < 2 || duration > 30)) {
+		h.errorResponse(c, http.StatusBadRequest, "invalid_duration", videoDurationMessage(model))
 		return
 	}
-	resolution, ok := normalizeH3Resolution(request)
-	if !ok {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
-		return
+	adapter := videoAdapterDCAPI
+	resolution := ""
+	unitPrice := 0.0
+	upstreamUnitCost := 0.0
+	if model == miniMaxH3Model {
+		resolution, ok = normalizeH3Resolution(request)
+		if !ok {
+			h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
+			return
+		}
+		body, err = buildH3JSONRequest(request, duration, resolution)
+		unitPrice = miniMaxH3768PriceUSD
+		if resolution == "2k" {
+			unitPrice = miniMaxH32KPriceUSD
+		}
+	} else {
+		adapter = videoAdapterAlibaba
+		resolution, ok = normalizeWanResolution(request)
+		if !ok {
+			h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 480P, 720P, or 1080P")
+			return
+		}
+		body, err = buildWanJSONRequest(request, model, duration, resolution)
+		unitPrice = wanCustomerPricesUSD[model][resolution]
+		upstreamUnitCost = wanUpstreamCostsUSD[model][resolution]
 	}
-	body, err = buildH3JSONRequest(request, duration, resolution)
+	requestDurationMs := duration * 1000
 	if err != nil {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_media", err.Error())
 		return
 	}
 
 	multiplier := h.gatewayService.ResolveUserGroupRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, apiKey.Group.RateMultiplier)
-	multiplier = h.gatewayService.ResolveUserModelRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, miniMaxH3Model, multiplier)
-	unitPrice := miniMaxH3768PriceUSD
-	if resolution == "2k" {
-		unitPrice = miniMaxH32KPriceUSD
-	}
+	multiplier = h.gatewayService.ResolveUserModelRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, model, multiplier)
 	cost := float64(duration) * unitPrice * multiplier
 	if apiKey.User.Balance+1e-9 < cost {
 		h.errorResponse(c, http.StatusPaymentRequired, "insufficient_balance", "Insufficient balance for this video request")
 		return
 	}
 
-	account, err := h.gatewayService.SelectDCVideoAccount(c.Request.Context(), miniMaxH3Model)
+	var account *service.Account
+	if adapter == videoAdapterAlibaba {
+		account, err = h.gatewayService.SelectAlibabaVideoAccount(c.Request.Context(), model)
+	} else {
+		account, err = h.gatewayService.SelectDCVideoAccount(c.Request.Context(), model)
+	}
 	if err != nil {
-		h.errorResponse(c, http.StatusServiceUnavailable, "video_unavailable", "MiniMax-H3 is temporarily unavailable")
+		h.errorResponse(c, http.StatusServiceUnavailable, "video_unavailable", "The requested video model is temporarily unavailable")
 		return
 	}
-	resp, err := h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
+	var resp *http.Response
+	if adapter == videoAdapterAlibaba {
+		resp, err = h.gatewayService.ForwardAlibabaVideo(c.Request.Context(), account, http.MethodPost, "/services/aigc/video-generation/video-synthesis", body)
+	} else {
+		resp, err = h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
+	}
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
@@ -136,7 +178,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Invalid video provider response")
 		return
 	}
-	upstreamTaskID, _ := upstream["id"].(string)
+	upstreamTaskID := upstreamVideoTaskID(upstream, adapter)
 	if strings.TrimSpace(upstreamTaskID) == "" {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider returned no task id")
 		return
@@ -145,7 +187,8 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		UpstreamID: upstreamTaskID,
 		AccountID:  account.ID,
 		UserID:     apiKey.User.ID,
-		Model:      miniMaxH3Model,
+		Model:      model,
+		Adapter:    adapter,
 		ExpiresAt:  time.Now().Add(14 * 24 * time.Hour).Unix(),
 	})
 	if err != nil {
@@ -153,16 +196,27 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		return
 	}
 
+	var accountStatsCost *float64
+	if adapter == videoAdapterAlibaba {
+		accountStatsCost = floatPointer(float64(duration) * upstreamUnitCost)
+	}
 	if _, err := h.usageService.Create(c.Request.Context(), service.CreateUsageLogRequest{
-		UserID:         apiKey.User.ID,
-		APIKeyID:       apiKey.ID,
-		AccountID:      account.ID,
-		RequestID:      videoUsageRequestID(publicTaskID),
-		Model:          miniMaxH3Model,
-		TotalCost:      cost,
-		ActualCost:     cost,
-		RateMultiplier: multiplier,
-		VideoTaskID:    &publicTaskID,
+		UserID:           apiKey.User.ID,
+		APIKeyID:         apiKey.ID,
+		AccountID:        account.ID,
+		RequestID:        videoUsageRequestID(publicTaskID),
+		Model:            model,
+		TotalCost:        cost,
+		ActualCost:       cost,
+		RateMultiplier:   multiplier,
+		VideoTaskID:      &publicTaskID,
+		GroupID:          &apiKey.Group.ID,
+		RequestType:      service.RequestTypeSync,
+		ImageSize:        &resolution,
+		DurationMs:       &requestDurationMs,
+		InboundEndpoint:  stringPointer("/v1/videos"),
+		UpstreamEndpoint: stringPointer(videoUpstreamCreateEndpoint(adapter)),
+		AccountStatsCost: accountStatsCost,
 	}); err != nil {
 		logger.L().With(zap.Int64("user_id", apiKey.User.ID), zap.Int64("account_id", account.ID)).Error("video.billing_failed", zap.Error(err))
 		h.errorResponse(c, http.StatusInternalServerError, "billing_error", "Video task was created but billing could not be finalized; contact support")
@@ -175,7 +229,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		_ = h.apiKeyService.UpdateRateLimitUsage(c.Request.Context(), apiKey.ID, cost)
 	}
 
-	c.JSON(http.StatusOK, sanitizedVideoResponse(c, upstream, publicTaskID))
+	c.JSON(http.StatusOK, sanitizedVideoResponseForModel(c, upstream, publicTaskID, model, adapter))
 }
 
 // videoUsageRequestID derives a stable idempotency key that fits the
@@ -238,22 +292,38 @@ func (h *GatewayHandler) forwardOwnedVideoTask(c *gin.Context, publicTaskID stri
 		h.errorResponse(c, http.StatusNotFound, "video_not_found", "Video task not found")
 		return
 	}
-	account, err := h.gatewayService.GetDCVideoAccount(c.Request.Context(), envelope.AccountID, envelope.Model)
+	adapter := envelope.Adapter
+	if adapter == "" {
+		adapter = videoAdapterDCAPI
+	}
+	var account *service.Account
+	if adapter == videoAdapterAlibaba {
+		account, err = h.gatewayService.GetAlibabaVideoAccount(c.Request.Context(), envelope.AccountID, envelope.Model)
+	} else {
+		account, err = h.gatewayService.GetDCVideoAccount(c.Request.Context(), envelope.AccountID, envelope.Model)
+	}
 	if err != nil {
 		h.errorResponse(c, http.StatusServiceUnavailable, "video_unavailable", "Video task is temporarily unavailable")
 		return
 	}
 	path := "/v1/videos/" + url.PathEscape(envelope.UpstreamID)
-	if content {
+	if adapter == videoAdapterAlibaba {
+		path = "/tasks/" + url.PathEscape(envelope.UpstreamID)
+	} else if content {
 		path += "/content"
 	}
-	resp, err := h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodGet, path, nil)
+	resp, err := func() (*http.Response, error) {
+		if adapter == videoAdapterAlibaba {
+			return h.gatewayService.ForwardAlibabaVideo(c.Request.Context(), account, http.MethodGet, path, nil)
+		}
+		return h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodGet, path, nil)
+	}()
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
 	}
 	defer resp.Body.Close()
-	if content && resp.StatusCode >= 200 && resp.StatusCode < 300 {
+	if content && adapter != videoAdapterAlibaba && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		if contentType := resp.Header.Get("Content-Type"); contentType != "" {
 			c.Header("Content-Type", contentType)
 		}
@@ -275,13 +345,227 @@ func (h *GatewayHandler) forwardOwnedVideoTask(c *gin.Context, publicTaskID stri
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Invalid video provider response")
 		return
 	}
-	response := sanitizedVideoResponse(c, upstream, publicTaskID)
+	if adapter == videoAdapterAlibaba && content {
+		videoURL := alibabaVideoURL(upstream)
+		if videoURL == "" {
+			h.errorResponse(c, http.StatusConflict, "video_not_ready", "Video content is not available")
+			return
+		}
+		contentResp, fetchErr := h.gatewayService.FetchAlibabaVideoContent(c.Request.Context(), account, videoURL)
+		if fetchErr != nil {
+			h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video content could not be downloaded")
+			return
+		}
+		defer contentResp.Body.Close()
+		if contentResp.StatusCode < 200 || contentResp.StatusCode >= 300 {
+			h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video content could not be downloaded")
+			return
+		}
+		if contentType := contentResp.Header.Get("Content-Type"); contentType != "" {
+			c.Header("Content-Type", contentType)
+		}
+		c.Status(http.StatusOK)
+		_, _ = io.Copy(c.Writer, contentResp.Body)
+		return
+	}
+	response := sanitizedVideoResponseForModel(c, upstream, publicTaskID, envelope.Model, adapter)
 	if historyID != "" {
 		response["id"] = historyID
 		delete(response, "url")
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func canonicalVideoModel(value any) string {
+	raw, _ := value.(string)
+	switch {
+	case strings.EqualFold(strings.TrimSpace(raw), miniMaxH3Model):
+		return miniMaxH3Model
+	case strings.EqualFold(strings.TrimSpace(raw), wanVideoModel):
+		return wanVideoModel
+	case strings.EqualFold(strings.TrimSpace(raw), wanVideoPrimeModel):
+		return wanVideoPrimeModel
+	default:
+		return ""
+	}
+}
+
+func videoDurationMessage(model string) string {
+	if model == miniMaxH3Model {
+		return "duration must be a whole number of seconds from 5 through 15"
+	}
+	return "duration must be a whole number of seconds from 2 through 30"
+}
+
+func normalizeWanResolution(request map[string]any) (string, bool) {
+	value, _ := request["resolution"].(string)
+	if strings.TrimSpace(value) == "" {
+		value, _ = request["size"].(string)
+	}
+	switch strings.ToUpper(strings.TrimSpace(value)) {
+	case "480P":
+		return "480P", true
+	case "720P":
+		return "720P", true
+	case "1080P":
+		return "1080P", true
+	default:
+		return "", false
+	}
+}
+
+func buildWanJSONRequest(request map[string]any, model string, duration int, resolution string) ([]byte, error) {
+	if model != wanVideoModel && model != wanVideoPrimeModel {
+		return nil, fmt.Errorf("unsupported video model")
+	}
+	input := map[string]any{}
+	prompt, _ := request["prompt"].(string)
+	if strings.TrimSpace(prompt) != "" {
+		input["prompt"] = strings.TrimSpace(prompt)
+	}
+	media := make([]map[string]any, 0)
+	add := func(kind string, values []string) {
+		for _, value := range values {
+			if strings.TrimSpace(value) != "" {
+				media = append(media, map[string]any{"type": kind, "url": value})
+			}
+		}
+	}
+	first := stringValues(request["first_frame_image"])
+	if len(first) == 0 {
+		first = stringValues(request["first_frame"])
+	}
+	last := stringValues(request["last_frame_image"])
+	if len(last) == 0 {
+		last = stringValues(request["last_frame"])
+	}
+	images := stringValues(request["reference_images"])
+	videos := stringValues(request["reference_videos"])
+	audios := stringValues(request["reference_audios"])
+	files := stringValues(request["file"])
+	links := stringValues(request["link"])
+	if len(first) > 1 || len(last) > 1 {
+		return nil, fmt.Errorf("only one first and last frame is allowed")
+	}
+	if len(images) > 10 {
+		return nil, fmt.Errorf("at most 10 reference images are allowed")
+	}
+	if len(videos) > 5 {
+		return nil, fmt.Errorf("at most 5 reference videos are allowed")
+	}
+	if len(audios) > 5 {
+		return nil, fmt.Errorf("at most 5 reference audios are allowed")
+	}
+	if len(files) > 1 || len(links) > 1 {
+		return nil, fmt.Errorf("only one file or link is allowed")
+	}
+	if len(files) > 0 && len(links) > 0 {
+		return nil, fmt.Errorf("file and link cannot be combined")
+	}
+	if len(first)+len(last) > 0 && len(images)+len(videos)+len(audios)+len(files)+len(links) > 0 {
+		return nil, fmt.Errorf("first/last frame cannot be combined with reference media, file, or link")
+	}
+	if len(first)+len(last)+len(images)+len(videos)+len(audios)+len(files)+len(links) > 20 {
+		return nil, fmt.Errorf("at most 20 media items are allowed")
+	}
+	add("first_frame", first)
+	add("last_frame", last)
+	add("reference_image", images)
+	add("reference_video", videos)
+	add("reference_audio", audios)
+	add("file", files)
+	add("link", links)
+	if len(media) > 0 {
+		input["media"] = media
+	}
+	if len(input) == 0 {
+		return nil, fmt.Errorf("prompt or media is required")
+	}
+	params := map[string]any{"resolution": resolution, "duration": duration}
+	ratio, _ := request["ratio"].(string)
+	if ratio == "" {
+		ratio = "adaptive"
+	}
+	allowedRatios := map[string]bool{"adaptive": true, "16:9": true, "4:3": true, "1:1": true, "3:4": true, "9:16": true}
+	if !allowedRatios[ratio] {
+		return nil, fmt.Errorf("invalid ratio")
+	}
+	params["ratio"] = ratio
+	for _, key := range []string{"audio", "prompt_extend", "watermark"} {
+		if value, exists := request[key]; exists {
+			if _, ok := value.(bool); !ok {
+				return nil, fmt.Errorf("%s must be boolean", key)
+			}
+			params[key] = value
+		}
+	}
+	if value, exists := request["seed"]; exists {
+		seed, ok := wholeNumber(value)
+		if !ok || seed < -1 || seed > 2147483647 {
+			return nil, fmt.Errorf("seed must be -1 or an integer from 0 through 2147483647")
+		}
+		params["seed"] = seed
+	}
+	return json.Marshal(map[string]any{"model": model, "input": input, "parameters": params})
+}
+
+func wholeNumber(value any) (int64, bool) {
+	n, ok := value.(float64)
+	if !ok || n != float64(int64(n)) {
+		return 0, false
+	}
+	return int64(n), true
+}
+
+func upstreamVideoTaskID(upstream map[string]any, adapter string) string {
+	if adapter == videoAdapterAlibaba {
+		if output, ok := upstream["output"].(map[string]any); ok {
+			id, _ := output["task_id"].(string)
+			return strings.TrimSpace(id)
+		}
+	}
+	id, _ := upstream["id"].(string)
+	return strings.TrimSpace(id)
+}
+
+func sanitizedVideoResponseForModel(c *gin.Context, upstream map[string]any, publicTaskID, model, adapter string) gin.H {
+	if adapter != videoAdapterAlibaba {
+		out := sanitizedVideoResponse(c, upstream, publicTaskID)
+		out["model"] = model
+		return out
+	}
+	out := gin.H{"id": publicTaskID, "object": "video", "model": model}
+	output, _ := upstream["output"].(map[string]any)
+	status, _ := output["task_status"].(string)
+	switch strings.ToUpper(status) {
+	case "PENDING":
+		out["status"] = "queued"
+	case "RUNNING":
+		out["status"] = "in_progress"
+	case "SUCCEEDED":
+		out["status"] = "completed"
+		if c != nil {
+			out["url"] = ownAPIVideoContentURL(c, publicTaskID)
+		}
+	default:
+		out["status"] = "failed"
+		out["error"] = gin.H{"code": "task_failed", "message": "Video generation failed"}
+	}
+	return out
+}
+
+func alibabaVideoURL(upstream map[string]any) string {
+	output, _ := upstream["output"].(map[string]any)
+	value, _ := output["video_url"].(string)
+	return strings.TrimSpace(value)
+}
+func videoUpstreamCreateEndpoint(adapter string) string {
+	// Usage records are customer-visible, so they keep the stable OwnAPI
+	// resource path rather than exposing a provider-specific implementation.
+	return "/v1/videos"
+}
+func stringPointer(value string) *string  { return &value }
+func floatPointer(value float64) *float64 { return &value }
 
 func positiveWholeNumber(value any) (int, bool) {
 	n, ok := value.(float64)

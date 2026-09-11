@@ -15,8 +15,9 @@ const (
 // the protocol compatibility layer, while provider identifies the commercial
 // upstream used by OwnAPI.
 const (
-	UpstreamProviderPackyAPI = "packyapi"
-	UpstreamProviderDCAPI    = "dc-api"
+	UpstreamProviderPackyAPI     = "packyapi"
+	UpstreamProviderDCAPI        = "dc-api"
+	UpstreamProviderAlibabaVideo = "alibaba-video"
 )
 
 // Role constants

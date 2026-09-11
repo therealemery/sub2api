@@ -1018,6 +1018,7 @@
             <option value="">普通 OpenAI API Key</option>
             <option value="packyapi">PackyAPI 文本模型</option>
             <option value="dc-api">DC-API 视频模型</option>
+            <option value="alibaba-video">Alibaba Video / Wan 3.0</option>
           </select>
           <p class="input-hint">上游密钥仅用于服务端转发，客户始终只使用 OwnAPI Key。</p>
         </div>
@@ -1079,6 +1080,16 @@
           >
             <p class="text-xs text-blue-700 dark:text-blue-400">
               MiniMax-H3 → MiniMax-H3
+            </p>
+          </div>
+
+          <div
+            v-else-if="managedUpstreamProvider === 'alibaba-video'"
+            class="mb-3 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20"
+            data-testid="alibaba-video-model-lock"
+          >
+            <p class="text-xs text-blue-700 dark:text-blue-400">
+              wan3.0-video → wan3.0-video<br />wan3.0-video-prime → wan3.0-video-prime
             </p>
           </div>
 
@@ -2505,7 +2516,7 @@
 
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
-        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api'"
+        v-if="form.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider)"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -2535,7 +2546,7 @@
 
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
       <div
-        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
+        v-if="form.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
         <div class="flex items-center justify-between">
@@ -2636,7 +2647,7 @@
 
       <!-- OpenAI Compact 能力配置 -->
       <div
-        v-if="form.platform === 'openai' && managedUpstreamProvider !== 'dc-api' && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
+        v-if="form.platform === 'openai' && !isManagedVideoProvider(managedUpstreamProvider) && (accountCategory === 'oauth-based' || accountCategory === 'apikey')"
         class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4"
       >
         <div class="flex items-center justify-between">
@@ -3158,9 +3169,11 @@ import ModelWhitelistSelector from '@/components/account/ModelWhitelistSelector.
 import QuotaLimitCard from '@/components/account/QuotaLimitCard.vue'
 import { applyInterceptWarmup } from '@/components/account/credentialsBuilder'
 import {
+  ALIBABA_VIDEO_MODELS,
   DC_API_BASE_URL,
   applyManagedUpstreamCredentials,
   applyManagedUpstreamExtra,
+  isManagedVideoProvider,
   type ManagedUpstreamProvider
 } from '@/components/account/managedUpstream'
 import { formatDateTimeLocalInput, parseDateTimeLocalInput } from '@/utils/format'
@@ -3695,14 +3708,14 @@ watch(
 )
 
 watch(managedUpstreamProvider, (provider) => {
-  if (provider !== 'dc-api') return
-  apiKeyBaseUrl.value = DC_API_BASE_URL
-  openaiPassthroughEnabled.value = false
+	if (!isManagedVideoProvider(provider)) return
+	if (provider === 'dc-api') apiKeyBaseUrl.value = DC_API_BASE_URL
+	openaiPassthroughEnabled.value = false
   openAICompactMode.value = 'auto'
   openAICompactModelMappings.value = []
   openaiAPIKeyResponsesWebSocketV2Mode.value = OPENAI_WS_MODE_OFF
   modelRestrictionMode.value = 'whitelist'
-  allowedModels.value = ['MiniMax-H3']
+	allowedModels.value = provider === 'dc-api' ? ['MiniMax-H3'] : [...ALIBABA_VIDEO_MODELS]
   modelMappings.value = []
 })
 
@@ -3748,7 +3761,7 @@ const handleSelectGeminiOAuthType = (oauthType: 'code_assist' | 'google_one' | '
 watch(
   [modelRestrictionMode, () => form.platform],
   ([newMode]) => {
-    if (newMode === 'whitelist' && managedUpstreamProvider.value !== 'dc-api') {
+    if (newMode === 'whitelist' && !isManagedVideoProvider(managedUpstreamProvider.value)) {
       allowedModels.value = [...getModelsByPlatform(form.platform)]
     }
   }
