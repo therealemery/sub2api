@@ -310,6 +310,18 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-11 — DeepSeek Sale and GPT-6 implementation approved
+
+- The user approved the written design in
+  `docs/superpowers/specs/2026-09-11-ownapi-deepseek-sale-gpt6-pricing-design.md`.
+- The implementation plan is recorded in
+  `docs/superpowers/plans/2026-09-11-ownapi-deepseek-sale-gpt6-pricing-plan.md`.
+- Implementation will add public `deepseek-v4.1-flash` and `deepseek-v4-pro` at 75 percent of the
+  supplied official USD price, route them only through a future dedicated `Packy / DeepSeek Sale`
+  account, and privately map flash to Packy's `deepseek-v4-flash` ID.
+- GPT-6 Astra short/long customer billing will be corrected to the approved 70-percent values,
+  including cache-read and cache-write charges. No paid request is authorized at this checkpoint.
+
 ### 2026-09-11 — Public model filter switching production verification
 
 - Commit `69565437` deployed successfully in Actions run `34588561790`; production is healthy on
