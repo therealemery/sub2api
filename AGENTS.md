@@ -18,7 +18,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:e1149101c0f9`. Customer/model rate overrides, the Claude Code-only model removal, and catalog identity normalization are deployed and verified.
+- Production is running image `ownapi:e1149101c0f9`. Customer/model rate overrides are deployed, but the admin modal's model-source correction is verified locally and still requires deployment.
 - The current catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
@@ -198,7 +198,7 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 
 ## Deployment Status
 
-- Required: no for the current committed feature set.
+- Required: yes for the admin model-rate modal model-source correction.
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
@@ -212,6 +212,20 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-11 — Complete model-rate modal source ready for deployment
+
+- Replaced the modal's static public-catalog model list with the union of real pricing models from
+  every active channel bound to the selected standard group. This keeps each group's configurable
+  list aligned with its backend channel pricing instead of the public website seed snapshot.
+- The `OwnAPI` group additionally includes the independent `MiniMax-H3` video model, while existing
+  user/model overrides remain visible after a model leaves channel pricing so administrators can
+  explicitly clear stale entries. Model IDs are deduplicated case-insensitively and public catalog
+  metadata is used only for friendly names and ordering.
+- No production customer multiplier was changed. Focused tests cover multiple matching channels,
+  unrelated-channel exclusion, H3 inclusion, stale override preservation, and invalid-value safety.
+  The focused suite, Vue type checking, focused ESLint, the full frontend suite, production build,
+  and `git diff --check` pass. Commit, push, deployment, and production browser verification remain.
 
 ### 2026-09-11 — Customer × model multiplier deployed
 

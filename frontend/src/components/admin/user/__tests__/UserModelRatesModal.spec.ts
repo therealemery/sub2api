@@ -9,9 +9,13 @@ const { getModelRateOverrides, setModelRateOverrides, showError } = vi.hoisted((
   setModelRateOverrides: vi.fn(),
   showError: vi.fn(),
 }))
+const listChannels = vi.hoisted(() => vi.fn())
 
 vi.mock('@/api/admin', () => ({
-  adminAPI: { users: { getModelRateOverrides, setModelRateOverrides } },
+  adminAPI: {
+    users: { getModelRateOverrides, setModelRateOverrides },
+    channels: { list: listChannels },
+  },
 }))
 vi.mock('@/stores/app', () => ({ useAppStore: () => ({ showError, showSuccess: vi.fn() }) }))
 
@@ -31,6 +35,27 @@ function mountModal() {
 describe('UserModelRatesModal', () => {
   beforeEach(() => {
     getModelRateOverrides.mockReset().mockResolvedValue([])
+    listChannels.mockReset().mockResolvedValue({
+      items: [{
+        id: 9,
+        name: 'OwnAPI LLM',
+        group_ids: [3],
+        model_pricing: [
+          { models: ['gpt-5.4-mini', 'gpt-5.5'] },
+        ],
+      }, {
+        id: 10,
+        name: 'OwnAPI Secondary',
+        group_ids: [3],
+        model_pricing: [{ models: ['qwen3.8-max', 'GPT-5.5'] }],
+      }, {
+        id: 11,
+        name: 'Other Group',
+        group_ids: [8],
+        model_pricing: [{ models: ['gpt-6-astra'] }],
+      }],
+      total: 1,
+    })
     setModelRateOverrides.mockReset().mockResolvedValue({ message: 'ok' })
     showError.mockReset()
   })
@@ -45,5 +70,27 @@ describe('UserModelRatesModal', () => {
 
     expect(showError).toHaveBeenCalledWith('admin.users.invalidModelRate')
     expect(setModelRateOverrides).not.toHaveBeenCalled()
+  })
+
+  it('merges all selected-group channel models and adds independent MiniMax H3', async () => {
+    const wrapper = mountModal()
+    await flushPromises()
+
+    const labels = wrapper.findAll('input[type="number"]').map(input => input.element.getAttribute('placeholder'))
+    expect(labels).toHaveLength(4)
+    expect(wrapper.text()).toContain('GPT-5.4 Mini')
+    expect(wrapper.text()).toContain('GPT-5.5')
+    expect(wrapper.text()).toContain('Qwen3.8 Max')
+    expect(wrapper.text()).toContain('MiniMax H3')
+    expect(wrapper.text()).not.toContain('GPT-6 Astra')
+  })
+
+  it('keeps an existing override visible after its model leaves the channel', async () => {
+    getModelRateOverrides.mockResolvedValue([{ model_id: 'retired-model', rate_multiplier: 0.9 }])
+    const wrapper = mountModal()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('retired-model')
+    expect(wrapper.findAll('input[type="number"]')).toHaveLength(5)
   })
 })

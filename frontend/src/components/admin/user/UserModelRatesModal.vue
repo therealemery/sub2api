@@ -50,6 +50,10 @@ const loading = ref(false)
 const saving = ref(false)
 const rows = ref<Array<{ modelId: string; displayName: string; value: string | number }>>([])
 
+const displayNameByModel = new Map(
+  verifiedModelSeedData.map(seed => [seed.modelId.toLowerCase(), seed.displayName])
+)
+
 const groupOptions = computed(() => props.groups
   .filter(g => g.status === 'active' && g.subscription_type === 'standard')
   .map(g => ({ value: g.id, label: `${g.name} (${g.rate_multiplier ?? 1}x)` })))
@@ -58,12 +62,35 @@ const load = async () => {
   if (!props.user || !selectedGroupId.value) return
   loading.value = true
   try {
-    const overrides = await adminAPI.users.getModelRateOverrides(props.user.id, selectedGroupId.value)
+    const [overrides, channels] = await Promise.all([
+      adminAPI.users.getModelRateOverrides(props.user.id, selectedGroupId.value),
+      adminAPI.channels.list(1, 200, { status: 'active' }),
+    ])
     const map = new Map(overrides.map(item => [item.model_id.toLowerCase(), String(item.rate_multiplier)]))
-    rows.value = verifiedModelSeedData
-      .filter(seed => seed.pricingStatus === 'paid' && seed.modelId.trim())
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map(seed => ({ modelId: seed.modelId, displayName: seed.displayName, value: map.get(seed.modelId.toLowerCase()) ?? '' }))
+    const group = props.groups.find(item => item.id === selectedGroupId.value)
+    const modelIds = channels.items
+      .filter(item => item.group_ids.includes(selectedGroupId.value as number))
+      .flatMap(item => item.model_pricing)
+      .flatMap(pricing => pricing.models)
+    if (group?.name.trim().toLowerCase() === 'ownapi') modelIds.push('MiniMax-H3')
+    modelIds.push(...overrides.map(item => item.model_id))
+
+    const uniqueModels = new Map<string, string>()
+    for (const modelId of modelIds) {
+      const clean = modelId.trim()
+      if (clean && clean !== '*') uniqueModels.set(clean.toLowerCase(), clean)
+    }
+    rows.value = [...uniqueModels.values()]
+      .sort((a, b) => {
+        const aSeed = verifiedModelSeedData.find(seed => seed.modelId.toLowerCase() === a.toLowerCase())
+        const bSeed = verifiedModelSeedData.find(seed => seed.modelId.toLowerCase() === b.toLowerCase())
+        return (aSeed?.sortOrder ?? 10_000) - (bSeed?.sortOrder ?? 10_000) || a.localeCompare(b)
+      })
+      .map(modelId => ({
+        modelId,
+        displayName: displayNameByModel.get(modelId.toLowerCase()) ?? modelId,
+        value: map.get(modelId.toLowerCase()) ?? '',
+      }))
   } catch (error: any) {
     appStore.showError(error.response?.data?.detail || t('admin.users.failedToLoadModelRates'))
   } finally {
