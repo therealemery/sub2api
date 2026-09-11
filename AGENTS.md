@@ -102,7 +102,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-11 — Public model filter category switching ready for deployment
+### 2026-09-11 — Public model filter category switching deployed and verified
 
 - Reproduced the apparent all-provider empty state: a model class or endpoint selected farther down
   the sticky rail remained active while the user clicked a provider, so every provider could appear
@@ -113,7 +113,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Added interaction coverage for search -> video -> Anthropic -> videos and verified the expected
   3 -> 6 -> 3 model results without reloading. Focused catalog/view tests (28), all 112 frontend test
   files / 677 tests, Vue type checks, focused ESLint, production frontend build, and
-  `git diff --check` pass. Ready to commit and deploy.
+  `git diff --check` pass.
+- Commit `69565437` was pushed to `origin/main` and deployed by Actions run `34588561790` as image
+  `ownapi:695654376a84`. Production browser QA then switched, without any reload, through video
+  (3 models), Anthropic (6), xAI (2), Alibaba (2), and the videos endpoint (3). Each switch cleared
+  the other hidden category selections, and no empty or `0 models` state occurred.
 
 ### 2026-09-11 — Wan 3.0 integration deployed and production verified
 
@@ -263,19 +267,29 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `171ec90e` (image `ownapi:171ec90e7907`, deployed by run `34578849249`).
+- Last deployed revision: `69565437` (image `ownapi:695654376a84`, deployed by run `34588561790`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
 - Production verification: healthy on 2026-09-11. The container health check and fixed-IP `/health`
   request pass; both Wan model pages are deployed. The `Alibaba / Wan 3` account is normal and
   schedulable, and the minimum `wan3.0-video` lifecycle, MP4 download, customer charge, account cost,
-  usage history, and private-upstream boundary were verified end to end.
+  usage history, and private-upstream boundary were verified end to end. Public model filtering was
+  also verified across five consecutive category switches without a reload or empty result state.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34578849249` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
+- Deployment build: run `34588561790` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-11 — Public model filter switching production verification
+
+- Commit `69565437` deployed successfully in Actions run `34588561790`; production is healthy on
+  image `ownapi:695654376a84`.
+- On `https://www.ownapi.dev/models`, one uninterrupted browser session switched from video model
+  class (3 models) to Anthropic (6), xAI (2), Alibaba (2), and videos endpoint (3). No reload was
+  used, no `0 models` result appeared, and each category selection reset the other category radios
+  to their `All` values as designed.
 
 ### 2026-09-11 — Wan 3.0 production deployment and minimum paid verification
 
