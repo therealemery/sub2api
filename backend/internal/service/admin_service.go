@@ -53,6 +53,8 @@ type AdminService interface {
 	DeleteGroup(ctx context.Context, id int64) error
 	GetGroupAPIKeys(ctx context.Context, groupID int64, page, pageSize int) ([]APIKey, int64, error)
 	GetGroupRateMultipliers(ctx context.Context, groupID int64) ([]UserGroupRateEntry, error)
+	GetUserModelRateOverrides(ctx context.Context, userID, groupID int64) ([]UserModelRateEntry, error)
+	SetUserModelRateOverrides(ctx context.Context, userID, groupID int64, entries []UserModelRateInput) error
 	ClearGroupRateMultipliers(ctx context.Context, groupID int64) error
 	BatchSetGroupRateMultipliers(ctx context.Context, groupID int64, entries []GroupRateMultiplierInput) error
 	ClearGroupRPMOverrides(ctx context.Context, groupID int64) error
@@ -2070,6 +2072,25 @@ func (s *adminServiceImpl) GetGroupRateMultipliers(ctx context.Context, groupID 
 		return nil, nil
 	}
 	return s.userGroupRateRepo.GetByGroupID(ctx, groupID)
+}
+
+func (s *adminServiceImpl) GetUserModelRateOverrides(ctx context.Context, userID, groupID int64) ([]UserModelRateEntry, error) {
+	if s.userGroupRateRepo == nil {
+		return []UserModelRateEntry{}, nil
+	}
+	return s.userGroupRateRepo.GetUserGroupModels(ctx, userID, groupID)
+}
+
+func (s *adminServiceImpl) SetUserModelRateOverrides(ctx context.Context, userID, groupID int64, entries []UserModelRateInput) error {
+	for _, entry := range entries {
+		if strings.TrimSpace(entry.ModelID) == "" || entry.RateMultiplier <= 0 {
+			return fmt.Errorf("model_id and positive rate_multiplier are required")
+		}
+	}
+	if s.userGroupRateRepo == nil {
+		return nil
+	}
+	return s.userGroupRateRepo.SyncUserGroupModels(ctx, userID, groupID, entries)
 }
 
 func (s *adminServiceImpl) ClearGroupRateMultipliers(ctx context.Context, groupID int64) error {

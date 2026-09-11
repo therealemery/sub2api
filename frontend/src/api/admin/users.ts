@@ -107,6 +107,21 @@ export async function getById(id: number): Promise<AdminUser> {
   return data
 }
 
+export interface UserModelRateOverride {
+  model_id: string
+  rate_multiplier: number
+}
+
+export async function getModelRateOverrides(userId: number, groupId: number): Promise<UserModelRateOverride[]> {
+  const { data } = await apiClient.get<UserModelRateOverride[]>(`/admin/users/${userId}/model-rates/${groupId}`)
+  return data
+}
+
+export async function setModelRateOverrides(userId: number, groupId: number, entries: UserModelRateOverride[]): Promise<{ message: string }> {
+  const { data } = await apiClient.put<{ message: string }>(`/admin/users/${userId}/model-rates/${groupId}`, { entries })
+  return data
+}
+
 /**
  * Create new user
  * @param userData - User data (email, password, etc.)
@@ -300,6 +315,8 @@ export async function bindUserAuthIdentity(
 export const usersAPI = {
   list,
   getById,
+  getModelRateOverrides,
+  setModelRateOverrides,
   create,
   update,
   delete: deleteUser,

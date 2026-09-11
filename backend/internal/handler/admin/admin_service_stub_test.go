@@ -283,6 +283,14 @@ func (s *stubAdminService) GetGroupRateMultipliers(_ context.Context, _ int64) (
 	return nil, nil
 }
 
+func (s *stubAdminService) GetUserModelRateOverrides(_ context.Context, _, _ int64) ([]service.UserModelRateEntry, error) {
+	return []service.UserModelRateEntry{}, nil
+}
+
+func (s *stubAdminService) SetUserModelRateOverrides(_ context.Context, _, _ int64, _ []service.UserModelRateInput) error {
+	return nil
+}
+
 func (s *stubAdminService) ClearGroupRateMultipliers(_ context.Context, _ int64) error {
 	return nil
 }

@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/service"
@@ -11,11 +13,73 @@ import (
 
 type userGroupRateRepository struct {
 	sql sqlExecutor
+	db  *sql.DB
 }
 
 // NewUserGroupRateRepository 创建用户专属分组倍率/RPM 仓储
 func NewUserGroupRateRepository(sqlDB *sql.DB) service.UserGroupRateRepository {
-	return &userGroupRateRepository{sql: sqlDB}
+	return &userGroupRateRepository{sql: sqlDB, db: sqlDB}
+}
+
+func (r *userGroupRateRepository) GetByUserAndGroupModel(ctx context.Context, userID, groupID int64, modelID string) (*float64, error) {
+	var rate sql.NullFloat64
+	err := scanSingleRow(ctx, r.sql, `SELECT rate_multiplier FROM user_model_rate_overrides WHERE user_id = $1 AND group_id = $2 AND lower(model_id) = lower($3)`, []any{userID, groupID, modelID}, &rate)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if !rate.Valid {
+		return nil, nil
+	}
+	v := rate.Float64
+	return &v, nil
+}
+
+func (r *userGroupRateRepository) GetUserGroupModels(ctx context.Context, userID, groupID int64) ([]service.UserModelRateEntry, error) {
+	rows, err := r.sql.QueryContext(ctx, `SELECT model_id, rate_multiplier FROM user_model_rate_overrides WHERE user_id = $1 AND group_id = $2 ORDER BY model_id`, userID, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+	var result []service.UserModelRateEntry
+	for rows.Next() {
+		var entry service.UserModelRateEntry
+		if err := rows.Scan(&entry.ModelID, &entry.RateMultiplier); err != nil {
+			return nil, err
+		}
+		result = append(result, entry)
+	}
+	return result, rows.Err()
+}
+
+func (r *userGroupRateRepository) SyncUserGroupModels(ctx context.Context, userID, groupID int64, entries []service.UserModelRateInput) error {
+	// Validate the complete replacement before touching existing rows.
+	for _, entry := range entries {
+		modelID := strings.TrimSpace(entry.ModelID)
+		if modelID == "" || entry.RateMultiplier <= 0 {
+			return fmt.Errorf("model_id and positive rate_multiplier are required")
+		}
+	}
+	if r.db == nil {
+		return fmt.Errorf("database unavailable")
+	}
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin model rate sync transaction: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+	if _, err := tx.ExecContext(ctx, `DELETE FROM user_model_rate_overrides WHERE user_id = $1 AND group_id = $2`, userID, groupID); err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		modelID := strings.TrimSpace(entry.ModelID)
+		if _, err := tx.ExecContext(ctx, `INSERT INTO user_model_rate_overrides (user_id, group_id, model_id, rate_multiplier) VALUES ($1, $2, $3, $4)`, userID, groupID, modelID, entry.RateMultiplier); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 // GetByUserID 获取用户所有专属分组 rate_multiplier（仅返回非 NULL 的条目）

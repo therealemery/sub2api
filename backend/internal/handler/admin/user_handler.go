@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -30,6 +31,57 @@ func NewUserHandler(adminService service.AdminService, concurrencyService *servi
 		adminService:       adminService,
 		concurrencyService: concurrencyService,
 	}
+}
+
+// GetModelRateOverrides handles GET /api/v1/admin/users/:id/model-rates/:group_id.
+func (h *UserHandler) GetModelRateOverrides(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	groupID, err := strconv.ParseInt(c.Param("group_id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "Invalid group ID")
+		return
+	}
+	entries, err := h.adminService.GetUserModelRateOverrides(c.Request.Context(), userID, groupID)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	if entries == nil {
+		entries = []service.UserModelRateEntry{}
+	}
+	response.Success(c, entries)
+}
+
+type SetModelRateOverridesRequest struct {
+	Entries []service.UserModelRateInput `json:"entries"`
+}
+
+// SetModelRateOverrides handles PUT /api/v1/admin/users/:id/model-rates/:group_id.
+func (h *UserHandler) SetModelRateOverrides(c *gin.Context) {
+	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	groupID, err := strconv.ParseInt(c.Param("group_id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "Invalid group ID")
+		return
+	}
+	var req SetModelRateOverridesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+	if err := h.adminService.SetUserModelRateOverrides(c.Request.Context(), userID, groupID, req.Entries); err != nil {
+		response.ErrorFrom(c, fmt.Errorf("save model rate overrides: %w", err))
+		return
+	}
+	response.Success(c, gin.H{"message": "Model rate overrides saved successfully"})
 }
 
 // CreateUserRequest represents admin create user request

@@ -543,6 +543,7 @@ type GatewayService struct {
 	userRepo              UserRepository
 	userSubRepo           UserSubscriptionRepository
 	userGroupRateRepo     UserGroupRateRepository
+	userModelRateResolver *userModelRateResolver
 	cache                 GatewayCache
 	digestStore           *DigestSessionStore
 	cfg                   *config.Config
@@ -644,6 +645,7 @@ func NewGatewayService(
 		&svc.userGroupRateSF,
 		"service.gateway",
 	)
+	svc.userModelRateResolver = newUserModelRateResolver(userGroupRateRepo, "service.gateway")
 	svc.debugModelRouting.Store(parseDebugEnvBool(os.Getenv("SUB2API_DEBUG_MODEL_ROUTING")))
 	svc.debugClaudeMimic.Store(parseDebugEnvBool(os.Getenv("SUB2API_DEBUG_CLAUDE_MIMIC")))
 	if path := strings.TrimSpace(os.Getenv(debugGatewayBodyEnv)); path != "" {
@@ -7934,6 +7936,15 @@ func (s *GatewayService) ResolveUserGroupRateMultiplier(ctx context.Context, use
 	return s.getUserGroupRateMultiplier(ctx, userID, groupID, groupDefaultMultiplier)
 }
 
+// ResolveUserModelRateMultiplier lets a customer/model override take precedence
+// over the already-resolved customer-group or group-default multiplier.
+func (s *GatewayService) ResolveUserModelRateMultiplier(ctx context.Context, userID, groupID int64, modelID string, groupMultiplier float64) float64 {
+	if s == nil || s.userModelRateResolver == nil {
+		return groupMultiplier
+	}
+	return s.userModelRateResolver.Resolve(ctx, userID, groupID, modelID, groupMultiplier)
+}
+
 // SelectDCVideoAccount returns a schedulable DC-API account dedicated to the
 // requested video model. Managed video accounts are global upstream resources;
 // customer access is controlled by the API key's OwnAPI group, not by exposing
@@ -8553,6 +8564,9 @@ func (s *GatewayService) recordUsageCore(ctx context.Context, input *recordUsage
 	}
 	if input.BillingModelSource == BillingModelSourceRequested && input.OriginalModel != "" {
 		billingModel = input.OriginalModel
+	}
+	if apiKey.GroupID != nil && apiKey.Group != nil {
+		multiplier = s.ResolveUserModelRateMultiplier(ctx, user.ID, *apiKey.GroupID, billingModel, multiplier)
 	}
 
 	// 确定 RequestedModel（渠道映射前的原始模型）

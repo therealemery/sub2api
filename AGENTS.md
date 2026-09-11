@@ -213,6 +213,22 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-11 — Customer × model multiplier implementation ready for review
+
+- Added `user_model_rate_overrides` migration and fail-safe resolver. A customer/model override now
+  takes precedence over the existing customer-group or group-default multiplier for text and
+  MiniMax H3 video requests; missing or unavailable overrides fall back to that existing multiplier.
+- Added authenticated admin endpoints for reading/replacing a user's model overrides within a
+  selected group, plus a Users-page "模型倍率" modal that lists curated models, supports per-model
+  values, clearing to inheritance, and saving the complete replacement.
+- Model override replacement is transaction-protected and validates the full input before deleting
+  existing rows. Model overrides are read without a process-local cache so a saved billing change
+  takes effect on the next request. Existing untracked QA/build/key/workspace files remain untouched.
+- Validation passed: backend service/repository/admin-handler tests, resolver unit tests, frontend
+  Vue type checking, focused Users view test, focused ESLint, and `git diff --check`.
+- Changes are local only and have not been committed, pushed, or deployed. Production data and
+  upstream accounts were not modified.
+
 ### 2026-09-09 — Claude Code-only Packy models removed and deployed
 
 - Packy's group documentation confirms that `cc` is restricted to the Claude Code client and may suspend third-party integrations, while `cc-sale` explicitly permits third-party API clients with an occasional prompt-cache instability caveat.

@@ -557,6 +557,14 @@
                 {{ t('admin.users.groups') }}
               </button>
 
+              <button
+                @click="handleModelRates(user); closeActionMenu()"
+                class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-700"
+              >
+                <Icon name="cog" size="sm" class="text-gray-400" :stroke-width="2" />
+                {{ t('admin.users.modelRates') }}
+              </button>
+
               <div class="my-1 border-t border-gray-100 dark:border-dark-700"></div>
 
               <!-- Deposit -->
@@ -610,6 +618,7 @@
     <UserEditModal :show="showEditModal" :user="editingUser" @close="closeEditModal" @success="loadUsers" />
     <UserApiKeysModal :show="showApiKeysModal" :user="viewingUser" @close="closeApiKeysModal" />
     <UserAllowedGroupsModal :show="showAllowedGroupsModal" :user="allowedGroupsUser" @close="closeAllowedGroupsModal" @success="loadUsers" />
+    <UserModelRatesModal :show="showModelRatesModal" :user="modelRatesUser" :groups="allGroups" @close="closeModelRates" @success="loadUsers" />
     <UserBalanceModal :show="showBalanceModal" :user="balanceUser" :operation="balanceOperation" @close="closeBalanceModal" @success="loadUsers" />
     <UserBalanceHistoryModal :show="showBalanceHistoryModal" :user="balanceHistoryUser" @close="closeBalanceHistoryModal" @deposit="handleDepositFromHistory" @withdraw="handleWithdrawFromHistory" />
     <GroupReplaceModal :show="showGroupReplaceModal" :user="groupReplaceUser" :old-group="groupReplaceOldGroup" :all-groups="allGroups" @close="closeGroupReplaceModal" @success="loadUsers" />
@@ -645,6 +654,7 @@ import UserAllowedGroupsModal from '@/components/admin/user/UserAllowedGroupsMod
 import UserBalanceModal from '@/components/admin/user/UserBalanceModal.vue'
 import UserBalanceHistoryModal from '@/components/admin/user/UserBalanceHistoryModal.vue'
 import GroupReplaceModal from '@/components/admin/user/GroupReplaceModal.vue'
+import UserModelRatesModal from '@/components/admin/user/UserModelRatesModal.vue'
 
 const appStore = useAppStore()
 
@@ -1101,6 +1111,8 @@ const handleClickOutside = (event: MouseEvent) => {
 // Allowed groups modal state
 const showAllowedGroupsModal = ref(false)
 const allowedGroupsUser = ref<AdminUser | null>(null)
+const showModelRatesModal = ref(false)
+const modelRatesUser = ref<AdminUser | null>(null)
 
 // Expanded group dropdown state (click to show exclusive groups list)
 const expandedGroupUserId = ref<number | null>(null)
@@ -1326,6 +1338,17 @@ const handleAllowedGroups = (user: AdminUser) => {
 const closeAllowedGroupsModal = () => {
   showAllowedGroupsModal.value = false
   allowedGroupsUser.value = null
+}
+
+const handleModelRates = (user: AdminUser) => {
+  void loadAllGroups()
+  modelRatesUser.value = user
+  showModelRatesModal.value = true
+}
+
+const closeModelRates = () => {
+  showModelRatesModal.value = false
+  modelRatesUser.value = null
 }
 
 const openGroupReplace = (user: AdminUser, group: { id: number; name: string }) => {

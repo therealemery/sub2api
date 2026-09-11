@@ -100,6 +100,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 
 	multiplier := h.gatewayService.ResolveUserGroupRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, apiKey.Group.RateMultiplier)
+	multiplier = h.gatewayService.ResolveUserModelRateMultiplier(c.Request.Context(), apiKey.User.ID, apiKey.Group.ID, miniMaxH3Model, multiplier)
 	unitPrice := miniMaxH3768PriceUSD
 	if resolution == "2k" {
 		unitPrice = miniMaxH32KPriceUSD
