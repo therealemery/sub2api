@@ -18,7 +18,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:e1149101c0f9`. Customer/model rate overrides are deployed, but the admin modal's model-source correction is verified locally and still requires deployment.
+- Production is running image `ownapi:950cb96cc792`. Customer/model rate overrides and the admin modal's model-source correction are deployed and verified.
 - The current catalog contains 42 models including `glm-5.3-flash`, `MiniMax-M3`, and `MiniMax-H3`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
@@ -198,16 +198,16 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 
 ## Deployment Status
 
-- Required: yes for the admin model-rate modal model-source correction.
+- Required: no for the current committed feature set.
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `e1149101` (image `ownapi:e1149101c0f9`, deployed by run `34554653380`).
+- Last deployed revision: `950cb96c` (image `ownapi:950cb96cc792`, deployed by run `34556009483`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
 - Production verification: healthy on 2026-09-11. `/health`, `/home`, `/admin/users`, and `/models/minimax-h3` return HTTP 200. The new admin model-rate endpoint returns the expected unauthenticated HTTP 401, migration 140 created `user_model_rate_overrides`, and no customer overrides were written during deployment verification.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34554653380` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
+- Deployment build: run `34556009483` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
@@ -225,7 +225,9 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - No production customer multiplier was changed. Focused tests cover multiple matching channels,
   unrelated-channel exclusion, H3 inclusion, stale override preservation, and invalid-value safety.
   The focused suite, Vue type checking, focused ESLint, the full frontend suite, production build,
-  and `git diff --check` pass. Commit, push, deployment, and production browser verification remain.
+  and `git diff --check` pass. Commit `950cb96c` was pushed to `origin/main`; deployment run
+  `34556009483` completed successfully. Read-only checks of `/health`, `/home`, `/models`,
+  `/models/minimax-h3`, `/docs`, and `/admin/users` return HTTP 200 on the new image.
 
 ### 2026-09-11 — Customer × model multiplier deployed
 
