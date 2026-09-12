@@ -100,11 +100,11 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 		baseURL, _ := credentials["base_url"].(string)
 		parsed, err := url.Parse(strings.TrimSpace(baseURL))
 		if err != nil || parsed == nil {
-			return fmt.Errorf("Alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
+			return fmt.Errorf("alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
 		}
 		path := strings.TrimRight(parsed.EscapedPath(), "/")
 		if parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" || path != "/api/v1" || !strings.HasSuffix(strings.ToLower(parsed.Hostname()), ".maas.aliyuncs.com") {
-			return fmt.Errorf("Alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
+			return fmt.Errorf("alibaba video base_url must be an HTTPS Workspace /api/v1 URL")
 		}
 	}
 	return nil

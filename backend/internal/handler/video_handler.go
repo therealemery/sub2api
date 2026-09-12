@@ -366,7 +366,7 @@ func (h *GatewayHandler) forwardOwnedVideoTask(c *gin.Context, publicTaskID stri
 			h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video content could not be downloaded")
 			return
 		}
-		defer contentResp.Body.Close()
+		defer func() { _ = contentResp.Body.Close() }()
 		if contentResp.StatusCode < 200 || contentResp.StatusCode >= 300 {
 			h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video content could not be downloaded")
 			return
