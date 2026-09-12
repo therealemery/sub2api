@@ -102,6 +102,23 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-13 — MiniMax H3 reference-media repair design approved
+
+- Production evidence confirms that H3 text-to-video still works at 768p and 2K, while requests
+  containing an uploaded PNG reference fail. The current frontend sends uploads as Base64 data URIs
+  and the backend forwards them inside JSON, but the current H3 media contract requires multipart
+  text/file fields.
+- The approved repair preserves the verified JSON path for text-only H3 traffic and uses multipart
+  whenever reference images, video, audio, or first/last frames are present. The OwnAPI endpoint and
+  customer key contract remain unchanged; JSON convenience inputs and direct customer multipart
+  inputs will both be accepted.
+- Reference images, videos, and audio must support HTTPS URLs, Base64/data URIs, and uploaded files,
+  with documented MIME, size, count, exclusivity, and audio-with-image validation. Wan 3 remains on
+  its independent Alibaba JSON adapter.
+- An upstream create response that is already terminally failed must not create usage or deduct the
+  customer balance. Historical records are not changed, and no paid production test is authorized.
+- Design: `docs/superpowers/specs/2026-09-13-ownapi-h3-reference-media-repair-design.md`.
+
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
 - Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's
