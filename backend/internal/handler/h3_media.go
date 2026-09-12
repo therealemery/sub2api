@@ -342,7 +342,7 @@ func validateH3UploadedMedia(field string, upload *h3UploadedMedia) error {
 	if err != nil {
 		return fmt.Errorf("unable to read media for %s", field)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	probe, err := io.ReadAll(io.LimitReader(file, 512))
 	if err != nil {
 		return fmt.Errorf("unable to read media for %s", field)
@@ -394,7 +394,7 @@ func validateH3MediaBytes(field, mediaType string, data []byte) error {
 	}
 	sniffed := strings.ToLower(strings.Split(http.DetectContentType(data), ";")[0])
 	if mediaType == "audio/mpeg" {
-		if !(strings.HasPrefix(string(data), "ID3") || (len(data) > 1 && data[0] == 0xff && data[1]&0xe0 == 0xe0)) {
+		if !strings.HasPrefix(string(data), "ID3") && (len(data) <= 1 || data[0] != 0xff || data[1]&0xe0 != 0xe0) {
 			return fmt.Errorf("media content does not match %s", mediaType)
 		}
 	} else if mediaType == "video/mp4" {
@@ -481,7 +481,7 @@ func writeH3MultipartFile(writer *multipart.Writer, field, name, mediaType, path
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	_, err = io.Copy(part, file)
 	return err
 }

@@ -156,7 +156,7 @@ async function poll() {
 
 function authHeaders() { return { Authorization: `Bearer ${apiKey.value}`, 'Content-Type': 'application/json' } }
 
-function buildCreateRequest(): { body: BodyInit; headers: Record<string, string> } {
+function buildCreateRequest(): { body: string | FormData; headers: Record<string, string> } {
   const payload: Record<string, unknown> = { model: props.modelId, prompt: prompt.value, duration: duration.value, resolution: resolution.value }
   if (isWan.value) Object.assign(payload, { ratio: ratio.value, seed: seed.value, audio: audio.value, prompt_extend: promptExtend.value, watermark: watermark.value })
   if (isWan.value && referenceDataURL.value) payload.reference_images = [referenceDataURL.value]
