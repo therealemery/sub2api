@@ -155,7 +155,11 @@ func (h *GatewayHandler) videoInputBaseURL(c *gin.Context) (string, error) {
 		base = scheme + "://" + hostname
 	}
 	parsed, err := url.Parse(base)
-	if err != nil || parsed.Hostname() == "" || (parsed.Scheme != "https" && !(parsed.Scheme == "http" && (parsed.Hostname() == "127.0.0.1" || parsed.Hostname() == "localhost"))) {
+	if err != nil {
+		return "", fmt.Errorf("public media URL is unavailable")
+	}
+	validLocalHTTP := parsed.Scheme == "http" && (parsed.Hostname() == "127.0.0.1" || parsed.Hostname() == "localhost")
+	if parsed.Hostname() == "" || (parsed.Scheme != "https" && !validLocalHTTP) {
 		return "", fmt.Errorf("public media URL is unavailable")
 	}
 	parsed.Path, parsed.RawPath, parsed.RawQuery, parsed.Fragment = "", "", "", ""
