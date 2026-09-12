@@ -105,13 +105,12 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ### 2026-09-13 — MiniMax H3 reference-media repair design approved
 
 - Production evidence confirms that H3 text-to-video still works at 768p and 2K, while requests
-  containing an uploaded PNG reference fail. The current frontend sends uploads as Base64 data URIs
-  and the backend forwards them inside JSON, but the current H3 media contract requires multipart
-  text/file fields.
-- The approved repair preserves the verified JSON path for text-only H3 traffic and uses multipart
-  whenever reference images, video, audio, or first/last frames are present. The OwnAPI endpoint and
-  customer key contract remain unchanged; JSON convenience inputs and direct customer multipart
-  inputs will both be accepted.
+  containing an uploaded PNG reference fail. Follow-up inspection of DC-API's own documentation and
+  signed-in frontend supersedes the initial CometAPI assumption: DC-API requires JSON URL-object
+  arrays for media and rejects multipart before task creation.
+- The approved repair keeps every upstream H3 create on JSON while continuing to accept both JSON
+  convenience inputs and direct customer multipart uploads at OwnAPI. Local audio/video becomes a
+  short-lived encrypted OwnAPI HTTPS input URL; the customer endpoint and key contract stay stable.
 - Reference images, videos, and audio must support HTTPS URLs, Base64/data URIs, and uploaded files,
   with documented MIME, size, count, exclusivity, and audio-with-image validation. Wan 3 remains on
   its independent Alibaba JSON adapter.
@@ -121,11 +120,20 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ### 2026-09-13 — MiniMax H3 reference-media repair locally verified
 
-- Repaired H3 reference image, video, audio, and PNG first/last-frame handling while preserving the
-  verified JSON path for text-only H3 requests and the independent Alibaba JSON path for Wan 3.
-- `POST /v1/videos` now accepts customer JSON and multipart requests. H3 requests containing media
-  are validated and privately transformed to DC-API multipart fields; browser file inputs send real
-  `FormData` instead of Base64 JSON. Customer OwnAPI keys and opaque task/download URLs are unchanged.
+- Commit `79b631f6` deployed successfully as image `ownapi:79b631f6188d`, but its sole approved
+  production PNG smoke test failed immediately before task creation or billing. OwnAPI balance,
+  usage history, and DC-API consumption were unchanged. Do not repeat a paid test without new
+  approval.
+- The true root cause is a protocol mismatch: DC-API's own docs and frontend send H3 media in JSON
+  URL-object arrays, while the deployed code copied CometAPI's multipart contract. DC-API accepts
+  JSON at `/v1/videos` and rejects the multipart request before task creation.
+- The corrected implementation keeps all H3 creates on JSON. Images become
+  `reference_images: [{"url": ...}]`; reference video/audio become matching URL-object arrays.
+  Uploaded MP4/MP3 files are copied to the persistent application data volume and represented by
+  one-hour encrypted OwnAPI HTTPS URLs that DC-API can fetch. Tampered, expired, path-traversal,
+  missing, or size-mismatched inputs return 404.
+- `POST /v1/videos` continues to accept customer JSON and multipart requests. Browser file inputs
+  send real `FormData`; customer OwnAPI keys and opaque task/download URLs are unchanged.
 - Enforced HTTPS/media type/signature, count, per-file size, 12-input total, audio-with-image, frame
   exclusivity, and URL/file mixing rules. Uploaded files are spooled to private temporary files and
   the total request limit is 96 MiB to avoid Base64 amplification in application memory.
@@ -133,10 +141,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
   deduction. Queued requests retain the existing idempotent billing path.
 - Docs and model examples distinguish direct-HTTPS JSON from local-file multipart requests and
   document PNG, MP4, MP3, polling, download, and limits without exposing the private upstream.
-- Local validation passed: handler/service/server Go packages; all 113 frontend test files / 685
-  tests; Vue type checking; production frontend build; Go formatting; and `git diff --check`.
-- Deployment and the single approved 5-second 768p PNG paid smoke test are pending the verified
-  implementation commit. Do not repeat the paid request after one successful attempt.
+- Focused JSON mapping, temporary media token/download, public-route, handler, service, server, and
+  routes tests pass. All 113 frontend test files / 685 tests, Vue type checking, the embedded
+  production build, Go formatting, and `git diff --check` pass. The complete local unit-tag suite
+  again has only the known Go 1.27/Ent `ent/schema: package "context" without types` environment
+  failure. Final commit, deployment, and non-billing verification remain pending.
 
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
@@ -631,8 +640,12 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 - Corrected MiniMax H3 pricing to the user-confirmed official rates of `0.5 CNY/s` for 768p and `0.8 CNY/s` for 2K. OwnAPI converts at `6.7 CNY = 1 USD` and charges 75% of the converted list price: approximately `$0.0559701493/s` and `$0.0895522388/s` respectively.
 - Updated both the public model catalog/detail pricing and the authenticated video billing constants; existing user/group rate multipliers still apply on top of the corrected OwnAPI unit price.
-- Verified CometAPI's MiniMax H3 create contract from `https://apidoc.cometapi.com/api/video/minimax-h3/create.md`: multipart upstream fields include `seconds`, `size`, `input_reference`, `reference_videos`, `reference_audios`, `first_frame`, and `last_frame`, with documented media limits.
-- OwnAPI's `/v1/videos` customer contract remains JSON and now converts privately to multipart for DC-API. Model-page controls and code examples cover reference images, reference video, reference audio, first frame, and last frame; task polling and content download remain OwnAPI-proxied.
+- CometAPI's MiniMax H3 create document describes multipart fields, but production later proved that
+  this is not DC-API's protocol. DC-API's own documentation uses JSON URL-object arrays for reference
+  images, videos, and audio. Never infer DC-API transport encoding from the CometAPI document again.
+- OwnAPI's `/v1/videos` customer contract accepts JSON and multipart for convenience, then privately
+  converts both to DC-API JSON. Model-page controls and examples cover reference images, video,
+  audio, and first/last frames; polling and content download remain OwnAPI-proxied.
 - Focused backend handler/service tests, model catalog/detail tests, Vue type checking, frontend production build, and `git diff --check` passed. No upstream credentials or untracked key/temp files were staged.
 
 ### 2026-09-10 — MiniMax H3 Docs lifecycle split

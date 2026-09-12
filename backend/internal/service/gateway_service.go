@@ -7987,8 +7987,8 @@ func (s *GatewayService) ForwardDCVideo(ctx context.Context, account *Account, m
 	return s.ForwardDCVideoWithContentType(ctx, account, method, requestPath, body, "application/json")
 }
 
-// ForwardDCVideoWithContentType sends a private DC-API video request while
-// preserving the caller-provided media type (JSON or multipart form data).
+// ForwardDCVideoWithContentType sends a private DC-API video request with an
+// explicit content type. H3 video creation uses ForwardDCVideo's JSON default.
 func (s *GatewayService) ForwardDCVideoWithContentType(ctx context.Context, account *Account, method, requestPath string, body []byte, contentType string) (*http.Response, error) {
 	if account == nil || account.ManagedUpstreamProvider() != UpstreamProviderDCAPI {
 		return nil, fmt.Errorf("invalid video account")

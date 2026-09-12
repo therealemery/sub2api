@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -108,14 +109,26 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	unitPrice := 0.0
 	upstreamUnitCost := 0.0
 	var body []byte
-	upstreamContentType := "application/json"
+	stagedInputPaths := make([]string, 0, 3)
+	keepStagedInputs := false
+	defer func() {
+		if !keepStagedInputs {
+			removeVideoInputFiles(stagedInputPaths)
+		}
+	}()
 	if model == miniMaxH3Model {
 		resolution, ok = normalizeH3Resolution(request)
 		if !ok {
 			h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
 			return
 		}
-		body, upstreamContentType, err = buildH3UpstreamRequest(request, duration, resolution)
+		body, _, err = buildH3UpstreamRequest(request, duration, resolution, func(field string, value h3MediaValue) (string, error) {
+			publicURL, path, storeErr := h.storeVideoInput(c, field, value)
+			if storeErr == nil {
+				stagedInputPaths = append(stagedInputPaths, path)
+			}
+			return publicURL, storeErr
+		})
 		unitPrice = miniMaxH3768PriceUSD
 		if resolution == "2k" {
 			unitPrice = miniMaxH32KPriceUSD
@@ -133,7 +146,8 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 	requestDurationMs := duration * 1000
 	if err != nil {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_media", err.Error())
+		logger.L().With(zap.String("model", model)).Warn("video.media_prepare_failed", zap.Error(err))
+		h.errorResponse(c, http.StatusBadRequest, "invalid_media", "Reference media could not be processed")
 		return
 	}
 
@@ -159,7 +173,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	if adapter == videoAdapterAlibaba {
 		resp, err = h.gatewayService.ForwardAlibabaVideo(c.Request.Context(), account, http.MethodPost, "/services/aigc/video-generation/video-synthesis", body)
 	} else {
-		resp, err = h.gatewayService.ForwardDCVideoWithContentType(c.Request.Context(), account, http.MethodPost, "/v1/videos", body, upstreamContentType)
+		resp, err = h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
 	}
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
@@ -189,6 +203,10 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider returned no task id")
 		return
 	}
+	// A successfully accepted H3 task may fetch its private reference inputs
+	// after the create response has returned. Their signed URLs expire in one
+	// hour and cleanup is handled opportunistically by the input store.
+	keepStagedInputs = adapter == videoAdapterDCAPI
 	publicTaskID, err := h.sealVideoTask(videoTaskEnvelope{
 		UpstreamID: upstreamTaskID,
 		AccountID:  account.ID,
@@ -588,36 +606,67 @@ func positiveWholeNumber(value any) (int, bool) {
 // buildH3JSONRequest translates OwnAPI's stable JSON contract into the JSON
 // protocol accepted by the configured console.dc-api.com account. The public
 // endpoint remains JSON; upstream media fields use the provider's names.
-func buildH3JSONRequest(request map[string]any, duration int, resolution string) ([]byte, error) {
-	upstream := map[string]any{"model": "minimax-h3", "seconds": duration}
+func buildH3JSONRequest(request map[string]any, duration int, resolution string, buildMediaURL h3MediaURLBuilder) ([]byte, error) {
+	// DC-API's own frontend and documentation use duration in the JSON body for
+	// both text-only and media-backed requests.
+	upstream := map[string]any{"model": "minimax-h3", "duration": duration}
 	prompt, _ := request["prompt"].(string)
 	if strings.TrimSpace(prompt) == "" {
 		return nil, fmt.Errorf("prompt is required")
 	}
-	upstream["prompt"] = prompt
-	if size, _ := request["size"].(string); strings.TrimSpace(size) != "" {
-		upstream["size"] = strings.TrimSpace(size)
-	} else {
-		size := "1344x768"
-		if resolution == "2k" {
-			size = "2544x1456"
-		}
-		upstream["size"] = size
-	}
-	for _, field := range []struct{ own, provider string }{
-		{"input_reference", "input_reference"}, {"reference_images", "input_reference"},
-		{"reference_videos", "reference_videos"}, {"reference_audios", "reference_audios"},
-		{"first_frame", "first_frame"}, {"last_frame", "last_frame"},
-		{"first_frame_image", "first_frame"}, {"last_frame_image", "last_frame"},
+	upstream["prompt"] = strings.TrimSpace(prompt)
+	upstream["size"] = h3RequestSize(request, resolution)
+
+	for _, mapping := range []struct {
+		provider string
+		field    string
+		values   []h3MediaValue
+	}{
+		{"reference_images", "input_reference", append(h3MediaValues(request["input_reference"]), h3MediaValues(request["reference_images"])...)},
+		{"reference_videos", "reference_videos", h3MediaValues(request["reference_videos"])},
+		{"reference_audios", "reference_audios", h3MediaValues(request["reference_audios"])},
+		{"first_frame", "first_frame", append(h3MediaValues(request["first_frame"]), h3MediaValues(request["first_frame_image"])...)},
+		{"last_frame", "last_frame", append(h3MediaValues(request["last_frame"]), h3MediaValues(request["last_frame_image"])...)},
 	} {
-		values := stringValues(request[field.own])
-		if len(values) == 1 {
-			upstream[field.provider] = values[0]
-		} else if len(values) > 1 {
-			upstream[field.provider] = values
+		objects := make([]map[string]string, 0, len(mapping.values))
+		for _, value := range mapping.values {
+			mediaURL, err := h3DCMediaURL(mapping.field, value, buildMediaURL)
+			if err != nil {
+				return nil, err
+			}
+			objects = append(objects, map[string]string{"url": mediaURL})
+		}
+		if len(objects) > 0 {
+			upstream[mapping.provider] = objects
 		}
 	}
 	return json.Marshal(upstream)
+}
+
+func h3DCMediaURL(field string, value h3MediaValue, buildMediaURL h3MediaURLBuilder) (string, error) {
+	if value.Upload == nil {
+		text := strings.TrimSpace(value.Text)
+		if !strings.HasPrefix(text, "data:") {
+			return text, nil
+		}
+		if field != "reference_videos" && field != "reference_audios" {
+			return text, nil
+		}
+	}
+	if field == "reference_videos" || field == "reference_audios" {
+		if buildMediaURL == nil {
+			return "", fmt.Errorf("%s upload could not be prepared", field)
+		}
+		return buildMediaURL(field, value)
+	}
+	if value.Upload == nil {
+		return strings.TrimSpace(value.Text), nil
+	}
+	data, err := os.ReadFile(value.Upload.Path)
+	if err != nil {
+		return "", fmt.Errorf("unable to read media for %s", field)
+	}
+	return "data:" + value.Upload.MIME + ";base64," + base64.StdEncoding.EncodeToString(data), nil
 }
 
 func stringValues(value any) []string {

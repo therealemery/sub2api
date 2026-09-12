@@ -4,7 +4,7 @@
 
 **Goal:** Restore MiniMax H3 reference image, video, audio, and frame requests without regressing verified text-only JSON generation or the independent Wan adapter.
 
-**Architecture:** Parse customer JSON and multipart bodies into a bounded internal H3 request with typed media items. Route media-free H3 creates through the existing JSON forwarder and media-bearing creates through a multipart encoder; the frontend sends real `File` objects with `FormData`, while URL-only callers retain the JSON convenience contract.
+**Architecture:** Parse customer JSON and multipart bodies into a bounded internal H3 request with typed media items. Route every H3 create through DC-API's JSON protocol. Images become URL objects directly, while local MP4/MP3 inputs are served through one-hour encrypted OwnAPI HTTPS URLs; the frontend sends real `File` objects with `FormData`, while URL-only callers retain the JSON convenience contract.
 
 **Tech Stack:** Go 1.24, Gin, `mime/multipart`, Vue 3, TypeScript, Vitest.
 
@@ -13,8 +13,8 @@
 ## Global Constraints
 
 - Keep `POST /v1/videos`, OwnAPI API keys, opaque task IDs, polling, and content download stable.
-- Keep 768p/2K text-only H3 requests on JSON.
-- Use multipart upstream whenever H3 reference media or frames are present.
+- Keep all 768p/2K H3 upstream requests on JSON.
+- Convert media to DC-API URL-object arrays; never forward H3 multipart upstream.
 - Support HTTPS URLs, Base64 data URIs, and uploaded PNG/JPEG, MP4, and MP3 files.
 - Enforce nine images, three videos, three audio files, twelve total inputs, per-type byte limits, audio-with-image, and frame exclusivity before calling or billing.
 - Do not expose DC-API credentials, hostname, raw errors, or private task IDs.
@@ -83,7 +83,7 @@ git add backend/internal/handler/h3_media.go backend/internal/handler/h3_media_t
 git commit -m "fix: parse H3 reference media safely"
 ```
 
-### Task 2: Conditional DC-API encoding and billing protection
+### Task 2: DC-API JSON encoding, temporary media URLs, and billing protection
 
 **Files:**
 - Modify: `backend/internal/handler/h3_media.go`
@@ -95,30 +95,23 @@ git commit -m "fix: parse H3 reference media safely"
 
 **Interfaces:**
 - Consumes: `h3MediaRequest` from Task 1.
-- Produces: `buildH3UpstreamRequest(map[string]any, *h3MediaRequest, int, string) ([]byte, string, error)` returning body and content type.
-- Uses: `GatewayService.ForwardDCVideoWithContentType` without changing authentication or URL selection.
+- Produces: a JSON body with DC-API media URL-object arrays.
+- Uses: `GatewayService.ForwardDCVideo` without changing authentication or URL selection.
+- Produces: an unauthenticated `GET /v1/video-inputs/:token` route whose encrypted token authorizes exactly one short-lived local MP4/MP3 file.
 
 - [ ] **Step 1: Write failing encoder and handler tests**
 
-Assert text-only creates return `application/json`; URL/file/data-URI media returns `multipart/form-data` with repeated fields and correct file MIME. Add a handler test where a 2xx create body has `{status:"failed"}` and assert no usage creation is attempted. Assert queued responses still create exactly one usage row. Assert Wan continues to send JSON through `ForwardAlibabaVideo`.
+Assert text-only and media-backed creates return `application/json`; media values are `{url}` object arrays. Verify temporary media token integrity, expiry, path safety, content type, content length, and public route placement. Add a handler test where a 2xx create body has `{status:"failed"}` and assert no usage creation is attempted. Assert queued responses still create exactly one usage row. Assert Wan continues to send JSON through `ForwardAlibabaVideo`.
 
 - [ ] **Step 2: Run focused tests and verify failure**
 
 Run: `cd backend && go test ./internal/handler ./internal/service -run 'Test(H3Upstream|VideosCreate|AlibabaVideoRouting)' -count=1`
 
-Expected: FAIL because H3 always forwards JSON and terminal create failures currently reach billing.
+Expected: FAIL because media fields use the wrong JSON names/shapes and local video/audio have no provider-fetchable URL.
 
-- [ ] **Step 3: Implement conditional encoding**
+- [ ] **Step 3: Implement JSON translation and encrypted temporary inputs**
 
-Build the control fields exactly once. If `HasMedia()` is false, marshal the current JSON payload. Otherwise encode controls and normalized media with `multipart.Writer`; write URLs as repeated text fields and bytes as file parts with an explicit `Content-Disposition` and `Content-Type`.
-
-Call:
-
-```go
-resp, err = h.gatewayService.ForwardDCVideoWithContentType(
-    ctx, account, http.MethodPost, "/v1/videos", upstreamBody, upstreamContentType,
-)
-```
+Build the control fields exactly once, normalize image/video/audio fields to URL-object arrays, and always call `ForwardDCVideo`. Persist validated local video/audio bytes below `/app/data` with mode `0600`. Encrypt the random file name, MIME, size, and one-hour expiry with the existing server secret, then pass the resulting OwnAPI HTTPS URL to DC-API. Register the token download route outside API-key middleware.
 
 After decoding a successful create response, reject `status == "failed"` before sealing the task or creating usage. Preserve sanitization.
 
@@ -132,7 +125,7 @@ Expected: PASS.
 
 ```bash
 git add backend/internal/handler/h3_media.go backend/internal/handler/h3_media_test.go backend/internal/handler/video_handler.go backend/internal/handler/video_handler_test.go backend/internal/service/gateway_service.go backend/internal/service/managed_upstream_test.go
-git commit -m "fix: forward H3 media as multipart"
+git commit -m "fix: forward H3 media with DC JSON"
 ```
 
 ### Task 3: Browser file uploads use FormData

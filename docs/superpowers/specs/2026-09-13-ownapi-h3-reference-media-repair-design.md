@@ -6,11 +6,11 @@ Approved in conversation on 2026-09-13. This document defines the repair boundar
 
 ## Problem
 
-OwnAPI's MiniMax H3 text-to-video path still works at both 768p and 2K, but requests containing a reference image fail immediately. Production evidence shows that these requests reach `POST /v1/videos`, create customer usage rows, and then return a sanitized `task_failed / Video generation failed` response.
+OwnAPI's MiniMax H3 text-to-video path still works at both 768p and 2K, but requests containing a reference image fail immediately. Production evidence shows that these requests reach `POST /v1/videos` and return a sanitized failure before task creation. The approved production probe created no OwnAPI usage row, customer charge, or DC-API consumption.
 
-The current browser uploads media as a Base64 data URI. The backend places that value in a JSON `input_reference` field and sends JSON to DC-API. The current MiniMax H3 media contract instead requires `multipart/form-data`: reference images must be HTTPS text fields or PNG/JPEG file parts, and reference video/audio must be repeated text or file parts. This mismatch affects both the website playground and customers calling OwnAPI directly.
+The current browser sends local uploads to OwnAPI as multipart, but the backend then forwards the entire request as multipart to DC-API. Production evidence shows that this returns a provider-side 500 before a task is created. DC-API's own documentation and signed-in frontend instead send JSON to `POST /v1/videos`: reference images use `reference_images: [{"url":"..."}]`, and reference video/audio use matching arrays of URL objects. This mismatch affects both the website playground and customers calling OwnAPI directly.
 
-An earlier production probe established that DC-API accepts JSON for text-only H3 requests while a text-only multipart probe returned an upstream 500. The repair must therefore preserve the verified JSON path for text-only traffic and use multipart only when the request contains media.
+An earlier production probe established that DC-API accepts JSON for text-only H3 requests while multipart returns an upstream 500. The repair must therefore use DC-API JSON for every H3 create request. OwnAPI may still accept multipart from customers as a convenience, but uploaded audio/video must first be materialized behind short-lived public HTTPS URLs because DC-API will not accept their Base64 or multipart bytes directly.
 
 ## Goals
 
@@ -49,7 +49,7 @@ The existing JSON contract remains supported:
 - `first_frame_image` or `first_frame`
 - `last_frame_image` or `last_frame`
 
-Media values may be a string, a repeated array of strings, or an object containing `url`. HTTPS URLs stay text values. Supported Base64 data URIs are decoded into real multipart file parts before forwarding.
+Media values may be a string, a repeated array of strings, or an object containing `url`. HTTPS URLs stay text values. Supported image Base64 data URIs stay inside the private JSON translation. Uploaded audio/video is exposed only through a short-lived encrypted OwnAPI URL that DC-API can fetch.
 
 ### Multipart input
 
@@ -59,15 +59,15 @@ The server normalizes both customer encodings into one internal H3 request repre
 
 ## Routing and Transformation
 
-The H3 adapter chooses the upstream encoding after parsing and validation:
+The H3 adapter always sends the upstream JSON protocol after parsing and validation:
 
-1. A request containing no media uses the existing verified JSON request to DC-API.
-2. A request containing any reference image, reference video, reference audio, first frame, or last frame uses `multipart/form-data`.
-3. HTTPS media values become repeated multipart text fields.
-4. Base64 data URIs become typed file parts with generated safe filenames.
-5. Customer-uploaded files are streamed/copied into typed upstream multipart file parts.
-6. Reference image aliases normalize to upstream `input_reference`; first/last-frame aliases normalize to `first_frame` and `last_frame`.
-7. Wan models continue through the existing Alibaba JSON adapter and must never enter the H3 multipart transformer.
+1. Text-only and media-backed H3 creates both use JSON at DC-API's `/v1/videos` endpoint.
+2. Reference image aliases normalize to `reference_images` URL-object arrays. HTTPS URLs and supported image data URIs remain valid URL values; uploaded images become validated image data URIs.
+3. Reference video/audio normalize to `reference_videos` and `reference_audios` URL-object arrays.
+4. Direct customer HTTPS video/audio URLs stay unchanged. Local MP4/MP3 uploads and data URIs are copied to a private persistent directory and represented by an encrypted, unguessable OwnAPI HTTPS URL that expires after one hour.
+5. The temporary media download route does not accept customer authentication because DC-API fetches it server-to-server. Its encrypted token binds the exact random file name, MIME type, size, and expiry. Path traversal, tampered/expired tokens, missing files, and size mismatches return 404.
+6. Expired files are removed opportunistically. Files created for requests rejected before upstream acceptance are removed immediately.
+7. Wan models continue through the existing Alibaba JSON adapter and must never enter the H3 translation or temporary-media path.
 
 The DC-API base URL and server-side API key continue to come only from the managed `dc-api` account. Responses remain sanitized and customer task IDs remain encrypted OwnAPI envelopes.
 

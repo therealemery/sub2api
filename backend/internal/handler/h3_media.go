@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -9,7 +8,6 @@ import (
 	"mime"
 	"mime/multipart"
 	"net/http"
-	"net/textproto"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -194,24 +192,14 @@ func mediaLimitForField(field string) int64 {
 	}
 }
 
-func hasH3Media(request map[string]any) bool {
-	for field := range h3MediaAliases {
-		if len(h3MediaValues(request[field])) > 0 {
-			return true
-		}
-	}
-	return false
-}
+type h3MediaURLBuilder func(field string, value h3MediaValue) (string, error)
 
-func buildH3UpstreamRequest(request map[string]any, duration int, resolution string) ([]byte, string, error) {
+func buildH3UpstreamRequest(request map[string]any, duration int, resolution string, buildMediaURL h3MediaURLBuilder) ([]byte, string, error) {
 	if err := validateH3Media(request); err != nil {
 		return nil, "", err
 	}
-	if !hasH3Media(request) {
-		body, err := buildH3JSONRequest(request, duration, resolution)
-		return body, "application/json", err
-	}
-	return buildH3MultipartRequest(request, duration, resolution)
+	body, err := buildH3JSONRequest(request, duration, resolution, buildMediaURL)
+	return body, "application/json", err
 }
 
 func validateH3Media(request map[string]any) error {
@@ -405,85 +393,6 @@ func validateH3MediaBytes(field, mediaType string, data []byte) error {
 		return fmt.Errorf("media content does not match %s", mediaType)
 	}
 	return nil
-}
-
-func buildH3MultipartRequest(request map[string]any, duration int, resolution string) ([]byte, string, error) {
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-	for key, value := range map[string]string{
-		"model": "minimax-h3", "prompt": strings.TrimSpace(stringValue(request["prompt"])),
-		"seconds": strconv.Itoa(duration), "size": h3RequestSize(request, resolution),
-	} {
-		if value == "" {
-			return nil, "", fmt.Errorf("%s is required", key)
-		}
-		if err := writer.WriteField(key, value); err != nil {
-			return nil, "", err
-		}
-	}
-	for _, mapping := range []struct {
-		upstream string
-		values   []h3MediaValue
-	}{
-		{"input_reference", append(h3MediaValues(request["input_reference"]), h3MediaValues(request["reference_images"])...)},
-		{"reference_videos", h3MediaValues(request["reference_videos"])},
-		{"reference_audios", h3MediaValues(request["reference_audios"])},
-		{"first_frame", append(h3MediaValues(request["first_frame"]), h3MediaValues(request["first_frame_image"])...)},
-		{"last_frame", append(h3MediaValues(request["last_frame"]), h3MediaValues(request["last_frame_image"])...)},
-	} {
-		for index, value := range mapping.values {
-			if err := writeH3MultipartMedia(writer, mapping.upstream, index, value); err != nil {
-				return nil, "", err
-			}
-		}
-	}
-	if err := writer.Close(); err != nil {
-		return nil, "", err
-	}
-	return body.Bytes(), writer.FormDataContentType(), nil
-}
-
-func writeH3MultipartMedia(writer *multipart.Writer, field string, index int, value h3MediaValue) error {
-	if value.Upload != nil {
-		return writeH3MultipartFile(writer, field, value.Upload.Name, value.Upload.MIME, value.Upload.Path)
-	}
-	if !strings.HasPrefix(strings.TrimSpace(value.Text), "data:") {
-		return writer.WriteField(field, strings.TrimSpace(value.Text))
-	}
-	mediaType, data, err := decodeH3DataURI(value.Text)
-	if err != nil {
-		return err
-	}
-	ext := ".bin"
-	if extensions, _ := mime.ExtensionsByType(mediaType); len(extensions) > 0 {
-		ext = extensions[0]
-	}
-	header := make(textproto.MIMEHeader)
-	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name=%q; filename=%q`, field, fmt.Sprintf("%s-%d%s", field, index+1, filepath.Ext("file"+ext))))
-	header.Set("Content-Type", mediaType)
-	part, err := writer.CreatePart(header)
-	if err != nil {
-		return err
-	}
-	_, err = part.Write(data)
-	return err
-}
-
-func writeH3MultipartFile(writer *multipart.Writer, field, name, mediaType, path string) error {
-	header := make(textproto.MIMEHeader)
-	header.Set("Content-Disposition", fmt.Sprintf(`form-data; name=%q; filename=%q`, field, filepath.Base(name)))
-	header.Set("Content-Type", mediaType)
-	part, err := writer.CreatePart(header)
-	if err != nil {
-		return err
-	}
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = file.Close() }()
-	_, err = io.Copy(part, file)
-	return err
 }
 
 func h3RequestSize(request map[string]any, resolution string) string {

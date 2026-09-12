@@ -31,6 +31,12 @@ func RegisterGatewayRoutes(
 	requireGroupAnthropic := middleware.RequireGroupAssignment(settingService, middleware.AnthropicErrorWriter)
 	requireGroupGoogle := middleware.RequireGroupAssignment(settingService, middleware.GoogleErrorWriter)
 
+	// H3 reference video/audio uploads are exposed to the private provider via
+	// short-lived encrypted URLs. The opaque token authenticates the fetch, so
+	// these two download routes intentionally do not use customer API-key auth.
+	r.GET("/v1/video-inputs/:token", h.Gateway.VideoInputContent)
+	r.HEAD("/v1/video-inputs/:token", h.Gateway.VideoInputContent)
+
 	// API网关（Claude API兼容）
 	gateway := r.Group("/v1")
 	gateway.Use(bodyLimit)

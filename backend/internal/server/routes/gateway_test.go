@@ -77,3 +77,14 @@ func TestGatewayRoutesOpenAIImagesPathsAreRegistered(t *testing.T) {
 		require.NotEqual(t, http.StatusNotFound, w.Code, "path=%s should hit OpenAI images handler", path)
 	}
 }
+
+func TestVideoInputRouteIsPublicAndOpaque(t *testing.T) {
+	router := newGatewayRoutesTestRouter()
+	req := httptest.NewRequest(http.MethodGet, "/v1/video-inputs/not-a-token", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusNotFound, w.Code)
+	require.NotContains(t, w.Body.String(), "Invalid API key")
+}
