@@ -18,7 +18,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:171ec90e7907`. The private Wan 3.0 gateway, customer/model rate overrides, and the admin modal's model-source correction are deployed and verified.
+- Production is running image `ownapi:fdd4b4f3beb5`. The H3 DC-API JSON reference-media repair,
+  private Wan 3.0 gateway, customer/model rate overrides, and the admin modal's model-source
+  correction are deployed and verified without a paid H3 task.
 - The verified local and production catalog contains 44 models after adding `wan3.0-video` and `wan3.0-video-prime`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
@@ -145,7 +147,11 @@ This repository is being customized into the OwnAPI product. The active objectiv
   routes tests pass. All 113 frontend test files / 685 tests, Vue type checking, the embedded
   production build, Go formatting, and `git diff --check` pass. The complete local unit-tag suite
   again has only the known Go 1.27/Ent `ent/schema: package "context" without types` environment
-  failure. Final commit, deployment, and non-billing verification remain pending.
+  failure. Commit `fdd4b4f3` is on `origin/main` and deployed as `ownapi:fdd4b4f3beb5` by Actions
+  run `34713353708`. The workflow's container check, public `/health`, rendered H3 detail page,
+  Docs route, and invalid input-token 404 behavior passed. No paid task was submitted. A direct
+  local SSH follow-up timed out once on port 22; it was not retried because the deployment workflow
+  had already connected successfully, replaced the container, and inspected the running revision.
 
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
@@ -340,20 +346,38 @@ The standard local URL is `http://127.0.0.1:3000/home` when Vite is configured o
 - Production URL: `https://ownapi.dev` and `https://www.ownapi.dev`; both resolve to server IP `13.159.10.43`.
 - Hosting method: Docker Compose on the existing server at `/opt/ownapi/deploy`.
 - Credentials: never store here.
-- Last deployed revision: `71318190` (image `ownapi:71318190cd6b`, deployed by run `34592604921`).
+- Last deployed revision: `fdd4b4f3` (image `ownapi:fdd4b4f3beb5`, deployed by run `34713353708`).
 - Rollback revision: prior image remains available; `.env.backup.<short-sha>` is created per deployment.
-- Production verification: healthy on 2026-09-11. The container health check and fixed-IP `/health`
-  request pass; both Wan model pages are deployed. The `Alibaba / Wan 3` account is normal and
+- Production verification: healthy on 2026-09-13. The deployment workflow confirmed the exact
+  running H3 repair image and passed the container health check; public `/health`, the rendered H3
+  model page, Docs redirect, and invalid `/v1/video-inputs` token 404 pass without creating a task.
+  Both Wan model pages remain deployed. The `Alibaba / Wan 3` account is normal and
   schedulable, and the minimum `wan3.0-video` lifecycle, MP4 download, customer charge, account cost,
   usage history, and private-upstream boundary were verified end to end. Public model filtering was
   also verified across five consecutive category switches without a reload or empty result state.
 - Source backup remote: `https://github.com/therealemery/sub2api.git`; commits through `7d7b69c1` are on both `main` and `codex/public-models-docs`.
 - CI: run `33352960936` passed frontend, Go lint, backend unit tests, and backend integration tests for the full feature set.
-- Deployment build: run `34592604921` successfully built and deployed current `main` to `13.159.10.43`; the application health check passed.
+- Deployment build: run `34713353708` successfully built and deployed current `main` to
+  `13.159.10.43`; the exact revision and application health check passed.
 
 Before deploying, determine the existing website's host, domain, deployment directory or service, environment-variable location, and rollback method. Do not create a new hosting target when an existing one is intended.
 
 ## Checkpoint Log
+
+### 2026-09-13 — MiniMax H3 reference-media repair deployed
+
+- Commit `fdd4b4f3` was pushed to `origin/main` and `origin/codex/video-usage-history`, then deployed
+  successfully by Actions run `34713353708` as image `ownapi:fdd4b4f3beb5`.
+- The workflow verified the running full commit, container start, and `/health` response. Independent
+  no-charge checks confirmed HTTP 200 for `/health` and the rendered MiniMax H3 page, the Docs route
+  remains available through its canonical redirect, and an invalid `/v1/video-inputs` token returns
+  404 without API-key authentication.
+- Production browser QA confirmed that the H3 detail page renders the complete OwnAPI create, poll,
+  and download lifecycle with optional reference image, video, and audio inputs. Customer-facing
+  content does not expose DC-API details.
+- No paid H3 request was created. A single direct local SSH follow-up to port 22 timed out and was not
+  repeated; the successful deployment job had already connected over SSH, installed the exact image,
+  inspected its version, and collected healthy startup logs.
 
 ### 2026-09-11 — DeepSeek Sale and GPT-6 implementation approved
 
