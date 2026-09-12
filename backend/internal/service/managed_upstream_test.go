@@ -138,7 +138,7 @@ func TestFetchAlibabaVideoContentUsesPrivateServerSideRequest(t *testing.T) {
 
 	resp, err := svc.FetchAlibabaVideoContent(context.Background(), account, "https://aliyuncs.com/results/video.mp4?Expires=1&Signature=test")
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	require.Equal(t, http.MethodGet, upstream.lastReq.Method)
 	require.Equal(t, "https://aliyuncs.com/results/video.mp4?Expires=1&Signature=test", upstream.lastReq.URL.String())
 	require.True(t, HasAlibabaVideoContentRedirectPolicy(upstream.lastReq.Context()))

@@ -165,7 +165,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	responseBody, err := io.ReadAll(io.LimitReader(resp.Body, maxVideoJSONBody+1))
 	if err != nil || len(responseBody) > maxVideoJSONBody {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Invalid video provider response")
@@ -332,7 +332,7 @@ func (h *GatewayHandler) forwardOwnedVideoTask(c *gin.Context, publicTaskID stri
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if content && adapter != videoAdapterAlibaba && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		if contentType := resp.Header.Get("Content-Type"); contentType != "" {
 			c.Header("Content-Type", contentType)

@@ -85,16 +85,16 @@ func ValidateManagedUpstreamCredentials(platform, accountType string, credential
 	}
 	if provider == UpstreamProviderAlibabaVideo {
 		if platform != PlatformOpenAI || (accountType != AccountTypeUpstream && accountType != AccountTypeAPIKey) {
-			return fmt.Errorf("Alibaba video accounts must use the openai platform and upstream or apikey type")
+			return fmt.Errorf("alibaba video accounts must use the openai platform and upstream or apikey type")
 		}
 		mapping := stringMappingFromRaw(credentials["model_mapping"])
 		if len(mapping) == 0 {
-			return fmt.Errorf("Alibaba video accounts require an exact model_mapping whitelist")
+			return fmt.Errorf("alibaba video accounts require an exact model_mapping whitelist")
 		}
 		allowed := map[string]bool{"wan3.0-video": true, "wan3.0-video-prime": true}
 		for requestedModel, upstreamModel := range mapping {
 			if !allowed[requestedModel] || upstreamModel != requestedModel {
-				return fmt.Errorf("Alibaba video model_mapping supports only exact Wan 3.0 model names")
+				return fmt.Errorf("alibaba video model_mapping supports only exact Wan 3.0 model names")
 			}
 		}
 		baseURL, _ := credentials["base_url"].(string)

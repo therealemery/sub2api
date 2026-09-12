@@ -185,7 +185,7 @@ func (s *UsageService) GetVideoTaskID(ctx context.Context, usageLogID, userID in
 	if err != nil {
 		return "", fmt.Errorf("query video task: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	if !rows.Next() {
 		if err := rows.Err(); err != nil {
 			return "", fmt.Errorf("query video task: %w", err)

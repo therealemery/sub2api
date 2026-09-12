@@ -37,6 +37,18 @@ func (s *userGroupRateRepoStubForGroupRate) GetByUserAndGroup(_ context.Context,
 	panic("unexpected GetByUserAndGroup call")
 }
 
+func (s *userGroupRateRepoStubForGroupRate) GetByUserAndGroupModel(context.Context, int64, int64, string) (*float64, error) {
+	panic("unexpected GetByUserAndGroupModel call")
+}
+
+func (s *userGroupRateRepoStubForGroupRate) GetUserGroupModels(context.Context, int64, int64) ([]UserModelRateEntry, error) {
+	panic("unexpected GetUserGroupModels call")
+}
+
+func (s *userGroupRateRepoStubForGroupRate) SyncUserGroupModels(context.Context, int64, int64, []UserModelRateInput) error {
+	panic("unexpected SyncUserGroupModels call")
+}
+
 func (s *userGroupRateRepoStubForGroupRate) GetRPMOverrideByUserAndGroup(_ context.Context, _, _ int64) (*int, error) {
 	panic("unexpected GetRPMOverrideByUserAndGroup call")
 }
