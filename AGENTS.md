@@ -119,6 +119,25 @@ This repository is being customized into the OwnAPI product. The active objectiv
   customer balance. Historical records are not changed, and no paid production test is authorized.
 - Design: `docs/superpowers/specs/2026-09-13-ownapi-h3-reference-media-repair-design.md`.
 
+### 2026-09-13 — MiniMax H3 reference-media repair locally verified
+
+- Repaired H3 reference image, video, audio, and PNG first/last-frame handling while preserving the
+  verified JSON path for text-only H3 requests and the independent Alibaba JSON path for Wan 3.
+- `POST /v1/videos` now accepts customer JSON and multipart requests. H3 requests containing media
+  are validated and privately transformed to DC-API multipart fields; browser file inputs send real
+  `FormData` instead of Base64 JSON. Customer OwnAPI keys and opaque task/download URLs are unchanged.
+- Enforced HTTPS/media type/signature, count, per-file size, 12-input total, audio-with-image, frame
+  exclusivity, and URL/file mixing rules. Uploaded files are spooled to private temporary files and
+  the total request limit is 96 MiB to avoid Base64 amplification in application memory.
+- A DC create response that is already `failed` is rejected before usage creation and balance
+  deduction. Queued requests retain the existing idempotent billing path.
+- Docs and model examples distinguish direct-HTTPS JSON from local-file multipart requests and
+  document PNG, MP4, MP3, polling, download, and limits without exposing the private upstream.
+- Local validation passed: handler/service/server Go packages; all 113 frontend test files / 685
+  tests; Vue type checking; production frontend build; Go formatting; and `git diff --check`.
+- Deployment and the single approved 5-second 768p PNG paid smoke test are pending the verified
+  implementation commit. Do not repeat the paid request after one successful attempt.
+
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
 - Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's

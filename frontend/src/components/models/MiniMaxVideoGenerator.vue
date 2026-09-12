@@ -34,15 +34,15 @@
       </label>
       <label>
         <span>{{ t('publicModels.videoGenerator.referenceFile') }}</span>
-        <input type="file" accept="image/*" @change="selectReferenceFile" />
+        <input type="file" accept="image/png,image/jpeg" @change="selectReferenceFile" />
       </label>
       <div class="options-grid">
         <label><span>{{ t('publicModels.videoGenerator.firstFrameUrl') }}</span><input v-model.trim="firstFrameURL" type="url" placeholder="https://…/first.png" /></label>
         <label><span>{{ t('publicModels.videoGenerator.lastFrameUrl') }}</span><input v-model.trim="lastFrameURL" type="url" placeholder="https://…/last.png" /></label>
       </div>
       <div class="options-grid">
-        <label><span>{{ t('publicModels.videoGenerator.firstFrameFile') }}</span><input type="file" accept="image/png,image/jpeg" @change="selectFirstFrameFile" /></label>
-        <label><span>{{ t('publicModels.videoGenerator.lastFrameFile') }}</span><input type="file" accept="image/png,image/jpeg" @change="selectLastFrameFile" /></label>
+        <label><span>{{ t('publicModels.videoGenerator.firstFrameFile') }}</span><input type="file" :accept="isWan ? 'image/png,image/jpeg' : 'image/png'" @change="selectFirstFrameFile" /></label>
+        <label><span>{{ t('publicModels.videoGenerator.lastFrameFile') }}</span><input type="file" :accept="isWan ? 'image/png,image/jpeg' : 'image/png'" @change="selectLastFrameFile" /></label>
       </div>
       <label>
         <span>{{ t('publicModels.videoGenerator.referenceVideoUrl') }}</span>
@@ -90,14 +90,19 @@ const audio = ref(true)
 const promptExtend = ref(true)
 const watermark = ref(false)
 const referenceURL = ref('')
+const referenceFile = ref<File | null>(null)
 const referenceDataURL = ref('')
 const referenceVideoURL = ref('')
+const referenceVideoFile = ref<File | null>(null)
 const referenceVideoDataURL = ref('')
 const referenceAudioURL = ref('')
+const referenceAudioFile = ref<File | null>(null)
 const referenceAudioDataURL = ref('')
 const firstFrameURL = ref('')
+const firstFrameFile = ref<File | null>(null)
 const firstFrameDataURL = ref('')
 const lastFrameURL = ref('')
+const lastFrameFile = ref<File | null>(null)
 const lastFrameDataURL = ref('')
 const submitting = ref(false)
 const error = ref('')
@@ -115,20 +120,9 @@ async function generate() {
   error.value = ''
   task.value = null
   releaseVideoObjectURL()
-  const body: Record<string, unknown> = { model: props.modelId, prompt: prompt.value, duration: duration.value, resolution: resolution.value }
-  if (isWan.value) Object.assign(body, { ratio: ratio.value, seed: seed.value, audio: audio.value, prompt_extend: promptExtend.value, watermark: watermark.value })
-  if (referenceDataURL.value) body.reference_images = [referenceDataURL.value]
-  else if (referenceURL.value) body.reference_images = [{ url: referenceURL.value }]
-  if (referenceVideoDataURL.value) body.reference_videos = [referenceVideoDataURL.value]
-  else if (referenceVideoURL.value) body.reference_videos = [referenceVideoURL.value]
-  if (referenceAudioDataURL.value) body.reference_audios = [referenceAudioDataURL.value]
-  else if (referenceAudioURL.value) body.reference_audios = [referenceAudioURL.value]
-  if (firstFrameDataURL.value) body.first_frame_image = firstFrameDataURL.value
-  else if (firstFrameURL.value) body.first_frame_image = firstFrameURL.value
-  if (lastFrameDataURL.value) body.last_frame_image = lastFrameDataURL.value
-  else if (lastFrameURL.value) body.last_frame_image = lastFrameURL.value
+  const { body, headers } = buildCreateRequest()
   try {
-    const response = await fetch('/v1/videos', { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) })
+    const response = await fetch('/v1/videos', { method: 'POST', headers, body })
     const data = await response.json()
     if (!response.ok) throw new Error(data?.error?.message || t('publicModels.videoGenerator.failed'))
     task.value = data
@@ -162,6 +156,41 @@ async function poll() {
 
 function authHeaders() { return { Authorization: `Bearer ${apiKey.value}`, 'Content-Type': 'application/json' } }
 
+function buildCreateRequest(): { body: BodyInit; headers: Record<string, string> } {
+  const payload: Record<string, unknown> = { model: props.modelId, prompt: prompt.value, duration: duration.value, resolution: resolution.value }
+  if (isWan.value) Object.assign(payload, { ratio: ratio.value, seed: seed.value, audio: audio.value, prompt_extend: promptExtend.value, watermark: watermark.value })
+  if (isWan.value && referenceDataURL.value) payload.reference_images = [referenceDataURL.value]
+  else if (referenceURL.value) payload.reference_images = [{ url: referenceURL.value }]
+  if (isWan.value && referenceVideoDataURL.value) payload.reference_videos = [referenceVideoDataURL.value]
+  else if (referenceVideoURL.value) payload.reference_videos = [referenceVideoURL.value]
+  if (isWan.value && referenceAudioDataURL.value) payload.reference_audios = [referenceAudioDataURL.value]
+  else if (referenceAudioURL.value) payload.reference_audios = [referenceAudioURL.value]
+  if (isWan.value && firstFrameDataURL.value) payload.first_frame_image = firstFrameDataURL.value
+  else if (firstFrameURL.value) payload.first_frame_image = firstFrameURL.value
+  if (isWan.value && lastFrameDataURL.value) payload.last_frame_image = lastFrameDataURL.value
+  else if (lastFrameURL.value) payload.last_frame_image = lastFrameURL.value
+
+  const hasLocalFiles = !isWan.value && [referenceFile, referenceVideoFile, referenceAudioFile, firstFrameFile, lastFrameFile].some(item => item.value)
+  if (!hasLocalFiles) return { body: JSON.stringify(payload), headers: authHeaders() }
+
+  const form = new FormData()
+  form.append('model', props.modelId)
+  form.append('prompt', prompt.value)
+  form.append('duration', String(duration.value))
+  form.append('resolution', resolution.value)
+  if (referenceFile.value) form.append('input_reference', referenceFile.value)
+  else if (referenceURL.value) form.append('input_reference', referenceURL.value)
+  if (referenceVideoFile.value) form.append('reference_videos', referenceVideoFile.value)
+  else if (referenceVideoURL.value) form.append('reference_videos', referenceVideoURL.value)
+  if (referenceAudioFile.value) form.append('reference_audios', referenceAudioFile.value)
+  else if (referenceAudioURL.value) form.append('reference_audios', referenceAudioURL.value)
+  if (firstFrameFile.value) form.append('first_frame', firstFrameFile.value)
+  else if (firstFrameURL.value) form.append('first_frame', firstFrameURL.value)
+  if (lastFrameFile.value) form.append('last_frame', lastFrameFile.value)
+  else if (lastFrameURL.value) form.append('last_frame', lastFrameURL.value)
+  return { body: form, headers: { Authorization: `Bearer ${apiKey.value}` } }
+}
+
 async function loadVideo() {
   if (!task.value) return
   const response = await fetch(`/v1/videos/${encodeURIComponent(task.value.id)}/content`, { headers: authHeaders() })
@@ -180,27 +209,23 @@ function releaseVideoObjectURL() {
 }
 
 function selectReferenceFile(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  referenceDataURL.value = ''
-  if (!file) return
+  readMediaFile(event, referenceFile, referenceDataURL)
+}
+
+function readMediaFile(event: Event, fileTarget: typeof referenceVideoFile, dataTarget: typeof referenceVideoDataURL) {
+  const file = (event.target as HTMLInputElement).files?.[0] || null
+  fileTarget.value = file
+  dataTarget.value = ''
+  if (!file || !isWan.value) return
   const reader = new FileReader()
-  reader.onload = () => { referenceDataURL.value = typeof reader.result === 'string' ? reader.result : '' }
+  reader.onload = () => { dataTarget.value = typeof reader.result === 'string' ? reader.result : '' }
   reader.readAsDataURL(file)
 }
 
-function readMediaFile(event: Event, target: typeof referenceVideoDataURL) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  target.value = ''
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => { target.value = typeof reader.result === 'string' ? reader.result : '' }
-  reader.readAsDataURL(file)
-}
-
-function selectReferenceVideoFile(event: Event) { readMediaFile(event, referenceVideoDataURL) }
-function selectReferenceAudioFile(event: Event) { readMediaFile(event, referenceAudioDataURL) }
-function selectFirstFrameFile(event: Event) { readMediaFile(event, firstFrameDataURL) }
-function selectLastFrameFile(event: Event) { readMediaFile(event, lastFrameDataURL) }
+function selectReferenceVideoFile(event: Event) { readMediaFile(event, referenceVideoFile, referenceVideoDataURL) }
+function selectReferenceAudioFile(event: Event) { readMediaFile(event, referenceAudioFile, referenceAudioDataURL) }
+function selectFirstFrameFile(event: Event) { readMediaFile(event, firstFrameFile, firstFrameDataURL) }
+function selectLastFrameFile(event: Event) { readMediaFile(event, lastFrameFile, lastFrameDataURL) }
 
 onBeforeUnmount(() => { window.clearTimeout(pollTimer); releaseVideoObjectURL() })
 </script>

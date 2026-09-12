@@ -61,6 +61,12 @@ func TestVideoUsageEndpointDoesNotRevealPrivateAdapterPath(t *testing.T) {
 	require.Equal(t, "/v1/videos", videoUpstreamCreateEndpoint(videoAdapterAlibaba))
 }
 
+func TestImmediateH3FailureIsRejectedBeforeBilling(t *testing.T) {
+	require.False(t, shouldBillVideoCreate(videoAdapterDCAPI, map[string]any{"status": "failed", "id": "private-task"}))
+	require.True(t, shouldBillVideoCreate(videoAdapterDCAPI, map[string]any{"status": "queued", "id": "private-task"}))
+	require.True(t, shouldBillVideoCreate(videoAdapterAlibaba, map[string]any{"status": "failed"}))
+}
+
 func TestSanitizedWanVideoResponse(t *testing.T) {
 	upstream := map[string]any{"output": map[string]any{"task_status": "SUCCEEDED", "task_id": "private", "video_url": "https://private.example/video.mp4"}, "request_id": "private-request"}
 	out := sanitizedVideoResponseForModel(nil, upstream, "video_public", wanVideoModel, videoAdapterAlibaba)
@@ -104,6 +110,14 @@ func TestNormalizeH3Resolution(t *testing.T) {
 	require.Equal(t, "2k", resolution)
 
 	resolution, ok = normalizeH3Resolution(map[string]any{"size": "768p"})
+	require.True(t, ok)
+	require.Equal(t, "768p", resolution)
+
+	resolution, ok = normalizeH3Resolution(map[string]any{"size": "1440x2560"})
+	require.True(t, ok)
+	require.Equal(t, "2k", resolution)
+
+	resolution, ok = normalizeH3Resolution(map[string]any{"size": "1024x768"})
 	require.True(t, ok)
 	require.Equal(t, "768p", resolution)
 

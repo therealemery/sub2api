@@ -75,16 +75,16 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		return
 	}
 
-	body, err := io.ReadAll(io.LimitReader(c.Request.Body, maxVideoJSONBody+1))
-	if err != nil || len(body) > maxVideoJSONBody {
-		h.errorResponse(c, http.StatusRequestEntityTooLarge, "invalid_request_error", "Video request is too large")
+	request, err := parseVideoCreateRequest(c.Request)
+	if err != nil {
+		message := "Invalid video request"
+		if requestErr, ok := err.(*videoRequestError); ok {
+			message = requestErr.message
+		}
+		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", message)
 		return
 	}
-	var request map[string]any
-	if err := json.Unmarshal(body, &request); err != nil {
-		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Invalid JSON body")
-		return
-	}
+	defer cleanupVideoCreateRequest(request)
 	model := canonicalVideoModel(request["model"])
 	if model == "" {
 		h.errorResponse(c, http.StatusBadRequest, "unsupported_model", "Unsupported video model")
@@ -107,13 +107,15 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	resolution := ""
 	unitPrice := 0.0
 	upstreamUnitCost := 0.0
+	var body []byte
+	upstreamContentType := "application/json"
 	if model == miniMaxH3Model {
 		resolution, ok = normalizeH3Resolution(request)
 		if !ok {
 			h.errorResponse(c, http.StatusBadRequest, "invalid_resolution", "resolution must be 768p or 2k")
 			return
 		}
-		body, err = buildH3JSONRequest(request, duration, resolution)
+		body, upstreamContentType, err = buildH3UpstreamRequest(request, duration, resolution)
 		unitPrice = miniMaxH3768PriceUSD
 		if resolution == "2k" {
 			unitPrice = miniMaxH32KPriceUSD
@@ -157,7 +159,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	if adapter == videoAdapterAlibaba {
 		resp, err = h.gatewayService.ForwardAlibabaVideo(c.Request.Context(), account, http.MethodPost, "/services/aigc/video-generation/video-synthesis", body)
 	} else {
-		resp, err = h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
+		resp, err = h.gatewayService.ForwardDCVideoWithContentType(c.Request.Context(), account, http.MethodPost, "/v1/videos", body, upstreamContentType)
 	}
 	if err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
@@ -176,6 +178,10 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	var upstream map[string]any
 	if err := json.Unmarshal(responseBody, &upstream); err != nil {
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Invalid video provider response")
+		return
+	}
+	if !shouldBillVideoCreate(adapter, upstream) {
+		c.JSON(http.StatusBadGateway, gin.H{"error": gin.H{"type": "video_provider_error", "message": "Video request could not be completed"}})
 		return
 	}
 	upstreamTaskID := upstreamVideoTaskID(upstream, adapter)
@@ -230,6 +236,10 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sanitizedVideoResponseForModel(c, upstream, publicTaskID, model, adapter))
+}
+
+func shouldBillVideoCreate(adapter string, upstream map[string]any) bool {
+	return adapter != videoAdapterDCAPI || !strings.EqualFold(strings.TrimSpace(stringValue(upstream["status"])), "failed")
 }
 
 // videoUsageRequestID derives a stable idempotency key that fits the
@@ -642,9 +652,9 @@ func normalizeH3Resolution(request map[string]any) (string, bool) {
 		value, _ = request["size"].(string)
 	}
 	switch strings.ToLower(strings.TrimSpace(value)) {
-	case "768p":
+	case "768p", "1536x672", "1344x768", "1024x768", "768x768", "768x1024", "768x1344":
 		return "768p", true
-	case "2k":
+	case "2k", "2912x1280", "2544x1456", "1920x1440", "1440x1440", "1440x1920", "1440x2560":
 		return "2k", true
 	default:
 		return "", false

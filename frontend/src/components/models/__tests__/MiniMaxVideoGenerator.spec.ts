@@ -74,4 +74,44 @@ describe('MiniMaxVideoGenerator', () => {
     wrapper.unmount()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:ownapi-video')
   })
+
+  it.each([
+    { index: 0, name: 'reference.png', type: 'image/png', field: 'input_reference' },
+    { index: 3, name: 'reference.mp4', type: 'video/mp4', field: 'reference_videos' },
+    { index: 4, name: 'reference.mp3', type: 'audio/mpeg', field: 'reference_audios' },
+  ])('uploads H3 $field as multipart without a manual boundary', async ({ index, name, type, field }) => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 'video_public_task', status: 'failed' }) })
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(MiniMaxVideoGenerator, {
+      props: { modelId: 'MiniMax-H3', pricing: [{ resolution: '768p', ownApiPerSecond: 0.05597 }] },
+    })
+    await wrapper.get('input[type="password"]').setValue('ownapi-customer-key')
+    await wrapper.get('textarea').setValue('Follow the reference')
+    const file = new File(['media'], name, { type })
+    const fileInput = wrapper.findAll('input[type="file"]')[index]!
+    Object.defineProperty(fileInput.element, 'files', { configurable: true, value: [file] })
+    await fileInput.trigger('change')
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit
+    expect(init.headers).toEqual({ Authorization: 'Bearer ownapi-customer-key' })
+    expect(init.body).toBeInstanceOf(FormData)
+    expect((init.body as FormData).get(field)).toBe(file)
+  })
+
+  it('keeps text-only H3 requests on JSON', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 'video_public_task', status: 'failed' }) })
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(MiniMaxVideoGenerator, {
+      props: { modelId: 'MiniMax-H3', pricing: [{ resolution: '2K', ownApiPerSecond: 0.089552 }] },
+    })
+    await wrapper.get('input[type="password"]').setValue('ownapi-customer-key')
+    await wrapper.get('textarea').setValue('A paper boat')
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit
+    expect(init.headers).toEqual({ Authorization: 'Bearer ownapi-customer-key', 'Content-Type': 'application/json' })
+    expect(JSON.parse(String(init.body))).toMatchObject({ model: 'MiniMax-H3', resolution: '2K' })
+  })
 })
