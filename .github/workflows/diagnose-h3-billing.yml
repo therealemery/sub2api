@@ -27,7 +27,9 @@ jobs:
           docker inspect ownapi --format 'image={{.Config.Image}} status={{.State.Status}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}'
 
           echo "== Public frontend URL setting =="
-          docker compose exec -T postgres psql -X -Atc "SELECT key || E'\\t' || value FROM settings WHERE key = 'frontend_url';"
+          docker compose exec -T postgres sh -c 'psql -X --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -At' <<'SQL'
+          SELECT key || chr(9) || value FROM settings WHERE key = chr(102)||chr(114)||chr(111)||chr(110)||chr(116)||chr(101)||chr(110)||chr(100)||chr(95)||chr(117)||chr(114)||chr(108);
+          SQL
 
           echo "== Video input storage =="
           if docker compose exec -T ownapi test -d /app/data/video-inputs; then
