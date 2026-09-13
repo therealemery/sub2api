@@ -104,7 +104,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-13 — Text pricing and conditional-multiplier design ready for review
+### 2026-09-14 — Text pricing and conditional-multiplier plan ready for execution
 
 - The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
   manufacturer list sells at 70%; cost above 60% through 80% sells at 80%; cost above 80% or
@@ -125,9 +125,17 @@ This repository is being customized into the OwnAPI product. The active objectiv
   input tokens. DeepSeek Pro is explicitly unavailable until an exact manufacturer-authoritative
   price replaces the current incorrect Flash-price reuse; Packy's 50% label cannot be used to
   infer that manufacturer price.
-- Design: `docs/superpowers/specs/2026-09-13-ownapi-text-pricing-conditional-multiplier-design.md`.
-  No business code, database, production data, account mapping, credential, or deployment changed
-  at this checkpoint.
+- The user approved the design. The test-first implementation plan is recorded at
+  `docs/superpowers/plans/2026-09-13-ownapi-text-pricing-conditional-multiplier-plan.md`.
+- The plan separates the work into: validated condition rules; final-successful-attempt locking;
+  unified customer/model and condition billing; additive usage audit persistence; checksum-safe
+  price/account corrections; one sanitized backend-owned frontend rule projection; customer/admin
+  usage evidence; and full CI, preflight, deployment, and rollback gates.
+- Execution must first read the exact signed-in Packy `codex` cost card before migration 143 can
+  contain Codex cost values. Missing evidence leaves all four Codex routes unschedulable; it never
+  permits a Core fallback or inferred cost. DeepSeek Pro remains unavailable.
+- No business code, database, production data, account mapping, credential, paid request, push, or
+  deployment changed at this checkpoint.
 
 ### 2026-09-13 — MiniMax H3 reference-media repair design approved
 
