@@ -167,6 +167,15 @@ This repository is being customized into the OwnAPI product. The active objectiv
   is ready to commit and deploy; no paid production request has been submitted after the previous
   failed reference-media probes.
 
+### 2026-09-13 — Read-only H3 production diagnostic workflow repaired
+
+- The first read-only diagnostic run was stopped by nested shell quoting in the workflow itself
+  (`sh: -c requires an argument`); this was a workflow failure, not a production failure.
+- Replaced the nested `sh -c`/single-quote construction with a quoted remote heredoc and kept all
+  checks read-only. The workflow now reports container health, the configured `frontend_url`, the
+  persistent H3 media directory, sanitized recent H3 request evidence, and public health/input
+  route status. It does not create tasks, change data, or print credentials/tokens.
+
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
 - Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's
