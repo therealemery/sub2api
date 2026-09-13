@@ -69,7 +69,7 @@ func (h *GatewayHandler) VideoInputContent(c *gin.Context) {
 }
 
 func (h *GatewayHandler) storeVideoInput(c *gin.Context, field string, value h3MediaValue) (string, string, error) {
-	if field != "reference_videos" && field != "reference_audios" {
+	if !isStagedH3MediaField(field) {
 		return "", "", fmt.Errorf("unsupported temporary video input")
 	}
 	dir := h.videoInputDir()
@@ -110,6 +110,15 @@ func (h *GatewayHandler) storeVideoInput(c *gin.Context, field string, value h3M
 		return "", "", err
 	}
 	return baseURL + "/v1/video-inputs/" + url.PathEscape(token), path, nil
+}
+
+func isStagedH3MediaField(field string) bool {
+	switch h3MediaAliases[field] {
+	case "input_reference", "reference_videos", "reference_audios", "first_frame", "last_frame":
+		return true
+	default:
+		return false
+	}
 }
 
 func writeVideoInput(output *os.File, field string, value h3MediaValue) (string, int64, error) {

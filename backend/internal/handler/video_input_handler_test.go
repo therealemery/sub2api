@@ -37,6 +37,8 @@ func TestVideoInputTokenAndPublicDownload(t *testing.T) {
 		{"video upload", "reference_videos", "video/mp4", append([]byte{0, 0, 0, 12}, []byte("ftypisom")...), true},
 		{"audio data URI", "reference_audios", "audio/mpeg", []byte("ID3audio"), false},
 		{"audio upload", "reference_audios", "audio/mpeg", []byte("ID3audio"), true},
+		{"image data URI", "input_reference", "image/png", tinyPNG, false},
+		{"image upload", "input_reference", "image/png", tinyPNG, true},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

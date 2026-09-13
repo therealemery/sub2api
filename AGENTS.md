@@ -154,6 +154,19 @@ This repository is being customized into the OwnAPI product. The active objectiv
   local SSH follow-up timed out once on port 22; it was not retried because the deployment workflow
   had already connected successfully, replaced the container, and inspected the running revision.
 
+### 2026-09-13 — MiniMax H3 uploaded-image URL staging patch ready
+
+- Extended the existing encrypted temporary-media path to PNG/JPEG images and first/last-frame
+  uploads. H3 uploaded images and image data URIs now become short-lived OwnAPI HTTPS URL objects in
+  the private DC-API JSON request, matching the provider's signed-in frontend contract. The public
+  customer endpoint, OwnAPI API key, opaque task ID, and download URL remain unchanged.
+- Added image token/download coverage alongside the existing MP4/MP3 cases. Uploaded media remains
+  mode `0600`, size-bound, MIME-checked, and removed on rejected requests; Wan routing is unchanged.
+- Focused H3/media tests, affected backend packages, all 113 frontend test files / 685 tests, Vue
+  type checking, production frontend build, Go formatting, and `git diff --check` pass. This patch
+  is ready to commit and deploy; no paid production request has been submitted after the previous
+  failed reference-media probes.
+
 ### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
 
 - Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's

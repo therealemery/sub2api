@@ -649,11 +649,8 @@ func h3DCMediaURL(field string, value h3MediaValue, buildMediaURL h3MediaURLBuil
 		if !strings.HasPrefix(text, "data:") {
 			return text, nil
 		}
-		if field != "reference_videos" && field != "reference_audios" {
-			return text, nil
-		}
 	}
-	if field == "reference_videos" || field == "reference_audios" {
+	if buildMediaURL != nil && (value.Upload != nil || strings.HasPrefix(strings.TrimSpace(value.Text), "data:")) {
 		if buildMediaURL == nil {
 			return "", fmt.Errorf("%s upload could not be prepared", field)
 		}

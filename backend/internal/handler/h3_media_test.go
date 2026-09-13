@@ -39,18 +39,38 @@ func TestBuildH3UpstreamRequestEncodesReferenceMediaAsDCAPIJSON(t *testing.T) {
 		"reference_videos": []any{mp4URI},
 		"reference_audios": []any{mp3URI},
 	}, 5, "2k", func(field string, value h3MediaValue) (string, error) {
-		if field == "reference_videos" {
+		switch field {
+		case "input_reference":
+			return "https://www.ownapi.dev/v1/video-inputs/image_token", nil
+		case "reference_videos":
 			return "https://www.ownapi.dev/v1/video-inputs/video_token", nil
+		default:
+			return "https://www.ownapi.dev/v1/video-inputs/audio_token", nil
 		}
-		return "https://www.ownapi.dev/v1/video-inputs/audio_token", nil
 	})
 	require.NoError(t, err)
 	require.Equal(t, "application/json", contentType)
 	var got map[string]any
 	require.NoError(t, json.Unmarshal(body, &got))
-	require.Equal(t, []any{map[string]any{"url": pngURI}}, got["reference_images"])
+	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/image_token"}}, got["reference_images"])
 	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/video_token"}}, got["reference_videos"])
 	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/audio_token"}}, got["reference_audios"])
+}
+
+func TestBuildH3UpstreamRequestStagesUploadedImageWithPublicURL(t *testing.T) {
+	temp := t.TempDir() + "/reference.png"
+	require.NoError(t, os.WriteFile(temp, tinyPNG, 0o600))
+	body, contentType, err := buildH3UpstreamRequest(map[string]any{
+		"prompt": "Animate", "input_reference": []any{&h3UploadedMedia{Path: temp, MIME: "image/png", Name: "reference.png", Size: int64(len(tinyPNG))}},
+	}, 5, "768p", func(field string, value h3MediaValue) (string, error) {
+		require.Equal(t, "input_reference", field)
+		return "https://www.ownapi.dev/v1/video-inputs/image_token", nil
+	})
+	require.NoError(t, err)
+	require.Equal(t, "application/json", contentType)
+	var got map[string]any
+	require.NoError(t, json.Unmarshal(body, &got))
+	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/image_token"}}, got["reference_images"])
 }
 
 func TestBuildH3UpstreamRequestConvertsUploadedImageToDataURI(t *testing.T) {
