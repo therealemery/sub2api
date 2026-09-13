@@ -27,6 +27,11 @@ jobs:
 
           SELECT 'ACCOUNT', a.id, a.name, a.status,
                  COALESCE(a.schedulable, false),
+                 COALESCE(a.error_message, ''),
+                 COALESCE(to_char(a.rate_limit_reset_at AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD HH24:MI:SS'), ''),
+                 COALESCE(to_char(a.overload_until AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD HH24:MI:SS'), ''),
+                 COALESCE(to_char(a.temp_unschedulable_until AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD HH24:MI:SS'), ''),
+                 COALESCE(a.temp_unschedulable_reason, ''),
                  COALESCE(a.extra->>'upstream_provider', ''),
                  COALESCE(a.credentials->>'base_url', ''),
                  COALESCE(a.credentials->>'model_mapping', '{}')
@@ -57,6 +62,31 @@ jobs:
             AND COALESCE(a.name, '') LIKE 'Packy / %'
           ORDER BY ul.id DESC
           LIMIT 150;
+
+          SELECT 'CHANNEL_PRICE', pricing.platform, pricing.models,
+                 pricing.billing_mode,
+                 pricing.input_price,
+                 pricing.output_price,
+                 pricing.cache_write_price,
+                 pricing.cache_read_price
+          FROM channel_model_pricing pricing
+          JOIN channels channel ON channel.id = pricing.channel_id
+          WHERE channel.name = 'OwnAPI LLM'
+            AND pricing.models ?| ARRAY['deepseek-v4.1-flash', 'deepseek-v4-pro']
+          ORDER BY pricing.id;
+
+          SELECT 'ACCOUNT_COST', rule.name, pricing.models,
+                 pricing.billing_mode,
+                 pricing.input_price,
+                 pricing.output_price,
+                 pricing.cache_write_price,
+                 pricing.cache_read_price
+          FROM channel_account_stats_model_pricing pricing
+          JOIN channel_account_stats_pricing_rules rule ON rule.id = pricing.rule_id
+          JOIN channels channel ON channel.id = rule.channel_id
+          WHERE channel.name = 'OwnAPI LLM'
+            AND rule.name = 'Packy cost / DeepSeek Sale'
+          ORDER BY pricing.id;
           SQL
           REMOTE
         env:
