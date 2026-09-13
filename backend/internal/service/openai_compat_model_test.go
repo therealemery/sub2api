@@ -149,6 +149,7 @@ func TestForwardAsAnthropic_NormalizesRoutingAndEffortForGpt54XHigh(t *testing.T
 	svc := &OpenAIGatewayService{
 		httpUpstream: upstream,
 		cfg:          &config.Config{Security: config.SecurityConfig{URLAllowlist: config.URLAllowlistConfig{Enabled: false}}},
+		pricingClock: func() time.Time { return time.Date(2026, 9, 14, 4, 0, 0, 0, time.UTC) },
 	}
 	account := &Account{
 		ID:          1,
@@ -173,6 +174,9 @@ func TestForwardAsAnthropic_NormalizesRoutingAndEffortForGpt54XHigh(t *testing.T
 	require.Equal(t, "gpt-5.4", result.BillingModel)
 	require.NotNil(t, result.ReasoningEffort)
 	require.Equal(t, "xhigh", *result.ReasoningEffort)
+	require.Equal(t, "gpt-5.4-xhigh", result.PricingContext.CanonicalModel)
+	require.Equal(t, "gpt-5.4", result.PricingContext.AccountingModel)
+	require.Equal(t, 1.0, result.PricingContext.CustomerMultiplier)
 
 	require.Equal(t, "gpt-5.4", gjson.GetBytes(upstream.lastBody, "model").String())
 	require.Equal(t, "xhigh", gjson.GetBytes(upstream.lastBody, "reasoning.effort").String())

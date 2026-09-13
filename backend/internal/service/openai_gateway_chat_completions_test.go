@@ -159,7 +159,8 @@ func TestForwardAsChatCompletions_ClientDisconnectDrainsUpstreamUsage(t *testing
 		Body:       io.NopCloser(strings.NewReader(upstreamBody)),
 	}}
 
-	svc := &OpenAIGatewayService{httpUpstream: upstream}
+	pricingAt := time.Date(2026, 9, 14, 4, 0, 0, 0, time.UTC)
+	svc := &OpenAIGatewayService{httpUpstream: upstream, pricingClock: func() time.Time { return pricingAt }}
 	account := &Account{
 		ID:          1,
 		Name:        "openai-oauth",
@@ -178,6 +179,8 @@ func TestForwardAsChatCompletions_ClientDisconnectDrainsUpstreamUsage(t *testing
 	require.Equal(t, 11, result.Usage.InputTokens)
 	require.Equal(t, 5, result.Usage.OutputTokens)
 	require.Equal(t, 4, result.Usage.CacheReadInputTokens)
+	require.Equal(t, pricingAt, result.PricingContext.EffectiveAt)
+	require.Equal(t, 1.0, result.PricingContext.CustomerMultiplier)
 }
 
 func TestForwardAsChatCompletions_TerminalUsageWithoutUpstreamCloseReturns(t *testing.T) {

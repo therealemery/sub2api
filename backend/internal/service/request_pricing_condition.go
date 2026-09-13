@@ -61,6 +61,35 @@ type RequestPricingContext struct {
 
 type PricingClock func() time.Time
 
+type requestPricingContextResolver func(model string, sentAt time.Time) (RequestPricingContext, error)
+
+func pricingAttemptNow(clock PricingClock) time.Time {
+	if clock == nil {
+		return time.Now().UTC()
+	}
+	return clock().UTC()
+}
+
+func resolveAttemptPricingContext(
+	clock PricingClock,
+	resolver requestPricingContextResolver,
+	canonicalModel string,
+	accountingModel string,
+) (RequestPricingContext, error) {
+	if resolver == nil {
+		resolver = ResolveRequestPricingContext
+	}
+	pricingContext, err := resolver(canonicalModel, pricingAttemptNow(clock))
+	if err != nil {
+		return RequestPricingContext{}, err
+	}
+	pricingContext.AccountingModel = canonicalRequestPricingModel(accountingModel)
+	if pricingContext.AccountingModel == "" {
+		pricingContext.AccountingModel = pricingContext.CanonicalModel
+	}
+	return pricingContext, nil
+}
+
 var requestPricingConditionRules = []RequestPricingConditionRule{
 	{
 		ID:       deepSeekWeekdayPeakRuleID,

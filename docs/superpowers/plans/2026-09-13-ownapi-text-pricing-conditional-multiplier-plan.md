@@ -140,12 +140,15 @@ git commit -m "feat: add conditional pricing registry"
 - Modify: `backend/internal/service/openai_gateway_chat_completions_raw.go`
 - Modify: `backend/internal/service/openai_gateway_chat_completions.go`
 - Modify: `backend/internal/service/openai_gateway_messages.go`
+- Modify: `backend/internal/service/openai_ws_forwarder.go`
 - Modify: `backend/internal/service/gateway_service.go`
 - Modify: `backend/internal/service/gateway_forward_as_chat_completions.go`
 - Modify: `backend/internal/handler/openai_chat_completions.go`
 - Test: `backend/internal/service/openai_gateway_chat_completions_raw_test.go`
 - Test: `backend/internal/service/openai_gateway_chat_completions_test.go`
+- Test: `backend/internal/service/openai_compat_model_test.go`
 - Test: `backend/internal/service/gateway_forward_as_chat_completions_test.go`
+- Test: `backend/internal/service/openai_ws_protocol_forward_test.go`
 - Test: `backend/internal/handler/openai_gateway_handler_test.go`
 
 **Interfaces:**
@@ -219,7 +222,7 @@ Expected: PASS, including existing Packy protocol, upstream-error sanitization, 
 - [ ] **Step 7: Commit attempt-time locking**
 
 ```bash
-git add backend/internal/service/openai_gateway_service.go backend/internal/service/openai_gateway_chat_completions_raw.go backend/internal/service/openai_gateway_chat_completions.go backend/internal/service/openai_gateway_messages.go backend/internal/service/gateway_service.go backend/internal/service/gateway_forward_as_chat_completions.go backend/internal/handler/openai_chat_completions.go backend/internal/service/openai_gateway_chat_completions_raw_test.go backend/internal/service/openai_gateway_chat_completions_test.go backend/internal/service/gateway_forward_as_chat_completions_test.go backend/internal/handler/openai_gateway_handler_test.go
+git add backend/internal/service/openai_gateway_service.go backend/internal/service/openai_gateway_chat_completions_raw.go backend/internal/service/openai_gateway_chat_completions.go backend/internal/service/openai_gateway_messages.go backend/internal/service/openai_ws_forwarder.go backend/internal/service/gateway_service.go backend/internal/service/gateway_forward_as_chat_completions.go backend/internal/handler/openai_chat_completions.go backend/internal/service/openai_gateway_chat_completions_raw_test.go backend/internal/service/openai_gateway_chat_completions_test.go backend/internal/service/openai_compat_model_test.go backend/internal/service/openai_ws_protocol_forward_test.go backend/internal/service/gateway_forward_as_chat_completions_test.go backend/internal/handler/openai_gateway_handler_test.go
 git commit -m "feat: lock pricing to successful upstream attempt"
 ```
 

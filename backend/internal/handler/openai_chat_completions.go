@@ -350,5 +350,6 @@ func (h *OpenAIGatewayHandler) forwardPackyAwareChatCompletions(
 		Stream:          compatResult.Stream,
 		Duration:        compatResult.Duration,
 		FirstTokenMs:    compatResult.FirstTokenMs,
+		PricingContext:  compatResult.PricingContext,
 	}, nil
 }

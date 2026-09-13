@@ -236,6 +236,7 @@ type OpenAIForwardResult struct {
 	FirstTokenMs    *int
 	ImageCount      int
 	ImageSize       string
+	PricingContext  RequestPricingContext
 }
 
 type OpenAIWSRetryMetricsSnapshot struct {
@@ -336,6 +337,8 @@ type OpenAIGatewayService struct {
 	channelService        *ChannelService
 	balanceNotifyService  *BalanceNotifyService
 	settingService        *SettingService
+	pricingClock          PricingClock
+	pricingResolver       requestPricingContextResolver
 
 	openaiWSPoolOnce              sync.Once
 	openaiWSStateStoreOnce        sync.Once
@@ -408,6 +411,8 @@ func NewOpenAIGatewayService(
 		channelService:        channelService,
 		balanceNotifyService:  balanceNotifyService,
 		settingService:        settingService,
+		pricingClock:          time.Now,
+		pricingResolver:       ResolveRequestPricingContext,
 		responseHeaderFilter:  compileResponseHeaderFilter(cfg),
 		codexSnapshotThrottle: newAccountWriteThrottle(openAICodexSnapshotPersistMinInterval),
 	}
@@ -2696,6 +2701,15 @@ func (s *OpenAIGatewayService) Forward(ctx context.Context, c *gin.Context, acco
 		}
 
 		// Send request
+		pricingContext, pricingErr := resolveAttemptPricingContext(
+			s.pricingClock,
+			s.pricingResolver,
+			originalModel,
+			upstreamModel,
+		)
+		if pricingErr != nil {
+			return nil, fmt.Errorf("resolve request pricing context: %w", pricingErr)
+		}
 		upstreamStart := time.Now()
 		resp, err := s.httpUpstream.Do(upstreamReq, proxyURL, account.ID, account.Concurrency)
 		SetOpsLatencyMs(c, OpsUpstreamLatencyMsKey, time.Since(upstreamStart).Milliseconds())
@@ -2819,6 +2833,7 @@ func (s *OpenAIGatewayService) Forward(ctx context.Context, c *gin.Context, acco
 			OpenAIWSMode:    false,
 			Duration:        time.Since(startTime),
 			FirstTokenMs:    firstTokenMs,
+			PricingContext:  pricingContext,
 		}
 		if imageCount > 0 {
 			forwardResult.ImageCount = imageCount
@@ -2990,6 +3005,15 @@ func (s *OpenAIGatewayService) forwardOpenAIPassthrough(
 	}
 
 	upstreamStart := time.Now()
+	pricingContext, err := resolveAttemptPricingContext(
+		s.pricingClock,
+		s.pricingResolver,
+		reqModel,
+		policyModel,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("resolve request pricing context: %w", err)
+	}
 	resp, err := s.httpUpstream.Do(upstreamReq, proxyURL, account.ID, account.Concurrency)
 	SetOpsLatencyMs(c, OpsUpstreamLatencyMsKey, time.Since(upstreamStart).Milliseconds())
 	if err != nil {
@@ -3062,6 +3086,7 @@ func (s *OpenAIGatewayService) forwardOpenAIPassthrough(
 		OpenAIWSMode:    false,
 		Duration:        time.Since(startTime),
 		FirstTokenMs:    firstTokenMs,
+		PricingContext:  pricingContext,
 	}
 	if imageCount > 0 {
 		forwardResult.ImageCount = imageCount

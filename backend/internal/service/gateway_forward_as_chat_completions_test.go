@@ -29,7 +29,8 @@ func TestGatewayService_ForwardAsChatCompletions_PackyAnthropicUsesMessagesBeare
 	}}
 	cfg := &config.Config{}
 	cfg.Security.URLAllowlist.Enabled = false
-	service := &GatewayService{cfg: cfg, httpUpstream: upstream, tlsFPProfileService: &TLSFingerprintProfileService{}}
+	pricingAt := time.Date(2026, 9, 14, 4, 0, 0, 0, time.UTC)
+	service := &GatewayService{cfg: cfg, httpUpstream: upstream, tlsFPProfileService: &TLSFingerprintProfileService{}, pricingClock: func() time.Time { return pricingAt }}
 	account := &Account{
 		ID: 9, Name: "Packy / Core", Platform: PlatformOpenAI, Type: AccountTypeAPIKey, Concurrency: 1,
 		Credentials: map[string]any{"api_key": "packy-secret", "base_url": "https://cf.api.fan/v1", "model_mapping": map[string]any{"claude-sonnet-4-6": "claude-sonnet-4-6"}},
@@ -43,6 +44,10 @@ func TestGatewayService_ForwardAsChatCompletions_PackyAnthropicUsesMessagesBeare
 	require.Empty(t, getHeaderRaw(upstream.lastReq.Header, "x-api-key"))
 	require.Equal(t, 2, result.Usage.InputTokens)
 	require.Equal(t, 1, result.Usage.OutputTokens)
+	require.Equal(t, pricingAt, result.PricingContext.EffectiveAt)
+	require.Equal(t, "claude-sonnet-4-6", result.PricingContext.CanonicalModel)
+	require.Equal(t, "claude-sonnet-4-6", result.PricingContext.AccountingModel)
+	require.Equal(t, 1.0, result.PricingContext.CustomerMultiplier)
 	require.NotContains(t, rec.Body.String(), "cf.api.fan")
 	require.NotContains(t, rec.Body.String(), "packy-secret")
 }

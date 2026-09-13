@@ -504,6 +504,8 @@ type ForwardResult struct {
 	// 图片生成计费字段（图片生成模型使用）
 	ImageCount int    // 生成的图片数量
 	ImageSize  string // 图片尺寸 "1K", "2K", "4K"
+
+	PricingContext RequestPricingContext
 }
 
 // UpstreamFailoverError indicates an upstream error that should trigger account failover.
@@ -572,6 +574,8 @@ type GatewayService struct {
 	debugGatewayBodyFile  atomic.Pointer[os.File] // non-nil when SUB2API_DEBUG_GATEWAY_BODY is set
 	tlsFPProfileService   *TLSFingerprintProfileService
 	balanceNotifyService  *BalanceNotifyService
+	pricingClock          PricingClock
+	pricingResolver       requestPricingContextResolver
 }
 
 // NewGatewayService creates a new GatewayService
@@ -637,6 +641,8 @@ func NewGatewayService(
 		channelService:       channelService,
 		resolver:             resolver,
 		balanceNotifyService: balanceNotifyService,
+		pricingClock:         time.Now,
+		pricingResolver:      ResolveRequestPricingContext,
 	}
 	svc.userGroupRateResolver = newUserGroupRateResolver(
 		userGroupRateRepo,
@@ -4535,6 +4541,7 @@ func (s *GatewayService) Forward(ctx context.Context, c *gin.Context, account *A
 
 	// 重试循环
 	var resp *http.Response
+	var pricingContext RequestPricingContext
 	retryStart := time.Now()
 	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
 		// 构建上游请求（每次重试需要重新构建，因为请求体需要重新读取）
@@ -4546,6 +4553,10 @@ func (s *GatewayService) Forward(ctx context.Context, c *gin.Context, account *A
 		}
 
 		// 发送请求
+		pricingContext, err = resolveAttemptPricingContext(s.pricingClock, s.pricingResolver, originalModel, reqModel)
+		if err != nil {
+			return nil, fmt.Errorf("resolve request pricing context: %w", err)
+		}
 		resp, err = s.httpUpstream.DoWithTLS(upstreamReq, proxyURL, account.ID, account.Concurrency, tlsProfile)
 		if err != nil {
 			if resp != nil && resp.Body != nil {
@@ -4965,6 +4976,7 @@ func (s *GatewayService) Forward(ctx context.Context, c *gin.Context, account *A
 		Duration:         time.Since(startTime),
 		FirstTokenMs:     firstTokenMs,
 		ClientDisconnect: clientDisconnect,
+		PricingContext:   pricingContext,
 	}, nil
 }
 
@@ -5027,6 +5039,7 @@ func (s *GatewayService) forwardAnthropicAPIKeyPassthroughWithInput(
 	setOpsUpstreamRequestBody(c, input.Body)
 
 	var resp *http.Response
+	var pricingContext RequestPricingContext
 	retryStart := time.Now()
 	for attempt := 1; attempt <= maxRetryAttempts; attempt++ {
 		upstreamCtx, releaseUpstreamCtx := detachStreamUpstreamContext(ctx, input.RequestStream)
@@ -5036,6 +5049,10 @@ func (s *GatewayService) forwardAnthropicAPIKeyPassthroughWithInput(
 			return nil, err
 		}
 
+		pricingContext, err = resolveAttemptPricingContext(s.pricingClock, s.pricingResolver, input.OriginalModel, input.RequestModel)
+		if err != nil {
+			return nil, fmt.Errorf("resolve request pricing context: %w", err)
+		}
 		resp, err = s.httpUpstream.DoWithTLS(upstreamReq, proxyURL, account.ID, account.Concurrency, s.tlsFPProfileService.ResolveTLSProfile(account))
 		if err != nil {
 			if resp != nil && resp.Body != nil {
@@ -5217,6 +5234,7 @@ func (s *GatewayService) forwardAnthropicAPIKeyPassthroughWithInput(
 		Duration:         time.Since(input.StartTime),
 		FirstTokenMs:     firstTokenMs,
 		ClientDisconnect: clientDisconnect,
+		PricingContext:   pricingContext,
 	}, nil
 }
 

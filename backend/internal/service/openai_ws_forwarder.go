@@ -1976,6 +1976,15 @@ func (s *OpenAIGatewayService) forwardOpenAIWSV2(
 	); err != nil {
 		return nil, err
 	}
+	pricingContext, pricingErr := resolveAttemptPricingContext(
+		s.pricingClock,
+		s.pricingResolver,
+		originalModel,
+		mappedModel,
+	)
+	if pricingErr != nil {
+		return nil, wrapOpenAIWSFallback("resolve_pricing_context", pricingErr)
+	}
 
 	if err := lease.WriteJSONWithContextTimeout(ctx, payload, s.openAIWSWriteTimeout()); err != nil {
 		lease.MarkBroken()
@@ -2363,6 +2372,7 @@ func (s *OpenAIGatewayService) forwardOpenAIWSV2(
 		ResponseHeaders: lease.HandshakeHeaders(),
 		Duration:        time.Since(startTime),
 		FirstTokenMs:    firstTokenMs,
+		PricingContext:  pricingContext,
 	}, nil
 }
 

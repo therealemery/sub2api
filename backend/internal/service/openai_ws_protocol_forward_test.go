@@ -230,6 +230,10 @@ func TestOpenAIGatewayService_Forward_HTTPIngressRetriesInvalidEncryptedContentO
 		cfg:              cfg,
 		httpUpstream:     upstream,
 		openaiWSResolver: NewOpenAIWSProtocolResolver(cfg),
+		pricingClock: requestPricingClockSequence(
+			time.Date(2026, 9, 14, 0, 59, 59, 0, time.UTC),
+			time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC),
+		),
 	}
 
 	account := &Account{
@@ -247,13 +251,16 @@ func TestOpenAIGatewayService_Forward_HTTPIngressRetriesInvalidEncryptedContentO
 		},
 	}
 
-	body := []byte(`{"model":"gpt-5.1","stream":false,"previous_response_id":"resp_http_retry","input":[{"type":"reasoning","encrypted_content":"gAAA","summary":[{"type":"summary_text","text":"keep me"}]},{"type":"input_text","text":"hello"}]}`)
+	body := []byte(`{"model":"deepseek-v4.1-flash","stream":false,"previous_response_id":"resp_http_retry","input":[{"type":"reasoning","encrypted_content":"gAAA","summary":[{"type":"summary_text","text":"keep me"}]},{"type":"input_text","text":"hello"}]}`)
 	result, err := svc.Forward(context.Background(), c, account, body)
 	require.NoError(t, err)
 	require.NotNil(t, result)
 	require.False(t, result.OpenAIWSMode, "HTTP 入站应保持 HTTP 转发")
 	require.Equal(t, 2, upstream.callCount, "命中 invalid_encrypted_content 后应只在 HTTP 路径重试一次")
 	require.Len(t, upstream.bodies, 2)
+	require.Equal(t, time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC), result.PricingContext.EffectiveAt)
+	require.Equal(t, deepSeekWeekdayPeakRuleID, result.PricingContext.RuleID)
+	require.Equal(t, 2.0, result.PricingContext.CustomerMultiplier)
 
 	firstBody := upstream.bodies[0]
 	secondBody := upstream.bodies[1]
@@ -270,6 +277,24 @@ func TestOpenAIGatewayService_Forward_HTTPIngressRetriesInvalidEncryptedContentO
 	reason, _ := c.Get("openai_ws_transport_reason")
 	require.Equal(t, string(OpenAIUpstreamTransportHTTPSSE), decision)
 	require.Equal(t, "client_protocol_http", reason)
+}
+
+func requestPricingClockSequence(values ...time.Time) PricingClock {
+	var mu sync.Mutex
+	index := 0
+	return func() time.Time {
+		mu.Lock()
+		defer mu.Unlock()
+		if len(values) == 0 {
+			return time.Now()
+		}
+		if index >= len(values) {
+			return values[len(values)-1]
+		}
+		value := values[index]
+		index++
+		return value
+	}
 }
 
 func TestOpenAIGatewayService_Forward_HTTPIngressRetriesWrappedInvalidEncryptedContentOnce(t *testing.T) {

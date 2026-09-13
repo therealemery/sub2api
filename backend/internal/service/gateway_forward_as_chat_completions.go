@@ -124,6 +124,15 @@ func (s *GatewayService) ForwardAsChatCompletions(
 	if err != nil {
 		return nil, fmt.Errorf("build upstream request: %w", err)
 	}
+	pricingContext, err := resolveAttemptPricingContext(
+		s.pricingClock,
+		s.pricingResolver,
+		originalModel,
+		mappedModel,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("resolve request pricing context: %w", err)
+	}
 
 	// 11. Send request
 	resp, err := s.httpUpstream.DoWithTLS(upstreamReq, proxyURL, account.ID, account.Concurrency, s.tlsFPProfileService.ResolveTLSProfile(account))
@@ -193,6 +202,9 @@ func (s *GatewayService) ForwardAsChatCompletions(
 		result, handleErr = s.handleCCStreamingFromAnthropic(resp, c, originalModel, mappedModel, reasoningEffort, startTime, includeUsage)
 	} else {
 		result, handleErr = s.handleCCBufferedFromAnthropic(resp, c, originalModel, mappedModel, reasoningEffort, startTime)
+	}
+	if handleErr == nil && result != nil {
+		result.PricingContext = pricingContext
 	}
 
 	return result, handleErr
