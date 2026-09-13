@@ -104,6 +104,31 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-13 — Text pricing and conditional-multiplier design ready for review
+
+- The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
+  manufacturer list sells at 70%; cost above 60% through 80% sells at 80%; cost above 80% or
+  lacking a verifiable exact price is removed from both the catalog and callable channel.
+- Qwen, GLM, and approved DeepSeek sale routes use the reviewed 50% cost band and 70% sale price.
+  The mandatory `gpt-5.6-luna`, `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-6-astra` routes use the
+  Packy `codex` 12% cost band and 70% sale price; other approved OpenAI 72% routes sell at 80%.
+- The four Codex models move to an exact-model `Packy / Codex` account and cannot fall back to
+  `Packy / Core`. Migrations never create, move, copy, or expose its credential.
+- Added the approved reusable request-condition design. Both DeepSeek models use `2x` customer and
+  upstream-cost factors Monday-Friday in half-open Beijing windows `[09:00,12:00)` and
+  `[14:00,18:00)` (UTC `[01:00,04:00)` and `[06:00,10:00)`). The final successful Packy attempt's
+  send timestamp locks one factor for billing, cost, and usage history even if the response crosses
+  a boundary; failed attempts do not bill.
+- The customer/model, customer/group, group, then `1.0` override precedence applies after the
+  condition factor. Usage history persists the condition factor, rule ID, and pricing timestamp.
+- GPT-6 Astra's long-context threshold is corrected from 200,000 to greater than 272,000 total
+  input tokens. DeepSeek Pro is explicitly unavailable until an exact manufacturer-authoritative
+  price replaces the current incorrect Flash-price reuse; Packy's 50% label cannot be used to
+  infer that manufacturer price.
+- Design: `docs/superpowers/specs/2026-09-13-ownapi-text-pricing-conditional-multiplier-design.md`.
+  No business code, database, production data, account mapping, credential, or deployment changed
+  at this checkpoint.
+
 ### 2026-09-13 — MiniMax H3 reference-media repair design approved
 
 - Production evidence confirms that H3 text-to-video still works at 768p and 2K, while requests
@@ -176,7 +201,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
   persistent H3 media directory, sanitized recent H3 request evidence, and public health/input
   route status. It does not create tasks, change data, or print credentials/tokens.
 
-### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design ready for review
+### 2026-09-11 — DeepSeek Sale and GPT-6 pricing design (superseded pricing terms)
 
 - Drafted the approved direction for `deepseek-v4.1-flash` (privately mapped to Packy's
   `deepseek-v4-flash`) and `deepseek-v4-pro` on a dedicated `Packy / DeepSeek Sale` account. Both
@@ -187,6 +212,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
   billing remains official price multiplied by `0.7`, with the existing 200,000-token boundary.
 - Design: `docs/superpowers/specs/2026-09-11-ownapi-deepseek-sale-gpt6-pricing-design.md`. No pricing,
   routing, account, production data, or secret has been modified at this checkpoint.
+- The 2026-09-13 text-pricing design supersedes the shared DeepSeek price, 75-percent sale factor,
+  and GPT-6 200,000-token boundary above. This entry remains only as implementation history.
 
 ### 2026-09-11 — Wan detail-page code examples corrected, deployed, and verified
 
@@ -429,7 +456,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
   repeated; the successful deployment job had already connected over SSH, installed the exact image,
   inspected its version, and collected healthy startup logs.
 
-### 2026-09-11 — DeepSeek Sale and GPT-6 implementation approved
+### 2026-09-11 — DeepSeek Sale and GPT-6 implementation approved (historical)
 
 - The user approved the written design in
   `docs/superpowers/specs/2026-09-11-ownapi-deepseek-sale-gpt6-pricing-design.md`.
@@ -440,6 +467,8 @@ Before deploying, determine the existing website's host, domain, deployment dire
   account, and privately map flash to Packy's `deepseek-v4-flash` ID.
 - GPT-6 Astra short/long customer billing will be corrected to the approved 70-percent values,
   including cache-read and cache-write charges. No paid request is authorized at this checkpoint.
+- The later 2026-09-13 text-pricing design supersedes the DeepSeek 75-percent sale factor, shared
+  Flash/Pro manufacturer price, and GPT-6 context boundary recorded here.
 
 ### 2026-09-11 — DeepSeek Sale and GPT-6 implementation pushed
 
