@@ -56,6 +56,7 @@ func TestVideoInputTokenAndPublicDownload(t *testing.T) {
 			publicURL, path, err := h.storeVideoInput(ctx, test.field, value)
 			require.NoError(t, err)
 			require.Equal(t, "https://ownapi.dev/v1/video-inputs/", publicURL[:len("https://ownapi.dev/v1/video-inputs/")])
+			require.True(t, strings.HasSuffix(publicURL, videoInputExtension(test.mimeType)))
 			info, err := os.Stat(path)
 			require.NoError(t, err)
 			require.Equal(t, os.FileMode(0o600), info.Mode().Perm())
@@ -73,6 +74,31 @@ func TestVideoInputTokenAndPublicDownload(t *testing.T) {
 			require.Equal(t, test.data, download.Body.Bytes())
 		})
 	}
+}
+
+func TestVideoInputExtensionMustMatchAuthenticatedMIME(t *testing.T) {
+	h := newVideoInputTestHandler(t)
+	envelope := videoInputEnvelope{File: "media", MIME: "audio/mpeg", Size: 4, ExpiresAt: time.Now().Add(time.Hour).Unix()}
+	token, err := h.sealVideoInput(envelope)
+	require.NoError(t, err)
+
+	opened, err := h.openVideoInput(token + ".mp3")
+	require.NoError(t, err)
+	require.Equal(t, envelope, *opened)
+	_, err = h.openVideoInput(token + ".mp4")
+	require.Error(t, err)
+	opened, err = h.openVideoInput(token)
+	require.NoError(t, err)
+	require.Equal(t, envelope, *opened)
+}
+
+func TestVideoInputExtensionMapping(t *testing.T) {
+	for mimeType, extension := range map[string]string{
+		"image/png": ".png", "image/jpeg": ".jpg", "audio/mpeg": ".mp3", "video/mp4": ".mp4",
+	} {
+		require.Equal(t, extension, videoInputExtension(mimeType))
+	}
+	require.Empty(t, videoInputExtension("application/octet-stream"))
 }
 
 func TestVideoInputDownloadRejectsTamperedExpiredAndUnsafeTokens(t *testing.T) {

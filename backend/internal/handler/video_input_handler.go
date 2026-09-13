@@ -65,7 +65,7 @@ func (h *GatewayHandler) VideoInputContent(c *gin.Context) {
 	c.Header("Content-Length", strconv.FormatInt(envelope.Size, 10))
 	c.Header("Cache-Control", "private, max-age=3600")
 	c.Header("X-Content-Type-Options", "nosniff")
-	http.ServeContent(c.Writer, c.Request, envelope.File, info.ModTime(), file)
+	http.ServeContent(c.Writer, c.Request, videoInputContentName(envelope), info.ModTime(), file)
 }
 
 func (h *GatewayHandler) storeVideoInput(c *gin.Context, field string, value h3MediaValue) (string, string, error) {
@@ -109,7 +109,7 @@ func (h *GatewayHandler) storeVideoInput(c *gin.Context, field string, value h3M
 		_ = os.Remove(path)
 		return "", "", err
 	}
-	return baseURL + "/v1/video-inputs/" + url.PathEscape(token), path, nil
+	return baseURL + "/v1/video-inputs/" + url.PathEscape(token) + videoInputExtension(mimeType), path, nil
 }
 
 func isStagedH3MediaField(field string) bool {
@@ -245,6 +245,8 @@ func (h *GatewayHandler) sealVideoInput(envelope videoInputEnvelope) (string, er
 }
 
 func (h *GatewayHandler) openVideoInput(token string) (*videoInputEnvelope, error) {
+	baseToken, requestedExtension := splitVideoInputToken(token)
+	token = baseToken
 	if !strings.HasPrefix(token, videoInputTokenPrefix) {
 		return nil, fmt.Errorf("invalid video input token")
 	}
@@ -264,5 +266,53 @@ func (h *GatewayHandler) openVideoInput(token string) (*videoInputEnvelope, erro
 	if err := json.Unmarshal(plain, &envelope); err != nil {
 		return nil, err
 	}
+	if requestedExtension != "" && requestedExtension != videoInputExtension(envelope.MIME) {
+		return nil, fmt.Errorf("invalid video input extension")
+	}
 	return &envelope, nil
+}
+
+// splitVideoInputToken keeps previously issued extensionless URLs working while
+// allowing new URLs to advertise the media type to providers that validate the
+// filename suffix. The encrypted token itself is URL-safe and never contains a
+// dot, so an extension can be safely recognized at the end of the path value.
+func splitVideoInputToken(token string) (string, string) {
+	for _, extension := range []string{".png", ".jpg", ".webp", ".mp3", ".wav", ".m4a", ".mp4", ".webm", ".mov"} {
+		if strings.HasSuffix(strings.ToLower(token), extension) {
+			return token[:len(token)-len(extension)], extension
+		}
+	}
+	return token, ""
+}
+
+func videoInputExtension(mimeType string) string {
+	switch strings.ToLower(strings.TrimSpace(strings.SplitN(mimeType, ";", 2)[0])) {
+	case "image/jpeg":
+		return ".jpg"
+	case "image/png":
+		return ".png"
+	case "image/webp":
+		return ".webp"
+	case "audio/mpeg":
+		return ".mp3"
+	case "audio/wav", "audio/x-wav":
+		return ".wav"
+	case "audio/mp4", "audio/x-m4a":
+		return ".m4a"
+	case "video/mp4":
+		return ".mp4"
+	case "video/webm":
+		return ".webm"
+	case "video/quicktime":
+		return ".mov"
+	default:
+		return ""
+	}
+}
+
+func videoInputContentName(envelope *videoInputEnvelope) string {
+	if envelope == nil {
+		return "input"
+	}
+	return "input" + videoInputExtension(envelope.MIME)
 }

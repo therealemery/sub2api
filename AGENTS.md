@@ -702,6 +702,14 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - The Docs page lists reference image/video/audio and first/last-frame fields, provider media limits, and the rule that frame inputs cannot be mixed with other reference media.
 - English and Chinese copy were added for the lifecycle steps; responsive Docs styling keeps the cards readable on mobile. Vue type checking, H3 model-detail tests, production build, and `git diff --check` passed.
 
+### 2026-09-13 — H3 reference-media URL suffix fix ready for deployment
+
+- New private H3 reference-media URLs now carry a MIME-derived suffix (`.png`, `.jpg`, `.mp3`, `.mp4`, and supported equivalents), allowing DC-API filename-based media validation to identify uploaded formats.
+- The encrypted media token remains the authorization boundary; the handler validates any supplied suffix against the authenticated envelope MIME type and continues to accept legacy extensionless URLs. Content responses use a matching logical filename while preserving private storage, content type, expiry, and cleanup behavior.
+- Added sanitized create-request telemetry containing only model, adapter, HTTP status, and elapsed milliseconds; credentials, URLs, upstream task IDs, and response bodies are never logged.
+- Validation passed: H3-related handler tests, backend handler/service/routes packages, all 113 frontend test files / 685 tests, Vue type checking, production frontend build, and `git diff --check`. No paid H3 request was repeated.
+- Changes are currently uncommitted on `codex/video-usage-history`; deploy only after committing and pushing the verified patch. Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`.
+
 ## Recovery Checklist
 
 1. Read this file, every document listed under Required Reading, and `design-qa.md`.

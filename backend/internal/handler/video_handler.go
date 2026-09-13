@@ -170,15 +170,29 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 		return
 	}
 	var resp *http.Response
+	upstreamStarted := time.Now()
 	if adapter == videoAdapterAlibaba {
 		resp, err = h.gatewayService.ForwardAlibabaVideo(c.Request.Context(), account, http.MethodPost, "/services/aigc/video-generation/video-synthesis", body)
 	} else {
 		resp, err = h.gatewayService.ForwardDCVideo(c.Request.Context(), account, http.MethodPost, "/v1/videos", body)
 	}
+	upstreamDuration := time.Since(upstreamStarted)
 	if err != nil {
+		logger.L().With(
+			zap.String("model", model),
+			zap.String("adapter", adapter),
+			zap.Int("status", 0),
+			zap.Int64("duration_ms", upstreamDuration.Milliseconds()),
+		).Warn("video.upstream_request_failed")
 		h.errorResponse(c, http.StatusBadGateway, "upstream_error", "Video provider request failed")
 		return
 	}
+	logger.L().With(
+		zap.String("model", model),
+		zap.String("adapter", adapter),
+		zap.Int("status", resp.StatusCode),
+		zap.Int64("duration_ms", upstreamDuration.Milliseconds()),
+	).Info("video.upstream_response")
 	defer func() { _ = resp.Body.Close() }()
 	responseBody, err := io.ReadAll(io.LimitReader(resp.Body, maxVideoJSONBody+1))
 	if err != nil || len(responseBody) > maxVideoJSONBody {
