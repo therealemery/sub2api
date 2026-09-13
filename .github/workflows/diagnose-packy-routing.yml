@@ -61,6 +61,16 @@ jobs:
                  COALESCE(a.name, ''),
                  COALESCE(ul.inbound_endpoint, ''),
                  COALESCE(ul.upstream_endpoint, ''),
+                 ul.input_tokens,
+                 ul.output_tokens,
+                 ul.cache_creation_tokens,
+                 ul.cache_read_tokens,
+                 ul.input_cost,
+                 ul.output_cost,
+                 ul.cache_creation_cost,
+                 ul.cache_read_cost,
+                 ul.rate_multiplier,
+                 COALESCE(ul.model_mapping_chain, ''),
                  ul.actual_cost,
                  COALESCE(ul.account_stats_cost, 0)
           FROM usage_logs ul
