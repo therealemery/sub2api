@@ -400,8 +400,9 @@ Before deploying, determine the existing website's host, domain, deployment dire
   boundaries.
 - `Packy / Core` is not currently usable: its stored error reports a Packy 401 invalid token and a
   temporary 403 cooldown whose upstream text explicitly prohibits secondary API relay access.
-  Consequently the Core whitelist is absent from `/v1/models`, and direct probes return 503 after
-  cooldown. `Packy / ZAI` is also disabled with a Packy 401 invalid-token error.
+  The cached `/v1/models` response can temporarily include or omit the Core whitelist, but direct
+  probes remain unavailable and the account ultimately transitions to `error`. `Packy / ZAI` is
+  also disabled with a Packy 401 invalid-token error.
 - `Packy / Expansion` remains schedulable, but `minimax-m2.5` consistently returns sanitized 400
   for all tested output-limit variants and `kimi-k2.5` consistently returns sanitized 503. Failed
   requests create no successful usage rows and no customer billing row was observed.
