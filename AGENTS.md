@@ -709,6 +709,7 @@ Before deploying, determine the existing website's host, domain, deployment dire
 - Added sanitized create-request telemetry containing only model, adapter, HTTP status, and elapsed milliseconds; credentials, URLs, upstream task IDs, and response bodies are never logged.
 - Validation passed: H3-related handler tests, backend handler/service/routes packages, all 113 frontend test files / 685 tests, Vue type checking, production frontend build, and `git diff --check`. No paid H3 request was repeated.
 - Changes are currently uncommitted on `codex/video-usage-history`; deploy only after committing and pushing the verified patch. Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`.
+- Deployment checkpoint: commit `a233e30e` was pushed to `main` and deployed by Actions run `34746935011`. The production health endpoint, public Models page, redirected Docs page, and invalid media-token 404 check passed without creating a paid task.
 
 ## Recovery Checklist
 
