@@ -1,0 +1,63 @@
+name: Diagnose Packy Routing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+
+      - name: Collect read-only Packy routing evidence
+        run: |
+          ssh -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i /tmp/ssh_key \
+            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" 'sh -s' <<'REMOTE'
+          set -eu
+          cd /opt/ownapi/deploy
+
+          docker compose exec -T postgres sh -c 'psql -X --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -F "$SEP" -At' <<'SQL'
+          \set ON_ERROR_STOP on
+
+          SELECT 'ACCOUNT', a.id, a.name, a.status,
+                 COALESCE(a.schedulable, false),
+                 COALESCE(a.extra->>'upstream_provider', ''),
+                 COALESCE(a.credentials->>'base_url', ''),
+                 COALESCE(a.credentials->>'model_mapping', '{}')
+          FROM accounts a
+          WHERE a.deleted_at IS NULL
+            AND a.name LIKE 'Packy / %'
+          ORDER BY a.id;
+
+          SELECT 'GROUP', a.name, g.name, g.platform
+          FROM accounts a
+          JOIN account_groups ag ON ag.account_id = a.id
+          JOIN groups g ON g.id = ag.group_id
+          WHERE a.deleted_at IS NULL
+            AND a.name LIKE 'Packy / %'
+          ORDER BY a.name, g.name;
+
+          SELECT 'USAGE', ul.id, to_char(ul.created_at AT TIME ZONE 'Asia/Shanghai', 'YYYY-MM-DD HH24:MI:SS'),
+                 COALESCE(ul.requested_model, ul.model),
+                 COALESCE(ul.upstream_model, ul.model),
+                 COALESCE(a.name, ''),
+                 COALESCE(ul.inbound_endpoint, ''),
+                 COALESCE(ul.upstream_endpoint, ''),
+                 ul.actual_cost,
+                 COALESCE(ul.account_stats_cost, 0)
+          FROM usage_logs ul
+          LEFT JOIN accounts a ON a.id = ul.account_id
+          WHERE ul.created_at >= NOW() - INTERVAL '2 hours'
+            AND COALESCE(a.name, '') LIKE 'Packy / %'
+          ORDER BY ul.id DESC
+          LIMIT 150;
+          SQL
+          REMOTE
+        env:
+          SEP: "|"
