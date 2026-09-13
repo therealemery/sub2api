@@ -387,6 +387,31 @@ Before deploying, determine the existing website's host, domain, deployment dire
 
 ## Checkpoint Log
 
+### 2026-09-13 — Packy text routing production audit
+
+- Used the existing OwnAPI test API key for minimum-output production calls and verified the
+  resulting administrator-only usage rows with the read-only `Diagnose Packy Routing` workflow.
+- Both DeepSeek models complete successfully through exactly `Packy / DeepSeek Sale` over
+  `/v1/chat/completions`; `deepseek-v4.1-flash` is privately rewritten to
+  `deepseek-v4-flash`, while `deepseek-v4-pro` remains unchanged. No DeepSeek request used another
+  Packy account.
+- All eleven successful Qwen samples and `MiniMax-M2.7` used exactly `Packy / Expansion`, and the
+  successful GPT-5.4 samples used exactly `Packy / GPT-5.4`. No successful sample crossed account
+  boundaries.
+- `Packy / Core` is not currently usable: its stored error reports a Packy 401 invalid token and a
+  temporary 403 cooldown whose upstream text explicitly prohibits secondary API relay access.
+  Consequently the Core whitelist is absent from `/v1/models`, and direct probes return 503 after
+  cooldown. `Packy / ZAI` is also disabled with a Packy 401 invalid-token error.
+- `Packy / Expansion` remains schedulable, but `minimax-m2.5` consistently returns sanitized 400
+  for all tested output-limit variants and `kimi-k2.5` consistently returns sanitized 503. Failed
+  requests create no successful usage rows and no customer billing row was observed.
+- The current DeepSeek customer price is `$0.1125/$0.45/$0.00225` per MTok for
+  input/output/cache-read. Recorded account-cost rules are materially higher for V4 Pro, and live
+  calls confirm V4 Pro is loss-making at the current customer price. Do not repeat paid Pro probes;
+  price/routing availability needs an explicit business decision before mutation.
+- Commits `309a509f` and `c86cd0d8` add the reusable read-only Packy routing diagnostic workflow to
+  `origin/main`; no application deployment or production-data mutation was performed.
+
 ### 2026-09-13 — MiniMax H3 reference-media repair deployed
 
 - Functional commit `fdd4b4f3` and equivalent staticcheck cleanup `4ef4a837` were pushed to
