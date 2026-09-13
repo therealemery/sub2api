@@ -171,8 +171,8 @@ rewrite base prices and not page-only prose. Each rule contains:
 The initial rule is:
 
 ```text
-id: packy-deepseek-weekday-peak-2026-09-13
-models: deepseek-v4.1-flash, deepseek-v4-pro
+id: deepseek-weekday-peak-2026-09-13
+models: deepseek-v4.1-flash
 timezone: Asia/Shanghai
 weekdays: Monday through Friday
 windows: [09:00, 12:00), [14:00, 18:00)
@@ -259,7 +259,8 @@ Each new text usage record persists enough immutable audit data to reproduce the
 
 New records default the condition multiplier to `1.0`; historical rows are not re-rated and show
 the neutral factor with no matched rule. The customer Usage page displays `1x` or `2x` and a
-localized peak-rule label without exposing Packy. The admin view also exposes the rule ID and
+localized peak-rule label without exposing Packy. The stable rule ID itself is provider-neutral
+and can therefore be shared by the customer and admin DTOs; the admin view also exposes the
 pricing-effective timestamp for reconciliation.
 
 The database migration is additive for audit columns and idempotent for price/account updates.

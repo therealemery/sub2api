@@ -98,7 +98,7 @@ tests := []struct {
 }
 ```
 
-Also assert that `deepseek-v4.1-flash` matches `packy-deepseek-weekday-peak-2026-09-13`, an unrelated model returns neutral factors with no rule ID, and public projection contains no upstream/account/cost fields.
+Also assert that `deepseek-v4.1-flash` matches the provider-neutral ID `deepseek-weekday-peak-2026-09-13`, an unrelated model returns neutral factors with no rule ID, and public projection contains no upstream/account/cost fields.
 
 - [ ] **Step 2: Write the failing registry-validation tests**
 
@@ -178,7 +178,7 @@ RequestPricingContext{
 	CanonicalModel: "deepseek-v4.1-flash",
 	AccountingModel: "deepseek-v4-flash",
 	EffectiveAt: time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC),
-	RuleID: "packy-deepseek-weekday-peak-2026-09-13",
+	RuleID: "deepseek-weekday-peak-2026-09-13",
 	CustomerMultiplier: 2,
 	UpstreamCostMultiplier: 2,
 }
@@ -698,7 +698,7 @@ Expected: FAIL because types, formatters, columns, tooltips, and export cells do
 
 - [ ] **Step 4: Extend frontend types and shared formatters**
 
-Add the three new audit fields to `UsageLog`; reuse them in `AdminUsageLog` and retain existing `rate_multiplier` as customer rate. Implement finite-positive normalization and a known-rule localization map keyed only by `packy-deepseek-weekday-peak-2026-09-13`. Unknown rule IDs render a neutral generic condition label to customers and the raw ID to admins.
+Add the three new audit fields to `UsageLog`; reuse them in `AdminUsageLog` and retain existing `rate_multiplier` as customer rate. Implement finite-positive normalization and a known-rule localization map keyed only by the provider-neutral `deepseek-weekday-peak-2026-09-13`. Unknown rule IDs render a neutral generic condition label to customers and the raw ID to admins.
 
 - [ ] **Step 5: Update customer usage history**
 
