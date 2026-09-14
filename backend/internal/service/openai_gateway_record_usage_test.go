@@ -114,9 +114,20 @@ func (s *openAIRecordUsageAPIKeyQuotaStub) UpdateRateLimitUsage(ctx context.Cont
 type openAIUserGroupRateRepoStub struct {
 	UserGroupRateRepository
 
-	rate  *float64
-	err   error
-	calls int
+	rate       *float64
+	modelRate  *float64
+	err        error
+	calls      int
+	modelCalls int
+	lastModel  string
+}
+
+func (s *openAIUserGroupRateRepoStub) GetUserGroupModels(context.Context, int64, int64) ([]UserModelRateEntry, error) {
+	return nil, s.err
+}
+
+func (s *openAIUserGroupRateRepoStub) SyncUserGroupModels(context.Context, int64, int64, []UserModelRateInput) error {
+	return s.err
 }
 
 func (s *openAIUserGroupRateRepoStub) GetByUserAndGroup(ctx context.Context, userID, groupID int64) (*float64, error) {
@@ -127,7 +138,20 @@ func (s *openAIUserGroupRateRepoStub) GetByUserAndGroup(ctx context.Context, use
 	return s.rate, nil
 }
 
+func (s *openAIUserGroupRateRepoStub) GetByUserAndGroupModel(_ context.Context, _, _ int64, model string) (*float64, error) {
+	s.modelCalls++
+	s.lastModel = model
+	if s.err != nil {
+		return nil, s.err
+	}
+	return s.modelRate, nil
+}
+
 func i64p(v int64) *int64 {
+	return &v
+}
+
+func floatPtr(v float64) *float64 {
 	return &v
 }
 
@@ -163,6 +187,7 @@ func newOpenAIRecordUsageServiceForTest(usageRepo UsageLogRepository, userRepo U
 		nil,
 		"service.openai_gateway.test",
 	)
+	svc.userModelRateResolver = newUserModelRateResolver(rateRepo, "service.openai_gateway.test")
 	return svc
 }
 
@@ -192,7 +217,7 @@ func max(a, b int) int {
 	return b
 }
 
-func TestOpenAIGatewayServiceRecordUsage_ZeroUsageStillWritesUsageLog(t *testing.T) {
+func TestOpenAIGatewayServiceRecordUsage_ZeroTokenUsageFailsReconciliationWithoutBilling(t *testing.T) {
 	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
 	billingRepo := &openAIRecordUsageBillingRepoStub{result: &UsageBillingApplyResult{Applied: true}}
 	userRepo := &openAIRecordUsageUserRepoStub{}
@@ -213,33 +238,117 @@ func TestOpenAIGatewayServiceRecordUsage_ZeroUsageStillWritesUsageLog(t *testing
 		APIKeyService: quotaSvc,
 	})
 
-	require.NoError(t, err)
-	require.Equal(t, 1, billingRepo.calls)
-	require.Equal(t, 1, usageRepo.calls)
+	var reconciliationErr *UsageReconciliationError
+	require.ErrorAs(t, err, &reconciliationErr)
+	require.Equal(t, 0, billingRepo.calls)
+	require.Equal(t, 0, usageRepo.calls)
 	require.Equal(t, 0, userRepo.deductCalls)
 	require.Equal(t, 0, subRepo.incrementCalls)
 	require.Equal(t, 0, quotaSvc.quotaCalls)
 	require.Equal(t, 0, quotaSvc.rateLimitCalls)
 
-	require.NotNil(t, usageRepo.lastLog)
-	require.Equal(t, "resp_zero_usage", usageRepo.lastLog.RequestID)
-	require.Zero(t, usageRepo.lastLog.InputTokens)
-	require.Zero(t, usageRepo.lastLog.OutputTokens)
-	require.Zero(t, usageRepo.lastLog.CacheCreationTokens)
-	require.Zero(t, usageRepo.lastLog.CacheReadTokens)
-	require.Zero(t, usageRepo.lastLog.ImageOutputTokens)
-	require.Zero(t, usageRepo.lastLog.ImageCount)
-	require.Zero(t, usageRepo.lastLog.InputCost)
-	require.Zero(t, usageRepo.lastLog.OutputCost)
-	require.Zero(t, usageRepo.lastLog.TotalCost)
-	require.Zero(t, usageRepo.lastLog.ActualCost)
+	require.Nil(t, usageRepo.lastLog)
+	require.Nil(t, billingRepo.lastCmd)
+}
 
-	require.NotNil(t, billingRepo.lastCmd)
-	require.Zero(t, billingRepo.lastCmd.BalanceCost)
-	require.Zero(t, billingRepo.lastCmd.SubscriptionCost)
-	require.Zero(t, billingRepo.lastCmd.APIKeyQuotaCost)
-	require.Zero(t, billingRepo.lastCmd.APIKeyRateLimitCost)
-	require.Zero(t, billingRepo.lastCmd.AccountQuotaCost)
+func TestOpenAIGatewayServiceRecordUsage_ConditionAndCustomerModelRateApplyExactlyOnce(t *testing.T) {
+	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
+	billingRepo := &openAIRecordUsageBillingRepoStub{result: &UsageBillingApplyResult{Applied: true}}
+	modelRate := 0.8
+	rateRepo := &openAIUserGroupRateRepoStub{modelRate: &modelRate}
+	svc := newOpenAIRecordUsageServiceWithBillingRepoForTest(usageRepo, billingRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{}, rateRepo)
+
+	usage := OpenAIUsage{InputTokens: 1_000, OutputTokens: 500}
+	cs := newTestChannelServiceWithCache(t, &channelCache{
+		pricingByGroupModel: map[channelModelKey]*ChannelModelPricing{
+			{groupID: 11, platform: "openai", model: "deepseek-v4.1-flash"}: {
+				BillingMode: BillingModeToken,
+				InputPrice:  testPtrFloat64(0.105 / 1_000_000),
+				OutputPrice: testPtrFloat64(0.42 / 1_000_000),
+			},
+		},
+		channelByGroupID:        map[int64]*Channel{11: {ID: 11, Status: StatusActive}},
+		groupPlatform:           map[int64]string{11: "openai"},
+		wildcardByGroupPlatform: map[channelGroupPlatformKey][]*wildcardPricingEntry{},
+		mappingByGroupModel:     map[channelModelKey]string{},
+		wildcardMappingByGP:     map[channelGroupPlatformKey][]*wildcardMappingEntry{},
+		byID:                    map[int64]*Channel{},
+	})
+	svc.channelService = cs
+	svc.resolver = NewModelPricingResolver(cs, svc.billingService)
+	baseTotal := 1_000*(0.105/1_000_000) + 500*(0.42/1_000_000)
+	err := svc.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
+		Result: &OpenAIForwardResult{
+			RequestID: "resp_peak", Model: "deepseek-v4.1-flash", UpstreamModel: "deepseek-v4-flash",
+			Usage: usage, Duration: time.Second,
+			PricingContext: RequestPricingContext{
+				CanonicalModel: "deepseek-v4.1-flash", AccountingModel: "deepseek-v4-flash",
+				EffectiveAt: time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC), RuleID: deepSeekWeekdayPeakRuleID,
+				CustomerMultiplier: 2, UpstreamCostMultiplier: 2,
+			},
+		},
+		APIKey: &APIKey{ID: 10, GroupID: i64p(11), Group: &Group{ID: 11, RateMultiplier: 1}},
+		User:   &User{ID: 12}, Account: &Account{ID: 13, Type: AccountTypeAPIKey},
+		ChannelUsageFields: ChannelUsageFields{OriginalModel: "DeepSeek_V4.1_Flash"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, "deepseek-v4.1-flash", rateRepo.lastModel)
+	require.InDelta(t, 0.8, usageRepo.lastLog.RateMultiplier, 1e-12)
+	require.InDelta(t, baseTotal*2, usageRepo.lastLog.TotalCost, 1e-12)
+	require.InDelta(t, baseTotal*2*0.8, usageRepo.lastLog.ActualCost, 1e-12)
+}
+
+func TestOpenAIGatewayServiceRecordUsage_CustomerMultiplierPrecedence(t *testing.T) {
+	tests := []struct {
+		name      string
+		groupRate float64
+		groupUser *float64
+		modelUser *float64
+		groupID   *int64
+		want      float64
+	}{
+		{name: "customer model", groupRate: 1, groupUser: floatPtr(0.85), modelUser: floatPtr(0.80), groupID: i64p(11), want: 0.80},
+		{name: "customer group", groupRate: 1, groupUser: floatPtr(0.85), groupID: i64p(11), want: 0.85},
+		{name: "group", groupRate: 0.90, groupID: i64p(11), want: 0.90},
+		{name: "system default", groupRate: 0, groupID: nil, want: 1.10},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
+			rateRepo := &openAIUserGroupRateRepoStub{rate: tt.groupUser, modelRate: tt.modelUser}
+			svc := newOpenAIRecordUsageServiceForTest(usageRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{}, rateRepo)
+			apiKey := &APIKey{ID: 10, GroupID: tt.groupID}
+			if tt.groupID != nil {
+				apiKey.Group = &Group{ID: *tt.groupID, RateMultiplier: tt.groupRate}
+			}
+			err := svc.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
+				Result: &OpenAIForwardResult{RequestID: "resp_" + tt.name, Model: "gpt-5.1", Usage: OpenAIUsage{InputTokens: 10}},
+				APIKey: apiKey, User: &User{ID: 12}, Account: &Account{ID: 13},
+			})
+			require.NoError(t, err)
+			require.InDelta(t, tt.want, usageRepo.lastLog.RateMultiplier, 1e-12)
+		})
+	}
+}
+
+func TestOpenAIGatewayServiceRecordUsage_RuledAccountingAliasMismatchFailsClosed(t *testing.T) {
+	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
+	billingRepo := &openAIRecordUsageBillingRepoStub{result: &UsageBillingApplyResult{Applied: true}}
+	svc := newOpenAIRecordUsageServiceWithBillingRepoForTest(usageRepo, billingRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{}, nil)
+	err := svc.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
+		Result: &OpenAIForwardResult{
+			RequestID: "resp_alias_mismatch", Model: "deepseek-v4.1-flash", UpstreamModel: "wrong-private-alias",
+			Usage: OpenAIUsage{InputTokens: 10}, PricingContext: RequestPricingContext{
+				CanonicalModel: "deepseek-v4.1-flash", AccountingModel: "deepseek-v4-flash", EffectiveAt: time.Now(),
+				CustomerMultiplier: 2, UpstreamCostMultiplier: 2,
+			},
+		},
+		APIKey: &APIKey{ID: 1}, User: &User{ID: 2}, Account: &Account{ID: 3},
+	})
+	var reconciliationErr *UsageReconciliationError
+	require.ErrorAs(t, err, &reconciliationErr)
+	require.Zero(t, usageRepo.calls)
+	require.Zero(t, billingRepo.calls)
 }
 
 func TestOpenAIGatewayServiceRecordUsage_MissingPricingRecordsZeroCostUsageLog(t *testing.T) {

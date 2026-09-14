@@ -4,12 +4,74 @@ package service
 
 import (
 	"context"
+	"math"
 	"testing"
 	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
 	"github.com/stretchr/testify/require"
 )
+
+func TestCalculateCostUnified_ConditionMultiplierAppliesToEveryTokenComponentOnce(t *testing.T) {
+	bs := newTestBillingService()
+	resolver := NewModelPricingResolver(nil, bs)
+	tokens := UsageTokens{
+		InputTokens:         1000,
+		OutputTokens:        500,
+		CacheCreationTokens: 200,
+		CacheReadTokens:     300,
+	}
+
+	base, err := bs.CalculateCostUnified(CostInput{
+		Ctx: context.Background(), Model: "claude-sonnet-4", Tokens: tokens,
+		RateMultiplier: 1, ConditionMultiplier: 1, Resolver: resolver,
+	})
+	require.NoError(t, err)
+	peak, err := bs.CalculateCostUnified(CostInput{
+		Ctx: context.Background(), Model: "claude-sonnet-4", Tokens: tokens,
+		RateMultiplier: 0.9, ConditionMultiplier: 2, Resolver: resolver,
+	})
+	require.NoError(t, err)
+
+	require.InDelta(t, base.InputCost*2, peak.InputCost, 1e-12)
+	require.InDelta(t, base.OutputCost*2, peak.OutputCost, 1e-12)
+	require.InDelta(t, base.CacheCreationCost*2, peak.CacheCreationCost, 1e-12)
+	require.InDelta(t, base.CacheReadCost*2, peak.CacheReadCost, 1e-12)
+	require.InDelta(t, base.TotalCost*2, peak.TotalCost, 1e-12)
+	require.InDelta(t, peak.TotalCost*0.9, peak.ActualCost, 1e-12)
+}
+
+func TestCalculateCostUnified_ConditionMultiplierValidation(t *testing.T) {
+	bs := newTestBillingService()
+	resolver := NewModelPricingResolver(nil, bs)
+	input := CostInput{
+		Ctx: context.Background(), Model: "claude-sonnet-4",
+		Tokens: UsageTokens{InputTokens: 100}, RateMultiplier: 1, Resolver: resolver,
+	}
+
+	neutral, err := bs.CalculateCostUnified(input)
+	require.NoError(t, err)
+	require.Greater(t, neutral.TotalCost, 0.0)
+
+	for _, invalid := range []float64{-1, math.NaN(), math.Inf(1), math.Inf(-1)} {
+		input.ConditionMultiplier = invalid
+		_, err := bs.CalculateCostUnified(input)
+		require.Error(t, err)
+	}
+}
+
+func TestCalculateCostUnified_ConditionMultiplierAppliesToPerRequestOnce(t *testing.T) {
+	bs := newTestBillingService()
+	resolver := NewModelPricingResolver(nil, bs)
+	cost, err := bs.CalculateCostUnified(CostInput{
+		Ctx: context.Background(), Model: "request-priced-model", RequestCount: 3,
+		RateMultiplier: 0.9, ConditionMultiplier: 2, Resolver: resolver,
+		Resolved: &ResolvedPricing{Mode: BillingModePerRequest, DefaultPerRequestPrice: 0.05},
+	})
+	require.NoError(t, err)
+	require.InDelta(t, 0.30, cost.TotalCost, 1e-12)
+	require.InDelta(t, 0.27, cost.ActualCost, 1e-12)
+}
 
 // ---------------------------------------------------------------------------
 // CalculateCostUnified

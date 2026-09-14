@@ -328,6 +328,7 @@ type OpenAIGatewayService struct {
 	rateLimitService      *RateLimitService
 	billingCacheService   *BillingCacheService
 	userGroupRateResolver *userGroupRateResolver
+	userModelRateResolver *userModelRateResolver
 	httpUpstream          HTTPUpstream
 	deferredService       *DeferredService
 	openAITokenProvider   *OpenAITokenProvider
@@ -402,6 +403,7 @@ func NewOpenAIGatewayService(
 			nil,
 			"service.openai_gateway",
 		),
+		userModelRateResolver: newUserModelRateResolver(userGroupRateRepo, "service.openai_gateway"),
 		httpUpstream:          httpUpstream,
 		deferredService:       deferredService,
 		openAITokenProvider:   openAITokenProvider,
@@ -5315,6 +5317,16 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 		CacheReadTokens:     result.Usage.CacheReadInputTokens,
 		ImageOutputTokens:   result.Usage.ImageOutputTokens,
 	}
+	// Preserve the original customer spelling in usage history, while using the
+	// canonical locked model for the per-customer model override key.
+	requestedModel := strings.TrimSpace(input.OriginalModel)
+	if requestedModel == "" {
+		requestedModel = strings.TrimSpace(result.Model)
+	}
+	pricingContext, err := normalizePricingContextForSettlement(requestedModel, result.UpstreamModel, result.PricingContext)
+	if err != nil {
+		return err
+	}
 
 	// Get rate multiplier
 	multiplier := 1.0
@@ -5327,11 +5339,15 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 			resolver = newUserGroupRateResolver(nil, nil, resolveUserGroupRateCacheTTL(s.cfg), nil, "service.openai_gateway")
 		}
 		multiplier = resolver.Resolve(ctx, user.ID, *apiKey.GroupID, apiKey.Group.RateMultiplier)
+		modelResolver := s.userModelRateResolver
+		if modelResolver == nil {
+			modelResolver = newUserModelRateResolver(nil, "service.openai_gateway")
+		}
+		multiplier = modelResolver.Resolve(ctx, user.ID, *apiKey.GroupID, pricingContext.CanonicalModel, multiplier)
 	}
 	imageMultiplier := resolveImageRateMultiplier(apiKey, multiplier)
 
 	var cost *CostBreakdown
-	var err error
 	billingModel := forwardResultBillingModel(result.Model, result.UpstreamModel)
 	if result.BillingModel != "" {
 		billingModel = strings.TrimSpace(result.BillingModel)
@@ -5354,10 +5370,13 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	if result.ServiceTier != nil {
 		serviceTier = strings.TrimSpace(*result.ServiceTier)
 	}
-	cost, err = s.calculateOpenAIRecordUsageCost(ctx, result, apiKey, billingModels, multiplier, imageMultiplier, tokens, serviceTier)
+	cost, err = s.calculateOpenAIRecordUsageCost(ctx, result, apiKey, billingModels, multiplier, imageMultiplier, pricingContext.CustomerMultiplier, tokens, serviceTier)
 	if err != nil {
 		if !isUsagePricingUnavailableError(err) {
 			return err
+		}
+		if requestPricingConditionAppliesToModel(pricingContext.CanonicalModel) {
+			return &UsageReconciliationError{Reason: "pricing is unavailable for a condition-priced model"}
 		}
 		logger.L().With(
 			zap.String("component", "service.openai_gateway"),
@@ -5369,6 +5388,9 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 			zap.Int64("account_id", account.ID),
 		).Warn("openai_usage.pricing_missing_record_zero_cost", zap.Error(err))
 		cost = &CostBreakdown{BillingMode: string(BillingModeToken)}
+	}
+	if !hasUsableOpenAIUsage(cost, tokens, result.ImageCount) {
+		return &UsageReconciliationError{Reason: "successful response has no billable usage"}
 	}
 
 	// Determine billing type
@@ -5382,12 +5404,6 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	durationMs := int(result.Duration.Milliseconds())
 	accountRateMultiplier := account.BillingRateMultiplier()
 	requestID := resolveUsageBillingRequestID(ctx, result.RequestID)
-
-	// 确定 RequestedModel（渠道映射前的原始模型）
-	requestedModel := result.Model
-	if input.OriginalModel != "" {
-		requestedModel = input.OriginalModel
-	}
 
 	usageLog := &UsageLog{
 		UserID:              user.ID,
@@ -5463,9 +5479,13 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 
 	// 计算账号统计定价费用（使用最终上游模型匹配自定义规则）
 	if apiKey.GroupID != nil {
+		accountingModel := pricingContext.AccountingModel
+		if accountingModel == "" {
+			accountingModel = result.UpstreamModel
+		}
 		applyAccountStatsCost(ctx, usageLog, s.channelService, s.billingService,
-			account.ID, *apiKey.GroupID, result.UpstreamModel, result.Model,
-			tokens, cost.TotalCost,
+			account.ID, *apiKey.GroupID, accountingModel, result.Model,
+			tokens, cost.TotalCost, pricingContext.UpstreamCostMultiplier,
 		)
 	}
 
@@ -5487,6 +5507,9 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 			IsSubscriptionBill:    isSubscriptionBilling,
 			AccountRateMultiplier: accountRateMultiplier,
 			APIKeyService:         input.APIKeyService,
+			PricingEffectiveAt:    pricingContext.EffectiveAt,
+			ConditionMultiplier:   pricingContext.CustomerMultiplier,
+			PricingRuleID:         pricingContext.RuleID,
 		}, s.billingDeps(), s.usageBillingRepo)
 		return err
 	}()
@@ -5506,12 +5529,13 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageCost(
 	billingModels []string,
 	multiplier float64,
 	imageMultiplier float64,
+	conditionMultiplier float64,
 	tokens UsageTokens,
 	serviceTier string,
 ) (*CostBreakdown, error) {
 	billingModel := firstUsageBillingModel(billingModels)
 	if result != nil && result.ImageCount > 0 {
-		return s.calculateOpenAIImageCost(ctx, billingModel, apiKey, result, imageMultiplier), nil
+		return s.calculateOpenAIImageCost(ctx, billingModel, apiKey, result, imageMultiplier, conditionMultiplier), nil
 	}
 	if len(billingModels) == 0 || billingModel == "" {
 		return nil, errors.New("openai usage billing model is empty")
@@ -5522,7 +5546,7 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageCost(
 		if candidate == "" {
 			continue
 		}
-		cost, err := s.calculateOpenAIRecordUsageTokenCost(ctx, apiKey, candidate, multiplier, tokens, serviceTier)
+		cost, err := s.calculateOpenAIRecordUsageTokenCost(ctx, apiKey, candidate, multiplier, conditionMultiplier, tokens, serviceTier)
 		if err == nil {
 			return cost, nil
 		}
@@ -5550,23 +5574,99 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageTokenCost(
 	apiKey *APIKey,
 	billingModel string,
 	multiplier float64,
+	conditionMultiplier float64,
 	tokens UsageTokens,
 	serviceTier string,
 ) (*CostBreakdown, error) {
 	if s.resolver != nil && apiKey.Group != nil {
 		gid := apiKey.Group.ID
 		return s.billingService.CalculateCostUnified(CostInput{
-			Ctx:            ctx,
-			Model:          billingModel,
-			GroupID:        &gid,
-			Tokens:         tokens,
-			RequestCount:   1,
-			RateMultiplier: multiplier,
-			ServiceTier:    serviceTier,
-			Resolver:       s.resolver,
+			Ctx:                 ctx,
+			Model:               billingModel,
+			GroupID:             &gid,
+			Tokens:              tokens,
+			RequestCount:        1,
+			RateMultiplier:      multiplier,
+			ConditionMultiplier: conditionMultiplier,
+			ServiceTier:         serviceTier,
+			Resolver:            s.resolver,
 		})
 	}
-	return s.billingService.CalculateCostWithServiceTier(billingModel, tokens, multiplier, serviceTier)
+	return s.billingService.calculateCostInternalWithCondition(billingModel, tokens, multiplier, conditionMultiplier, serviceTier, nil)
+}
+
+// UsageReconciliationError marks a successful upstream response that cannot be
+// safely reconciled into a charge. It prevents guessed or partial settlement.
+type UsageReconciliationError struct {
+	Reason string
+}
+
+func (e *UsageReconciliationError) Error() string {
+	if e == nil || strings.TrimSpace(e.Reason) == "" {
+		return "usage reconciliation failed"
+	}
+	return "usage reconciliation failed: " + e.Reason
+}
+
+func hasUsableOpenAIUsage(cost *CostBreakdown, tokens UsageTokens, imageCount int) bool {
+	if cost == nil {
+		return false
+	}
+	switch BillingMode(cost.BillingMode) {
+	case BillingModeImage:
+		return imageCount > 0
+	case BillingModePerRequest:
+		return true
+	default:
+		return tokens.InputTokens > 0 || tokens.OutputTokens > 0 || tokens.CacheCreationTokens > 0 ||
+			tokens.CacheReadTokens > 0 || tokens.ImageOutputTokens > 0
+	}
+}
+
+func normalizePricingContextForSettlement(requestedModel, finalUpstreamModel string, pricingContext RequestPricingContext) (RequestPricingContext, error) {
+	canonicalModel := canonicalRequestPricingModel(requestedModel)
+	registry, registryErr := loadRequestPricingConditionRegistry()
+	if registryErr != nil {
+		return RequestPricingContext{}, &UsageReconciliationError{Reason: "pricing condition registry is invalid"}
+	}
+	_, ruled := registry[canonicalModel]
+	if pricingContext.CanonicalModel == "" && !ruled {
+		pricingContext.CanonicalModel = canonicalModel
+		pricingContext.AccountingModel = canonicalModel
+		pricingContext.CustomerMultiplier = 1
+		pricingContext.UpstreamCostMultiplier = 1
+		return pricingContext, nil
+	}
+	if canonicalRequestPricingModel(pricingContext.CanonicalModel) != canonicalModel {
+		return RequestPricingContext{}, &UsageReconciliationError{Reason: "pricing context model mismatch"}
+	}
+	if pricingContext.EffectiveAt.IsZero() ||
+		!isFinitePositivePricingMultiplier(pricingContext.CustomerMultiplier) ||
+		!isFinitePositivePricingMultiplier(pricingContext.UpstreamCostMultiplier) {
+		return RequestPricingContext{}, &UsageReconciliationError{Reason: "pricing context is incomplete"}
+	}
+	pricingContext.CanonicalModel = canonicalModel
+	pricingContext.AccountingModel = canonicalRequestPricingModel(pricingContext.AccountingModel)
+	if pricingContext.AccountingModel == "" {
+		pricingContext.AccountingModel = canonicalModel
+	}
+	if ruled {
+		finalAccountingModel := canonicalRequestPricingModel(finalUpstreamModel)
+		if finalAccountingModel == "" || pricingContext.AccountingModel != finalAccountingModel {
+			return RequestPricingContext{}, &UsageReconciliationError{Reason: "pricing accounting model mismatch"}
+		}
+	}
+	pricingContext.EffectiveAt = pricingContext.EffectiveAt.UTC()
+	return pricingContext, nil
+}
+
+func requestPricingConditionAppliesToModel(model string) bool {
+	registry, err := loadRequestPricingConditionRegistry()
+	if err != nil {
+		return true
+	}
+	_, applies := registry[canonicalRequestPricingModel(model)]
+	return applies
 }
 
 func (s *OpenAIGatewayService) calculateOpenAIImageCost(
@@ -5575,19 +5675,21 @@ func (s *OpenAIGatewayService) calculateOpenAIImageCost(
 	apiKey *APIKey,
 	result *OpenAIForwardResult,
 	multiplier float64,
+	conditionMultiplier float64,
 ) *CostBreakdown {
 	if resolved := s.resolveOpenAIChannelPricing(ctx, billingModel, apiKey); resolved != nil &&
 		(resolved.Mode == BillingModePerRequest || resolved.Mode == BillingModeImage) {
 		gid := apiKey.Group.ID
 		cost, err := s.billingService.CalculateCostUnified(CostInput{
-			Ctx:            ctx,
-			Model:          billingModel,
-			GroupID:        &gid,
-			RequestCount:   result.ImageCount,
-			SizeTier:       result.ImageSize,
-			RateMultiplier: multiplier,
-			Resolver:       s.resolver,
-			Resolved:       resolved,
+			Ctx:                 ctx,
+			Model:               billingModel,
+			GroupID:             &gid,
+			RequestCount:        result.ImageCount,
+			SizeTier:            result.ImageSize,
+			RateMultiplier:      multiplier,
+			ConditionMultiplier: conditionMultiplier,
+			Resolver:            s.resolver,
+			Resolved:            resolved,
 		})
 		if err == nil {
 			return cost
@@ -5603,7 +5705,12 @@ func (s *OpenAIGatewayService) calculateOpenAIImageCost(
 			Price4K: apiKey.Group.ImagePrice4K,
 		}
 	}
-	return s.billingService.CalculateImageCost(billingModel, result.ImageSize, result.ImageCount, groupConfig, multiplier)
+	cost := s.billingService.CalculateImageCost(billingModel, result.ImageSize, result.ImageCount, groupConfig, multiplier)
+	if cost != nil && conditionMultiplier != 1 {
+		cost.TotalCost *= conditionMultiplier
+		cost.ActualCost *= conditionMultiplier
+	}
+	return cost
 }
 
 func (s *OpenAIGatewayService) resolveOpenAIChannelPricing(ctx context.Context, billingModel string, apiKey *APIKey) *ResolvedPricing {

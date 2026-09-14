@@ -8211,6 +8211,10 @@ type postUsageBillingParams struct {
 	IsSubscriptionBill    bool
 	AccountRateMultiplier float64
 	APIKeyService         APIKeyQuotaUpdater
+	AccountStatsCost      *float64
+	PricingEffectiveAt    time.Time
+	ConditionMultiplier   float64
+	PricingRuleID         string
 }
 
 func (p *postUsageBillingParams) shouldDeductAPIKeyQuota() bool {
@@ -8222,7 +8226,17 @@ func (p *postUsageBillingParams) shouldUpdateRateLimits() bool {
 }
 
 func (p *postUsageBillingParams) shouldUpdateAccountQuota() bool {
-	return p.Cost.TotalCost > 0 && p.Account.IsAPIKeyOrBedrock() && p.Account.HasAnyQuotaLimit()
+	return p.accountQuotaBaseCost() > 0 && p.Account.IsAPIKeyOrBedrock() && p.Account.HasAnyQuotaLimit()
+}
+
+func (p *postUsageBillingParams) accountQuotaBaseCost() float64 {
+	if p != nil && p.AccountStatsCost != nil {
+		return *p.AccountStatsCost
+	}
+	if p == nil || p.Cost == nil {
+		return 0
+	}
+	return p.Cost.TotalCost
 }
 
 // postUsageBilling is the legacy fallback billing path used when the unified
@@ -8263,7 +8277,7 @@ func postUsageBilling(ctx context.Context, p *postUsageBillingParams, deps *bill
 	}
 
 	if p.shouldUpdateAccountQuota() {
-		accountCost := cost.TotalCost * p.AccountRateMultiplier
+		accountCost := p.accountQuotaBaseCost() * p.AccountRateMultiplier
 		if err := deps.accountRepo.IncrementQuotaUsed(billingCtx, p.Account.ID, accountCost); err != nil {
 			slog.Error("increment account quota used failed", "account_id", p.Account.ID, "cost", accountCost, "error", err)
 		}
@@ -8311,12 +8325,15 @@ func buildUsageBillingCommand(requestID string, usageLog *UsageLog, p *postUsage
 	}
 
 	cmd := &UsageBillingCommand{
-		RequestID:          requestID,
-		APIKeyID:           p.APIKey.ID,
-		UserID:             p.User.ID,
-		AccountID:          p.Account.ID,
-		AccountType:        p.Account.Type,
-		RequestPayloadHash: strings.TrimSpace(p.RequestPayloadHash),
+		RequestID:           requestID,
+		APIKeyID:            p.APIKey.ID,
+		UserID:              p.User.ID,
+		AccountID:           p.Account.ID,
+		AccountType:         p.Account.Type,
+		RequestPayloadHash:  strings.TrimSpace(p.RequestPayloadHash),
+		PricingEffectiveAt:  p.PricingEffectiveAt,
+		ConditionMultiplier: p.ConditionMultiplier,
+		PricingRuleID:       strings.TrimSpace(p.PricingRuleID),
 	}
 	if usageLog != nil {
 		cmd.Model = usageLog.Model
@@ -8355,7 +8372,7 @@ func buildUsageBillingCommand(requestID string, usageLog *UsageLog, p *postUsage
 		cmd.APIKeyRateLimitCost = p.Cost.ActualCost
 	}
 	if p.shouldUpdateAccountQuota() {
-		cmd.AccountQuotaCost = p.Cost.TotalCost * p.AccountRateMultiplier
+		cmd.AccountQuotaCost = p.accountQuotaBaseCost() * p.AccountRateMultiplier
 	}
 
 	cmd.Normalize()
@@ -8365,6 +8382,9 @@ func buildUsageBillingCommand(requestID string, usageLog *UsageLog, p *postUsage
 func applyUsageBilling(ctx context.Context, requestID string, usageLog *UsageLog, p *postUsageBillingParams, deps *billingDeps, repo UsageBillingRepository) (bool, error) {
 	if p == nil || deps == nil {
 		return false, nil
+	}
+	if p.AccountStatsCost == nil && usageLog != nil {
+		p.AccountStatsCost = usageLog.AccountStatsCost
 	}
 
 	cmd := buildUsageBillingCommand(requestID, usageLog, p)
@@ -8471,7 +8491,8 @@ func notifyAccountQuota(p *postUsageBillingParams, deps *billingDeps, result *Us
 			slog.Error("panic in notifyAccountQuota", "recover", r)
 		}
 	}()
-	if p.Cost.TotalCost <= 0 || p.Account == nil || !p.Account.IsAPIKeyOrBedrock() || deps.balanceNotifyService == nil {
+	accountQuotaBaseCost := p.accountQuotaBaseCost()
+	if accountQuotaBaseCost <= 0 || p.Account == nil || !p.Account.IsAPIKeyOrBedrock() || deps.balanceNotifyService == nil {
 		slog.Debug("notifyAccountQuota: skipped",
 			"total_cost", p.Cost.TotalCost,
 			"account_nil", p.Account == nil,
@@ -8480,7 +8501,7 @@ func notifyAccountQuota(p *postUsageBillingParams, deps *billingDeps, result *Us
 		)
 		return
 	}
-	accountCost := p.Cost.TotalCost * p.AccountRateMultiplier
+	accountCost := accountQuotaBaseCost * p.AccountRateMultiplier
 	var quotaState *AccountQuotaState
 	if result != nil {
 		quotaState = result.QuotaState
@@ -8732,6 +8753,10 @@ func (s *GatewayService) recordUsageCore(ctx context.Context, input *recordUsage
 
 	// 计算账号统计定价费用（使用最终上游模型匹配自定义规则）
 	if apiKey.GroupID != nil {
+		accountConditionMultiplier := result.PricingContext.UpstreamCostMultiplier
+		if !isFinitePositivePricingMultiplier(accountConditionMultiplier) {
+			accountConditionMultiplier = 1
+		}
 		applyAccountStatsCost(ctx, usageLog, s.channelService, s.billingService,
 			account.ID, *apiKey.GroupID, result.UpstreamModel, result.Model,
 			// Anthropic's input_tokens excludes cache_read and cache_creation (billed separately);
@@ -8743,7 +8768,7 @@ func (s *GatewayService) recordUsageCore(ctx context.Context, input *recordUsage
 				CacheReadTokens:     result.Usage.CacheReadInputTokens,
 				ImageOutputTokens:   result.Usage.ImageOutputTokens,
 			},
-			cost.TotalCost,
+			cost.TotalCost, accountConditionMultiplier,
 		)
 	}
 

@@ -4,6 +4,9 @@ package service
 
 import (
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TestBuildUsageBillingCommand_SubscriptionAppliesRateMultiplier locks in the fix
@@ -82,4 +85,38 @@ func TestBuildUsageBillingCommand_SubscriptionAppliesRateMultiplier(t *testing.T
 			}
 		})
 	}
+}
+
+func TestBuildUsageBillingFingerprintIncludesPricingDecisionOnlyAsStructuredValues(t *testing.T) {
+	base := &UsageBillingCommand{
+		RequestID: "req-1", UserID: 1, AccountID: 2, APIKeyID: 3, Model: "deepseek-v4.1-flash",
+		PricingEffectiveAt:  time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC),
+		ConditionMultiplier: 2, PricingRuleID: deepSeekWeekdayPeakRuleID,
+	}
+	baseFingerprint := buildUsageBillingFingerprint(base)
+	require.Equal(t, baseFingerprint, buildUsageBillingFingerprint(base))
+
+	changedTime := *base
+	changedTime.PricingEffectiveAt = changedTime.PricingEffectiveAt.Add(time.Second)
+	require.NotEqual(t, baseFingerprint, buildUsageBillingFingerprint(&changedTime))
+	changedFactor := *base
+	changedFactor.ConditionMultiplier = 1
+	require.NotEqual(t, baseFingerprint, buildUsageBillingFingerprint(&changedFactor))
+	changedRule := *base
+	changedRule.PricingRuleID = "future-neutral-rule"
+	require.NotEqual(t, baseFingerprint, buildUsageBillingFingerprint(&changedRule))
+}
+
+func TestBuildUsageBillingCommandUsesAccountStatsCostForAccountQuota(t *testing.T) {
+	accountCost := 0.25
+	accountRate := 1.2
+	p := &postUsageBillingParams{
+		Cost: &CostBreakdown{TotalCost: 0.90, ActualCost: 0.90},
+		User: &User{ID: 1}, APIKey: &APIKey{ID: 2},
+		Account:          &Account{ID: 3, Type: AccountTypeAPIKey, Extra: map[string]any{"quota_limit": 100}},
+		AccountStatsCost: &accountCost, AccountRateMultiplier: accountRate,
+	}
+	cmd := buildUsageBillingCommand("req-account-cost", nil, p)
+	require.NotNil(t, cmd)
+	require.InDelta(t, accountCost*accountRate, cmd.AccountQuotaCost, 1e-12)
 }

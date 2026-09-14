@@ -26,6 +26,7 @@ func resolveAccountStatsCost(
 	tokens UsageTokens,
 	requestCount int,
 	totalCost float64,
+	conditionMultiplier float64,
 ) *float64 {
 	if channelService == nil || upstreamModel == "" {
 		return nil
@@ -36,10 +37,9 @@ func resolveAccountStatsCost(
 	}
 
 	platform := channelService.GetGroupPlatform(ctx, groupID)
-
 	// 优先级 1：自定义规则（始终尝试）
 	if cost := tryCustomRules(channel, accountID, groupID, platform, upstreamModel, tokens, requestCount); cost != nil {
-		return cost
+		return multiplyAccountStatsCost(cost, conditionMultiplier)
 	}
 
 	// 优先级 2：渠道开启"应用模型定价到账号统计"时，直接使用客户计费（倍率前）
@@ -53,10 +53,21 @@ func resolveAccountStatsCost(
 
 	// 优先级 3：模型定价文件（LiteLLM）默认价格
 	if billingService != nil {
-		return tryModelFilePricing(billingService, upstreamModel, tokens)
+		return multiplyAccountStatsCost(tryModelFilePricing(billingService, upstreamModel, tokens), conditionMultiplier)
 	}
 
 	return nil
+}
+
+func multiplyAccountStatsCost(cost *float64, multiplier float64) *float64 {
+	if cost == nil {
+		return nil
+	}
+	if !isFinitePositivePricingMultiplier(multiplier) {
+		return nil
+	}
+	adjusted := *cost * multiplier
+	return &adjusted
 }
 
 // tryModelFilePricing 使用模型定价文件（LiteLLM/fallback）中的标准价格计算费用。
@@ -228,6 +239,7 @@ func applyAccountStatsCost(
 	upstreamModel, requestedModel string,
 	tokens UsageTokens,
 	totalCost float64,
+	conditionMultiplier float64,
 ) {
 	model := upstreamModel
 	if model == "" {
@@ -238,6 +250,6 @@ func applyAccountStatsCost(
 		requestCount = usageLog.ImageCount
 	}
 	usageLog.AccountStatsCost = resolveAccountStatsCost(
-		ctx, cs, bs, accountID, groupID, model, tokens, requestCount, totalCost,
+		ctx, cs, bs, accountID, groupID, model, tokens, requestCount, totalCost, conditionMultiplier,
 	)
 }

@@ -42,7 +42,8 @@ func TestOpenAIGatewayServiceRecordUsage_ResetsOpenAI403CounterForZeroUsage(t *t
 		Account: &Account{ID: 777, Platform: PlatformOpenAI},
 	})
 
-	require.NoError(t, err)
+	var reconciliationErr *UsageReconciliationError
+	require.ErrorAs(t, err, &reconciliationErr)
 	require.Equal(t, []int64{777}, counter.resetCalls)
-	require.Equal(t, 1, usageRepo.calls)
+	require.Equal(t, 0, usageRepo.calls)
 }

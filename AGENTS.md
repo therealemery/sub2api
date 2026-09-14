@@ -104,7 +104,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-14 — Text pricing and conditional-multiplier plan ready for execution
+### 2026-09-14 — Text pricing and conditional-multiplier Tasks 1–3 implemented
 
 - The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
   manufacturer list sells at 70%; cost above 60% through 80% sells at 80%; cost above 80% or
@@ -127,6 +127,19 @@ This repository is being customized into the OwnAPI product. The active objectiv
   infer that manufacturer price.
 - The user approved the design. The test-first implementation plan is recorded at
   `docs/superpowers/plans/2026-09-13-ownapi-text-pricing-conditional-multiplier-plan.md`.
+- Tasks 1–3 are implemented on the active branch. The immutable rule registry validates the
+  DeepSeek weekday windows; every supported text protocol carries the final successful upstream
+  attempt's timestamp and private accounting model into settlement; failed attempts discard their
+  local pricing context.
+- Customer billing now applies the condition multiplier once before the independently resolved
+  customer/model, customer/group, group, or default multiplier. Packy account-cost calculation uses
+  the same locked context and private accounting alias, account quota uses the resulting account
+  cost when available, and the billing fingerprint includes the rule, factor, and effective time.
+  Successful responses without usable billing evidence fail closed before usage creation or any
+  customer/account deduction.
+- Focused conditional-pricing and settlement tests pass. The complete unit-tagged service and
+  handler packages pass after the final canonical-model override correction, as do Go formatting
+  and `git diff --check`.
 - The plan separates the work into: validated condition rules; final-successful-attempt locking;
   unified customer/model and condition billing; additive usage audit persistence; checksum-safe
   price/account corrections; one sanitized backend-owned frontend rule projection; customer/admin
@@ -134,8 +147,10 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Execution must first read the exact signed-in Packy `codex` cost card before migration 143 can
   contain Codex cost values. Missing evidence leaves all four Codex routes unschedulable; it never
   permits a Core fallback or inferred cost. DeepSeek Pro remains unavailable.
-- No business code, database, production data, account mapping, credential, paid request, push, or
-  deployment changed at this checkpoint.
+- Tasks 4–8 remain: persist audit fields, apply reviewed price/account migrations, project sanitized
+  rules to the frontend, show usage evidence, and complete rollout verification. No database,
+  production data, account mapping, credential, paid request, push, or deployment changed at this
+  checkpoint.
 
 ### 2026-09-13 — MiniMax H3 reference-media repair design approved
 

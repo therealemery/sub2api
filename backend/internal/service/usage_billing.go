@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 var ErrUsageBillingRequestIDRequired = errors.New("usage billing request_id is required")
@@ -33,6 +34,9 @@ type UsageBillingCommand struct {
 	CacheReadTokens     int
 	ImageCount          int
 	MediaType           string
+	PricingEffectiveAt  time.Time
+	ConditionMultiplier float64
+	PricingRuleID       string
 
 	BalanceCost         float64
 	SubscriptionCost    float64
@@ -56,7 +60,7 @@ func buildUsageBillingFingerprint(c *UsageBillingCommand) string {
 		return ""
 	}
 	raw := fmt.Sprintf(
-		"%d|%d|%d|%s|%s|%s|%s|%d|%d|%d|%d|%d|%d|%s|%d|%0.10f|%0.10f|%0.10f|%0.10f|%0.10f",
+		"%d|%d|%d|%s|%s|%s|%s|%d|%d|%d|%d|%d|%d|%s|%d|%s|%0.10f|%s|%0.10f|%0.10f|%0.10f|%0.10f|%0.10f",
 		c.UserID,
 		c.AccountID,
 		c.APIKeyID,
@@ -72,6 +76,9 @@ func buildUsageBillingFingerprint(c *UsageBillingCommand) string {
 		c.ImageCount,
 		strings.TrimSpace(c.MediaType),
 		valueOrZero(c.SubscriptionID),
+		c.PricingEffectiveAt.UTC().Format(time.RFC3339Nano),
+		c.ConditionMultiplier,
+		strings.TrimSpace(c.PricingRuleID),
 		c.BalanceCost,
 		c.SubscriptionCost,
 		c.APIKeyQuotaCost,

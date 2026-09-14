@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
@@ -406,17 +407,26 @@ type CostInput struct {
 	RequestCount   int    // 按次计费时使用
 	SizeTier       string // 按次/图片模式的层级标签（"1K","2K","4K","HD" 等）
 	RateMultiplier float64
-	ServiceTier    string                // "priority","flex","" 等
-	Resolver       *ModelPricingResolver // 定价解析器
-	Resolved       *ResolvedPricing      // 可选：预解析的定价结果（避免重复 Resolve 调用）
+	// ConditionMultiplier is the request-time pricing condition (for example a
+	// weekday peak factor). Zero means neutral for legacy callers; invalid
+	// non-zero values fail closed.
+	ConditionMultiplier float64
+	ServiceTier         string                // "priority","flex","" 等
+	Resolver            *ModelPricingResolver // 定价解析器
+	Resolved            *ResolvedPricing      // 可选：预解析的定价结果（避免重复 Resolve 调用）
 }
 
 // CalculateCostUnified 统一计费入口，支持三种计费模式。
 // 使用 ModelPricingResolver 解析定价，然后根据 BillingMode 分发计算。
 func (s *BillingService) CalculateCostUnified(input CostInput) (*CostBreakdown, error) {
+	conditionMultiplier, err := normalizeConditionMultiplier(input.ConditionMultiplier)
+	if err != nil {
+		return nil, err
+	}
+	input.ConditionMultiplier = conditionMultiplier
 	if input.Resolver == nil {
 		// 无 Resolver，回退到旧路径
-		return s.calculateCostInternal(input.Model, input.Tokens, input.RateMultiplier, input.ServiceTier, nil)
+		return s.calculateCostInternalWithCondition(input.Model, input.Tokens, input.RateMultiplier, conditionMultiplier, input.ServiceTier, nil)
 	}
 
 	// 优先使用预解析结果，避免重复 Resolve 调用
@@ -434,7 +444,6 @@ func (s *BillingService) CalculateCostUnified(input CostInput) (*CostBreakdown, 
 	}
 
 	var breakdown *CostBreakdown
-	var err error
 	switch resolved.Mode {
 	case BillingModePerRequest, BillingModeImage:
 		breakdown, err = s.calculatePerRequestCost(resolved, input)
@@ -464,19 +473,24 @@ func (s *BillingService) calculateTokenCost(resolved *ResolvedPricing, input Cos
 	// 长上下文定价仅在无区间定价时应用（区间定价已包含上下文分层）
 	applyLongCtx := len(resolved.Intervals) == 0
 
-	return s.computeTokenBreakdown(pricing, input.Tokens, input.RateMultiplier, input.ServiceTier, applyLongCtx), nil
+	return s.computeTokenBreakdown(pricing, input.Tokens, input.RateMultiplier, input.ConditionMultiplier, input.ServiceTier, applyLongCtx), nil
 }
 
 // computeTokenBreakdown 是 token 计费的核心逻辑，由 calculateTokenCost 和 calculateCostInternal 共用。
 // applyLongCtx 控制是否检查长上下文定价（区间定价已自含上下文分层，不需要额外应用）。
 func (s *BillingService) computeTokenBreakdown(
 	pricing *ModelPricing, tokens UsageTokens,
-	rateMultiplier float64, serviceTier string,
+	rateMultiplier float64, conditionMultiplier float64, serviceTier string,
 	applyLongCtx bool,
 ) *CostBreakdown {
 	// 保存时强制 > 0；若仍有负数泄漏，按 0 处理避免按 1x 误扣。
 	if rateMultiplier < 0 {
 		rateMultiplier = 0
+	}
+	// Callers validate non-zero values before reaching this helper. Preserve
+	// neutral behavior for old direct paths.
+	if conditionMultiplier == 0 {
+		conditionMultiplier = 1
 	}
 
 	inputPrice := pricing.InputPricePerToken
@@ -534,6 +548,13 @@ func (s *BillingService) computeTokenBreakdown(
 		bd.CacheCreationCost *= tierMultiplier
 		bd.CacheReadCost *= tierMultiplier
 	}
+	if conditionMultiplier != 1.0 {
+		bd.InputCost *= conditionMultiplier
+		bd.OutputCost *= conditionMultiplier
+		bd.ImageOutputCost *= conditionMultiplier
+		bd.CacheCreationCost *= conditionMultiplier
+		bd.CacheReadCost *= conditionMultiplier
+	}
 
 	bd.TotalCost = bd.InputCost + bd.OutputCost + bd.ImageOutputCost +
 		bd.CacheCreationCost + bd.CacheReadCost
@@ -578,7 +599,7 @@ func (s *BillingService) calculatePerRequestCost(resolved *ResolvedPricing, inpu
 		unitPrice = resolved.DefaultPerRequestPrice
 	}
 
-	totalCost := unitPrice * float64(count)
+	totalCost := unitPrice * float64(count) * input.ConditionMultiplier
 	actualCost := totalCost * input.RateMultiplier
 
 	return &CostBreakdown{
@@ -597,6 +618,10 @@ func (s *BillingService) CalculateCostWithServiceTier(model string, tokens Usage
 }
 
 func (s *BillingService) calculateCostInternal(model string, tokens UsageTokens, rateMultiplier float64, serviceTier string, channelPricing *ChannelModelPricing) (*CostBreakdown, error) {
+	return s.calculateCostInternalWithCondition(model, tokens, rateMultiplier, 1, serviceTier, channelPricing)
+}
+
+func (s *BillingService) calculateCostInternalWithCondition(model string, tokens UsageTokens, rateMultiplier, conditionMultiplier float64, serviceTier string, channelPricing *ChannelModelPricing) (*CostBreakdown, error) {
 	var pricing *ModelPricing
 	var err error
 	if channelPricing != nil {
@@ -609,7 +634,17 @@ func (s *BillingService) calculateCostInternal(model string, tokens UsageTokens,
 	}
 
 	// 旧路径始终检查长上下文定价（无区间定价概念）
-	return s.computeTokenBreakdown(pricing, tokens, rateMultiplier, serviceTier, true), nil
+	return s.computeTokenBreakdown(pricing, tokens, rateMultiplier, conditionMultiplier, serviceTier, true), nil
+}
+
+func normalizeConditionMultiplier(value float64) (float64, error) {
+	if value == 0 {
+		return 1, nil
+	}
+	if value < 0 || math.IsNaN(value) || math.IsInf(value, 0) {
+		return 0, fmt.Errorf("invalid condition multiplier: %v", value)
+	}
+	return value, nil
 }
 
 func (s *BillingService) applyModelSpecificPricingPolicy(model string, pricing *ModelPricing) *ModelPricing {
