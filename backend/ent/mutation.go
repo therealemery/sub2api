@@ -34246,6 +34246,10 @@ type UsageLogMutation struct {
 	addactual_cost              *float64
 	rate_multiplier             *float64
 	addrate_multiplier          *float64
+	pricing_effective_at        *time.Time
+	condition_multiplier        *float64
+	addcondition_multiplier     *float64
+	pricing_rule_id             *string
 	account_rate_multiplier     *float64
 	addaccount_rate_multiplier  *float64
 	billing_type                *int8
@@ -35697,6 +35701,160 @@ func (m *UsageLogMutation) ResetRateMultiplier() {
 	m.addrate_multiplier = nil
 }
 
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (m *UsageLogMutation) SetPricingEffectiveAt(t time.Time) {
+	m.pricing_effective_at = &t
+}
+
+// PricingEffectiveAt returns the value of the "pricing_effective_at" field in the mutation.
+func (m *UsageLogMutation) PricingEffectiveAt() (r time.Time, exists bool) {
+	v := m.pricing_effective_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPricingEffectiveAt returns the old "pricing_effective_at" field's value of the UsageLog entity.
+// If the UsageLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UsageLogMutation) OldPricingEffectiveAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPricingEffectiveAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPricingEffectiveAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPricingEffectiveAt: %w", err)
+	}
+	return oldValue.PricingEffectiveAt, nil
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (m *UsageLogMutation) ClearPricingEffectiveAt() {
+	m.pricing_effective_at = nil
+	m.clearedFields[usagelog.FieldPricingEffectiveAt] = struct{}{}
+}
+
+// PricingEffectiveAtCleared returns if the "pricing_effective_at" field was cleared in this mutation.
+func (m *UsageLogMutation) PricingEffectiveAtCleared() bool {
+	_, ok := m.clearedFields[usagelog.FieldPricingEffectiveAt]
+	return ok
+}
+
+// ResetPricingEffectiveAt resets all changes to the "pricing_effective_at" field.
+func (m *UsageLogMutation) ResetPricingEffectiveAt() {
+	m.pricing_effective_at = nil
+	delete(m.clearedFields, usagelog.FieldPricingEffectiveAt)
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (m *UsageLogMutation) SetConditionMultiplier(f float64) {
+	m.condition_multiplier = &f
+	m.addcondition_multiplier = nil
+}
+
+// ConditionMultiplier returns the value of the "condition_multiplier" field in the mutation.
+func (m *UsageLogMutation) ConditionMultiplier() (r float64, exists bool) {
+	v := m.condition_multiplier
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConditionMultiplier returns the old "condition_multiplier" field's value of the UsageLog entity.
+// If the UsageLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UsageLogMutation) OldConditionMultiplier(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConditionMultiplier is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConditionMultiplier requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConditionMultiplier: %w", err)
+	}
+	return oldValue.ConditionMultiplier, nil
+}
+
+// AddConditionMultiplier adds f to the "condition_multiplier" field.
+func (m *UsageLogMutation) AddConditionMultiplier(f float64) {
+	if m.addcondition_multiplier != nil {
+		*m.addcondition_multiplier += f
+	} else {
+		m.addcondition_multiplier = &f
+	}
+}
+
+// AddedConditionMultiplier returns the value that was added to the "condition_multiplier" field in this mutation.
+func (m *UsageLogMutation) AddedConditionMultiplier() (r float64, exists bool) {
+	v := m.addcondition_multiplier
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetConditionMultiplier resets all changes to the "condition_multiplier" field.
+func (m *UsageLogMutation) ResetConditionMultiplier() {
+	m.condition_multiplier = nil
+	m.addcondition_multiplier = nil
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (m *UsageLogMutation) SetPricingRuleID(s string) {
+	m.pricing_rule_id = &s
+}
+
+// PricingRuleID returns the value of the "pricing_rule_id" field in the mutation.
+func (m *UsageLogMutation) PricingRuleID() (r string, exists bool) {
+	v := m.pricing_rule_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPricingRuleID returns the old "pricing_rule_id" field's value of the UsageLog entity.
+// If the UsageLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UsageLogMutation) OldPricingRuleID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPricingRuleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPricingRuleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPricingRuleID: %w", err)
+	}
+	return oldValue.PricingRuleID, nil
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (m *UsageLogMutation) ClearPricingRuleID() {
+	m.pricing_rule_id = nil
+	m.clearedFields[usagelog.FieldPricingRuleID] = struct{}{}
+}
+
+// PricingRuleIDCleared returns if the "pricing_rule_id" field was cleared in this mutation.
+func (m *UsageLogMutation) PricingRuleIDCleared() bool {
+	_, ok := m.clearedFields[usagelog.FieldPricingRuleID]
+	return ok
+}
+
+// ResetPricingRuleID resets all changes to the "pricing_rule_id" field.
+func (m *UsageLogMutation) ResetPricingRuleID() {
+	m.pricing_rule_id = nil
+	delete(m.clearedFields, usagelog.FieldPricingRuleID)
+}
+
 // SetAccountRateMultiplier sets the "account_rate_multiplier" field.
 func (m *UsageLogMutation) SetAccountRateMultiplier(f float64) {
 	m.account_rate_multiplier = &f
@@ -36443,7 +36601,7 @@ func (m *UsageLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UsageLogMutation) Fields() []string {
-	fields := make([]string, 0, 37)
+	fields := make([]string, 0, 40)
 	if m.user != nil {
 		fields = append(fields, usagelog.FieldUserID)
 	}
@@ -36521,6 +36679,15 @@ func (m *UsageLogMutation) Fields() []string {
 	}
 	if m.rate_multiplier != nil {
 		fields = append(fields, usagelog.FieldRateMultiplier)
+	}
+	if m.pricing_effective_at != nil {
+		fields = append(fields, usagelog.FieldPricingEffectiveAt)
+	}
+	if m.condition_multiplier != nil {
+		fields = append(fields, usagelog.FieldConditionMultiplier)
+	}
+	if m.pricing_rule_id != nil {
+		fields = append(fields, usagelog.FieldPricingRuleID)
 	}
 	if m.account_rate_multiplier != nil {
 		fields = append(fields, usagelog.FieldAccountRateMultiplier)
@@ -36615,6 +36782,12 @@ func (m *UsageLogMutation) Field(name string) (ent.Value, bool) {
 		return m.ActualCost()
 	case usagelog.FieldRateMultiplier:
 		return m.RateMultiplier()
+	case usagelog.FieldPricingEffectiveAt:
+		return m.PricingEffectiveAt()
+	case usagelog.FieldConditionMultiplier:
+		return m.ConditionMultiplier()
+	case usagelog.FieldPricingRuleID:
+		return m.PricingRuleID()
 	case usagelog.FieldAccountRateMultiplier:
 		return m.AccountRateMultiplier()
 	case usagelog.FieldBillingType:
@@ -36698,6 +36871,12 @@ func (m *UsageLogMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldActualCost(ctx)
 	case usagelog.FieldRateMultiplier:
 		return m.OldRateMultiplier(ctx)
+	case usagelog.FieldPricingEffectiveAt:
+		return m.OldPricingEffectiveAt(ctx)
+	case usagelog.FieldConditionMultiplier:
+		return m.OldConditionMultiplier(ctx)
+	case usagelog.FieldPricingRuleID:
+		return m.OldPricingRuleID(ctx)
 	case usagelog.FieldAccountRateMultiplier:
 		return m.OldAccountRateMultiplier(ctx)
 	case usagelog.FieldBillingType:
@@ -36911,6 +37090,27 @@ func (m *UsageLogMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRateMultiplier(v)
 		return nil
+	case usagelog.FieldPricingEffectiveAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPricingEffectiveAt(v)
+		return nil
+	case usagelog.FieldConditionMultiplier:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConditionMultiplier(v)
+		return nil
+	case usagelog.FieldPricingRuleID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPricingRuleID(v)
+		return nil
 	case usagelog.FieldAccountRateMultiplier:
 		v, ok := value.(float64)
 		if !ok {
@@ -37038,6 +37238,9 @@ func (m *UsageLogMutation) AddedFields() []string {
 	if m.addrate_multiplier != nil {
 		fields = append(fields, usagelog.FieldRateMultiplier)
 	}
+	if m.addcondition_multiplier != nil {
+		fields = append(fields, usagelog.FieldConditionMultiplier)
+	}
 	if m.addaccount_rate_multiplier != nil {
 		fields = append(fields, usagelog.FieldAccountRateMultiplier)
 	}
@@ -37089,6 +37292,8 @@ func (m *UsageLogMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedActualCost()
 	case usagelog.FieldRateMultiplier:
 		return m.AddedRateMultiplier()
+	case usagelog.FieldConditionMultiplier:
+		return m.AddedConditionMultiplier()
 	case usagelog.FieldAccountRateMultiplier:
 		return m.AddedAccountRateMultiplier()
 	case usagelog.FieldBillingType:
@@ -37206,6 +37411,13 @@ func (m *UsageLogMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddRateMultiplier(v)
 		return nil
+	case usagelog.FieldConditionMultiplier:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddConditionMultiplier(v)
+		return nil
 	case usagelog.FieldAccountRateMultiplier:
 		v, ok := value.(float64)
 		if !ok {
@@ -37273,6 +37485,12 @@ func (m *UsageLogMutation) ClearedFields() []string {
 	if m.FieldCleared(usagelog.FieldSubscriptionID) {
 		fields = append(fields, usagelog.FieldSubscriptionID)
 	}
+	if m.FieldCleared(usagelog.FieldPricingEffectiveAt) {
+		fields = append(fields, usagelog.FieldPricingEffectiveAt)
+	}
+	if m.FieldCleared(usagelog.FieldPricingRuleID) {
+		fields = append(fields, usagelog.FieldPricingRuleID)
+	}
 	if m.FieldCleared(usagelog.FieldAccountRateMultiplier) {
 		fields = append(fields, usagelog.FieldAccountRateMultiplier)
 	}
@@ -37328,6 +37546,12 @@ func (m *UsageLogMutation) ClearField(name string) error {
 		return nil
 	case usagelog.FieldSubscriptionID:
 		m.ClearSubscriptionID()
+		return nil
+	case usagelog.FieldPricingEffectiveAt:
+		m.ClearPricingEffectiveAt()
+		return nil
+	case usagelog.FieldPricingRuleID:
+		m.ClearPricingRuleID()
 		return nil
 	case usagelog.FieldAccountRateMultiplier:
 		m.ClearAccountRateMultiplier()
@@ -37432,6 +37656,15 @@ func (m *UsageLogMutation) ResetField(name string) error {
 		return nil
 	case usagelog.FieldRateMultiplier:
 		m.ResetRateMultiplier()
+		return nil
+	case usagelog.FieldPricingEffectiveAt:
+		m.ResetPricingEffectiveAt()
+		return nil
+	case usagelog.FieldConditionMultiplier:
+		m.ResetConditionMultiplier()
+		return nil
+	case usagelog.FieldPricingRuleID:
+		m.ResetPricingRuleID()
 		return nil
 	case usagelog.FieldAccountRateMultiplier:
 		m.ResetAccountRateMultiplier()

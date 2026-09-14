@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -542,6 +543,67 @@ func (_u *UsageLogUpdate) AddRateMultiplier(v float64) *UsageLogUpdate {
 	return _u
 }
 
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (_u *UsageLogUpdate) SetPricingEffectiveAt(v time.Time) *UsageLogUpdate {
+	_u.mutation.SetPricingEffectiveAt(v)
+	return _u
+}
+
+// SetNillablePricingEffectiveAt sets the "pricing_effective_at" field if the given value is not nil.
+func (_u *UsageLogUpdate) SetNillablePricingEffectiveAt(v *time.Time) *UsageLogUpdate {
+	if v != nil {
+		_u.SetPricingEffectiveAt(*v)
+	}
+	return _u
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (_u *UsageLogUpdate) ClearPricingEffectiveAt() *UsageLogUpdate {
+	_u.mutation.ClearPricingEffectiveAt()
+	return _u
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (_u *UsageLogUpdate) SetConditionMultiplier(v float64) *UsageLogUpdate {
+	_u.mutation.ResetConditionMultiplier()
+	_u.mutation.SetConditionMultiplier(v)
+	return _u
+}
+
+// SetNillableConditionMultiplier sets the "condition_multiplier" field if the given value is not nil.
+func (_u *UsageLogUpdate) SetNillableConditionMultiplier(v *float64) *UsageLogUpdate {
+	if v != nil {
+		_u.SetConditionMultiplier(*v)
+	}
+	return _u
+}
+
+// AddConditionMultiplier adds value to the "condition_multiplier" field.
+func (_u *UsageLogUpdate) AddConditionMultiplier(v float64) *UsageLogUpdate {
+	_u.mutation.AddConditionMultiplier(v)
+	return _u
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (_u *UsageLogUpdate) SetPricingRuleID(v string) *UsageLogUpdate {
+	_u.mutation.SetPricingRuleID(v)
+	return _u
+}
+
+// SetNillablePricingRuleID sets the "pricing_rule_id" field if the given value is not nil.
+func (_u *UsageLogUpdate) SetNillablePricingRuleID(v *string) *UsageLogUpdate {
+	if v != nil {
+		_u.SetPricingRuleID(*v)
+	}
+	return _u
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (_u *UsageLogUpdate) ClearPricingRuleID() *UsageLogUpdate {
+	_u.mutation.ClearPricingRuleID()
+	return _u
+}
+
 // SetAccountRateMultiplier sets the "account_rate_multiplier" field.
 func (_u *UsageLogUpdate) SetAccountRateMultiplier(v float64) *UsageLogUpdate {
 	_u.mutation.ResetAccountRateMultiplier()
@@ -877,6 +939,16 @@ func (_u *UsageLogUpdate) check() error {
 			return &ValidationError{Name: "billing_mode", err: fmt.Errorf(`ent: validator failed for field "UsageLog.billing_mode": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ConditionMultiplier(); ok {
+		if err := usagelog.ConditionMultiplierValidator(v); err != nil {
+			return &ValidationError{Name: "condition_multiplier", err: fmt.Errorf(`ent: validator failed for field "UsageLog.condition_multiplier": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.PricingRuleID(); ok {
+		if err := usagelog.PricingRuleIDValidator(v); err != nil {
+			return &ValidationError{Name: "pricing_rule_id", err: fmt.Errorf(`ent: validator failed for field "UsageLog.pricing_rule_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.UserAgent(); ok {
 		if err := usagelog.UserAgentValidator(v); err != nil {
 			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "UsageLog.user_agent": %w`, err)}
@@ -1038,6 +1110,24 @@ func (_u *UsageLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedRateMultiplier(); ok {
 		_spec.AddField(usagelog.FieldRateMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.PricingEffectiveAt(); ok {
+		_spec.SetField(usagelog.FieldPricingEffectiveAt, field.TypeTime, value)
+	}
+	if _u.mutation.PricingEffectiveAtCleared() {
+		_spec.ClearField(usagelog.FieldPricingEffectiveAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ConditionMultiplier(); ok {
+		_spec.SetField(usagelog.FieldConditionMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedConditionMultiplier(); ok {
+		_spec.AddField(usagelog.FieldConditionMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.PricingRuleID(); ok {
+		_spec.SetField(usagelog.FieldPricingRuleID, field.TypeString, value)
+	}
+	if _u.mutation.PricingRuleIDCleared() {
+		_spec.ClearField(usagelog.FieldPricingRuleID, field.TypeString)
 	}
 	if value, ok := _u.mutation.AccountRateMultiplier(); ok {
 		_spec.SetField(usagelog.FieldAccountRateMultiplier, field.TypeFloat64, value)
@@ -1777,6 +1867,67 @@ func (_u *UsageLogUpdateOne) AddRateMultiplier(v float64) *UsageLogUpdateOne {
 	return _u
 }
 
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (_u *UsageLogUpdateOne) SetPricingEffectiveAt(v time.Time) *UsageLogUpdateOne {
+	_u.mutation.SetPricingEffectiveAt(v)
+	return _u
+}
+
+// SetNillablePricingEffectiveAt sets the "pricing_effective_at" field if the given value is not nil.
+func (_u *UsageLogUpdateOne) SetNillablePricingEffectiveAt(v *time.Time) *UsageLogUpdateOne {
+	if v != nil {
+		_u.SetPricingEffectiveAt(*v)
+	}
+	return _u
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (_u *UsageLogUpdateOne) ClearPricingEffectiveAt() *UsageLogUpdateOne {
+	_u.mutation.ClearPricingEffectiveAt()
+	return _u
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (_u *UsageLogUpdateOne) SetConditionMultiplier(v float64) *UsageLogUpdateOne {
+	_u.mutation.ResetConditionMultiplier()
+	_u.mutation.SetConditionMultiplier(v)
+	return _u
+}
+
+// SetNillableConditionMultiplier sets the "condition_multiplier" field if the given value is not nil.
+func (_u *UsageLogUpdateOne) SetNillableConditionMultiplier(v *float64) *UsageLogUpdateOne {
+	if v != nil {
+		_u.SetConditionMultiplier(*v)
+	}
+	return _u
+}
+
+// AddConditionMultiplier adds value to the "condition_multiplier" field.
+func (_u *UsageLogUpdateOne) AddConditionMultiplier(v float64) *UsageLogUpdateOne {
+	_u.mutation.AddConditionMultiplier(v)
+	return _u
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (_u *UsageLogUpdateOne) SetPricingRuleID(v string) *UsageLogUpdateOne {
+	_u.mutation.SetPricingRuleID(v)
+	return _u
+}
+
+// SetNillablePricingRuleID sets the "pricing_rule_id" field if the given value is not nil.
+func (_u *UsageLogUpdateOne) SetNillablePricingRuleID(v *string) *UsageLogUpdateOne {
+	if v != nil {
+		_u.SetPricingRuleID(*v)
+	}
+	return _u
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (_u *UsageLogUpdateOne) ClearPricingRuleID() *UsageLogUpdateOne {
+	_u.mutation.ClearPricingRuleID()
+	return _u
+}
+
 // SetAccountRateMultiplier sets the "account_rate_multiplier" field.
 func (_u *UsageLogUpdateOne) SetAccountRateMultiplier(v float64) *UsageLogUpdateOne {
 	_u.mutation.ResetAccountRateMultiplier()
@@ -2125,6 +2276,16 @@ func (_u *UsageLogUpdateOne) check() error {
 			return &ValidationError{Name: "billing_mode", err: fmt.Errorf(`ent: validator failed for field "UsageLog.billing_mode": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ConditionMultiplier(); ok {
+		if err := usagelog.ConditionMultiplierValidator(v); err != nil {
+			return &ValidationError{Name: "condition_multiplier", err: fmt.Errorf(`ent: validator failed for field "UsageLog.condition_multiplier": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.PricingRuleID(); ok {
+		if err := usagelog.PricingRuleIDValidator(v); err != nil {
+			return &ValidationError{Name: "pricing_rule_id", err: fmt.Errorf(`ent: validator failed for field "UsageLog.pricing_rule_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.UserAgent(); ok {
 		if err := usagelog.UserAgentValidator(v); err != nil {
 			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "UsageLog.user_agent": %w`, err)}
@@ -2303,6 +2464,24 @@ func (_u *UsageLogUpdateOne) sqlSave(ctx context.Context) (_node *UsageLog, err 
 	}
 	if value, ok := _u.mutation.AddedRateMultiplier(); ok {
 		_spec.AddField(usagelog.FieldRateMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.PricingEffectiveAt(); ok {
+		_spec.SetField(usagelog.FieldPricingEffectiveAt, field.TypeTime, value)
+	}
+	if _u.mutation.PricingEffectiveAtCleared() {
+		_spec.ClearField(usagelog.FieldPricingEffectiveAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.ConditionMultiplier(); ok {
+		_spec.SetField(usagelog.FieldConditionMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedConditionMultiplier(); ok {
+		_spec.AddField(usagelog.FieldConditionMultiplier, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.PricingRuleID(); ok {
+		_spec.SetField(usagelog.FieldPricingRuleID, field.TypeString, value)
+	}
+	if _u.mutation.PricingRuleIDCleared() {
+		_spec.ClearField(usagelog.FieldPricingRuleID, field.TypeString)
 	}
 	if value, ok := _u.mutation.AccountRateMultiplier(); ok {
 		_spec.SetField(usagelog.FieldAccountRateMultiplier, field.TypeFloat64, value)

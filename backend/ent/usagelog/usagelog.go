@@ -66,6 +66,12 @@ const (
 	FieldActualCost = "actual_cost"
 	// FieldRateMultiplier holds the string denoting the rate_multiplier field in the database.
 	FieldRateMultiplier = "rate_multiplier"
+	// FieldPricingEffectiveAt holds the string denoting the pricing_effective_at field in the database.
+	FieldPricingEffectiveAt = "pricing_effective_at"
+	// FieldConditionMultiplier holds the string denoting the condition_multiplier field in the database.
+	FieldConditionMultiplier = "condition_multiplier"
+	// FieldPricingRuleID holds the string denoting the pricing_rule_id field in the database.
+	FieldPricingRuleID = "pricing_rule_id"
 	// FieldAccountRateMultiplier holds the string denoting the account_rate_multiplier field in the database.
 	FieldAccountRateMultiplier = "account_rate_multiplier"
 	// FieldBillingType holds the string denoting the billing_type field in the database.
@@ -166,6 +172,9 @@ var Columns = []string{
 	FieldTotalCost,
 	FieldActualCost,
 	FieldRateMultiplier,
+	FieldPricingEffectiveAt,
+	FieldConditionMultiplier,
+	FieldPricingRuleID,
 	FieldAccountRateMultiplier,
 	FieldBillingType,
 	FieldStream,
@@ -230,6 +239,12 @@ var (
 	DefaultActualCost float64
 	// DefaultRateMultiplier holds the default value on creation for the "rate_multiplier" field.
 	DefaultRateMultiplier float64
+	// DefaultConditionMultiplier holds the default value on creation for the "condition_multiplier" field.
+	DefaultConditionMultiplier float64
+	// ConditionMultiplierValidator is a validator for the "condition_multiplier" field. It is called by the builders before save.
+	ConditionMultiplierValidator func(float64) error
+	// PricingRuleIDValidator is a validator for the "pricing_rule_id" field. It is called by the builders before save.
+	PricingRuleIDValidator func(string) error
 	// DefaultBillingType holds the default value on creation for the "billing_type" field.
 	DefaultBillingType int8
 	// DefaultStream holds the default value on creation for the "stream" field.
@@ -384,6 +399,21 @@ func ByActualCost(opts ...sql.OrderTermOption) OrderOption {
 // ByRateMultiplier orders the results by the rate_multiplier field.
 func ByRateMultiplier(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRateMultiplier, opts...).ToFunc()
+}
+
+// ByPricingEffectiveAt orders the results by the pricing_effective_at field.
+func ByPricingEffectiveAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPricingEffectiveAt, opts...).ToFunc()
+}
+
+// ByConditionMultiplier orders the results by the condition_multiplier field.
+func ByConditionMultiplier(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldConditionMultiplier, opts...).ToFunc()
+}
+
+// ByPricingRuleID orders the results by the pricing_rule_id field.
+func ByPricingRuleID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPricingRuleID, opts...).ToFunc()
 }
 
 // ByAccountRateMultiplier orders the results by the account_rate_multiplier field.

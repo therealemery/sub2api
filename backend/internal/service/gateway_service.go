@@ -8790,6 +8790,9 @@ func (s *GatewayService) recordUsageCore(ctx context.Context, input *recordUsage
 		IsSubscriptionBill:    isSubscriptionBilling,
 		AccountRateMultiplier: accountRateMultiplier,
 		APIKeyService:         input.APIKeyService,
+		PricingEffectiveAt:    result.PricingContext.EffectiveAt,
+		ConditionMultiplier:   usageLog.EffectiveConditionMultiplier(),
+		PricingRuleID:         result.PricingContext.RuleID,
 	}, s.billingDeps(), s.usageBillingRepo)
 
 	if billingErr != nil {
@@ -8982,6 +8985,9 @@ func (s *GatewayService) buildRecordUsageLog(
 		IPAddress:             optionalTrimmedStringPtr(input.IPAddress),
 		GroupID:               apiKey.GroupID,
 		SubscriptionID:        optionalSubscriptionID(subscription),
+		PricingEffectiveAt:    optionalPricingTimePtr(result.PricingContext.EffectiveAt),
+		ConditionMultiplier:   result.PricingContext.CustomerMultiplier,
+		PricingRuleID:         optionalTrimmedStringPtr(result.PricingContext.RuleID),
 		CreatedAt:             time.Now(),
 	}
 	if result.ImageCount > 0 {

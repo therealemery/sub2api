@@ -3,6 +3,7 @@ package dto
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/stretchr/testify/require"
@@ -146,6 +147,49 @@ func TestUsageLogFromService_FallsBackToLegacyModelWhenRequestedModelMissing(t *
 
 	require.Equal(t, "claude-3", userDTO.Model)
 	require.Equal(t, "claude-3", adminDTO.Model)
+}
+
+func TestUsageLogFromService_PricingAuditIsPublicButUpstreamAccountingRemainsPrivate(t *testing.T) {
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC)
+	ruleID := "deepseek-weekday-peak-2026-09-13"
+	upstreamModel := "deepseek-v4-flash"
+	accountCost := 0.25
+	log := &service.UsageLog{
+		Model: "deepseek-v4.1-flash", RequestedModel: "deepseek-v4.1-flash",
+		UpstreamModel: &upstreamModel, PricingEffectiveAt: &effectiveAt,
+		ConditionMultiplier: 2, PricingRuleID: &ruleID, RateMultiplier: 0.8,
+		AccountStatsCost: &accountCost,
+	}
+
+	userDTO := UsageLogFromService(log)
+	adminDTO := UsageLogFromServiceAdmin(log)
+	require.Equal(t, &effectiveAt, userDTO.PricingEffectiveAt)
+	require.Equal(t, 2.0, userDTO.ConditionMultiplier)
+	require.Equal(t, &ruleID, userDTO.PricingRuleID)
+	require.Equal(t, 0.8, userDTO.RateMultiplier)
+	require.Equal(t, userDTO.PricingEffectiveAt, adminDTO.PricingEffectiveAt)
+	require.Equal(t, userDTO.ConditionMultiplier, adminDTO.ConditionMultiplier)
+
+	userJSON, err := json.Marshal(userDTO)
+	require.NoError(t, err)
+	require.NotContains(t, string(userJSON), "upstream_model")
+	require.NotContains(t, string(userJSON), "account_stats_cost")
+	require.NotContains(t, string(userJSON), "deepseek-v4-flash")
+
+	adminJSON, err := json.Marshal(adminDTO)
+	require.NoError(t, err)
+	require.Contains(t, string(adminJSON), `"condition_multiplier":2`)
+	require.Contains(t, string(adminJSON), `"account_stats_cost":0.25`)
+}
+
+func TestUsageLogFromService_HistoricalPricingAuditDefaultsToNeutralWithoutRerating(t *testing.T) {
+	log := &service.UsageLog{Model: "gpt-5.4", RateMultiplier: 0.9, ActualCost: 0.42}
+	dto := UsageLogFromService(log)
+	require.Nil(t, dto.PricingEffectiveAt)
+	require.Nil(t, dto.PricingRuleID)
+	require.Equal(t, 1.0, dto.ConditionMultiplier)
+	require.Equal(t, 0.9, dto.RateMultiplier)
+	require.Equal(t, 0.42, dto.ActualCost)
 }
 
 func f64Ptr(value float64) *float64 {

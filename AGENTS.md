@@ -104,7 +104,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
-### 2026-09-14 — Text pricing and conditional-multiplier Tasks 1–3 implemented
+### 2026-09-14 — Text pricing and conditional-multiplier Tasks 1–4 implemented
 
 - The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
   manufacturer list sells at 70%; cost above 60% through 80% sells at 80%; cost above 80% or
@@ -140,6 +140,14 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Focused conditional-pricing and settlement tests pass. The complete unit-tagged service and
   handler packages pass after the final canonical-model override correction, as do Go formatting
   and `git diff --check`.
+- Task 4 adds idempotent migration 142 and persists the final successful attempt's UTC pricing
+  timestamp, customer condition multiplier, and public rule ID across single, batched, and
+  best-effort usage-log inserts. Historical rows retain their stored costs/rates and project a
+  neutral `1.0` condition without being re-rated. User and admin DTOs expose the same audited
+  condition fields; customer responses still omit the private upstream model and account cost.
+- Ent code was regenerated with the repository-required Go 1.26.3 toolchain. Migration, repository,
+  service, and DTO focused tests pass, as does the real PostgreSQL pricing-audit round-trip
+  integration test.
 - The plan separates the work into: validated condition rules; final-successful-attempt locking;
   unified customer/model and condition billing; additive usage audit persistence; checksum-safe
   price/account corrections; one sanitized backend-owned frontend rule projection; customer/admin
@@ -147,8 +155,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Execution must first read the exact signed-in Packy `codex` cost card before migration 143 can
   contain Codex cost values. Missing evidence leaves all four Codex routes unschedulable; it never
   permits a Core fallback or inferred cost. DeepSeek Pro remains unavailable.
-- Tasks 4–8 remain: persist audit fields, apply reviewed price/account migrations, project sanitized
-  rules to the frontend, show usage evidence, and complete rollout verification. No database,
+- Tasks 5–8 remain: apply reviewed price/account migrations, project sanitized rules to the
+  frontend, show usage evidence, and complete rollout verification. No production database,
   production data, account mapping, credential, paid request, push, or deployment changed at this
   checkpoint.
 

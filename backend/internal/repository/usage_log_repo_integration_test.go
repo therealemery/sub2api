@@ -40,6 +40,53 @@ func TestUsageLogRepoSuite(t *testing.T) {
 	suite.Run(t, new(UsageLogRepoSuite))
 }
 
+func TestUsageLogRepositoryPricingAuditRoundTrip(t *testing.T) {
+	ctx := context.Background()
+	tx := testEntTx(t)
+	client := tx.Client()
+	repo := newUsageLogRepositoryWithSQL(client, tx)
+
+	user := mustCreateUser(t, client, &service.User{Email: fmt.Sprintf("usage-pricing-audit-%d@example.com", time.Now().UnixNano())})
+	apiKey := mustCreateApiKey(t, client, &service.APIKey{UserID: user.ID, Key: "sk-usage-pricing-audit-" + uuid.NewString(), Name: "k"})
+	account := mustCreateAccount(t, client, &service.Account{Name: "acc-usage-pricing-audit-" + uuid.NewString()})
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 123, time.UTC)
+	ruleID := "deepseek-weekday-peak-2026-09-13"
+	log := &service.UsageLog{
+		UserID: user.ID, APIKeyID: apiKey.ID, AccountID: account.ID,
+		RequestID: uuid.NewString(), Model: "deepseek-v4.1-flash", RequestedModel: "deepseek-v4.1-flash",
+		InputTokens: 100, OutputTokens: 50, TotalCost: 0.52, ActualCost: 0.42,
+		RateMultiplier: 0.8, PricingEffectiveAt: &effectiveAt,
+		ConditionMultiplier: 2, PricingRuleID: &ruleID,
+		CreatedAt: effectiveAt.Add(time.Second),
+	}
+
+	inserted, err := repo.Create(ctx, log)
+	require.NoError(t, err)
+	require.True(t, inserted)
+	got, err := repo.GetByID(ctx, log.ID)
+	require.NoError(t, err)
+	require.Equal(t, &effectiveAt, got.PricingEffectiveAt)
+	require.Equal(t, 2.0, got.ConditionMultiplier)
+	require.Equal(t, &ruleID, got.PricingRuleID)
+	require.Equal(t, 0.8, got.RateMultiplier)
+
+	historical := &service.UsageLog{
+		UserID: user.ID, APIKeyID: apiKey.ID, AccountID: account.ID,
+		RequestID: uuid.NewString(), Model: "gpt-5.4", RateMultiplier: 0.9,
+		TotalCost: 0.50, ActualCost: 0.45, CreatedAt: effectiveAt.Add(2 * time.Second),
+	}
+	inserted, err = repo.Create(ctx, historical)
+	require.NoError(t, err)
+	require.True(t, inserted)
+	gotHistorical, err := repo.GetByID(ctx, historical.ID)
+	require.NoError(t, err)
+	require.Nil(t, gotHistorical.PricingEffectiveAt)
+	require.Nil(t, gotHistorical.PricingRuleID)
+	require.Equal(t, 1.0, gotHistorical.EffectiveConditionMultiplier())
+	require.Equal(t, 0.9, gotHistorical.RateMultiplier)
+	require.Equal(t, 0.45, gotHistorical.ActualCost)
+}
+
 // truncateToDayUTC 截断到 UTC 日期边界（测试辅助函数）
 func truncateToDayUTC(t time.Time) time.Time {
 	t = t.UTC()

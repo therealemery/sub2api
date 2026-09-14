@@ -351,6 +351,48 @@ func (_c *UsageLogCreate) SetNillableRateMultiplier(v *float64) *UsageLogCreate 
 	return _c
 }
 
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (_c *UsageLogCreate) SetPricingEffectiveAt(v time.Time) *UsageLogCreate {
+	_c.mutation.SetPricingEffectiveAt(v)
+	return _c
+}
+
+// SetNillablePricingEffectiveAt sets the "pricing_effective_at" field if the given value is not nil.
+func (_c *UsageLogCreate) SetNillablePricingEffectiveAt(v *time.Time) *UsageLogCreate {
+	if v != nil {
+		_c.SetPricingEffectiveAt(*v)
+	}
+	return _c
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (_c *UsageLogCreate) SetConditionMultiplier(v float64) *UsageLogCreate {
+	_c.mutation.SetConditionMultiplier(v)
+	return _c
+}
+
+// SetNillableConditionMultiplier sets the "condition_multiplier" field if the given value is not nil.
+func (_c *UsageLogCreate) SetNillableConditionMultiplier(v *float64) *UsageLogCreate {
+	if v != nil {
+		_c.SetConditionMultiplier(*v)
+	}
+	return _c
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (_c *UsageLogCreate) SetPricingRuleID(v string) *UsageLogCreate {
+	_c.mutation.SetPricingRuleID(v)
+	return _c
+}
+
+// SetNillablePricingRuleID sets the "pricing_rule_id" field if the given value is not nil.
+func (_c *UsageLogCreate) SetNillablePricingRuleID(v *string) *UsageLogCreate {
+	if v != nil {
+		_c.SetPricingRuleID(*v)
+	}
+	return _c
+}
+
 // SetAccountRateMultiplier sets the "account_rate_multiplier" field.
 func (_c *UsageLogCreate) SetAccountRateMultiplier(v float64) *UsageLogCreate {
 	_c.mutation.SetAccountRateMultiplier(v)
@@ -617,6 +659,10 @@ func (_c *UsageLogCreate) defaults() {
 		v := usagelog.DefaultRateMultiplier
 		_c.mutation.SetRateMultiplier(v)
 	}
+	if _, ok := _c.mutation.ConditionMultiplier(); !ok {
+		v := usagelog.DefaultConditionMultiplier
+		_c.mutation.SetConditionMultiplier(v)
+	}
 	if _, ok := _c.mutation.BillingType(); !ok {
 		v := usagelog.DefaultBillingType
 		_c.mutation.SetBillingType(v)
@@ -729,6 +775,19 @@ func (_c *UsageLogCreate) check() error {
 	}
 	if _, ok := _c.mutation.RateMultiplier(); !ok {
 		return &ValidationError{Name: "rate_multiplier", err: errors.New(`ent: missing required field "UsageLog.rate_multiplier"`)}
+	}
+	if _, ok := _c.mutation.ConditionMultiplier(); !ok {
+		return &ValidationError{Name: "condition_multiplier", err: errors.New(`ent: missing required field "UsageLog.condition_multiplier"`)}
+	}
+	if v, ok := _c.mutation.ConditionMultiplier(); ok {
+		if err := usagelog.ConditionMultiplierValidator(v); err != nil {
+			return &ValidationError{Name: "condition_multiplier", err: fmt.Errorf(`ent: validator failed for field "UsageLog.condition_multiplier": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.PricingRuleID(); ok {
+		if err := usagelog.PricingRuleIDValidator(v); err != nil {
+			return &ValidationError{Name: "pricing_rule_id", err: fmt.Errorf(`ent: validator failed for field "UsageLog.pricing_rule_id": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.BillingType(); !ok {
 		return &ValidationError{Name: "billing_type", err: errors.New(`ent: missing required field "UsageLog.billing_type"`)}
@@ -879,6 +938,18 @@ func (_c *UsageLogCreate) createSpec() (*UsageLog, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.RateMultiplier(); ok {
 		_spec.SetField(usagelog.FieldRateMultiplier, field.TypeFloat64, value)
 		_node.RateMultiplier = value
+	}
+	if value, ok := _c.mutation.PricingEffectiveAt(); ok {
+		_spec.SetField(usagelog.FieldPricingEffectiveAt, field.TypeTime, value)
+		_node.PricingEffectiveAt = &value
+	}
+	if value, ok := _c.mutation.ConditionMultiplier(); ok {
+		_spec.SetField(usagelog.FieldConditionMultiplier, field.TypeFloat64, value)
+		_node.ConditionMultiplier = value
+	}
+	if value, ok := _c.mutation.PricingRuleID(); ok {
+		_spec.SetField(usagelog.FieldPricingRuleID, field.TypeString, value)
+		_node.PricingRuleID = &value
 	}
 	if value, ok := _c.mutation.AccountRateMultiplier(); ok {
 		_spec.SetField(usagelog.FieldAccountRateMultiplier, field.TypeFloat64, value)
@@ -1502,6 +1573,60 @@ func (u *UsageLogUpsert) UpdateRateMultiplier() *UsageLogUpsert {
 // AddRateMultiplier adds v to the "rate_multiplier" field.
 func (u *UsageLogUpsert) AddRateMultiplier(v float64) *UsageLogUpsert {
 	u.Add(usagelog.FieldRateMultiplier, v)
+	return u
+}
+
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (u *UsageLogUpsert) SetPricingEffectiveAt(v time.Time) *UsageLogUpsert {
+	u.Set(usagelog.FieldPricingEffectiveAt, v)
+	return u
+}
+
+// UpdatePricingEffectiveAt sets the "pricing_effective_at" field to the value that was provided on create.
+func (u *UsageLogUpsert) UpdatePricingEffectiveAt() *UsageLogUpsert {
+	u.SetExcluded(usagelog.FieldPricingEffectiveAt)
+	return u
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (u *UsageLogUpsert) ClearPricingEffectiveAt() *UsageLogUpsert {
+	u.SetNull(usagelog.FieldPricingEffectiveAt)
+	return u
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (u *UsageLogUpsert) SetConditionMultiplier(v float64) *UsageLogUpsert {
+	u.Set(usagelog.FieldConditionMultiplier, v)
+	return u
+}
+
+// UpdateConditionMultiplier sets the "condition_multiplier" field to the value that was provided on create.
+func (u *UsageLogUpsert) UpdateConditionMultiplier() *UsageLogUpsert {
+	u.SetExcluded(usagelog.FieldConditionMultiplier)
+	return u
+}
+
+// AddConditionMultiplier adds v to the "condition_multiplier" field.
+func (u *UsageLogUpsert) AddConditionMultiplier(v float64) *UsageLogUpsert {
+	u.Add(usagelog.FieldConditionMultiplier, v)
+	return u
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (u *UsageLogUpsert) SetPricingRuleID(v string) *UsageLogUpsert {
+	u.Set(usagelog.FieldPricingRuleID, v)
+	return u
+}
+
+// UpdatePricingRuleID sets the "pricing_rule_id" field to the value that was provided on create.
+func (u *UsageLogUpsert) UpdatePricingRuleID() *UsageLogUpsert {
+	u.SetExcluded(usagelog.FieldPricingRuleID)
+	return u
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (u *UsageLogUpsert) ClearPricingRuleID() *UsageLogUpsert {
+	u.SetNull(usagelog.FieldPricingRuleID)
 	return u
 }
 
@@ -2251,6 +2376,69 @@ func (u *UsageLogUpsertOne) AddRateMultiplier(v float64) *UsageLogUpsertOne {
 func (u *UsageLogUpsertOne) UpdateRateMultiplier() *UsageLogUpsertOne {
 	return u.Update(func(s *UsageLogUpsert) {
 		s.UpdateRateMultiplier()
+	})
+}
+
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (u *UsageLogUpsertOne) SetPricingEffectiveAt(v time.Time) *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetPricingEffectiveAt(v)
+	})
+}
+
+// UpdatePricingEffectiveAt sets the "pricing_effective_at" field to the value that was provided on create.
+func (u *UsageLogUpsertOne) UpdatePricingEffectiveAt() *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdatePricingEffectiveAt()
+	})
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (u *UsageLogUpsertOne) ClearPricingEffectiveAt() *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.ClearPricingEffectiveAt()
+	})
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (u *UsageLogUpsertOne) SetConditionMultiplier(v float64) *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetConditionMultiplier(v)
+	})
+}
+
+// AddConditionMultiplier adds v to the "condition_multiplier" field.
+func (u *UsageLogUpsertOne) AddConditionMultiplier(v float64) *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.AddConditionMultiplier(v)
+	})
+}
+
+// UpdateConditionMultiplier sets the "condition_multiplier" field to the value that was provided on create.
+func (u *UsageLogUpsertOne) UpdateConditionMultiplier() *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdateConditionMultiplier()
+	})
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (u *UsageLogUpsertOne) SetPricingRuleID(v string) *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetPricingRuleID(v)
+	})
+}
+
+// UpdatePricingRuleID sets the "pricing_rule_id" field to the value that was provided on create.
+func (u *UsageLogUpsertOne) UpdatePricingRuleID() *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdatePricingRuleID()
+	})
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (u *UsageLogUpsertOne) ClearPricingRuleID() *UsageLogUpsertOne {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.ClearPricingRuleID()
 	})
 }
 
@@ -3197,6 +3385,69 @@ func (u *UsageLogUpsertBulk) AddRateMultiplier(v float64) *UsageLogUpsertBulk {
 func (u *UsageLogUpsertBulk) UpdateRateMultiplier() *UsageLogUpsertBulk {
 	return u.Update(func(s *UsageLogUpsert) {
 		s.UpdateRateMultiplier()
+	})
+}
+
+// SetPricingEffectiveAt sets the "pricing_effective_at" field.
+func (u *UsageLogUpsertBulk) SetPricingEffectiveAt(v time.Time) *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetPricingEffectiveAt(v)
+	})
+}
+
+// UpdatePricingEffectiveAt sets the "pricing_effective_at" field to the value that was provided on create.
+func (u *UsageLogUpsertBulk) UpdatePricingEffectiveAt() *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdatePricingEffectiveAt()
+	})
+}
+
+// ClearPricingEffectiveAt clears the value of the "pricing_effective_at" field.
+func (u *UsageLogUpsertBulk) ClearPricingEffectiveAt() *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.ClearPricingEffectiveAt()
+	})
+}
+
+// SetConditionMultiplier sets the "condition_multiplier" field.
+func (u *UsageLogUpsertBulk) SetConditionMultiplier(v float64) *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetConditionMultiplier(v)
+	})
+}
+
+// AddConditionMultiplier adds v to the "condition_multiplier" field.
+func (u *UsageLogUpsertBulk) AddConditionMultiplier(v float64) *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.AddConditionMultiplier(v)
+	})
+}
+
+// UpdateConditionMultiplier sets the "condition_multiplier" field to the value that was provided on create.
+func (u *UsageLogUpsertBulk) UpdateConditionMultiplier() *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdateConditionMultiplier()
+	})
+}
+
+// SetPricingRuleID sets the "pricing_rule_id" field.
+func (u *UsageLogUpsertBulk) SetPricingRuleID(v string) *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.SetPricingRuleID(v)
+	})
+}
+
+// UpdatePricingRuleID sets the "pricing_rule_id" field to the value that was provided on create.
+func (u *UsageLogUpsertBulk) UpdatePricingRuleID() *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.UpdatePricingRuleID()
+	})
+}
+
+// ClearPricingRuleID clears the value of the "pricing_rule_id" field.
+func (u *UsageLogUpsertBulk) ClearPricingRuleID() *UsageLogUpsertBulk {
+	return u.Update(func(s *UsageLogUpsert) {
+		s.ClearPricingRuleID()
 	})
 }
 

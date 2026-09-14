@@ -185,6 +185,21 @@ func RateMultiplier(v float64) predicate.UsageLog {
 	return predicate.UsageLog(sql.FieldEQ(FieldRateMultiplier, v))
 }
 
+// PricingEffectiveAt applies equality check predicate on the "pricing_effective_at" field. It's identical to PricingEffectiveAtEQ.
+func PricingEffectiveAt(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldPricingEffectiveAt, v))
+}
+
+// ConditionMultiplier applies equality check predicate on the "condition_multiplier" field. It's identical to ConditionMultiplierEQ.
+func ConditionMultiplier(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldConditionMultiplier, v))
+}
+
+// PricingRuleID applies equality check predicate on the "pricing_rule_id" field. It's identical to PricingRuleIDEQ.
+func PricingRuleID(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldPricingRuleID, v))
+}
+
 // AccountRateMultiplier applies equality check predicate on the "account_rate_multiplier" field. It's identical to AccountRateMultiplierEQ.
 func AccountRateMultiplier(v float64) predicate.UsageLog {
 	return predicate.UsageLog(sql.FieldEQ(FieldAccountRateMultiplier, v))
@@ -1433,6 +1448,171 @@ func RateMultiplierLT(v float64) predicate.UsageLog {
 // RateMultiplierLTE applies the LTE predicate on the "rate_multiplier" field.
 func RateMultiplierLTE(v float64) predicate.UsageLog {
 	return predicate.UsageLog(sql.FieldLTE(FieldRateMultiplier, v))
+}
+
+// PricingEffectiveAtEQ applies the EQ predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtEQ(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtNEQ applies the NEQ predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtNEQ(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNEQ(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtIn applies the In predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtIn(vs ...time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldIn(FieldPricingEffectiveAt, vs...))
+}
+
+// PricingEffectiveAtNotIn applies the NotIn predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtNotIn(vs ...time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNotIn(FieldPricingEffectiveAt, vs...))
+}
+
+// PricingEffectiveAtGT applies the GT predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtGT(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGT(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtGTE applies the GTE predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtGTE(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGTE(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtLT applies the LT predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtLT(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLT(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtLTE applies the LTE predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtLTE(v time.Time) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLTE(FieldPricingEffectiveAt, v))
+}
+
+// PricingEffectiveAtIsNil applies the IsNil predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtIsNil() predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldIsNull(FieldPricingEffectiveAt))
+}
+
+// PricingEffectiveAtNotNil applies the NotNil predicate on the "pricing_effective_at" field.
+func PricingEffectiveAtNotNil() predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNotNull(FieldPricingEffectiveAt))
+}
+
+// ConditionMultiplierEQ applies the EQ predicate on the "condition_multiplier" field.
+func ConditionMultiplierEQ(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldConditionMultiplier, v))
+}
+
+// ConditionMultiplierNEQ applies the NEQ predicate on the "condition_multiplier" field.
+func ConditionMultiplierNEQ(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNEQ(FieldConditionMultiplier, v))
+}
+
+// ConditionMultiplierIn applies the In predicate on the "condition_multiplier" field.
+func ConditionMultiplierIn(vs ...float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldIn(FieldConditionMultiplier, vs...))
+}
+
+// ConditionMultiplierNotIn applies the NotIn predicate on the "condition_multiplier" field.
+func ConditionMultiplierNotIn(vs ...float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNotIn(FieldConditionMultiplier, vs...))
+}
+
+// ConditionMultiplierGT applies the GT predicate on the "condition_multiplier" field.
+func ConditionMultiplierGT(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGT(FieldConditionMultiplier, v))
+}
+
+// ConditionMultiplierGTE applies the GTE predicate on the "condition_multiplier" field.
+func ConditionMultiplierGTE(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGTE(FieldConditionMultiplier, v))
+}
+
+// ConditionMultiplierLT applies the LT predicate on the "condition_multiplier" field.
+func ConditionMultiplierLT(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLT(FieldConditionMultiplier, v))
+}
+
+// ConditionMultiplierLTE applies the LTE predicate on the "condition_multiplier" field.
+func ConditionMultiplierLTE(v float64) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLTE(FieldConditionMultiplier, v))
+}
+
+// PricingRuleIDEQ applies the EQ predicate on the "pricing_rule_id" field.
+func PricingRuleIDEQ(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEQ(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDNEQ applies the NEQ predicate on the "pricing_rule_id" field.
+func PricingRuleIDNEQ(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNEQ(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDIn applies the In predicate on the "pricing_rule_id" field.
+func PricingRuleIDIn(vs ...string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldIn(FieldPricingRuleID, vs...))
+}
+
+// PricingRuleIDNotIn applies the NotIn predicate on the "pricing_rule_id" field.
+func PricingRuleIDNotIn(vs ...string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNotIn(FieldPricingRuleID, vs...))
+}
+
+// PricingRuleIDGT applies the GT predicate on the "pricing_rule_id" field.
+func PricingRuleIDGT(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGT(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDGTE applies the GTE predicate on the "pricing_rule_id" field.
+func PricingRuleIDGTE(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldGTE(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDLT applies the LT predicate on the "pricing_rule_id" field.
+func PricingRuleIDLT(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLT(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDLTE applies the LTE predicate on the "pricing_rule_id" field.
+func PricingRuleIDLTE(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldLTE(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDContains applies the Contains predicate on the "pricing_rule_id" field.
+func PricingRuleIDContains(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldContains(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDHasPrefix applies the HasPrefix predicate on the "pricing_rule_id" field.
+func PricingRuleIDHasPrefix(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldHasPrefix(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDHasSuffix applies the HasSuffix predicate on the "pricing_rule_id" field.
+func PricingRuleIDHasSuffix(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldHasSuffix(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDIsNil applies the IsNil predicate on the "pricing_rule_id" field.
+func PricingRuleIDIsNil() predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldIsNull(FieldPricingRuleID))
+}
+
+// PricingRuleIDNotNil applies the NotNil predicate on the "pricing_rule_id" field.
+func PricingRuleIDNotNil() predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldNotNull(FieldPricingRuleID))
+}
+
+// PricingRuleIDEqualFold applies the EqualFold predicate on the "pricing_rule_id" field.
+func PricingRuleIDEqualFold(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldEqualFold(FieldPricingRuleID, v))
+}
+
+// PricingRuleIDContainsFold applies the ContainsFold predicate on the "pricing_rule_id" field.
+func PricingRuleIDContainsFold(v string) predicate.UsageLog {
+	return predicate.UsageLog(sql.FieldContainsFold(FieldPricingRuleID, v))
 }
 
 // AccountRateMultiplierEQ applies the EQ predicate on the "account_rate_multiplier" field.

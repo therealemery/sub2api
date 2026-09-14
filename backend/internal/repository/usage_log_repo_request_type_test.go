@@ -86,6 +86,9 @@ func TestUsageLogRepositoryCreateSyncRequestTypeAndLegacyFields(t *testing.T) {
 			sqlmock.AnyArg(), // billing_tier
 			sqlmock.AnyArg(), // billing_mode
 			sqlmock.AnyArg(), // account_stats_cost
+			sqlmock.AnyArg(), // pricing_effective_at
+			1.0,              // condition_multiplier
+			sqlmock.AnyArg(), // pricing_rule_id
 			createdAt,
 		).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at"}).AddRow(int64(99), createdAt))
@@ -165,6 +168,9 @@ func TestUsageLogRepositoryCreate_PersistsServiceTier(t *testing.T) {
 			sqlmock.AnyArg(), // billing_tier
 			sqlmock.AnyArg(), // billing_mode
 			sqlmock.AnyArg(), // account_stats_cost
+			sqlmock.AnyArg(), // pricing_effective_at
+			1.0,              // condition_multiplier
+			sqlmock.AnyArg(), // pricing_rule_id
 			createdAt,
 		).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at"}).AddRow(int64(100), createdAt))
@@ -228,6 +234,78 @@ func TestPrepareUsageLogInsert_ArgCountMatchesTypes(t *testing.T) {
 	})
 
 	require.Len(t, prepared.args, len(usageLogInsertArgTypes))
+}
+
+func TestPrepareUsageLogInsert_PricingAuditFieldsStayAlignedAcrossInsertPaths(t *testing.T) {
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 123, time.UTC)
+	ruleID := "deepseek-weekday-peak-2026-09-13"
+	log := &service.UsageLog{
+		UserID: 1, APIKeyID: 2, AccountID: 3, RequestID: "req-pricing-audit",
+		Model: "deepseek-v4.1-flash", RequestedModel: "deepseek-v4.1-flash",
+		RateMultiplier: 0.8, PricingEffectiveAt: &effectiveAt,
+		ConditionMultiplier: 2, PricingRuleID: &ruleID,
+		CreatedAt: time.Date(2026, 9, 14, 1, 0, 1, 0, time.UTC),
+	}
+
+	prepared := prepareUsageLogInsert(log)
+	require.Len(t, prepared.args, len(usageLogInsertArgTypes))
+	require.Contains(t, usageLogSelectColumns, "pricing_effective_at, condition_multiplier, pricing_rule_id")
+
+	batchQuery, _ := buildUsageLogBatchInsertQuery(
+		[]string{usageLogBatchKey(log.RequestID, log.APIKeyID)},
+		map[string]usageLogInsertPrepared{usageLogBatchKey(log.RequestID, log.APIKeyID): prepared},
+	)
+	bestEffortQuery, _ := buildUsageLogBestEffortInsertQuery([]usageLogInsertPrepared{prepared})
+	for _, query := range []string{batchQuery, bestEffortQuery} {
+		require.Contains(t, query, "pricing_effective_at")
+		require.Contains(t, query, "condition_multiplier")
+		require.Contains(t, query, "pricing_rule_id")
+	}
+}
+
+func TestScanUsageLogPricingAuditAndHistoricalNeutralDefault(t *testing.T) {
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 123, time.UTC)
+	ruleID := "deepseek-weekday-peak-2026-09-13"
+
+	peak, err := scanUsageLog(usageLogScannerStub{values: usageLogPricingAuditScanValues(
+		sql.NullTime{Time: effectiveAt, Valid: true}, 2, sql.NullString{String: ruleID, Valid: true},
+	)})
+	require.NoError(t, err)
+	require.Equal(t, &effectiveAt, peak.PricingEffectiveAt)
+	require.Equal(t, 2.0, peak.ConditionMultiplier)
+	require.Equal(t, &ruleID, peak.PricingRuleID)
+	require.Equal(t, 0.8, peak.RateMultiplier)
+
+	historical, err := scanUsageLog(usageLogScannerStub{values: usageLogPricingAuditScanValues(
+		sql.NullTime{}, 1, sql.NullString{},
+	)})
+	require.NoError(t, err)
+	require.Nil(t, historical.PricingEffectiveAt)
+	require.Nil(t, historical.PricingRuleID)
+	require.Equal(t, 1.0, historical.EffectiveConditionMultiplier())
+	require.Equal(t, 0.8, historical.RateMultiplier)
+	require.Equal(t, 0.42, historical.ActualCost)
+}
+
+func usageLogPricingAuditScanValues(pricingEffectiveAt sql.NullTime, conditionMultiplier float64, pricingRuleID sql.NullString) []any {
+	return []any{
+		int64(1), int64(10), int64(20), int64(30),
+		sql.NullString{Valid: true, String: "req-pricing-audit"},
+		"deepseek-v4.1-flash",
+		sql.NullString{Valid: true, String: "deepseek-v4.1-flash"},
+		sql.NullString{Valid: true, String: "deepseek-v4-flash"},
+		sql.NullInt64{}, sql.NullInt64{},
+		100, 50, 0, 10, 0, 0,
+		0, 0.0,
+		0.1, 0.2, 0.0, 0.01, 0.52, 0.42,
+		0.8, sql.NullFloat64{},
+		int16(service.BillingTypeBalance), int16(service.RequestTypeSync), false, false,
+		sql.NullInt64{}, sql.NullInt64{}, sql.NullString{}, sql.NullString{},
+		0, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{},
+		false, sql.NullInt64{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullFloat64{},
+		pricingEffectiveAt, conditionMultiplier, pricingRuleID,
+		time.Date(2026, 9, 14, 1, 0, 1, 0, time.UTC),
+	}
 }
 
 func TestCoalesceTrimmedString(t *testing.T) {
@@ -577,6 +655,9 @@ func TestScanUsageLogRequestTypeAndLegacyFallback(t *testing.T) {
 			sql.NullString{},  // billing_tier
 			sql.NullString{},  // billing_mode
 			sql.NullFloat64{}, // account_stats_cost
+			sql.NullTime{},    // pricing_effective_at
+			1.0,               // condition_multiplier
+			sql.NullString{},  // pricing_rule_id
 			now,
 		}})
 		require.NoError(t, err)
@@ -625,6 +706,9 @@ func TestScanUsageLogRequestTypeAndLegacyFallback(t *testing.T) {
 			sql.NullString{},  // billing_tier
 			sql.NullString{},  // billing_mode
 			sql.NullFloat64{}, // account_stats_cost
+			sql.NullTime{},    // pricing_effective_at
+			1.0,               // condition_multiplier
+			sql.NullString{},  // pricing_rule_id
 			now,
 		}})
 		require.NoError(t, err)
@@ -673,6 +757,9 @@ func TestScanUsageLogRequestTypeAndLegacyFallback(t *testing.T) {
 			sql.NullString{},  // billing_tier
 			sql.NullString{},  // billing_mode
 			sql.NullFloat64{}, // account_stats_cost
+			sql.NullTime{},    // pricing_effective_at
+			1.0,               // condition_multiplier
+			sql.NullString{},  // pricing_rule_id
 			now,
 		}})
 		require.NoError(t, err)

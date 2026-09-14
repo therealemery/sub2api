@@ -37,6 +37,9 @@ type CreateUsageLogRequest struct {
 	TotalCost             float64     `json:"total_cost"`
 	ActualCost            float64     `json:"actual_cost"`
 	RateMultiplier        float64     `json:"rate_multiplier"`
+	PricingEffectiveAt    *time.Time  `json:"pricing_effective_at,omitempty"`
+	ConditionMultiplier   float64     `json:"condition_multiplier"`
+	PricingRuleID         *string     `json:"pricing_rule_id,omitempty"`
 	Stream                bool        `json:"stream"`
 	DurationMs            *int        `json:"duration_ms"`
 	VideoTaskID           *string     `json:"-"`
@@ -118,6 +121,9 @@ func (s *UsageService) Create(ctx context.Context, req CreateUsageLogRequest) (*
 		TotalCost:             req.TotalCost,
 		ActualCost:            req.ActualCost,
 		RateMultiplier:        req.RateMultiplier,
+		PricingEffectiveAt:    req.PricingEffectiveAt,
+		ConditionMultiplier:   req.ConditionMultiplier,
+		PricingRuleID:         req.PricingRuleID,
 		Stream:                req.Stream,
 		DurationMs:            req.DurationMs,
 		GroupID:               req.GroupID,

@@ -144,6 +144,13 @@ type UsageLog struct {
 	TotalCost         float64
 	ActualCost        float64
 	RateMultiplier    float64
+	// PricingEffectiveAt is the final successful upstream attempt's send time.
+	PricingEffectiveAt *time.Time
+	// ConditionMultiplier is the independently audited request-condition factor.
+	// Zero is treated as neutral only for historical/in-memory compatibility.
+	ConditionMultiplier float64
+	// PricingRuleID identifies the public condition rule without exposing upstream details.
+	PricingRuleID *string
 	// AccountRateMultiplier 账号计费倍率快照（nil 表示历史数据，按 1.0 处理）
 	AccountRateMultiplier *float64
 	// AccountStatsCost 账号统计定价预计算费用（nil = 使用默认公式 total_cost × account_rate_multiplier）
@@ -177,6 +184,13 @@ type UsageLog struct {
 
 func (u *UsageLog) TotalTokens() int {
 	return u.InputTokens + u.OutputTokens + u.CacheCreationTokens + u.CacheReadTokens
+}
+
+func (u *UsageLog) EffectiveConditionMultiplier() float64 {
+	if u == nil || u.ConditionMultiplier == 0 {
+		return 1
+	}
+	return u.ConditionMultiplier
 }
 
 func (u *UsageLog) EffectiveRequestType() RequestType {

@@ -277,13 +277,14 @@ func TestOpenAIGatewayServiceRecordUsage_ConditionAndCustomerModelRateApplyExact
 	svc.channelService = cs
 	svc.resolver = NewModelPricingResolver(cs, svc.billingService)
 	baseTotal := 1_000*(0.105/1_000_000) + 500*(0.42/1_000_000)
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC)
 	err := svc.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
 		Result: &OpenAIForwardResult{
 			RequestID: "resp_peak", Model: "deepseek-v4.1-flash", UpstreamModel: "deepseek-v4-flash",
 			Usage: usage, Duration: time.Second,
 			PricingContext: RequestPricingContext{
 				CanonicalModel: "deepseek-v4.1-flash", AccountingModel: "deepseek-v4-flash",
-				EffectiveAt: time.Date(2026, 9, 14, 1, 0, 0, 0, time.UTC), RuleID: deepSeekWeekdayPeakRuleID,
+				EffectiveAt: effectiveAt, RuleID: deepSeekWeekdayPeakRuleID,
 				CustomerMultiplier: 2, UpstreamCostMultiplier: 2,
 			},
 		},
@@ -294,6 +295,10 @@ func TestOpenAIGatewayServiceRecordUsage_ConditionAndCustomerModelRateApplyExact
 	require.NoError(t, err)
 	require.Equal(t, "deepseek-v4.1-flash", rateRepo.lastModel)
 	require.InDelta(t, 0.8, usageRepo.lastLog.RateMultiplier, 1e-12)
+	require.Equal(t, 2.0, usageRepo.lastLog.ConditionMultiplier)
+	require.Equal(t, &effectiveAt, usageRepo.lastLog.PricingEffectiveAt)
+	require.NotNil(t, usageRepo.lastLog.PricingRuleID)
+	require.Equal(t, deepSeekWeekdayPeakRuleID, *usageRepo.lastLog.PricingRuleID)
 	require.InDelta(t, baseTotal*2, usageRepo.lastLog.TotalCost, 1e-12)
 	require.InDelta(t, baseTotal*2*0.8, usageRepo.lastLog.ActualCost, 1e-12)
 }

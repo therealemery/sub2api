@@ -5424,6 +5424,9 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 		ImageOutputTokens:   result.Usage.ImageOutputTokens,
 		ImageCount:          result.ImageCount,
 		ImageSize:           optionalTrimmedStringPtr(result.ImageSize),
+		PricingEffectiveAt:  optionalPricingTimePtr(pricingContext.EffectiveAt),
+		ConditionMultiplier: pricingContext.CustomerMultiplier,
+		PricingRuleID:       optionalTrimmedStringPtr(pricingContext.RuleID),
 	}
 	if cost != nil {
 		usageLog.InputCost = cost.InputCost
@@ -5667,6 +5670,14 @@ func requestPricingConditionAppliesToModel(model string) bool {
 	}
 	_, applies := registry[canonicalRequestPricingModel(model)]
 	return applies
+}
+
+func optionalPricingTimePtr(value time.Time) *time.Time {
+	if value.IsZero() {
+		return nil
+	}
+	utc := value.UTC()
+	return &utc
 }
 
 func (s *OpenAIGatewayService) calculateOpenAIImageCost(

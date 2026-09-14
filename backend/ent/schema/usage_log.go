@@ -100,6 +100,18 @@ func (UsageLog) Fields() []ent.Field {
 		field.Float("rate_multiplier").
 			Default(1).
 			SchemaType(map[string]string{dialect.Postgres: "decimal(10,4)"}),
+		field.Time("pricing_effective_at").
+			Optional().
+			Nillable().
+			SchemaType(map[string]string{dialect.Postgres: "timestamptz"}),
+		field.Float("condition_multiplier").
+			Default(1).
+			Positive().
+			SchemaType(map[string]string{dialect.Postgres: "decimal(10,4)"}),
+		field.String("pricing_rule_id").
+			MaxLen(128).
+			Optional().
+			Nillable(),
 
 		// account_rate_multiplier: 账号计费倍率快照（NULL 表示按 1.0 处理）
 		field.Float("account_rate_multiplier").
