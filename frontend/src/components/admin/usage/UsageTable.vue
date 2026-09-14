@@ -160,6 +160,20 @@
           </div>
         </template>
 
+        <template #cell-condition_multiplier="{ row }">
+          <span class="inline-flex rounded border border-gray-200 px-1.5 py-0.5 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-200">
+            {{ formatPricingConditionMultiplier(row.condition_multiplier) }}
+          </span>
+        </template>
+
+        <template #cell-pricing_rule_id="{ row }">
+          <code class="block max-w-[260px] break-all text-xs text-gray-600 dark:text-gray-300">{{ row.pricing_rule_id || '-' }}</code>
+        </template>
+
+        <template #cell-pricing_effective_at="{ row }">
+          <span class="whitespace-nowrap text-xs text-gray-600 dark:text-gray-300">{{ formatPricingEffectiveAtUTC(row.pricing_effective_at) }}</span>
+        </template>
+
         <template #cell-first_token="{ row }">
           <span v-if="row.first_token_ms != null" class="text-sm text-gray-600 dark:text-gray-400">{{ formatDuration(row.first_token_ms) }}</span>
           <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
@@ -324,8 +338,20 @@
             <span class="font-semibold text-cyan-300">{{ getUsageServiceTierLabel(tooltipData?.service_tier, t) }}</span>
           </div>
           <div class="flex items-center justify-between gap-6">
-            <span class="text-gray-400">{{ t('usage.rate') }}</span>
+            <span class="text-gray-400">{{ t('usage.customerRate') }}</span>
             <span class="font-semibold text-blue-400">{{ formatMultiplier(tooltipData?.rate_multiplier || 1) }}x</span>
+          </div>
+          <div class="flex items-center justify-between gap-6">
+            <span class="text-gray-400">{{ t('usage.timeCondition') }}</span>
+            <span class="font-semibold text-amber-300">{{ formatPricingConditionMultiplier(tooltipData?.condition_multiplier) }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-6">
+            <span class="text-gray-400">{{ t('usage.pricingRule') }}</span>
+            <span class="max-w-[300px] break-all text-right font-medium text-white">{{ tooltipData?.pricing_rule_id || '-' }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-6">
+            <span class="text-gray-400">{{ t('usage.pricingEffectiveAt') }}</span>
+            <span class="font-medium text-white">{{ formatPricingEffectiveAtUTC(tooltipData?.pricing_effective_at) }}</span>
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.original') }}</span>
@@ -362,7 +388,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatDateTime, formatReasoningEffort } from '@/utils/format'
 import { formatCacheTokens, formatMultiplier } from '@/utils/formatters'
-import { formatTokenPricePerMillion } from '@/utils/usagePricing'
+import { formatPricingConditionMultiplier, formatPricingEffectiveAtUTC, formatTokenPricePerMillion } from '@/utils/usagePricing'
 import { getUsageServiceTierLabel } from '@/utils/usageServiceTier'
 import { resolveUsageRequestType } from '@/utils/usageRequestType'
 import { getBillingModeLabel, getBillingModeBadgeClass, BILLING_MODE_TOKEN, BILLING_MODE_IMAGE } from '@/utils/billingMode'

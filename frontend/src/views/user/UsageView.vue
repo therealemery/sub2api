@@ -291,6 +291,9 @@
               <span class="font-medium text-green-600 dark:text-green-400">
                 ${{ formatCost(row.actual_cost) }}
               </span>
+              <span class="inline-flex rounded border border-gray-200 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-300">
+                {{ formatPricingConditionMultiplier(row.condition_multiplier) }}
+              </span>
               <!-- Cost Detail Tooltip -->
               <div
                 class="group relative"
@@ -523,10 +526,16 @@
             <span class="font-semibold text-cyan-300">{{ getUsageServiceTierLabel(tooltipData?.service_tier, t) }}</span>
           </div>
           <div class="flex items-center justify-between gap-6">
-            <span class="text-gray-400">{{ t('usage.rate') }}</span>
+            <span class="text-gray-400">{{ t('usage.customerRate') }}</span>
             <span class="font-semibold text-blue-400"
               >{{ formatMultiplier(tooltipData?.rate_multiplier || 1) }}x</span
             >
+          </div>
+          <div class="flex items-center justify-between gap-6">
+            <span class="text-gray-400">{{ t('usage.timeCondition') }}</span>
+            <span class="font-semibold text-amber-300">
+              {{ pricingRuleLabel(tooltipData?.pricing_rule_id, locale) }} · {{ formatPricingConditionMultiplier(tooltipData?.condition_multiplier) }}
+            </span>
           </div>
           <div class="flex items-center justify-between gap-6">
             <span class="text-gray-400">{{ t('usage.original') }}</span>
@@ -567,12 +576,12 @@ import type { Column } from '@/components/common/types'
 import { formatDateTime, formatReasoningEffort } from '@/utils/format'
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 import { formatCacheTokens, formatMultiplier } from '@/utils/formatters'
-import { formatTokenPricePerMillion } from '@/utils/usagePricing'
+import { formatPricingConditionMultiplier, formatPricingEffectiveAtUTC, formatTokenPricePerMillion, pricingRuleLabel } from '@/utils/usagePricing'
 import { getUsageServiceTierLabel } from '@/utils/usageServiceTier'
 import { resolveUsageRequestType } from '@/utils/usageRequestType'
 import { getBillingModeLabel, getBillingModeBadgeClass } from '@/utils/billingMode'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const appStore = useAppStore()
 
 let abortController: AbortController | null = null
@@ -981,6 +990,9 @@ const exportToCSV = async () => {
       'Cache Read Tokens',
       'Cache Creation Tokens',
       'Rate Multiplier',
+      'Condition Multiplier',
+      'Pricing Rule',
+      'Pricing Effective At (UTC)',
       'Billed Cost',
       'Original Cost',
       'First Token (ms)',
@@ -1000,6 +1012,9 @@ const exportToCSV = async () => {
         log.cache_read_tokens,
         log.cache_creation_tokens,
         log.rate_multiplier,
+        formatPricingConditionMultiplier(log.condition_multiplier),
+        pricingRuleLabel(log.pricing_rule_id, locale.value),
+        formatPricingEffectiveAtUTC(log.pricing_effective_at) === '-' ? '' : formatPricingEffectiveAtUTC(log.pricing_effective_at),
         formatCost(log.actual_cost, 8),
         formatCost(log.total_cost, 8),
         log.first_token_ms ?? '',

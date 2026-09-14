@@ -30,6 +30,8 @@ const messages: Record<string, string> = {
   'usage.serviceTierFlex': 'Flex',
   'usage.serviceTierStandard': 'Standard',
   'usage.rate': 'Rate',
+  'usage.customerRate': 'Customer rate',
+  'usage.timeCondition': 'Time condition',
   'usage.original': 'Original',
   'usage.billed': 'Billed',
   'usage.allApiKeys': 'All API Keys',
@@ -63,10 +65,12 @@ vi.mock('@/stores/app', () => ({
 
 vi.mock('vue-i18n', async () => {
   const actual = await vi.importActual<typeof import('vue-i18n')>('vue-i18n')
+  const { ref } = await import('vue')
   return {
     ...actual,
     useI18n: () => ({
       t: (key: string) => messages[key] ?? key,
+      locale: ref('en'),
     }),
   }
 })
@@ -181,12 +185,63 @@ describe('user UsageView tooltip', () => {
     const text = wrapper.text()
     expect(text).toContain('Service tier')
     expect(text).toContain('Fast')
-    expect(text).toContain('Rate')
+    expect(text).toContain('Customer rate')
     expect(text).toContain('1.00x')
     expect(text).toContain('Billed')
     expect(text).toContain('$0.092883')
     expect(text).toContain('$5.0000 / 1M tokens')
     expect(text).toContain('$30.0000 / 1M tokens')
+  })
+
+  it('shows neutral historical and peak condition evidence without private upstream details', async () => {
+    query.mockResolvedValue({ items: [], total: 0, pages: 0 })
+    getStatsByDateRange.mockResolvedValue({ total_requests: 0, total_tokens: 0, total_cost: 0, average_duration_ms: 0 })
+    list.mockResolvedValue({ items: [] })
+
+    const wrapper = mount(UsageView, {
+      global: {
+        stubs: {
+          AppLayout: AppLayoutStub,
+          TablePageLayout: TablePageLayoutStub,
+          Pagination: true,
+          EmptyState: true,
+          Select: true,
+          DateRangePicker: true,
+          Icon: true,
+          Teleport: true,
+        },
+      },
+    })
+    await flushPromises()
+
+    const setupState = (wrapper.vm as any).$?.setupState
+    setupState.tooltipData = {
+      actual_cost: 0.21,
+      total_cost: 0.21,
+      rate_multiplier: 1,
+      condition_multiplier: 2,
+      pricing_rule_id: 'deepseek-weekday-peak-2026-09-13',
+      service_tier: 'standard',
+      input_cost: 0.105,
+      output_cost: 0.105,
+      cache_creation_cost: 0,
+      cache_read_cost: 0,
+      input_tokens: 1_000_000,
+      output_tokens: 250_000,
+    }
+    setupState.tooltipVisible = true
+    await nextTick()
+
+    expect(wrapper.text()).toContain('Customer rate')
+    expect(wrapper.text()).toContain('Time condition')
+    expect(wrapper.text()).toContain('Weekday peak pricing · 2x')
+    expect(wrapper.text()).not.toContain('Packy')
+    expect(wrapper.text()).not.toContain('deepseek-v4-flash')
+    expect(wrapper.text()).not.toContain('account_stats_cost')
+
+    setupState.tooltipData = { ...setupState.tooltipData, condition_multiplier: undefined, pricing_rule_id: null }
+    await nextTick()
+    expect(wrapper.text()).toContain('Standard time · 1x')
   })
 
   it('exports csv with input and output unit price columns', async () => {

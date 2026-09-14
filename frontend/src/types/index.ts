@@ -1184,6 +1184,9 @@ export interface UsageLog {
   total_cost: number
   actual_cost: number
   rate_multiplier: number
+  pricing_effective_at?: string | null
+  condition_multiplier?: number | null
+  pricing_rule_id?: string | null
   billing_type: number
 
   request_type?: UsageRequestType

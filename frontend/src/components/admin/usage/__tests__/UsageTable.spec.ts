@@ -18,6 +18,10 @@ const messages: Record<string, string> = {
   'usage.serviceTierFlex': 'Flex',
   'usage.serviceTierStandard': 'Standard',
   'usage.rate': 'Rate',
+  'usage.customerRate': 'Customer rate',
+  'usage.timeCondition': 'Time condition',
+  'usage.pricingRule': 'Pricing rule',
+  'usage.pricingEffectiveAt': 'Pricing effective at (UTC)',
   'usage.accountMultiplier': 'Account rate',
   'usage.original': 'Original',
   'usage.userBilled': 'User billed',
@@ -41,6 +45,9 @@ const DataTableStub = {
       <div v-for="row in data" :key="row.request_id">
         <slot name="cell-model" :row="row" :value="row.model" />
         <slot name="cell-cost" :row="row" />
+        <slot name="cell-condition_multiplier" :row="row" />
+        <slot name="cell-pricing_rule_id" :row="row" />
+        <slot name="cell-pricing_effective_at" :row="row" />
       </div>
     </div>
   `,
@@ -69,6 +76,9 @@ describe('admin UsageTable tooltip', () => {
       account_rate_multiplier: 1,
       rate_multiplier: 1,
       service_tier: 'priority',
+      condition_multiplier: 2,
+      pricing_rule_id: 'deepseek-weekday-peak-2026-09-13',
+      pricing_effective_at: '2026-09-14T09:30:00+08:00',
       input_cost: 0.020285,
       output_cost: 0.00303,
       cache_creation_cost: 0,
@@ -99,8 +109,12 @@ describe('admin UsageTable tooltip', () => {
     const text = wrapper.text()
     expect(text).toContain('Service tier')
     expect(text).toContain('Fast')
-    expect(text).toContain('Rate')
+    expect(text).toContain('Customer rate')
     expect(text).toContain('1.00x')
+    expect(text).toContain('Time condition')
+    expect(text).toContain('2x')
+    expect(text).toContain('deepseek-weekday-peak-2026-09-13')
+    expect(text).toContain('2026-09-14T01:30:00.000Z')
     expect(text).toContain('Account rate')
     expect(text).toContain('User billed')
     expect(text).toContain('Account billed')

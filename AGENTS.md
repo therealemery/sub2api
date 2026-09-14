@@ -121,6 +121,21 @@ This repository is being customized into the OwnAPI product. The active objectiv
   and `git diff --check` pass. This checkpoint is not pushed or deployed; production data and paid
   upstream traffic remain unchanged.
 
+### 2026-09-14 — Pricing-condition usage evidence locally verified
+
+- The frontend usage type now carries the locked pricing timestamp, independent condition factor,
+  and provider-neutral rule ID returned by the sanitized user/admin DTOs. Missing historical values
+  normalize to `1x` without changing stored cost.
+- Customer usage rows show a compact condition badge; the cost detail separates customer rate from
+  the time condition and localizes the known DeepSeek peak rule without exposing an upstream model,
+  account, host, or account cost. Customer CSV exports include the condition factor, localized rule,
+  and UTC pricing timestamp.
+- The admin table adds hideable condition, raw rule-ID, and UTC pricing-time columns. Its cost detail
+  and XLSX export keep the customer rate, condition factor, account rate, customer charge, and
+  account cost distinct for reconciliation.
+- Four focused frontend test files / 14 tests, Vue type checking, focused ESLint, and
+  `git diff --check` pass. The pre-existing Browserslist notice remains warning-only.
+
 ### 2026-09-14 — Text pricing and conditional-multiplier Tasks 1–4 implemented
 
 - The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
@@ -172,8 +187,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Execution must first read the exact signed-in Packy `codex` cost card before migration 143 can
   contain Codex cost values. Missing evidence leaves all four Codex routes unschedulable; it never
   permits a Core fallback or inferred cost. DeepSeek Pro remains unavailable.
-- Tasks 5, 7, and 8 remain: apply reviewed price/account migrations, show usage evidence, and
-  complete rollout verification. No production database,
+- Tasks 5 and 8 remain: apply the reviewed price/account migration and complete rollout
+  verification. No production database,
   production data, account mapping, credential, paid request, push, or deployment changed at this
   checkpoint.
 

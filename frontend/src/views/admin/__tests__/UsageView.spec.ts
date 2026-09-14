@@ -3,7 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 
 import UsageView from '../UsageView.vue'
 
-const { list, getStats, getSnapshotV2, getById } = vi.hoisted(() => {
+const { list, getStats, getSnapshotV2, getModelStats, getById, adminUsageList, saveAsMock, aoaToSheet, sheetAddAoa } = vi.hoisted(() => {
   vi.stubGlobal('localStorage', {
     getItem: vi.fn(() => null),
     setItem: vi.fn(),
@@ -14,9 +14,26 @@ const { list, getStats, getSnapshotV2, getById } = vi.hoisted(() => {
     list: vi.fn(),
     getStats: vi.fn(),
     getSnapshotV2: vi.fn(),
+    getModelStats: vi.fn(),
     getById: vi.fn(),
+    adminUsageList: vi.fn(),
+    saveAsMock: vi.fn(),
+    aoaToSheet: vi.fn(() => ({ rows: [] as unknown[][] })),
+    sheetAddAoa: vi.fn((sheet: { rows: unknown[][] }, rows: unknown[][]) => { sheet.rows.push(...rows) }),
   }
 })
+
+vi.mock('file-saver', () => ({ saveAs: saveAsMock }))
+
+vi.mock('xlsx', () => ({
+  utils: {
+    aoa_to_sheet: aoaToSheet,
+    sheet_add_aoa: sheetAddAoa,
+    book_new: vi.fn(() => ({})),
+    book_append_sheet: vi.fn(),
+  },
+  write: vi.fn(() => new Uint8Array([1, 2, 3])),
+}))
 
 const messages: Record<string, string> = {
   'admin.dashboard.timeRange': 'Time Range',
@@ -40,6 +57,7 @@ vi.mock('@/api/admin', () => ({
     },
     dashboard: {
       getSnapshotV2,
+      getModelStats,
     },
     users: {
       getById,
@@ -49,7 +67,7 @@ vi.mock('@/api/admin', () => ({
 
 vi.mock('@/api/admin/usage', () => ({
   adminUsageAPI: {
-    list: vi.fn(),
+    list: adminUsageList,
   },
 }))
 
@@ -111,7 +129,12 @@ describe('admin UsageView distribution metric toggles', () => {
     list.mockReset()
     getStats.mockReset()
     getSnapshotV2.mockReset()
+    getModelStats.mockReset()
     getById.mockReset()
+    adminUsageList.mockReset()
+    saveAsMock.mockReset()
+    aoaToSheet.mockClear()
+    sheetAddAoa.mockClear()
 
     list.mockResolvedValue({
       items: [],
@@ -133,6 +156,7 @@ describe('admin UsageView distribution metric toggles', () => {
       models: [],
       groups: [],
     })
+    getModelStats.mockResolvedValue({ models: [] })
   })
 
   afterEach(() => {
@@ -192,5 +216,81 @@ describe('admin UsageView distribution metric toggles', () => {
     expect(modelChart.find('.metric').text()).toBe('actual_cost')
     expect(groupChart.find('.metric').text()).toBe('actual_cost')
     expect(getSnapshotV2).toHaveBeenCalledTimes(1)
+  })
+
+  it('exports exact pricing audit evidence with customer and account rates separated', async () => {
+    adminUsageList.mockResolvedValue({
+      items: [{
+        created_at: '2026-09-14T01:31:00Z',
+        user: { email: 'customer@example.com' },
+        api_key: { name: 'customer-key' },
+        account: { name: 'private-account' },
+        model: 'deepseek-v4.1-flash',
+        upstream_model: 'private-model',
+        group: { name: 'OwnAPI' },
+        input_tokens: 1,
+        output_tokens: 1,
+        cache_read_tokens: 0,
+        cache_creation_tokens: 0,
+        input_cost: 0.1,
+        output_cost: 0.2,
+        cache_read_cost: 0,
+        cache_creation_cost: 0,
+        rate_multiplier: 0.9,
+        condition_multiplier: 2,
+        pricing_rule_id: 'deepseek-weekday-peak-2026-09-13',
+        pricing_effective_at: '2026-09-14T09:30:00+08:00',
+        account_rate_multiplier: 1.1,
+        account_stats_cost: 0.15,
+        total_cost: 0.3,
+        actual_cost: 0.27,
+        duration_ms: 100,
+        request_id: 'req-audit',
+      }],
+      total: 1,
+      pages: 1,
+    })
+
+    const wrapper = mount(UsageView, {
+      global: {
+        stubs: {
+          AppLayout: AppLayoutStub,
+          UsageStatsCards: true,
+          UsageFilters: UsageFiltersStub,
+          UsageTable: true,
+          UsageExportProgress: true,
+          UsageCleanupDialog: true,
+          UserBalanceHistoryModal: true,
+          Pagination: true,
+          Select: true,
+          DateRangePicker: true,
+          Icon: true,
+          TokenUsageTrend: true,
+          ModelDistributionChart: ModelDistributionChartStub,
+          GroupDistributionChart: GroupDistributionChartStub,
+          EndpointDistributionChart: true,
+        },
+      },
+    })
+    await flushPromises()
+
+    await (wrapper.vm as any).$?.setupState.exportToExcel()
+    await flushPromises()
+
+    const headers = aoaToSheet.mock.calls.at(-1)?.[0]?.[0] as string[]
+    expect(headers).toEqual(expect.arrayContaining([
+      'usage.customerRate',
+      'usage.conditionMultiplier',
+      'usage.pricingRule',
+      'usage.pricingEffectiveAt',
+      'usage.accountMultiplier',
+    ]))
+    const rows = sheetAddAoa.mock.calls.at(-1)?.[1] as unknown[][]
+    expect(rows[0]).toEqual(expect.arrayContaining([
+      2,
+      'deepseek-weekday-peak-2026-09-13',
+      '2026-09-14T01:30:00.000Z',
+    ]))
+    expect(saveAsMock).toHaveBeenCalledTimes(1)
   })
 })
