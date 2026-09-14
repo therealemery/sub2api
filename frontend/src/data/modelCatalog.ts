@@ -86,6 +86,7 @@ const providerSearchAliases: Record<string, string[]> = {
 const restrictedThirdPartyModelIds = new Set([
   'claude-haiku-4-5-20251001',
   'claude-sonnet-4-5-20250929',
+  'deepseek-v4-pro',
 ].map(normalizeModelIdentity))
 
 export function calculateOwnApiPricing(
@@ -219,7 +220,7 @@ const fallbackFamily: FamilyMetadata = {
 }
 
 export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData
-  .filter((raw) => raw.discountPercent >= 28 && !isRestrictedThirdPartyModel(raw.modelId))
+  .filter((raw) => raw.discountPercent >= 20 && !isRestrictedThirdPartyModel(raw.modelId))
   .map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
@@ -389,7 +390,7 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
   const checkedAt = raw.checkedAt ?? '2026-09-07'
   const pricingStatus: ModelPricingStatus = raw.pricingStatus === 'free'
     ? 'free'
-    : raw.discountPercent >= 28
+    : raw.discountPercent >= 20
       ? raw.pricingStatus
       : 'unpublished'
   return {

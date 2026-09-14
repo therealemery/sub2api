@@ -39,8 +39,30 @@ func TestSettingService_GetModelDisplayConfig_DefaultsWhenUnsetOrInvalid(t *test
 			require.Empty(t, got.FeaturedModels)
 			require.Empty(t, got.PricingModels)
 			require.Nil(t, got.ReferenceDiscount)
+			require.Equal(t, PublicRequestPricingConditionRules(), got.RequestPricingConditions)
 		})
 	}
+}
+
+func TestSettingService_ModelDisplayConditionsAreBackendOwnedAndNotPersisted(t *testing.T) {
+	t.Parallel()
+
+	repo := newMockSettingRepo()
+	svc := NewSettingService(repo, &config.Config{})
+	malicious := []PublicRequestPricingConditionRule{{
+		ID: "attacker-rule", Models: []string{"gpt-5.4"}, Timezone: "UTC",
+		CustomerMultiplier: 0.01, NameEN: "tampered", NameZH: "篡改",
+	}}
+	got, err := svc.UpdateModelDisplayConfig(context.Background(), ModelDisplayConfig{
+		RequestPricingConditions: malicious,
+	})
+	require.NoError(t, err)
+	require.Equal(t, PublicRequestPricingConditionRules(), got.RequestPricingConditions)
+
+	raw, err := repo.GetValue(context.Background(), SettingKeyModelDisplayConfig)
+	require.NoError(t, err)
+	require.NotContains(t, raw, "request_pricing_conditions")
+	require.NotContains(t, raw, "attacker-rule")
 }
 
 func TestSettingService_UpdateModelDisplayConfig_NormalizesAndPersists(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
@@ -110,8 +111,9 @@ func TestSettingHandler_GetModelDisplayConfig_ReturnsPublicDisplayConfig(t *test
 	var resp struct {
 		Code int `json:"code"`
 		Data struct {
-			FeaturedModels []service.FeaturedModelConfig       `json:"featured_models"`
-			PricingModels  []service.ModelDisplayPricingConfig `json:"pricing_models"`
+			FeaturedModels           []service.FeaturedModelConfig               `json:"featured_models"`
+			PricingModels            []service.ModelDisplayPricingConfig         `json:"pricing_models"`
+			RequestPricingConditions []service.PublicRequestPricingConditionRule `json:"request_pricing_conditions"`
 		} `json:"data"`
 	}
 	require.NoError(t, json.Unmarshal(recorder.Body.Bytes(), &resp))
@@ -123,6 +125,18 @@ func TestSettingHandler_GetModelDisplayConfig_ReturnsPublicDisplayConfig(t *test
 	require.Equal(t, "claude-sonnet-4.5", resp.Data.PricingModels[0].Model)
 	require.Equal(t, "anthropic", resp.Data.PricingModels[0].Platform)
 	require.Equal(t, "token", resp.Data.PricingModels[0].BillingMode)
+	require.Len(t, resp.Data.RequestPricingConditions, 1)
+	rule := resp.Data.RequestPricingConditions[0]
+	require.Equal(t, "deepseek-weekday-peak-2026-09-13", rule.ID)
+	require.Equal(t, []string{"deepseek-v4.1-flash"}, rule.Models)
+	require.Equal(t, "Asia/Shanghai", rule.Timezone)
+	require.Equal(t, 2.0, rule.CustomerMultiplier)
+	require.Equal(t, []service.RequestPricingTimeWindow{{StartMinute: 540, EndMinute: 720}, {StartMinute: 840, EndMinute: 1080}}, rule.Windows)
+
+	payload := recorder.Body.String()
+	for _, privateValue := range []string{"upstream_cost_multiplier", "signed-in upstream", "packy", "account", "deepseek-v4-flash", "base_url", "credential"} {
+		require.NotContains(t, strings.ToLower(payload), privateValue)
+	}
 }
 
 func TestSettingHandler_GetPublicSettings_ExposesWeChatOAuthModeCapabilities(t *testing.T) {

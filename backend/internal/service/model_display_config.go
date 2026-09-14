@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sort"
 	"strings"
 )
@@ -29,9 +30,10 @@ type ModelDisplayPricingConfig struct {
 }
 
 type ModelDisplayConfig struct {
-	FeaturedModels    []FeaturedModelConfig       `json:"featured_models"`
-	PricingModels     []ModelDisplayPricingConfig `json:"pricing_models"`
-	ReferenceDiscount *float64                    `json:"reference_discount,omitempty"`
+	FeaturedModels           []FeaturedModelConfig               `json:"featured_models"`
+	PricingModels            []ModelDisplayPricingConfig         `json:"pricing_models"`
+	ReferenceDiscount        *float64                            `json:"reference_discount,omitempty"`
+	RequestPricingConditions []PublicRequestPricingConditionRule `json:"request_pricing_conditions,omitempty"`
 }
 
 func DefaultModelDisplayConfig() *ModelDisplayConfig {
@@ -42,28 +44,45 @@ func DefaultModelDisplayConfig() *ModelDisplayConfig {
 }
 
 func (s *SettingService) GetModelDisplayConfig(ctx context.Context) (*ModelDisplayConfig, error) {
+	conditions, err := publicModelDisplayPricingConditions()
+	if err != nil {
+		return nil, err
+	}
 	raw, err := s.settingRepo.GetValue(ctx, SettingKeyModelDisplayConfig)
 	if err != nil {
 		if errors.Is(err, ErrSettingNotFound) {
-			return DefaultModelDisplayConfig(), nil
+			cfg := DefaultModelDisplayConfig()
+			cfg.RequestPricingConditions = conditions
+			return cfg, nil
 		}
 		return nil, err
 	}
 	if strings.TrimSpace(raw) == "" {
-		return DefaultModelDisplayConfig(), nil
+		cfg := DefaultModelDisplayConfig()
+		cfg.RequestPricingConditions = conditions
+		return cfg, nil
 	}
 
 	var cfg ModelDisplayConfig
 	if err := json.Unmarshal([]byte(raw), &cfg); err != nil {
-		return DefaultModelDisplayConfig(), nil
+		fallback := DefaultModelDisplayConfig()
+		fallback.RequestPricingConditions = conditions
+		return fallback, nil
 	}
 	normalizeModelDisplayConfig(&cfg)
+	cfg.RequestPricingConditions = conditions
 	return &cfg, nil
 }
 
 func (s *SettingService) UpdateModelDisplayConfig(ctx context.Context, cfg ModelDisplayConfig) (*ModelDisplayConfig, error) {
+	conditions, err := publicModelDisplayPricingConditions()
+	if err != nil {
+		return nil, err
+	}
 	normalizeModelDisplayConfig(&cfg)
-	raw, err := json.Marshal(cfg)
+	persisted := cfg
+	persisted.RequestPricingConditions = nil
+	raw, err := json.Marshal(persisted)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +92,15 @@ func (s *SettingService) UpdateModelDisplayConfig(ctx context.Context, cfg Model
 	if s.onUpdate != nil {
 		s.onUpdate()
 	}
+	cfg.RequestPricingConditions = conditions
 	return &cfg, nil
+}
+
+func publicModelDisplayPricingConditions() ([]PublicRequestPricingConditionRule, error) {
+	if _, err := loadRequestPricingConditionRegistry(); err != nil {
+		return nil, fmt.Errorf("load public request pricing conditions: %w", err)
+	}
+	return PublicRequestPricingConditionRules(), nil
 }
 
 func normalizeModelDisplayConfig(cfg *ModelDisplayConfig) {

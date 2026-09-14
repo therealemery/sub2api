@@ -20,7 +20,7 @@ export interface OfficialPricingTier {
 export interface CatalogEligibilitySource {
   source: 'packyapi' | 'dc-api' | 'alibaba'
   discountPercent: number
-  checkedAt: '2026-09-07' | '2026-09-11'
+  checkedAt: '2026-09-07' | '2026-09-11' | '2026-09-13'
   sourceUrl: 'https://www.packyapi.com/pricing' | 'https://console.dc-api.com/integration-doc' | 'https://www.alibabacloud.com/help/en/model-studio/model-pricing'
 }
 
@@ -36,7 +36,7 @@ export interface ModelPricingSource {
   tiers: OfficialPricingTier[]
   multiplier: 0.7 | 0.75 | 0.8
   sourceUrl: string
-  checkedAt: '2026-09-07' | '2026-09-11'
+  checkedAt: '2026-09-07' | '2026-09-11' | '2026-09-13'
   noteKey: string | null
 }
 
@@ -53,7 +53,7 @@ export interface RawVerifiedModelSeed {
   noteKey?: string
   discountPercent: number
   customerMultiplier?: 0.7 | 0.75 | 0.8
-  checkedAt?: '2026-09-07' | '2026-09-11'
+  checkedAt?: '2026-09-07' | '2026-09-11' | '2026-09-13'
   searchAliases?: string[]
   contextWindow?: string | null
   isAlias?: boolean
@@ -66,31 +66,35 @@ export interface RawVerifiedModelSeed {
 }
 
 export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
-  seed('gpt-6-astra', 'GPT-6 Astra', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 10, cachedInput: 1, cacheWrite: 12.5, output: 50 }, 'https://www.packyapi.com/pricing', 93, 5, {
+  seed('gpt-6-astra', 'GPT-6 Astra', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 10, cachedInput: 1, cacheWrite: 12.5, output: 50 }, 'https://www.packyapi.com/pricing', 88, 5, {
     contextWindow: '1M',
     featured: true,
-    tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, cacheWrite: 25, output: 75 } }],
+    checkedAt: '2026-09-13',
+    tiers: [{ id: 'long', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 20, cachedInput: 2, cacheWrite: 25, output: 75 } }],
   }),
   seed('gpt-5.4', 'GPT-5.4', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://developers.openai.com/api/docs/models/gpt-5.4', 28, 10, {
     contextWindow: '1.05M', featured: true,
     tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 5, cachedInput: 0.5, output: 22.5 } }],
   }),
-  seed('gpt-5.4-mini', 'GPT-5.4 Mini', 'gpt', ['balanced', 'fast', 'coding'], ['openai'], { input: 0.75, cachedInput: 0.075, output: 4.5 }, 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', 93, 20, { contextWindow: '400K' }),
-  seed('gpt-5.5', 'GPT-5.5', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 30 }, 'https://developers.openai.com/api/docs/models/gpt-5.5', 93, 30, { featured: true }),
-  seed('gpt-5.6-luna', 'GPT-5.6 Luna', 'gpt', ['fast', 'balanced'], ['openai'], { input: 0.2, cachedInput: 0.02, output: 1.2 }, 'https://developers.openai.com/api/docs/models/compare', 93, 40, {
+  seed('gpt-5.4-mini', 'GPT-5.4 Mini', 'gpt', ['balanced', 'fast', 'coding'], ['openai'], { input: 0.75, cachedInput: 0.075, output: 4.5 }, 'https://developers.openai.com/api/docs/models/gpt-5.4-mini', 28, 20, { customerMultiplier: 0.8, checkedAt: '2026-09-13', contextWindow: '400K' }),
+  seed('gpt-5.5', 'GPT-5.5', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 5, cachedInput: 0.5, output: 30 }, 'https://developers.openai.com/api/docs/models/gpt-5.5', 28, 30, { customerMultiplier: 0.8, checkedAt: '2026-09-13', featured: true }),
+  seed('gpt-5.6-luna', 'GPT-5.6 Luna', 'gpt', ['fast', 'balanced'], ['openai'], { input: 0.2, cachedInput: 0.02, output: 1.2 }, 'https://developers.openai.com/api/docs/models/compare', 88, 40, {
+    checkedAt: '2026-09-13',
     tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 0.4, cachedInput: 0.04, output: 1.8 } }],
   }),
-  seed('gpt-5.6-sol', 'GPT-5.6 Sol', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 4, cachedInput: 0.4, output: 20 }, 'https://developers.openai.com/api/docs/models/compare', 93, 50, {
+  seed('gpt-5.6-sol', 'GPT-5.6 Sol', 'gpt', ['flagship', 'coding', 'reasoning'], ['openai'], { input: 4, cachedInput: 0.4, output: 20 }, 'https://developers.openai.com/api/docs/models/compare', 88, 50, {
     featured: true,
+    checkedAt: '2026-09-13',
     tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 8, cachedInput: 0.8, output: 30 } }],
   }),
-  seed('gpt-5.6-terra', 'GPT-5.6 Terra', 'gpt', ['balanced', 'coding', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://developers.openai.com/api/docs/models/compare', 93, 60, {
+  seed('gpt-5.6-terra', 'GPT-5.6 Terra', 'gpt', ['balanced', 'coding', 'reasoning'], ['openai'], { input: 2, cachedInput: 0.2, output: 12 }, 'https://developers.openai.com/api/docs/models/compare', 88, 60, {
+    checkedAt: '2026-09-13',
     tiers: [{ id: 'over-272k', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 0.4, output: 18 } }],
   }),
   seed('gpt-daybreak-blue-latest', 'GPT Daybreak Blue', 'gpt', ['preview', 'reasoning'], ['openai'], { input: null, cachedInput: null, output: null }, 'https://developers.openai.com/api/docs/models/all', 0, 65, {
     pricingStatus: 'unpublished', searchAliases: ['daybreak blue', 'gpt daybreak'],
   }),
-  seed('codex-auto-review', 'Codex Auto Review', 'gpt', ['coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://help.openai.com/en/articles/20001415', 93, 70, { isAlias: true, aliasNoteKey: 'publicModels.aliases.codexAutoReview', searchAliases: ['codex review'] }),
+  seed('codex-auto-review', 'Codex Auto Review', 'gpt', ['coding', 'reasoning'], ['openai'], { input: 2.5, cachedInput: 0.25, output: 15 }, 'https://help.openai.com/en/articles/20001415', 28, 70, { customerMultiplier: 0.8, checkedAt: '2026-09-13', isAlias: true, aliasNoteKey: 'publicModels.aliases.codexAutoReview', searchAliases: ['codex review'] }),
   seed('omni-moderation-latest', 'Omni Moderation', 'gpt', ['moderation', 'fast'], ['openai'], { input: 0, cachedInput: 0, output: 0 }, 'https://developers.openai.com/api/docs/models/omni-moderation-latest', 0, 75, {
     pricingStatus: 'free', searchAliases: ['moderation', 'omni moderation'], contextWindow: null,
   }),
@@ -112,10 +116,7 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
     tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 1, output: 12 } }],
   }),
   seed('deepseek-v4.1-flash', 'DeepSeek V4.1 Flash', 'deepseek', ['fast', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 40, 165, {
-    customerMultiplier: 0.75, checkedAt: '2026-09-11', contextWindow: null,
-  }),
-  seed('deepseek-v4-pro', 'DeepSeek V4 Pro', 'deepseek', ['flagship', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 40, 166, {
-    customerMultiplier: 0.75, checkedAt: '2026-09-11', contextWindow: null,
+    customerMultiplier: 0.7, checkedAt: '2026-09-13', contextWindow: null,
   }),
   seed('gemini-2.5-flash', 'Gemini 2.5 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 2.5 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 170, { contextWindow: '1M' }),
   seed('gemini-2.5-pro', 'Gemini 2.5 Pro', 'gemini', ['flagship', 'reasoning', 'multimodal'], ['openai'], { input: 1.25, cachedInput: 0.125, output: 10 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 180, {

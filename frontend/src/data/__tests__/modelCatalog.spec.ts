@@ -35,8 +35,8 @@ describe('modelCatalog', () => {
   it('applies the approved Packy profit policy and excludes unprofitable models', () => {
     const catalog = buildModelCatalog(emptyConfig)
     expect(catalog.find((entry) => entry.modelId === 'gpt-5.4')?.pricingSource?.multiplier).toBe(0.8)
-    expect(catalog.find((entry) => entry.modelId === 'gpt-5.4-mini')?.pricingSource?.multiplier).toBe(0.7)
-    for (const modelId of ['gpt-daybreak-blue-latest', 'claude-fable-5', 'gemini-3.7-flash', 'kimi-k3']) {
+    expect(catalog.find((entry) => entry.modelId === 'gpt-5.4-mini')?.pricingSource?.multiplier).toBe(0.8)
+    for (const modelId of ['gpt-daybreak-blue-latest', 'claude-fable-5', 'gemini-3.7-flash', 'kimi-k3', 'deepseek-v4-pro']) {
       expect(catalog.some((entry) => entry.modelId === modelId)).toBe(false)
     }
   })
@@ -60,9 +60,30 @@ describe('modelCatalog', () => {
       })),
     })
 
-    expect(catalog).toHaveLength(46)
+    expect(catalog).toHaveLength(45)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-haiku-4-5'))).toBe(false)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-sonnet-4-5'))).toBe(false)
+  })
+
+  it('does not let stale live display configuration republish DeepSeek Pro', () => {
+    const catalog = buildModelCatalog({
+      featured_models: [{ model: 'deepseek-v4-pro', platform: 'deepseek', badge: 'Featured', sort_order: 1 }],
+      reference_discount: null,
+      pricing_models: [{
+        model: 'deepseek-v4-pro',
+        platform: 'deepseek',
+        billing_mode: 'token',
+        input_price: 0.000000105,
+        output_price: 0.00000042,
+        cache_write_price: null,
+        cache_read_price: 0.0000000021,
+        image_output_price: null,
+        per_request_price: null,
+        sort_order: 1,
+      }],
+    })
+
+    expect(catalog.some((entry) => entry.modelId === 'deepseek-v4-pro')).toBe(false)
   })
 
   it('merges dotted live Claude aliases into their canonical catalog entries', () => {
@@ -83,7 +104,7 @@ describe('modelCatalog', () => {
       }],
     })
 
-    expect(catalog).toHaveLength(46)
+    expect(catalog).toHaveLength(45)
     expect(catalog.filter((entry) => entry.slug === 'claude-opus-4-7')).toHaveLength(1)
     expect(catalog.find((entry) => entry.slug === 'claude-opus-4-7')?.modelId).toBe('claude-opus-4-7')
   })
@@ -121,7 +142,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(46)
+    expect(result).toHaveLength(45)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -133,31 +154,35 @@ describe('modelCatalog', () => {
       'gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review',
       'claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5',
       'claude-sonnet-4-6', 'claude-sonnet-5', 'grok-4.5', 'grok-4.6',
-      'deepseek-v4.1-flash', 'deepseek-v4-pro',
+      'deepseek-v4.1-flash',
     ]
     const catalog = buildModelCatalog(emptyConfig)
 
     expect(verifiedCatalogSeeds.map((model) => model.modelId)).toEqual(expect.arrayContaining(requiredIds))
     expect(requiredIds.every((id) => catalog.some((model) => model.modelId === id))).toBe(true)
-    expect(new Set(requiredIds).size).toBe(18)
+    expect(new Set(requiredIds).size).toBe(17)
     expect(Object.fromEntries(['OpenAI', 'Anthropic', 'xAI'].map((provider) => [
       provider,
       catalog.filter((model) => model.provider === provider).length,
     ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2 })
 
+    const reviewedOnSeptember13 = new Set([
+      'gpt-6-astra', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna',
+      'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review', 'deepseek-v4.1-flash',
+    ])
     for (const modelId of requiredIds) {
       const model = catalog.find((entry) => entry.modelId === modelId)
       expect(model?.slug).toBe(modelId.replace(/[^a-z0-9]+/g, '-'))
       expect(model?.pricingSource).toMatchObject({
         status: expect.stringMatching(/^(paid|free|unpublished)$/),
         sourceUrl: expect.stringMatching(/^https:\/\//),
-        checkedAt: modelId.startsWith('deepseek-') ? '2026-09-11' : '2026-09-07',
+        checkedAt: reviewedOnSeptember13.has(modelId) ? '2026-09-13' : '2026-09-07',
         multiplier: expect.any(Number),
       })
       expect(model?.eligibilitySource).toMatchObject({
         source: 'packyapi',
         discountPercent: expect.any(Number),
-        checkedAt: modelId.startsWith('deepseek-') ? '2026-09-11' : '2026-09-07',
+        checkedAt: reviewedOnSeptember13.has(modelId) ? '2026-09-13' : '2026-09-07',
         sourceUrl: 'https://www.packyapi.com/pricing',
       })
       expect(model?.searchAliases).toEqual(expect.any(Array))
@@ -192,7 +217,6 @@ describe('modelCatalog', () => {
       'grok-4.5': { input: 2, cachedInput: 0.3, output: 6 },
       'grok-4.6': { input: 2, cachedInput: 0.5, output: 6 },
       'deepseek-v4.1-flash': { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 },
-      'deepseek-v4-pro': { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 },
     })
 
     expect(Object.fromEntries(requiredIds.map((modelId) => {
@@ -216,7 +240,6 @@ describe('modelCatalog', () => {
       'grok-4.5': 'https://docs.x.ai/developers/pricing',
       'grok-4.6': 'https://docs.x.ai/developers/pricing',
       'deepseek-v4.1-flash': 'https://api-docs.deepseek.com/quick_start/pricing',
-      'deepseek-v4-pro': 'https://api-docs.deepseek.com/quick_start/pricing',
     })
 
     expect(catalog.find((model) => model.modelId === 'codex-auto-review')).toMatchObject({
@@ -239,18 +262,19 @@ describe('modelCatalog', () => {
       official: { input: 5, cachedInput: 0.5, output: 22.5 },
     }])
     expect(catalog.find((model) => model.modelId === 'gpt-6-astra')?.pricingSource?.tiers).toEqual([{
-      id: 'long', minInputTokens: 200_000, minInclusive: false, maxInputTokens: null, maxInclusive: true,
+      id: 'long', minInputTokens: 272_000, minInclusive: false, maxInputTokens: null, maxInclusive: true,
       official: { input: 20, cachedInput: 2, cacheWrite: 25, output: 75 },
     }])
-    for (const modelId of ['deepseek-v4.1-flash', 'deepseek-v4-pro']) {
-      const pricing = catalog.find((model) => model.modelId === modelId)?.pricingSource
-      expect(pricing?.multiplier).toBe(0.75)
-      const ownApi = calculateOwnApiPricing(pricing!.official, pricing!.multiplier)
-      expect(ownApi.input).toBeCloseTo(0.1125, 12)
-      expect(ownApi.cachedInput).toBeCloseTo(0.00225, 12)
-      expect(ownApi.cacheWrite).toBeNull()
-      expect(ownApi.output).toBeCloseTo(0.45, 12)
-    }
+    const deepSeekPricing = catalog.find((model) => model.modelId === 'deepseek-v4.1-flash')?.pricingSource
+    expect(deepSeekPricing?.multiplier).toBe(0.7)
+    const deepSeekOwnApi = calculateOwnApiPricing(deepSeekPricing!.official, deepSeekPricing!.multiplier)
+    expect(deepSeekOwnApi.input).toBeCloseTo(0.105, 12)
+    expect(deepSeekOwnApi.cachedInput).toBeCloseTo(0.0021, 12)
+    expect(deepSeekOwnApi.cacheWrite).toBeNull()
+    expect(deepSeekOwnApi.output).toBeCloseTo(0.42, 12)
+    expect(catalog.find((model) => model.modelId === 'gpt-5.4-mini')?.pricingSource?.multiplier).toBe(0.8)
+    expect(catalog.find((model) => model.modelId === 'gpt-5.5')?.pricingSource?.multiplier).toBe(0.8)
+    expect(catalog.find((model) => model.modelId === 'codex-auto-review')?.pricingSource?.multiplier).toBe(0.8)
     expect(['gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra'].map((modelId) =>
       catalog.find((model) => model.modelId === modelId)?.pricingSource?.tiers[0],
     )).toEqual([
@@ -260,12 +284,12 @@ describe('modelCatalog', () => {
     ])
   })
 
-  it('contains the exact 46-model eligibility snapshot across ten providers', () => {
+  it('contains the exact 45-model eligibility snapshot across ten providers', () => {
     const providerIds = {
       OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
       Anthropic: ['claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-6', 'claude-sonnet-5'],
       xAI: ['grok-4.5', 'grok-4.6'],
-      DeepSeek: ['deepseek-v4.1-flash', 'deepseek-v4-pro'],
+      DeepSeek: ['deepseek-v4.1-flash'],
       Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'],
       Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
       'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3', 'glm-5.3-flash'],
@@ -276,14 +300,14 @@ describe('modelCatalog', () => {
     const catalog = buildModelCatalog(emptyConfig)
     const expectedIds = Object.values(providerIds).flat()
 
-    expect(verifiedModelSeedData).toHaveLength(53)
-    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(53)
-    expect(new Set(expectedIds).size).toBe(46)
+    expect(verifiedModelSeedData).toHaveLength(52)
+    expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(52)
+    expect(new Set(expectedIds).size).toBe(45)
     expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, DeepSeek: 2, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4, Alibaba: 2 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, DeepSeek: 1, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4, Alibaba: 2 })
 
     const addedIds = expectedIds.slice(16)
     expect(Object.fromEntries(addedIds.map((modelId) => [
@@ -319,7 +343,6 @@ describe('modelCatalog', () => {
       'wan3.0-video': { input: null, cachedInput: null, output: null },
       'wan3.0-video-prime': { input: null, cachedInput: null, output: null },
       'deepseek-v4.1-flash': { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 },
-      'deepseek-v4-pro': { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 },
     })
     expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].map((modelId) =>
       catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
@@ -357,7 +380,7 @@ describe('modelCatalog', () => {
       expect(entry?.eligibilitySource.checkedAt).toBe('2026-09-11')
     }
     for (const entry of catalog) {
-      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(28)
+      expect(entry.eligibilitySource?.discountPercent).toBeGreaterThanOrEqual(20)
       expect(entry.available).toBeNull()
       expect(entry.providerLogo).toMatch(/^\/brand\/(openai|claude|grok|deepseek|gemini|qwen|glm|kimi|minimax)\.svg$/)
     }
@@ -368,7 +391,7 @@ describe('modelCatalog', () => {
       { provider: 'OpenAI', label: 'ChatGPT', logo: '/brand/openai.svg', count: 8 },
       { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 6 },
       { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
-      { provider: 'DeepSeek', label: 'DeepSeek', logo: '/brand/deepseek.svg', count: 2 },
+      { provider: 'DeepSeek', label: 'DeepSeek', logo: '/brand/deepseek.svg', count: 1 },
       { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 6 },
       { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },
       { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 4 },

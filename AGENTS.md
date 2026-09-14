@@ -21,7 +21,7 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Production is running image `ownapi:4ef4a83716b5`. The H3 DC-API JSON reference-media repair,
   private Wan 3.0 gateway, customer/model rate overrides, and the admin modal's model-source
   correction are deployed and verified without a paid H3 task.
-- The verified local and production catalog contains 44 models after adding `wan3.0-video` and `wan3.0-video-prime`. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
+- The current local branch catalog contains 45 models after removing the unverified `deepseek-v4-pro`; production remains on the previously deployed 44-model snapshot. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -104,6 +104,23 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-14 — Sanitized conditional-pricing disclosure locally verified
+
+- The backend-owned model-display projection now publishes only the provider-neutral DeepSeek rule
+  ID, canonical OwnAPI model, structured weekdays/windows, customer multiplier, and bilingual name.
+  Admin writes cannot modify or persist the rule, and the public payload omits Packy identity,
+  account/cost data, private aliases, hosts, and credentials.
+- The DeepSeek Flash detail page derives Beijing `09:00–12:00, 14:00–18:00` and UTC
+  `01:00–04:00, 06:00–10:00` from the structured backend rule, explains the half-open boundary,
+  and states that usage history records `1×/2×`. English and Chinese are both covered.
+- The local catalog now contains 45 models: DeepSeek Pro is removed and blocked from stale live
+  display configuration, DeepSeek Flash uses official price × 70%, GPT-6 starts its long tier only
+  above 272,000 input tokens, and the reviewed GPT-5.4 Mini/GPT-5.5/Codex Auto Review entries use
+  official price × 80%.
+- Focused backend model-display tests, 44 focused frontend tests, Vue type checking, focused ESLint,
+  and `git diff --check` pass. This checkpoint is not pushed or deployed; production data and paid
+  upstream traffic remain unchanged.
+
 ### 2026-09-14 — Text pricing and conditional-multiplier Tasks 1–4 implemented
 
 - The user approved a manual, reviewed Packy pricing snapshot: upstream cost at or below 60% of
@@ -155,8 +172,8 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Execution must first read the exact signed-in Packy `codex` cost card before migration 143 can
   contain Codex cost values. Missing evidence leaves all four Codex routes unschedulable; it never
   permits a Core fallback or inferred cost. DeepSeek Pro remains unavailable.
-- Tasks 5–8 remain: apply reviewed price/account migrations, project sanitized rules to the
-  frontend, show usage evidence, and complete rollout verification. No production database,
+- Tasks 5, 7, and 8 remain: apply reviewed price/account migrations, show usage evidence, and
+  complete rollout verification. No production database,
   production data, account mapping, credential, paid request, push, or deployment changed at this
   checkpoint.
 

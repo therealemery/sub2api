@@ -20,10 +20,27 @@ export interface ModelDisplayPricingConfig {
   sort_order: number
 }
 
+export interface PublicRequestPricingTimeWindow {
+  start_minute: number
+  end_minute: number
+}
+
+export interface PublicRequestPricingConditionRule {
+  id: string
+  models: string[]
+  timezone: string
+  weekdays: number[]
+  windows: PublicRequestPricingTimeWindow[]
+  customer_multiplier: number
+  name_en: string
+  name_zh: string
+}
+
 export interface ModelDisplayConfig {
   featured_models: FeaturedModelConfig[]
   pricing_models: ModelDisplayPricingConfig[]
   reference_discount?: number | null
+  request_pricing_conditions?: PublicRequestPricingConditionRule[]
 }
 
 export async function getModelDisplayConfig(): Promise<ModelDisplayConfig> {

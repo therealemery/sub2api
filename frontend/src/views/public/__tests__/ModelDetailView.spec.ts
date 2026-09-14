@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ModelDisplayConfig } from '@/api/modelDisplay'
 import ModelDetailView from '../ModelDetailView.vue'
 
-const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
+const { getModelDisplayConfig, localeState, routeState, t } = vi.hoisted(() => ({
   getModelDisplayConfig: vi.fn<() => Promise<ModelDisplayConfig>>(),
+  localeState: { value: 'en' },
   routeState: { params: { modelId: 'grok-4-6' } },
   t: (key: string, params?: Record<string, unknown>) => {
     const messages: Record<string, string> = {
@@ -62,7 +63,28 @@ const { getModelDisplayConfig, routeState, t } = vi.hoisted(() => ({
       'publicModels.pricingNotes.alibabaGlobal': 'Alibaba Cloud international-region list prices and context tiers are shown.',
       'publicModels.pricingNotes.minimaxPromotion': 'MiniMax list prices are shown before its separate promotional discount.',
       'publicModels.pricingNotes.unpublishedDecision': 'The provider has not published a verified public token price.',
+      'publicModels.pricingCondition.label': 'Time-based pricing',
+      'publicModels.pricingCondition.baseOutsidePeak': 'The base OwnAPI prices shown above apply outside peak hours.',
+      'publicModels.pricingCondition.schedule': 'Peak schedule',
+      'publicModels.pricingCondition.weekdays': 'Monday–Friday',
+      'publicModels.pricingCondition.beijingTime': `Beijing ${String(params?.windows ?? '')}`,
+      'publicModels.pricingCondition.utc': 'UTC equivalent',
+      'publicModels.pricingCondition.multiplier': 'Peak multiplier',
+      'publicModels.pricingCondition.halfOpen': 'Opening times are included; closing times are excluded.',
+      'publicModels.pricingCondition.usageAudit': 'Usage history records whether the standard 1× or peak 2× multiplier applied.',
     }
+    const chineseMessages: Record<string, string> = {
+      'publicModels.pricingCondition.label': '时段计费',
+      'publicModels.pricingCondition.baseOutsidePeak': '上方展示的 OwnAPI 基础价格适用于非高峰时段。',
+      'publicModels.pricingCondition.schedule': '高峰时段',
+      'publicModels.pricingCondition.weekdays': '周一至周五',
+      'publicModels.pricingCondition.beijingTime': `北京时间 ${String(params?.windows ?? '')}`,
+      'publicModels.pricingCondition.utc': '对应 UTC',
+      'publicModels.pricingCondition.multiplier': '高峰倍率',
+      'publicModels.pricingCondition.halfOpen': '开始时间包含在内，结束时间不包含在内。',
+      'publicModels.pricingCondition.usageAudit': '使用记录会标明本次请求采用标准 1× 还是高峰 2× 倍率。',
+    }
+    if (localeState.value.startsWith('zh') && chineseMessages[key]) return chineseMessages[key]
     return messages[key] ?? key
   },
 }))
@@ -86,7 +108,7 @@ vi.mock('vue-i18n', () => ({
       setLocaleMessage: vi.fn(),
     },
   }),
-  useI18n: () => ({ t }),
+  useI18n: () => ({ t, locale: localeState }),
 }))
 
 const emptyConfig: ModelDisplayConfig = {
@@ -115,6 +137,7 @@ function mountDetail(modelId: string) {
 
 describe('ModelDetailView', () => {
   beforeEach(() => {
+    localeState.value = 'en'
     getModelDisplayConfig.mockResolvedValue(emptyConfig)
   })
 
@@ -244,6 +267,71 @@ describe('ModelDetailView', () => {
     expect(wrapper.text()).toContain('$0.254399/ second')
     expect(wrapper.text()).toContain('$0.203519/ second')
     expect(wrapper.find('a[href="https://www.alibabacloud.com/help/en/model-studio/wan3-video-generation-api-reference"]').exists()).toBe(true)
+  })
+
+  it('renders the backend-owned DeepSeek peak rule in English without private routing data', async () => {
+    getModelDisplayConfig.mockResolvedValue({
+      ...emptyConfig,
+      request_pricing_conditions: [{
+        id: 'deepseek-weekday-peak-2026-09-13',
+        models: ['deepseek-v4.1-flash'],
+        timezone: 'Asia/Shanghai',
+        weekdays: [1, 2, 3, 4, 5],
+        windows: [{ start_minute: 540, end_minute: 720 }, { start_minute: 840, end_minute: 1080 }],
+        customer_multiplier: 2,
+        name_en: 'Weekday peak pricing',
+        name_zh: '工作日高峰计费',
+      }],
+    })
+
+    const wrapper = mountDetail('deepseek-v4-1-flash')
+    await flushPromises()
+
+    expect(wrapper.get('.pricing-condition').text()).toContain('Weekday peak pricing')
+    expect(wrapper.get('.pricing-condition').text()).toContain('Monday–Friday · Beijing 09:00–12:00, 14:00–18:00')
+    expect(wrapper.get('.pricing-condition').text()).toContain('01:00–04:00, 06:00–10:00')
+    expect(wrapper.get('.pricing-condition').text()).toContain('2×')
+    expect(wrapper.get('.pricing-condition').text()).toContain('Opening times are included; closing times are excluded.')
+    expect(wrapper.get('.pricing-condition').text()).toContain('standard 1× or peak 2×')
+    expect(wrapper.text().toLowerCase()).not.toContain('packy')
+    expect(wrapper.text()).not.toContain('deepseek-v4-flash')
+  })
+
+  it('localizes the DeepSeek rule in Chinese and hides it from unrelated models', async () => {
+    localeState.value = 'zh-CN'
+    getModelDisplayConfig.mockResolvedValue({
+      ...emptyConfig,
+      request_pricing_conditions: [{
+        id: 'deepseek-weekday-peak-2026-09-13',
+        models: ['deepseek-v4.1-flash'],
+        timezone: 'Asia/Shanghai',
+        weekdays: [1, 2, 3, 4, 5],
+        windows: [{ start_minute: 540, end_minute: 720 }, { start_minute: 840, end_minute: 1080 }],
+        customer_multiplier: 2,
+        name_en: 'Weekday peak pricing',
+        name_zh: '工作日高峰计费',
+      }],
+    })
+
+    const deepSeek = mountDetail('deepseek-v4-1-flash')
+    await flushPromises()
+    expect(deepSeek.get('.pricing-condition').text()).toContain('工作日高峰计费')
+    expect(deepSeek.get('.pricing-condition').text()).toContain('周一至周五 · 北京时间 09:00–12:00, 14:00–18:00')
+    expect(deepSeek.get('.pricing-condition').text()).toContain('开始时间包含在内，结束时间不包含在内。')
+
+    const grok = mountDetail('grok-4-6')
+    await flushPromises()
+    expect(grok.find('.pricing-condition').exists()).toBe(false)
+  })
+
+  it('shows GPT-6 long-context pricing only above 272,000 input tokens', async () => {
+    const wrapper = mountDetail('gpt-6-astra')
+    await flushPromises()
+
+    expect(wrapper.findAll('button.pricing-tier-option').map((button) => button.text())).toEqual([
+      'Base pricing', '> 272,000 input tokens',
+    ])
+    expect(wrapper.text()).not.toContain('> 200,000 input tokens')
   })
 
 })

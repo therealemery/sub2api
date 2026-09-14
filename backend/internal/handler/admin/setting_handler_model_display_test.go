@@ -105,7 +105,8 @@ func TestAdminSettingHandler_UpdateModelDisplayConfig(t *testing.T) {
 	body := `{
 		"featured_models":[{"model":" claude-sonnet-4.5 ","platform":"Anthropic","badge":"主推","sort_order":1}],
 		"pricing_models":[{"model":" claude-sonnet-4.5 ","platform":"Anthropic","billing_mode":"bad","input_price":0.0000018,"output_price":0.000009,"sort_order":1}],
-		"reference_discount":0.6
+		"reference_discount":0.6,
+		"request_pricing_conditions":[{"id":"tampered","models":["gpt-5.4"],"timezone":"UTC","customer_multiplier":0.01}]
 	}`
 	recorder := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(recorder)
@@ -127,6 +128,9 @@ func TestAdminSettingHandler_UpdateModelDisplayConfig(t *testing.T) {
 	require.Equal(t, "anthropic", resp.Data.PricingModels[0].Platform)
 	require.Equal(t, string(service.BillingModeToken), resp.Data.PricingModels[0].BillingMode)
 	require.Equal(t, 0.6, *resp.Data.ReferenceDiscount)
+	require.Equal(t, service.PublicRequestPricingConditionRules(), resp.Data.RequestPricingConditions)
+	require.NotContains(t, repo.values[service.SettingKeyModelDisplayConfig], "request_pricing_conditions")
+	require.NotContains(t, repo.values[service.SettingKeyModelDisplayConfig], "tampered")
 }
 
 func TestAdminSettingHandler_UpdateModelDisplayConfig_InvalidJSON(t *testing.T) {
