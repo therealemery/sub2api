@@ -120,8 +120,14 @@ async function generate() {
   error.value = ''
   task.value = null
   releaseVideoObjectURL()
-  const { body, headers } = buildCreateRequest()
   try {
+    if (!isWan.value && referenceVideoFile.value) {
+      const referenceDuration = await mp4Duration(referenceVideoFile.value)
+      if (referenceDuration < 2 || referenceDuration > 15) {
+        throw new Error(t('publicModels.videoGenerator.h3VideoDuration'))
+      }
+    }
+    const { body, headers } = buildCreateRequest()
     const response = await fetch('/v1/videos', { method: 'POST', headers, body })
     const data = await response.json()
     if (!response.ok) throw new Error(data?.error?.message || t('publicModels.videoGenerator.failed'))
@@ -133,6 +139,52 @@ async function generate() {
   } finally {
     submitting.value = false
   }
+}
+
+async function mp4Duration(file: File): Promise<number> {
+  const data = new DataView(await readFileArrayBuffer(file))
+  const moov = findMP4Atom(data, 0, data.byteLength, 'moov')
+  const mvhd = findMP4Atom(data, moov.start, moov.end, 'mvhd')
+  const version = data.getUint8(mvhd.start)
+  const timescaleOffset = mvhd.start + (version === 1 ? 20 : 12)
+  const durationOffset = mvhd.start + (version === 1 ? 24 : 16)
+  if (timescaleOffset + 4 > mvhd.end || durationOffset + (version === 1 ? 8 : 4) > mvhd.end) throw new Error(t('publicModels.videoGenerator.invalidH3Video'))
+  const timescale = data.getUint32(timescaleOffset)
+  const duration = version === 1
+    ? Number(data.getBigUint64(durationOffset))
+    : data.getUint32(durationOffset)
+  if (!timescale || !duration) throw new Error(t('publicModels.videoGenerator.invalidH3Video'))
+  return duration / timescale
+}
+
+function readFileArrayBuffer(file: File): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => reader.result instanceof ArrayBuffer
+      ? resolve(reader.result)
+      : reject(new Error(t('publicModels.videoGenerator.invalidH3Video')))
+    reader.onerror = () => reject(new Error(t('publicModels.videoGenerator.invalidH3Video')))
+    reader.readAsArrayBuffer(file)
+  })
+}
+
+function findMP4Atom(data: DataView, start: number, end: number, type: string): { start: number; end: number } {
+  for (let offset = start; offset + 8 <= end;) {
+    let size = data.getUint32(offset)
+    let headerSize = 8
+    if (size === 1) {
+      if (offset + 16 > end) break
+      size = Number(data.getBigUint64(offset + 8))
+      headerSize = 16
+    } else if (size === 0) {
+      size = end - offset
+    }
+    if (size < headerSize || size > end - offset) break
+    const atomType = String.fromCharCode(...new Uint8Array(data.buffer, data.byteOffset + offset + 4, 4))
+    if (atomType === type) return { start: offset + headerSize, end: offset + size }
+    offset += size
+  }
+  throw new Error(t('publicModels.videoGenerator.invalidH3Video'))
 }
 
 function schedulePoll() {

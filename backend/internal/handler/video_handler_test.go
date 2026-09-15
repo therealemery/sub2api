@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -64,6 +65,13 @@ func TestBuildWanJSONRequestRejectsInvalidMediaCombinations(t *testing.T) {
 func TestVideoUsageEndpointDoesNotRevealPrivateAdapterPath(t *testing.T) {
 	require.Equal(t, "/v1/videos", videoUpstreamCreateEndpoint(videoAdapterDCAPI))
 	require.Equal(t, "/v1/videos", videoUpstreamCreateEndpoint(videoAdapterAlibaba))
+}
+
+func TestVideoMediaErrorMessageOnlyExposesSafeDurationGuidance(t *testing.T) {
+	require.Equal(t, "Reference videos must be from 2 through 15 seconds",
+		videoMediaErrorMessage(fmt.Errorf("reference videos must be from 2 through 15 seconds")))
+	require.Equal(t, "Reference media could not be processed",
+		videoMediaErrorMessage(fmt.Errorf("unable to read /private/path/reference.mp4")))
 }
 
 func TestImmediateH3FailureIsRejectedBeforeBilling(t *testing.T) {

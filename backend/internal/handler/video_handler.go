@@ -147,7 +147,7 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	requestDurationMs := duration * 1000
 	if err != nil {
 		logger.L().With(zap.String("model", model)).Warn("video.media_prepare_failed", zap.Error(err))
-		h.errorResponse(c, http.StatusBadRequest, "invalid_media", "Reference media could not be processed")
+		h.errorResponse(c, http.StatusBadRequest, "invalid_media", videoMediaErrorMessage(err))
 		return
 	}
 
@@ -268,6 +268,13 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sanitizedVideoResponseForModel(c, upstream, publicTaskID, model, adapter))
+}
+
+func videoMediaErrorMessage(err error) string {
+	if err != nil && strings.Contains(err.Error(), "reference videos must be from 2 through 15 seconds") {
+		return "Reference videos must be from 2 through 15 seconds"
+	}
+	return "Reference media could not be processed"
 }
 
 func shouldBillVideoCreate(adapter string, upstream map[string]any) bool {

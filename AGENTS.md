@@ -18,8 +18,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 ## Current Repository State
 
 - Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; branch and
-  `origin/main` point to documentation checkpoint `c140665d`, while deployed functional revision
-  `71d0c624` remains the production image source.
+  `origin/main` point to production-QA documentation checkpoint `32956624`, while deployed functional
+  revision `71d0c624` remains the production image source. The H3 reference-media follow-up fix is
+  locally implemented and verified but not yet committed, pushed, or deployed.
 - Production is running healthy image `ownapi:71d0c624efff`. The conditional text-pricing, usage-audit,
   H3 DC-API JSON reference-media repair, private Wan 3.0 gateway, customer/model rate overrides,
   and admin modal model-source correction are deployed. No paid rollout request was submitted.
@@ -108,6 +109,28 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Public motion Tasks 1–5 are implemented and independently reviewed: route/mobile-menu transitions, a session-once homepage Hero, meaningful one-time section reveals, bounded model-list/card/tier motion, a moving Docs active indicator, and 1500ms stable-width copy feedback. Reduced Motion removes delays/transforms and keeps final content visible. No admin view was modified.
 
 ## Work in Progress
+
+### 2026-09-15 — MiniMax H3 reference-media follow-up fix locally verified
+
+- Corrected the failed-test diagnosis without changing `/v1/videos` or the DC-API JSON URL-object
+  contract. The earlier public reference-video probe used MDN's overlong `flower.mp4`, which violates
+  H3's documented 2–15-second reference-video limit; the earlier local-upload probes also used an
+  internal `127.0.0.1` Host, causing callback URLs that the remote provider could not fetch.
+- H3 MP4 uploads and video data URIs now both read the `moov/mvhd` duration and fail before upstream task
+  creation or billing when the duration is unreadable, below two seconds, or above 15 seconds. The
+  signed-in generator performs the same check before `fetch` and provides localized guidance.
+- Release mode now refuses to construct temporary-media URLs on `localhost` or `127.0.0.1`; debug
+  mode retains loopback support for local tests. Media-processing errors remain generic to customers
+  except for the safe 2–15-second duration message. Wan routing, prices, accounts, credentials,
+  migrations, and customer endpoint contracts are unchanged.
+- Focused H3/input tests, affected backend packages, `go vet`, four focused frontend files / 27
+  tests, the full frontend suite, Vue type checking, focused ESLint, the production frontend build,
+  and `git diff --check` passed. Existing Browserslist and large-chunk build notices remain
+  warning-only.
+- After CI and deployment, the user authorized at most two lowest-cost H3 production tasks: one
+  uploaded small PNG and one uploaded valid two-second MP4, each at 768p / five generated seconds,
+  about `$0.2798507465` each. Use the real `https://ownapi.dev` customer path, stop after one result
+  per case, and record usage/balance evidence without printing the API key or private provider data.
 
 ### 2026-09-15 — Production reference-image/video paid verification
 

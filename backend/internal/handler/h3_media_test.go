@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"mime/multipart"
 	"net/http/httptest"
@@ -13,6 +14,23 @@ import (
 )
 
 var tinyPNG = []byte{0x89, 'P', 'N', 'G', 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0, 'I', 'E', 'N', 'D'}
+
+func tinyMP4WithDuration(seconds uint32) []byte {
+	ftyp := append([]byte{0, 0, 0, 20}, []byte("ftypisom")...)
+	ftyp = append(ftyp, []byte{0, 0, 0, 0, 'i', 's', 'o', 'm'}...)
+	mvhdPayload := make([]byte, 20)
+	binary.BigEndian.PutUint32(mvhdPayload[12:16], 1000)
+	binary.BigEndian.PutUint32(mvhdPayload[16:20], seconds*1000)
+	mvhd := make([]byte, 8+len(mvhdPayload))
+	binary.BigEndian.PutUint32(mvhd[:4], uint32(len(mvhd)))
+	copy(mvhd[4:8], "mvhd")
+	copy(mvhd[8:], mvhdPayload)
+	moov := make([]byte, 8+len(mvhd))
+	binary.BigEndian.PutUint32(moov[:4], uint32(len(moov)))
+	copy(moov[4:8], "moov")
+	copy(moov[8:], mvhd)
+	return append(ftyp, moov...)
+}
 
 func TestBuildH3UpstreamRequestKeepsTextOnlyJSON(t *testing.T) {
 	body, contentType, err := buildH3UpstreamRequest(map[string]any{
@@ -30,7 +48,7 @@ func TestBuildH3UpstreamRequestKeepsTextOnlyJSON(t *testing.T) {
 
 func TestBuildH3UpstreamRequestEncodesReferenceMediaAsDCAPIJSON(t *testing.T) {
 	pngURI := "data:image/png;base64," + base64.StdEncoding.EncodeToString(tinyPNG)
-	mp4 := append([]byte{0, 0, 0, 12}, []byte("ftypisom")...)
+	mp4 := tinyMP4WithDuration(2)
 	mp4URI := "data:video/mp4;base64," + base64.StdEncoding.EncodeToString(mp4)
 	mp3URI := "data:audio/mpeg;base64," + base64.StdEncoding.EncodeToString([]byte("ID3audio"))
 	body, contentType, err := buildH3UpstreamRequest(map[string]any{
@@ -130,6 +148,57 @@ func TestValidateH3MediaRules(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			err := validateH3Media(test.request)
 			require.ErrorContains(t, err, test.message)
+		})
+	}
+}
+
+func TestValidateH3UploadedReferenceVideoDuration(t *testing.T) {
+	tests := []struct {
+		name    string
+		seconds uint32
+		wantErr string
+	}{
+		{name: "minimum", seconds: 2},
+		{name: "maximum", seconds: 15},
+		{name: "too short", seconds: 1, wantErr: "2 through 15 seconds"},
+		{name: "too long", seconds: 16, wantErr: "2 through 15 seconds"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			path := t.TempDir() + "/reference.mp4"
+			data := tinyMP4WithDuration(test.seconds)
+			require.NoError(t, os.WriteFile(path, data, 0o600))
+			err := validateH3UploadedMedia("reference_videos", &h3UploadedMedia{
+				Path: path, MIME: "video/mp4", Name: "reference.mp4", Size: int64(len(data)),
+			})
+			if test.wantErr == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, test.wantErr)
+			}
+		})
+	}
+}
+
+func TestValidateH3DataURIReferenceVideoDuration(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		seconds uint32
+		wantErr string
+	}{
+		{name: "minimum", seconds: 2},
+		{name: "maximum", seconds: 15},
+		{name: "too short", seconds: 1, wantErr: "2 through 15 seconds"},
+		{name: "too long", seconds: 16, wantErr: "2 through 15 seconds"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			value := "data:video/mp4;base64," + base64.StdEncoding.EncodeToString(tinyMP4WithDuration(test.seconds))
+			err := validateH3MediaValue("reference_videos", h3MediaValue{Text: value})
+			if test.wantErr == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, test.wantErr)
+			}
 		})
 	}
 }

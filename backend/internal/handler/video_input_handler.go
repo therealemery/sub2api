@@ -167,7 +167,11 @@ func (h *GatewayHandler) videoInputBaseURL(c *gin.Context) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("public media URL is unavailable")
 	}
-	validLocalHTTP := parsed.Scheme == "http" && (parsed.Hostname() == "127.0.0.1" || parsed.Hostname() == "localhost")
+	isLoopback := parsed.Hostname() == "127.0.0.1" || parsed.Hostname() == "localhost"
+	if isLoopback && h.cfg != nil && h.cfg.Server.Mode == "release" {
+		return "", fmt.Errorf("public media URL is unavailable")
+	}
+	validLocalHTTP := parsed.Scheme == "http" && isLoopback
 	if parsed.Hostname() == "" || (parsed.Scheme != "https" && !validLocalHTTP) {
 		return "", fmt.Errorf("public media URL is unavailable")
 	}

@@ -33,8 +33,8 @@ func TestVideoInputTokenAndPublicDownload(t *testing.T) {
 		data      []byte
 		useUpload bool
 	}{
-		{"video data URI", "reference_videos", "video/mp4", append([]byte{0, 0, 0, 12}, []byte("ftypisom")...), false},
-		{"video upload", "reference_videos", "video/mp4", append([]byte{0, 0, 0, 12}, []byte("ftypisom")...), true},
+		{"video data URI", "reference_videos", "video/mp4", tinyMP4WithDuration(2), false},
+		{"video upload", "reference_videos", "video/mp4", tinyMP4WithDuration(2), true},
 		{"audio data URI", "reference_audios", "audio/mpeg", []byte("ID3audio"), false},
 		{"audio upload", "reference_audios", "audio/mpeg", []byte("ID3audio"), true},
 		{"image data URI", "input_reference", "image/png", tinyPNG, false},
@@ -140,4 +140,31 @@ func TestVideoInputBaseURLRejectsUnconfiguredHostHeader(t *testing.T) {
 	_, err := h.videoInputBaseURL(ctx)
 
 	require.ErrorContains(t, err, "unavailable")
+}
+
+func TestVideoInputBaseURLRejectsLoopbackHostInRelease(t *testing.T) {
+	h := newVideoInputTestHandler(t)
+	h.cfg.Server.FrontendURL = ""
+	h.cfg.Server.Mode = "release"
+	recorder := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(recorder)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "http://127.0.0.1:8080/v1/videos", nil)
+
+	_, err := h.videoInputBaseURL(ctx)
+
+	require.ErrorContains(t, err, "public media URL is unavailable")
+}
+
+func TestVideoInputBaseURLAllowsLoopbackHostInDebug(t *testing.T) {
+	h := newVideoInputTestHandler(t)
+	h.cfg.Server.FrontendURL = ""
+	h.cfg.Server.Mode = "debug"
+	recorder := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(recorder)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "http://127.0.0.1:8080/v1/videos", nil)
+
+	baseURL, err := h.videoInputBaseURL(ctx)
+
+	require.NoError(t, err)
+	require.Equal(t, "http://127.0.0.1:8080", baseURL)
 }

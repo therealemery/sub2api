@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -310,6 +312,11 @@ func validateH3MediaValue(field string, value h3MediaValue) error {
 		if err := validateH3MediaBytes(field, mediaType, data); err != nil {
 			return err
 		}
+		if field == "reference_videos" {
+			if err := validateH3ReferenceVideoDuration(bytes.NewReader(data), int64(len(data))); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 	parsed, err := url.Parse(text)
@@ -348,7 +355,102 @@ func validateH3UploadedMedia(field string, upload *h3UploadedMedia) error {
 	if extensions := allowedExtension[field]; extensions != nil && !extensions[ext] {
 		return fmt.Errorf("unsupported file extension for %s", field)
 	}
+	if field == "reference_videos" {
+		if err := validateH3ReferenceVideoDuration(file, upload.Size); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func validateH3ReferenceVideoDuration(reader io.ReaderAt, size int64) error {
+	duration, err := h3MP4Duration(reader, size)
+	if err != nil {
+		return fmt.Errorf("reference video duration could not be determined")
+	}
+	if duration < 2 || duration > 15 {
+		return fmt.Errorf("reference videos must be from 2 through 15 seconds")
+	}
+	return nil
+}
+
+func h3MP4Duration(reader io.ReaderAt, size int64) (float64, error) {
+	if reader == nil || size < 8 {
+		return 0, fmt.Errorf("invalid MP4")
+	}
+	moovStart, moovEnd, err := findMP4Atom(reader, 0, size, "moov")
+	if err != nil {
+		return 0, err
+	}
+	mvhdStart, mvhdEnd, err := findMP4Atom(reader, moovStart, moovEnd, "mvhd")
+	if err != nil {
+		return 0, err
+	}
+	payloadSize := mvhdEnd - mvhdStart
+	if payloadSize < 20 {
+		return 0, fmt.Errorf("invalid mvhd")
+	}
+	bufferSize := int64(32)
+	if payloadSize < bufferSize {
+		bufferSize = payloadSize
+	}
+	payload := make([]byte, bufferSize)
+	if _, err := reader.ReadAt(payload, mvhdStart); err != nil {
+		return 0, err
+	}
+	var timescale uint32
+	var duration uint64
+	switch payload[0] {
+	case 0:
+		if len(payload) < 20 {
+			return 0, fmt.Errorf("invalid mvhd")
+		}
+		timescale = binary.BigEndian.Uint32(payload[12:16])
+		duration = uint64(binary.BigEndian.Uint32(payload[16:20]))
+	case 1:
+		if len(payload) < 32 {
+			return 0, fmt.Errorf("invalid mvhd")
+		}
+		timescale = binary.BigEndian.Uint32(payload[20:24])
+		duration = binary.BigEndian.Uint64(payload[24:32])
+	default:
+		return 0, fmt.Errorf("unsupported mvhd version")
+	}
+	if timescale == 0 || duration == 0 {
+		return 0, fmt.Errorf("invalid MP4 duration")
+	}
+	return float64(duration) / float64(timescale), nil
+}
+
+func findMP4Atom(reader io.ReaderAt, start, end int64, atomType string) (int64, int64, error) {
+	for offset := start; offset+8 <= end; {
+		header := make([]byte, 16)
+		if _, err := reader.ReadAt(header[:8], offset); err != nil {
+			return 0, 0, err
+		}
+		atomSize := int64(binary.BigEndian.Uint32(header[:4]))
+		headerSize := int64(8)
+		if atomSize == 1 {
+			if offset+16 > end {
+				return 0, 0, fmt.Errorf("invalid extended MP4 atom")
+			}
+			if _, err := reader.ReadAt(header[8:16], offset+8); err != nil {
+				return 0, 0, err
+			}
+			atomSize = int64(binary.BigEndian.Uint64(header[8:16]))
+			headerSize = 16
+		} else if atomSize == 0 {
+			atomSize = end - offset
+		}
+		if atomSize < headerSize || atomSize > end-offset {
+			return 0, 0, fmt.Errorf("invalid MP4 atom size")
+		}
+		if string(header[4:8]) == atomType {
+			return offset + headerSize, offset + atomSize, nil
+		}
+		offset += atomSize
+	}
+	return 0, 0, fmt.Errorf("MP4 atom %s not found", atomType)
 }
 
 func decodeH3DataURI(value string) (string, []byte, error) {
