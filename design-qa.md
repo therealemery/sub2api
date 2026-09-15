@@ -23,6 +23,38 @@
 
 final result: passed
 
+## Conditional Text Pricing Production QA — 2026-09-15
+
+### Deployment and data evidence
+
+- CI run `34937659145` passed all frontend, Go unit/integration, and lint jobs. Deploy run
+  `34938306793` completed successfully for commit `71d0c624` and image `ownapi:71d0c624efff`.
+- The container reports `running` and `healthy`; `/health`, `/home`, `/models`,
+  `/models/deepseek-v4-1-flash`, `/models/gpt-6-astra`, and `/docs` all returned successfully from
+  the production host.
+- Migrations `142_add_usage_pricing_audit.sql` and
+  `143_correct_text_pricing_and_packy_scopes.sql` each appear once in `schema_migrations`; their
+  recorded checksums match the repository's trimmed embedded SQL.
+- The three usage-audit columns exist. All 83 usage rows predating this deployment retain a neutral
+  condition multiplier and null rule ID, so the rollout did not re-rate historical usage.
+- DeepSeek Pro has no customer-price record. DeepSeek Flash has the reviewed 70-percent customer
+  price. GPT-6 Astra has contiguous `(0,272000]` and `(272000,+inf]` tiers, so 272,000 remains short
+  and 272,001 selects long.
+- `Packy / Core` no longer maps the four Codex models. No `Packy / Codex` account exists, so those
+  routes fail closed; the unique `Packy / DeepSeek Sale` account and its exact cost rule remain.
+
+### Public disclosure and limits
+
+- The public model-display response contains the provider-neutral DeepSeek weekday schedule,
+  Beijing half-open windows, and customer multiplier. It contains no Packy name, private model alias,
+  base URL, API key, account identifier, or account-cost field.
+- No paid DeepSeek or Codex request was submitted. Browser automation could not access a reusable
+  authenticated session because its Codex auth token was unavailable; post-deploy customer/admin
+  Usage-page rendering was therefore not rechecked. DTO, component, export, and integration behavior
+  remains covered by the passing CI suites.
+
+final result: passed with the documented authenticated-browser limitation
+
 # OwnAPI Home Page Design QA
 
 ## Comparison Target

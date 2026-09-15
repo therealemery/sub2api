@@ -17,11 +17,14 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; the H3 usage-history feature commit `c21871b3` and cleanup history are on `origin/main`.
-- Production is running image `ownapi:4ef4a83716b5`. The H3 DC-API JSON reference-media repair,
-  private Wan 3.0 gateway, customer/model rate overrides, and the admin modal's model-source
-  correction are deployed and verified without a paid H3 task.
-- The current local branch catalog contains 45 models after removing the unverified `deepseek-v4-pro`; production remains on the previously deployed 44-model snapshot. The two Packy `cc`-only models are intentionally excluded because OwnAPI is a third-party gateway; the six `cc-sale` Claude models remain published.
+- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; branch and `origin/main` point to `71d0c624` after the conditional-pricing rollout.
+- Production is running healthy image `ownapi:71d0c624efff`. The conditional text-pricing, usage-audit,
+  H3 DC-API JSON reference-media repair, private Wan 3.0 gateway, customer/model rate overrides,
+  and admin modal model-source correction are deployed. No paid rollout request was submitted.
+- Production publishes the reviewed 42-model snapshot: 39 text models plus three video models.
+  `deepseek-v4-pro`, the two Packy `cc`-only models, and other unverified/loss-making entries remain
+  excluded. The four Codex models are public but currently fail closed because no unique managed
+  `Packy / Codex` account exists; they never fall back to `Packy / Core`.
 - Preserve the pre-existing untracked `.codex-qa/`, `.vite/`, `LightsailDefaultKey-ap-northeast-1.pem`, and `frontend/pnpm-workspace.yaml`; none belongs to the video-history change and none should be committed.
 - Local frontend and backend were restored and verified on 2026-09-07 at `http://127.0.0.1:3000` and `http://127.0.0.1:8080`. Confirm the current processes before relying on them.
 
@@ -103,6 +106,35 @@ This repository is being customized into the OwnAPI product. The active objectiv
 - Public motion Tasks 1–5 are implemented and independently reviewed: route/mobile-menu transitions, a session-once homepage Hero, meaningful one-time section reveals, bounded model-list/card/tier motion, a moving Docs active indicator, and 1500ms stable-width copy feedback. Reduced Motion removes delays/transforms and keeps final content visible. No admin view was modified.
 
 ## Work in Progress
+
+### 2026-09-15 — Conditional text pricing deployed and verified
+
+- Functional commit `b5625850` plus PostgreSQL integration-fixture corrections `bcc4c5e5` and
+  `71d0c624` were pushed to the feature branch and `main`. CI run `34937659145` passed frontend,
+  Go unit/integration, and golangci-lint jobs.
+- A read-only production preflight (run `34938096710`) found no `Packy / Codex` account. The existing
+  four Codex mappings were incorrectly present on `Packy / Core`; migration 143 removed them and did
+  not create or copy an account or credential. The unique `Packy / DeepSeek Sale` account was active
+  and schedulable.
+- Before deployment, production database backup
+  `/opt/ownapi/deploy/backups/pre-conditional-pricing-20260915T1443Z.dump` was created with mode 600,
+  size 79,062,039 bytes, and SHA-256
+  `d570655503a7bab8bc981f8eb9896d779b98b5495d81dd358731be2feac9c8bf`.
+- Deploy run `34938306793` replaced rollback image `ownapi:a233e30e1d92` with healthy image
+  `ownapi:71d0c624efff` (full commit `71d0c624effff4d5ac45255bc9acd15b9f38dc01`). Migrations 142
+  and 143 each applied once; their stored checksums match the trimmed embedded SQL.
+- Read-only production QA passed `/health`, `/home`, `/models`, the DeepSeek Flash and GPT-6 Astra
+  detail routes, and `/docs`. Usage audit columns exist; all 83 pre-deployment usage rows retain
+  neutral `1x` defaults. DeepSeek Pro has no customer-price row, Flash uses the reviewed 70-percent
+  price, and GPT-6 uses short `(0,272000]` and long `(272000,+inf]` intervals.
+- Public model-display JSON exposes the provider-neutral weekday peak schedule and no Packy name,
+  private alias, account/base URL, credential, or account-cost field. No paid DeepSeek/Codex request
+  was made. Browser automation could not reuse an authenticated session because its Codex auth token
+  was unavailable, so customer/admin rendered usage pages were not rechecked after deployment; their
+  DTO/UI/export paths remain covered by the passing frontend and integration suites.
+- Operational follow-up: create exactly one managed `Packy / Codex` account through the existing
+  authorized secret workflow before enabling the four Codex routes. Do not restore those mappings to
+  Core and do not copy, move, print, or commit a credential.
 
 ### 2026-09-15 — Conditional text pricing implementation locally complete
 
