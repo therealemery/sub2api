@@ -150,7 +150,9 @@ func TestPackyTextPricingMigrationIsIdempotentAndFailClosed(t *testing.T) {
 		CROSS JOIN LATERAL jsonb_array_elements_text(cmp.models) AS models(model_id)
 		WHERE c.name = 'OwnAPI LLM'
 	`).Scan(&modelCount))
-	require.Equal(t, 37, modelCount)
+	// Migration 141 adds two DeepSeek rows before migration 139 removes the two
+	// Claude Code-only rows, leaving the reviewed 39-model text catalog.
+	require.Equal(t, 39, modelCount)
 
 	require.NoError(t, tx.QueryRowContext(ctx, `
 		SELECT COUNT(*)
