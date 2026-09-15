@@ -430,7 +430,8 @@ func findMP4Atom(reader io.ReaderAt, start, end int64, atomType string) (int64, 
 		}
 		atomSize := int64(binary.BigEndian.Uint32(header[:4]))
 		headerSize := int64(8)
-		if atomSize == 1 {
+		switch atomSize {
+		case 1:
 			if offset+16 > end {
 				return 0, 0, fmt.Errorf("invalid extended MP4 atom")
 			}
@@ -439,7 +440,7 @@ func findMP4Atom(reader io.ReaderAt, start, end int64, atomType string) (int64, 
 			}
 			atomSize = int64(binary.BigEndian.Uint64(header[8:16]))
 			headerSize = 16
-		} else if atomSize == 0 {
+		case 0:
 			atomSize = end - offset
 		}
 		if atomSize < headerSize || atomSize > end-offset {
