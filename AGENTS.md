@@ -17,7 +17,9 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Current Repository State
 
-- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; branch and `origin/main` point to `71d0c624` after the conditional-pricing rollout.
+- Active checkout: `/Users/owen/apizhongzhuan/sub2api`, branch `codex/video-usage-history`; branch and
+  `origin/main` point to documentation checkpoint `c140665d`, while deployed functional revision
+  `71d0c624` remains the production image source.
 - Production is running healthy image `ownapi:71d0c624efff`. The conditional text-pricing, usage-audit,
   H3 DC-API JSON reference-media repair, private Wan 3.0 gateway, customer/model rate overrides,
   and admin modal model-source correction are deployed. No paid rollout request was submitted.
