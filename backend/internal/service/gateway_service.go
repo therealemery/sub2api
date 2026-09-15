@@ -149,7 +149,7 @@ func anthropicStreamEventIsTerminal(eventName, data string) bool {
 }
 
 func cloneStringSlice(src []string) []string {
-	if len(src) == 0 {
+	if src == nil {
 		return nil
 	}
 	dst := make([]string, len(src))
@@ -3717,6 +3717,9 @@ func (s *GatewayService) isModelSupportedByAccountWithContext(ctx context.Contex
 
 // isModelSupportedByAccount 根据账户平台检查模型支持（无 context，用于非 Antigravity 平台）
 func (s *GatewayService) isModelSupportedByAccount(account *Account, requestedModel string) bool {
+	if !isManagedPackyAccountAllowedForModel(account, requestedModel) {
+		return false
+	}
 	if account.Platform == PlatformAntigravity {
 		if strings.TrimSpace(requestedModel) == "" {
 			return true
@@ -9745,6 +9748,12 @@ func (s *GatewayService) GetAvailableModels(ctx context.Context, groupID *int64,
 		if len(mapping) > 0 {
 			hasAnyMapping = true
 			for model := range mapping {
+				if !isManagedPackyAccountAllowedForModel(&acc, model) {
+					continue
+				}
+				if !hasUniqueExactManagedPackyAccount(accounts, model) {
+					continue
+				}
 				modelSet[model] = struct{}{}
 			}
 		}
@@ -9752,11 +9761,15 @@ func (s *GatewayService) GetAvailableModels(ctx context.Context, groupID *int64,
 
 	// If no account has model_mapping, return nil (use default)
 	if !hasAnyMapping {
+		var models []string
+		if groupID != nil && s.channelService != nil {
+			models = s.channelService.FilterModelsByGroupPricing(ctx, *groupID, models)
+		}
 		if s.modelsListCache != nil {
-			s.modelsListCache.Set(cacheKey, []string(nil), s.modelsListCacheTTL)
+			s.modelsListCache.Set(cacheKey, cloneStringSlice(models), s.modelsListCacheTTL)
 			modelsListCacheStoreTotal.Add(1)
 		}
-		return nil
+		return cloneStringSlice(models)
 	}
 
 	// Convert to slice
@@ -9765,6 +9778,9 @@ func (s *GatewayService) GetAvailableModels(ctx context.Context, groupID *int64,
 		models = append(models, model)
 	}
 	sort.Strings(models)
+	if groupID != nil && s.channelService != nil {
+		models = s.channelService.FilterModelsByGroupPricing(ctx, *groupID, models)
+	}
 
 	if s.modelsListCache != nil {
 		s.modelsListCache.Set(cacheKey, cloneStringSlice(models), s.modelsListCacheTTL)

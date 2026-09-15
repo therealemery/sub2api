@@ -949,7 +949,10 @@ func (h *GatewayHandler) Models(c *gin.Context) {
 	// Get available models from account configurations (without platform filter)
 	availableModels := h.gatewayService.GetAvailableModels(c.Request.Context(), groupID, "")
 
-	if len(availableModels) > 0 {
+	// A non-nil empty list means an active restrictive channel deliberately
+	// exposed no text models. Do not replace that fail-closed decision with the
+	// broad built-in defaults; the independent H3 route remains explicit.
+	if availableModels != nil {
 		availableModels = appendModelIfMissing(availableModels, miniMaxH3Model)
 		// Build model list from whitelist
 		models := make([]claude.Model, 0, len(availableModels))

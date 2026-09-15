@@ -580,6 +580,119 @@ func TestGetAvailableModels_ErrorAndGlobalListBranches(t *testing.T) {
 	require.Equal(t, int64(1), okRepo.listAllCalls.Load())
 }
 
+func TestGetAvailableModels_RestrictiveChannelRequiresExactPrice(t *testing.T) {
+	t.Parallel()
+	groupID := int64(91)
+	repo := &modelsListAccountRepoStub{
+		byGroup: map[int64][]Account{
+			groupID: {
+				{
+					ID:       1,
+					Name:     "Packy / DeepSeek Sale",
+					Platform: PlatformOpenAI,
+					Extra:    map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+					Credentials: map[string]any{"model_mapping": map[string]any{
+						"deepseek-v4.1-flash": "deepseek-v4-flash",
+						"deepseek-v4-pro":     "deepseek-v4-pro",
+					}},
+				},
+			},
+		},
+	}
+	channelSvc := newGatewayHotpathChannelService(Channel{
+		ID:                 1,
+		Status:             StatusActive,
+		GroupIDs:           []int64{groupID},
+		RestrictModels:     true,
+		BillingModelSource: BillingModelSourceChannelMapped,
+		ModelPricing: []ChannelModelPricing{
+			{Platform: PlatformOpenAI, Models: []string{"deepseek-v4.1-flash"}},
+		},
+	}, groupID, PlatformOpenAI)
+	svc := &GatewayService{
+		accountRepo:        repo,
+		channelService:     channelSvc,
+		modelsListCache:    gocache.New(time.Minute, time.Minute),
+		modelsListCacheTTL: time.Minute,
+	}
+
+	require.Equal(t, []string{"deepseek-v4.1-flash"}, svc.GetAvailableModels(context.Background(), &groupID, PlatformOpenAI))
+}
+
+func TestGetAvailableModels_RestrictiveChannelPreservesExplicitEmpty(t *testing.T) {
+	t.Parallel()
+	groupID := int64(93)
+	repo := &modelsListAccountRepoStub{
+		byGroup: map[int64][]Account{
+			groupID: {{
+				ID:       1,
+				Platform: PlatformOpenAI,
+				Credentials: map[string]any{"model_mapping": map[string]any{
+					"deepseek-v4-pro": "deepseek-v4-pro",
+				}},
+			}},
+		},
+	}
+	channelSvc := newGatewayHotpathChannelService(Channel{
+		ID: 1, Status: StatusActive, GroupIDs: []int64{groupID}, RestrictModels: true,
+		BillingModelSource: BillingModelSourceChannelMapped,
+	}, groupID, PlatformOpenAI)
+	svc := &GatewayService{
+		accountRepo:        repo,
+		channelService:     channelSvc,
+		modelsListCache:    gocache.New(time.Minute, time.Minute),
+		modelsListCacheTTL: time.Minute,
+	}
+
+	models := svc.GetAvailableModels(context.Background(), &groupID, PlatformOpenAI)
+	require.NotNil(t, models)
+	require.Empty(t, models)
+	cached := svc.GetAvailableModels(context.Background(), &groupID, PlatformOpenAI)
+	require.NotNil(t, cached)
+	require.Empty(t, cached)
+	require.Equal(t, int64(1), repo.listByGroupCalls.Load())
+}
+
+func TestGetAvailableModels_CostSensitivePackyModelsRequireExactAccount(t *testing.T) {
+	t.Parallel()
+	groupID := int64(92)
+	model := "gpt-5.6-luna"
+	account := func(id int64, name string, managed bool) Account {
+		extra := map[string]any{}
+		if managed {
+			extra["upstream_provider"] = UpstreamProviderPackyAPI
+		}
+		return Account{
+			ID: id, Name: name, Platform: PlatformOpenAI,
+			Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+			Extra:       extra,
+		}
+	}
+	channelSvc := newGatewayHotpathChannelService(Channel{
+		ID: 1, Status: StatusActive, GroupIDs: []int64{groupID}, RestrictModels: true,
+		BillingModelSource: BillingModelSourceChannelMapped,
+		ModelPricing:       []ChannelModelPricing{{Platform: PlatformOpenAI, Models: []string{model}}},
+	}, groupID, PlatformOpenAI)
+	available := func(accounts ...Account) []string {
+		return (&GatewayService{
+			accountRepo:    &modelsListAccountRepoStub{byGroup: map[int64][]Account{groupID: accounts}},
+			channelService: channelSvc,
+		}).GetAvailableModels(context.Background(), &groupID, PlatformOpenAI)
+	}
+
+	require.Empty(t, available(account(1, "Packy / Core", true)))
+	require.Empty(t, available(account(2, "Packy / Codex", false)))
+	require.Equal(t, []string{model}, available(account(3, "Packy / Codex", true)))
+	require.Empty(t, available(account(4, "Packy / Codex", true), account(5, "Packy / Codex", true)))
+}
+
+func newGatewayHotpathChannelService(channel Channel, groupID int64, platform string) *ChannelService {
+	cache := populateChannelCache([]Channel{channel}, map[int64]string{groupID: platform})
+	service := &ChannelService{}
+	service.cache.Store(cache)
+	return service
+}
+
 func TestGatewayHotpathHelpers_CacheTTLAndStickyContext(t *testing.T) {
 	t.Run("resolve_user_group_rate_cache_ttl", func(t *testing.T) {
 		require.Equal(t, defaultUserGroupRateCacheTTL, resolveUserGroupRateCacheTTL(nil))

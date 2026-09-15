@@ -1,3 +1,28 @@
+# Conditional Text Pricing QA — 2026-09-15
+
+## Local browser evidence
+
+- Local frontend and backend were running at `http://127.0.0.1:3000` and
+  `http://127.0.0.1:8080`; backend `/health` returned `{"status":"ok"}`.
+- At 1440 × 900, `/models` rendered 42 models across nine nonempty providers.
+  `/models/deepseek-v4-1-flash` showed the structured weekday peak windows and `2×`
+  multiplier without publishing DeepSeek Pro or any private Packy account, host, or alias.
+- `/models/gpt-6-astra` showed the long-context tier as input tokens strictly greater than
+  272,000. Both detail pages had no page-level horizontal overflow.
+- At 390 × 844, the DeepSeek page retained the complete peak-pricing disclosure without
+  horizontal overflow. The removed `gemini-3-pro-preview` route rendered the public model 404.
+- SPA navigation `/models` → `/docs` → `/models` completed without a reload, empty content,
+  or blank-route state.
+- `/api/v1/settings/model-display` returned only the sanitized provider-neutral rule projection:
+  canonical OwnAPI model, Asia/Shanghai schedule, weekdays, windows, customer multiplier, and
+  bilingual names. It exposed no Packy identity, upstream cost multiplier, private alias, host,
+  account, or credential.
+- Authenticated `/usage` and admin usage required a local login, so their `1×`/`2×`, audit
+  timestamp, rule label, and export behavior were verified by component tests rather than by
+  modifying the local database or using production credentials.
+
+final result: passed
+
 # OwnAPI Home Page Design QA
 
 ## Comparison Target

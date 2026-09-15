@@ -80,18 +80,18 @@ describe('ModelsCatalogView', () => {
 
     const wrapper = mountCatalog()
     await flushPromises()
-    expect(wrapper.get('#catalog-results-title').text()).toBe('45 models')
+    expect(wrapper.get('#catalog-results-title').text()).toBe('42 models')
   })
 
-  it('renders all ten providers as ordered sections with correct model counts', async () => {
+  it('renders all nine published providers as ordered sections with correct model counts', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
     const sections = wrapper.findAll('section.provider-section')
 
     expect(sections.map((section) => section.get('h2').text())).toEqual([
-      'OpenAI', 'Anthropic', 'xAI', 'DeepSeek', 'Google', 'Qwen', 'Z.AI', 'Moonshot', 'MiniMax', 'Alibaba',
+      'OpenAI', 'Anthropic', 'xAI', 'DeepSeek', 'Google', 'Qwen', 'Z.AI', 'MiniMax', 'Alibaba',
     ])
-    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 1, 6, 11, 4, 1, 4, 2])
+    expect(sections.map((section) => section.findAll('.model-card').length)).toEqual([8, 6, 2, 1, 5, 11, 3, 4, 2])
     for (const section of sections) {
       const provider = section.get('h2').text()
       expect(section.findAll('.provider-line').every((line) => line.text().includes(provider))).toBe(true)
@@ -130,7 +130,7 @@ describe('ModelsCatalogView', () => {
     await wrapper.get('.reset-all').trigger('click')
     expect((wrapper.get('input[type="search"]').element as HTMLInputElement).value).toBe('')
     expect((wrapper.get('select').element as HTMLSelectElement).value).toBe('featured')
-    expect(wrapper.findAll('section.provider-section')).toHaveLength(10)
+    expect(wrapper.findAll('section.provider-section')).toHaveLength(9)
   })
 
   it('treats provider, model class, and endpoint as mutually exclusive category filters', async () => {
@@ -159,14 +159,13 @@ describe('ModelsCatalogView', () => {
     expect(wrapper.findAll('.model-card')).toHaveLength(3)
   })
 
-  it('renders unpublished pricing without zero-value metric fallbacks', async () => {
+  it('does not publish models without an exact verified price', async () => {
     const wrapper = mountCatalog()
     await flushPromises()
-    const unpublished = wrapper.findAll('.model-card').find((card) => card.text().includes('Gemini 3 Pro Preview'))!
 
-    expect(unpublished.get('.pricing-card-status').text()).toContain('publicModels.notPublished')
-    expect(unpublished.findAll('.price-line')).toHaveLength(0)
-    expect(unpublished.text()).not.toContain('$0')
+    expect(wrapper.text()).not.toContain('Gemini 3 Pro Preview')
+    expect(wrapper.text()).not.toContain('GLM 5.2')
+    expect(wrapper.text()).not.toContain('Kimi K2.5')
   })
 
   it('renders traceable OwnAPI pricing for GPT-5.6 Sol', async () => {

@@ -259,12 +259,12 @@ func TestOpenAIGatewayServiceRecordUsage_ConditionAndCustomerModelRateApplyExact
 	svc := newOpenAIRecordUsageServiceWithBillingRepoForTest(usageRepo, billingRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{}, rateRepo)
 
 	usage := OpenAIUsage{InputTokens: 1_000, OutputTokens: 500}
-	cs := newTestChannelServiceWithCache(t, &channelCache{
+	cs := newOpenAIRecordUsageChannelService(&channelCache{
 		pricingByGroupModel: map[channelModelKey]*ChannelModelPricing{
 			{groupID: 11, platform: "openai", model: "deepseek-v4.1-flash"}: {
 				BillingMode: BillingModeToken,
-				InputPrice:  testPtrFloat64(0.105 / 1_000_000),
-				OutputPrice: testPtrFloat64(0.42 / 1_000_000),
+				InputPrice:  openAIRecordUsageFloatPtr(0.105 / 1_000_000),
+				OutputPrice: openAIRecordUsageFloatPtr(0.42 / 1_000_000),
 			},
 		},
 		channelByGroupID:        map[int64]*Channel{11: {ID: 11, Status: StatusActive}},
@@ -302,6 +302,15 @@ func TestOpenAIGatewayServiceRecordUsage_ConditionAndCustomerModelRateApplyExact
 	require.InDelta(t, baseTotal*2, usageRepo.lastLog.TotalCost, 1e-12)
 	require.InDelta(t, baseTotal*2*0.8, usageRepo.lastLog.ActualCost, 1e-12)
 }
+
+func newOpenAIRecordUsageChannelService(cache *channelCache) *ChannelService {
+	cache.loadedAt = time.Now()
+	service := &ChannelService{}
+	service.cache.Store(cache)
+	return service
+}
+
+func openAIRecordUsageFloatPtr(value float64) *float64 { return &value }
 
 func TestOpenAIGatewayServiceRecordUsage_CustomerMultiplierPrecedence(t *testing.T) {
 	tests := []struct {

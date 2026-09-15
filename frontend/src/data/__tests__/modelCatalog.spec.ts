@@ -11,6 +11,7 @@ import {
   getCatalogProviderSummaries,
   groupModelCatalog,
   normalizeCatalogSearch,
+  ownApiSaleMultiplierForCostRatio,
   relatedCatalogModels,
   scoreCatalogMatch,
   verifiedCatalogSeeds,
@@ -36,8 +37,71 @@ describe('modelCatalog', () => {
     const catalog = buildModelCatalog(emptyConfig)
     expect(catalog.find((entry) => entry.modelId === 'gpt-5.4')?.pricingSource?.multiplier).toBe(0.8)
     expect(catalog.find((entry) => entry.modelId === 'gpt-5.4-mini')?.pricingSource?.multiplier).toBe(0.8)
-    for (const modelId of ['gpt-daybreak-blue-latest', 'claude-fable-5', 'gemini-3.7-flash', 'kimi-k3', 'deepseek-v4-pro']) {
+    for (const modelId of ['gpt-daybreak-blue-latest', 'claude-fable-5', 'gemini-3-pro-preview', 'gemini-3.7-flash', 'glm-5.2', 'kimi-k2.5', 'kimi-k3', 'deepseek-v4-pro']) {
       expect(catalog.some((entry) => entry.modelId === modelId)).toBe(false)
+    }
+  })
+
+  it('uses exact 60% and 80% Packy cost-band boundaries', () => {
+    expect(ownApiSaleMultiplierForCostRatio(0.6)).toBe(0.7)
+    expect(ownApiSaleMultiplierForCostRatio(0.600001)).toBe(0.8)
+    expect(ownApiSaleMultiplierForCostRatio(0.8)).toBe(0.8)
+    expect(ownApiSaleMultiplierForCostRatio(0.800001)).toBeNull()
+    expect(ownApiSaleMultiplierForCostRatio(null)).toBeNull()
+    expect(ownApiSaleMultiplierForCostRatio(Number.NaN)).toBeNull()
+  })
+
+  it('locks the complete reviewed text-model cost and availability snapshot', () => {
+    type Snapshot = {
+      pricingStatus: 'paid' | 'free' | 'unpublished'
+      costRatio: number
+      saleMultiplier: 0.7 | 0.8 | null
+      published: boolean
+    }
+    const entries = (
+      ids: string[],
+      pricingStatus: Snapshot['pricingStatus'],
+      costRatio: number,
+      saleMultiplier: Snapshot['saleMultiplier'],
+      published: boolean,
+    ) => Object.fromEntries(ids.map((modelId) => [modelId, {
+      pricingStatus, costRatio, saleMultiplier, published,
+    } satisfies Snapshot]))
+
+    const snapshot: Record<string, Snapshot> = {
+      ...entries(['gpt-6-astra', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra'], 'paid', 0.12, 0.7, true),
+      ...entries(['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'codex-auto-review'], 'paid', 0.72, 0.8, true),
+      ...entries(['gpt-daybreak-blue-latest'], 'unpublished', 1, null, false),
+      ...entries(['omni-moderation-latest'], 'free', 1, null, false),
+      ...entries(['claude-fable-5'], 'paid', 1, null, false),
+      ...entries(['claude-haiku-4-5-20251001', 'claude-sonnet-4-5-20250929'], 'paid', 0.29, 0.7, false),
+      ...entries(['claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-6', 'claude-sonnet-5'], 'paid', 0.12, 0.7, true),
+      ...entries(['grok-4.5', 'grok-4.6'], 'paid', 0.01, 0.7, true),
+      ...entries(['deepseek-v4.1-flash'], 'paid', 0.5, 0.7, true),
+      ...entries(['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'], 'paid', 0.43, 0.7, true),
+      ...entries(['gemini-3-pro-preview'], 'unpublished', 0.43, null, false),
+      ...entries(['gemini-3.7-flash'], 'paid', 1, null, false),
+      ...entries(['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'], 'paid', 0.5, 0.7, true),
+      ...entries(['glm-5', 'glm-5.3', 'glm-5.3-flash'], 'paid', 0.5, 0.7, true),
+      ...entries(['glm-5.2', 'kimi-k2.5'], 'unpublished', 0.5, null, false),
+      ...entries(['kimi-k3'], 'paid', 0.95, null, false),
+      ...entries(['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3'], 'paid', 0.5, 0.7, true),
+    }
+    const textSeeds = verifiedModelSeedData.filter((seed) => seed.modality !== 'Video')
+    const publishedIds = new Set(buildModelCatalog(emptyConfig).filter((entry) => entry.modality !== 'Video').map((entry) => entry.modelId))
+
+    expect(textSeeds).toHaveLength(49)
+    expect(Object.keys(snapshot)).toHaveLength(textSeeds.length)
+    for (const seed of textSeeds) {
+      const expected = snapshot[seed.modelId]
+      expect(expected, `missing reviewed cost fixture for ${seed.modelId}`).toBeDefined()
+      expect(seed.pricingStatus).toBe(expected.pricingStatus)
+      expect(1 - seed.discountPercent / 100).toBeCloseTo(expected.costRatio, 12)
+      const computedMultiplier = seed.pricingStatus === 'paid'
+        ? ownApiSaleMultiplierForCostRatio(expected.costRatio)
+        : null
+      expect(seed.customerMultiplier ?? computedMultiplier).toBe(expected.saleMultiplier)
+      expect(publishedIds.has(seed.modelId)).toBe(expected.published)
     }
   })
 
@@ -60,7 +124,7 @@ describe('modelCatalog', () => {
       })),
     })
 
-    expect(catalog).toHaveLength(45)
+    expect(catalog).toHaveLength(42)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-haiku-4-5'))).toBe(false)
     expect(catalog.some((entry) => entry.modelId.toLowerCase().includes('claude-sonnet-4-5'))).toBe(false)
   })
@@ -104,7 +168,7 @@ describe('modelCatalog', () => {
       }],
     })
 
-    expect(catalog).toHaveLength(45)
+    expect(catalog).toHaveLength(42)
     expect(catalog.filter((entry) => entry.slug === 'claude-opus-4-7')).toHaveLength(1)
     expect(catalog.find((entry) => entry.slug === 'claude-opus-4-7')?.modelId).toBe('claude-opus-4-7')
   })
@@ -142,7 +206,7 @@ describe('modelCatalog', () => {
   it('uses curated entries when the API config is empty', () => {
     const result = buildModelCatalog(emptyConfig)
 
-    expect(result).toHaveLength(45)
+    expect(result).toHaveLength(42)
     expect(result.map((item) => item.family)).toEqual(
       expect.arrayContaining(['gpt', 'claude', 'grok']),
     )
@@ -284,16 +348,15 @@ describe('modelCatalog', () => {
     ])
   })
 
-  it('contains the exact 45-model eligibility snapshot across ten providers', () => {
+  it('contains the exact 42-model eligibility snapshot across nine providers', () => {
     const providerIds = {
       OpenAI: ['gpt-6-astra', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'codex-auto-review'],
       Anthropic: ['claude-opus-4-6', 'claude-opus-4-7', 'claude-opus-4-8', 'claude-opus-5', 'claude-sonnet-4-6', 'claude-sonnet-5'],
       xAI: ['grok-4.5', 'grok-4.6'],
       DeepSeek: ['deepseek-v4.1-flash'],
-      Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3-pro-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'],
+      Google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview', 'gemini-3.1-pro-preview', 'gemini-3.5-flash'],
       Qwen: ['qwen3-coder-next', 'qwen3-max', 'qwen3-vl-flash', 'qwen3.5-flash', 'qwen3.5-plus', 'qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.7-max', 'qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
-      'Z.AI': ['glm-5', 'glm-5.2', 'glm-5.3', 'glm-5.3-flash'],
-      Moonshot: ['kimi-k2.5'],
+      'Z.AI': ['glm-5', 'glm-5.3', 'glm-5.3-flash'],
       MiniMax: ['minimax-m2.5', 'MiniMax-M2.7', 'MiniMax-M3', 'MiniMax-H3'],
       Alibaba: ['wan3.0-video', 'wan3.0-video-prime'],
     }
@@ -302,12 +365,12 @@ describe('modelCatalog', () => {
 
     expect(verifiedModelSeedData).toHaveLength(52)
     expect(new Set(verifiedModelSeedData.map((seed) => seed.modelId)).size).toBe(52)
-    expect(new Set(expectedIds).size).toBe(45)
+    expect(new Set(expectedIds).size).toBe(42)
     expect(verifiedCatalogSeeds.map((seed) => seed.modelId)).toEqual(expectedIds)
     expect(Object.fromEntries(Object.entries(providerIds).map(([provider, ids]) => [
       provider,
       catalog.filter((model) => model.provider === provider && ids.includes(model.modelId)).length,
-    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, DeepSeek: 1, Google: 6, Qwen: 11, 'Z.AI': 4, Moonshot: 1, MiniMax: 4, Alibaba: 2 })
+    ]))).toEqual({ OpenAI: 8, Anthropic: 6, xAI: 2, DeepSeek: 1, Google: 5, Qwen: 11, 'Z.AI': 3, MiniMax: 4, Alibaba: 2 })
 
     const addedIds = expectedIds.slice(16)
     expect(Object.fromEntries(addedIds.map((modelId) => [
@@ -317,7 +380,6 @@ describe('modelCatalog', () => {
       'gemini-2.5-flash': { input: 0.3, cachedInput: 0.03, output: 2.5 },
       'gemini-2.5-pro': { input: 1.25, cachedInput: 0.125, output: 10 },
       'gemini-3-flash-preview': { input: 0.5, cachedInput: 0.05, output: 3 },
-      'gemini-3-pro-preview': { input: null, cachedInput: null, output: null },
       'gemini-3.1-pro-preview': { input: 2, cachedInput: 0.2, output: 12 },
       'gemini-3.5-flash': { input: 1.5, cachedInput: 0.15, output: 9 },
       'qwen3-coder-next': { input: 0.144, cachedInput: null, output: 0.574 },
@@ -332,10 +394,8 @@ describe('modelCatalog', () => {
       'qwen3.8-flash': { input: 0.113, cachedInput: null, output: 0.382 },
       'qwen3.8-max': { input: 2, cachedInput: null, output: 6 },
       'glm-5': { input: 1, cachedInput: 0.2, output: 3.2 },
-      'glm-5.2': { input: null, cachedInput: null, output: null },
       'glm-5.3': { input: 1.4, cachedInput: 0.26, output: 4.4 },
       'glm-5.3-flash': { input: 0.15, cachedInput: 0.03, output: 0.5 },
-      'kimi-k2.5': { input: null, cachedInput: null, output: null },
       'minimax-m2.5': { input: 0.3, cachedInput: 0.03, output: 1.2 },
       'MiniMax-M2.7': { input: 0.3, cachedInput: 0.06, output: 1.2 },
       'MiniMax-M3': { input: 0.6, cachedInput: 0.12, output: 2.4 },
@@ -344,9 +404,9 @@ describe('modelCatalog', () => {
       'wan3.0-video-prime': { input: null, cachedInput: null, output: null },
       'deepseek-v4.1-flash': { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 },
     })
-    expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].map((modelId) =>
-      catalog.find((entry) => entry.modelId === modelId)?.pricingSource?.status,
-    )).toEqual(['unpublished', 'unpublished', 'unpublished'])
+    expect(['gemini-3-pro-preview', 'glm-5.2', 'kimi-k2.5'].every((modelId) =>
+      !catalog.some((entry) => entry.modelId === modelId),
+    )).toBe(true)
     expect(catalog.find((entry) => entry.modelId === 'gemini-2.5-pro')?.pricingSource?.tiers[0]).toMatchObject({
       id: 'over-200k', minInputTokens: 200_000, minInclusive: false,
       official: { input: 2.5, cachedInput: 0.25, output: 15 },
@@ -392,10 +452,9 @@ describe('modelCatalog', () => {
       { provider: 'Anthropic', label: 'Claude', logo: '/brand/claude.svg', count: 6 },
       { provider: 'xAI', label: 'Grok', logo: '/brand/grok.svg', count: 2 },
       { provider: 'DeepSeek', label: 'DeepSeek', logo: '/brand/deepseek.svg', count: 1 },
-      { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 6 },
+      { provider: 'Google', label: 'Gemini', logo: '/brand/gemini.svg', count: 5 },
       { provider: 'Qwen', label: 'Qwen', logo: '/brand/qwen.svg', count: 11 },
-      { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 4 },
-      { provider: 'Moonshot', label: 'Kimi', logo: '/brand/kimi.svg', count: 1 },
+      { provider: 'Z.AI', label: 'GLM', logo: '/brand/glm.svg', count: 3 },
       { provider: 'MiniMax', label: 'MiniMax', logo: '/brand/minimax.svg', count: 4 },
       { provider: 'Alibaba', label: 'Wan', logo: '/brand/qwen.svg', count: 2 },
     ])
@@ -501,10 +560,11 @@ describe('modelCatalog', () => {
 
   it('keeps providers grouped in the approved order for every sort', () => {
     const catalog = buildModelCatalog(emptyConfig)
+	const publishedProviderOrder = CATALOG_PROVIDER_ORDER.filter((provider) => provider !== 'Moonshot')
 
-    expect(groupModelCatalog(filterModelCatalog(catalog, {})).map((group) => group.provider)).toEqual(CATALOG_PROVIDER_ORDER)
+    expect(groupModelCatalog(filterModelCatalog(catalog, {})).map((group) => group.provider)).toEqual(publishedProviderOrder)
     for (const sort of ['featured', 'name', 'input-price', 'output-price'] as const) {
-      expect(groupModelCatalog(filterModelCatalog(catalog, { sort })).map((group) => group.provider)).toEqual(CATALOG_PROVIDER_ORDER)
+      expect(groupModelCatalog(filterModelCatalog(catalog, { sort })).map((group) => group.provider)).toEqual(publishedProviderOrder)
     }
   })
 

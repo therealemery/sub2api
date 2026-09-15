@@ -1303,10 +1303,62 @@ func isOpenAIAccountEligibleForRequest(account *Account, requestedModel string, 
 	if requestedModel != "" && !account.IsModelSupported(requestedModel) {
 		return false
 	}
+	if !isManagedPackyAccountAllowedForModel(account, requestedModel) {
+		return false
+	}
 	if requireCompact && openAICompactSupportTier(account) == 0 {
 		return false
 	}
 	return true
+}
+
+var packyExactAccountByModel = map[string]string{
+	"gpt-5.6-luna":        "Packy / Codex",
+	"gpt-5.6-sol":         "Packy / Codex",
+	"gpt-5.6-terra":       "Packy / Codex",
+	"gpt-6-astra":         "Packy / Codex",
+	"deepseek-v4.1-flash": "Packy / DeepSeek Sale",
+}
+
+var unavailableCustomerTextModels = map[string]struct{}{
+	"deepseek-v4-pro": {},
+}
+
+func isManagedPackyAccountAllowedForModel(account *Account, requestedModel string) bool {
+	if account == nil {
+		return false
+	}
+	normalizedModel := strings.ToLower(strings.TrimSpace(requestedModel))
+	if _, unavailable := unavailableCustomerTextModels[normalizedModel]; unavailable {
+		return false
+	}
+	wantAccount, restricted := packyExactAccountByModel[normalizedModel]
+	if !restricted {
+		return true
+	}
+	return account.ManagedUpstreamProvider() == UpstreamProviderPackyAPI && account.Name == wantAccount
+}
+
+// hasUniqueExactManagedPackyAccount validates the collection-level half of
+// the cost-sensitive route policy. A matching account name is not enough: the
+// candidate set must contain exactly one managed Packy account with that name.
+func hasUniqueExactManagedPackyAccount(accounts []Account, requestedModel string) bool {
+	normalizedModel := strings.ToLower(strings.TrimSpace(requestedModel))
+	if _, unavailable := unavailableCustomerTextModels[normalizedModel]; unavailable {
+		return false
+	}
+	wantAccount, restricted := packyExactAccountByModel[normalizedModel]
+	if !restricted {
+		return true
+	}
+
+	matches := 0
+	for i := range accounts {
+		if accounts[i].ManagedUpstreamProvider() == UpstreamProviderPackyAPI && accounts[i].Name == wantAccount {
+			matches++
+		}
+	}
+	return matches == 1
 }
 
 // prioritizeOpenAICompactAccounts re-orders a slice so that accounts with known
@@ -1357,6 +1409,9 @@ func (s *OpenAIGatewayService) selectAccountForModelWithExclusions(ctx context.C
 			"model", requestedModel)
 		return nil, fmt.Errorf("%w supporting model: %s (channel pricing restriction)", ErrNoAvailableAccounts, requestedModel)
 	}
+	if err := s.validateManagedPackyAccountCardinality(ctx, groupID, requestedModel); err != nil {
+		return nil, err
+	}
 
 	// 1. 尝试粘性会话命中
 	// Try sticky session hit
@@ -1386,6 +1441,20 @@ func (s *OpenAIGatewayService) selectAccountForModelWithExclusions(ctx context.C
 	}
 
 	return s.hydrateSelectedAccount(ctx, selected)
+}
+
+func (s *OpenAIGatewayService) validateManagedPackyAccountCardinality(ctx context.Context, groupID *int64, requestedModel string) error {
+	if _, restricted := packyExactAccountByModel[strings.ToLower(strings.TrimSpace(requestedModel))]; !restricted {
+		return nil
+	}
+	accounts, err := s.listSchedulableAccounts(ctx, groupID)
+	if err != nil {
+		return err
+	}
+	if !hasUniqueExactManagedPackyAccount(accounts, requestedModel) {
+		return noAvailableOpenAISelectionError(requestedModel, false)
+	}
+	return nil
 }
 
 // tryStickySessionHit 尝试从粘性会话获取账号。
@@ -1600,6 +1669,9 @@ func (s *OpenAIGatewayService) selectAccountWithLoadAwareness(ctx context.Contex
 		return nil, err
 	}
 	if len(accounts) == 0 {
+		return nil, ErrNoAvailableAccounts
+	}
+	if !hasUniqueExactManagedPackyAccount(accounts, requestedModel) {
 		return nil, ErrNoAvailableAccounts
 	}
 

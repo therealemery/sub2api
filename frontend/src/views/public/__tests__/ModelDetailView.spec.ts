@@ -43,6 +43,8 @@ const { getModelDisplayConfig, localeState, routeState, t } = vi.hoisted(() => (
       'publicModels.viewOfficialPricing': 'View official pricing',
       'publicModels.priceUnavailable': 'Price on request',
       'publicModels.notPublished': 'Not published',
+      'publicModels.notFoundTitle': 'Model not found',
+      'publicModels.notFoundDescription': 'This model is not currently listed in the public OwnAPI catalog.',
       'publicModels.free': 'Free',
       'publicModels.priceType': 'Price type',
       'publicModels.related': 'Related models',
@@ -173,12 +175,13 @@ describe('ModelDetailView', () => {
     expect(wrapper.find('a button').exists()).toBe(false)
   })
 
-  it('renders verified Not published pricing states without numeric fallbacks', async () => {
+  it('returns the public 404 state for models without an exact verified price', async () => {
     const unpublished = mountDetail('gemini-3-pro-preview')
     await flushPromises()
-    expect(unpublished.get('.pricing-state').text()).toContain('Not published')
-    expect(unpublished.text()).toContain('The provider has not published a verified public token price.')
-    expect(unpublished.findAll('.pricing-tier tbody td')).toHaveLength(0)
+    expect(unpublished.get('.not-found').text()).toContain('404')
+    expect(unpublished.get('.not-found').text()).toContain('Model not found')
+    expect(unpublished.get('.not-found').text()).toContain('This model is not currently listed in the public OwnAPI catalog.')
+    expect(unpublished.find('.pricing-state').exists()).toBe(false)
     expect(unpublished.text()).not.toMatch(/\$\d/)
   })
 

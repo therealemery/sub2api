@@ -115,7 +115,7 @@ export const verifiedModelSeedData: RawVerifiedModelSeed[] = [
     contextWindow: '500K',
     tiers: [{ id: 'long', minInputTokens: 200_000, minInclusive: true, maxInputTokens: null, maxInclusive: true, official: { input: 4, cachedInput: 1, output: 12 } }],
   }),
-  seed('deepseek-v4.1-flash', 'DeepSeek V4.1 Flash', 'deepseek', ['fast', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 40, 165, {
+  seed('deepseek-v4.1-flash', 'DeepSeek V4.1 Flash', 'deepseek', ['fast', 'reasoning', 'coding'], ['openai'], { input: 0.15, cachedInput: 0.003, cacheWrite: null, output: 0.6 }, 'https://api-docs.deepseek.com/quick_start/pricing', 50, 165, {
     customerMultiplier: 0.7, checkedAt: '2026-09-13', contextWindow: null,
   }),
   seed('gemini-2.5-flash', 'Gemini 2.5 Flash', 'gemini', ['fast', 'multimodal'], ['openai'], { input: 0.3, cachedInput: 0.03, output: 2.5 }, 'https://ai.google.dev/gemini-api/docs/pricing', 57, 170, { contextWindow: '1M' }),

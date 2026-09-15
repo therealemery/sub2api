@@ -24,6 +24,101 @@ type schedulerTestOpenAIAccountRepo struct {
 	accounts []Account
 }
 
+func TestManagedPackyCostSensitiveModelsRequireExactAccount(t *testing.T) {
+	t.Parallel()
+	models := []string{"gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-6-astra"}
+	for _, model := range models {
+		model := model
+		t.Run(model, func(t *testing.T) {
+			t.Parallel()
+			core := &Account{
+				Name: "Packy / Core", Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+				Status: StatusActive, Schedulable: true,
+				Extra:       map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+				Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+			}
+			codex := *core
+			codex.Name = "Packy / Codex"
+			unmanaged := codex
+			unmanaged.Extra = nil
+			require.False(t, isOpenAIAccountEligibleForRequest(core, model, false))
+			require.False(t, isOpenAIAccountEligibleForRequest(&unmanaged, model, false))
+			require.True(t, isOpenAIAccountEligibleForRequest(&codex, model, false))
+		})
+	}
+
+	deepSeek := &Account{
+		Name: "Packy / DeepSeek Sale", Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+		Status: StatusActive, Schedulable: true,
+		Extra:       map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+		Credentials: map[string]any{"model_mapping": map[string]any{"deepseek-v4.1-flash": "deepseek-v4-flash"}},
+	}
+	require.True(t, isOpenAIAccountEligibleForRequest(deepSeek, "deepseek-v4.1-flash", false))
+	deepSeek.Name = "Packy / Core"
+	require.False(t, isOpenAIAccountEligibleForRequest(deepSeek, "deepseek-v4.1-flash", false))
+	deepSeek.Name = "Packy / DeepSeek Sale"
+	deepSeek.Credentials = map[string]any{"model_mapping": map[string]any{"deepseek-v4-pro": "deepseek-v4-pro"}}
+	require.False(t, isOpenAIAccountEligibleForRequest(deepSeek, "deepseek-v4-pro", false))
+}
+
+func TestOpenAIGatewayServiceSelectsOnlyExactCodexAccount(t *testing.T) {
+	t.Parallel()
+	model := "gpt-5.6-luna"
+	newAccount := func(id int64, name string) Account {
+		return Account{
+			ID: id, Name: name, Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+			Status: StatusActive, Schedulable: true, Concurrency: 1,
+			Extra:       map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+			Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+		}
+	}
+
+	svc := &OpenAIGatewayService{
+		accountRepo: schedulerTestOpenAIAccountRepo{accounts: []Account{
+			newAccount(1, "Packy / Core"),
+			newAccount(2, "Packy / Codex"),
+		}},
+	}
+	selected, err := svc.SelectAccountForModel(context.Background(), nil, "", model)
+	require.NoError(t, err)
+	require.Equal(t, int64(2), selected.ID)
+
+	svc.accountRepo = schedulerTestOpenAIAccountRepo{accounts: []Account{newAccount(1, "Packy / Core")}}
+	selected, err = svc.SelectAccountForModel(context.Background(), nil, "", model)
+	require.Error(t, err)
+	require.Nil(t, selected)
+
+	svc.accountRepo = schedulerTestOpenAIAccountRepo{accounts: []Account{
+		newAccount(2, "Packy / Codex"),
+		newAccount(3, "Packy / Codex"),
+	}}
+	selected, err = svc.SelectAccountForModel(context.Background(), nil, "", model)
+	require.Error(t, err)
+	require.Nil(t, selected)
+}
+
+func TestOpenAIGatewayServiceStickyCodexFailsClosedWithDuplicateExactAccounts(t *testing.T) {
+	t.Parallel()
+	model := "gpt-5.6-luna"
+	newAccount := func(id int64) Account {
+		return Account{
+			ID: id, Name: "Packy / Codex", Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+			Status: StatusActive, Schedulable: true, Concurrency: 1,
+			Extra:       map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+			Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+		}
+	}
+	cache := &stubGatewayCache{sessionBindings: map[string]int64{"duplicate-codex": 41}}
+	svc := &OpenAIGatewayService{
+		accountRepo: schedulerTestOpenAIAccountRepo{accounts: []Account{newAccount(41), newAccount(42)}},
+		cache:       cache,
+	}
+
+	selected, err := svc.SelectAccountForModel(context.Background(), nil, "duplicate-codex", model)
+	require.Error(t, err)
+	require.Nil(t, selected)
+}
+
 func (r schedulerTestOpenAIAccountRepo) GetByID(ctx context.Context, id int64) (*Account, error) {
 	for i := range r.accounts {
 		if r.accounts[i].ID == id {
@@ -678,6 +773,36 @@ func TestOpenAIGatewayService_SelectAccountWithScheduler_SessionSticky(t *testin
 	if selection.ReleaseFunc != nil {
 		selection.ReleaseFunc()
 	}
+}
+
+func TestOpenAIGatewayService_SelectAccountWithScheduler_SessionStickyCodexFailsClosedWithDuplicateExactAccounts(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	groupID := int64(10110)
+	model := "gpt-5.6-luna"
+	newAccount := func(id int64) Account {
+		return Account{
+			ID: id, Name: "Packy / Codex", Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+			Status: StatusActive, Schedulable: true, Concurrency: 1,
+			Extra:       map[string]any{"upstream_provider": UpstreamProviderPackyAPI},
+			Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+		}
+	}
+	accounts := []Account{newAccount(51001), newAccount(51002)}
+	cache := &schedulerTestGatewayCache{sessionBindings: map[string]int64{"openai:duplicate-codex": 51001}}
+	svc := &OpenAIGatewayService{
+		accountRepo:        schedulerTestOpenAIAccountRepo{accounts: accounts},
+		cache:              cache,
+		cfg:                &config.Config{},
+		rateLimitService:   newOpenAIAdvancedSchedulerRateLimitService("true"),
+		concurrencyService: NewConcurrencyService(schedulerTestConcurrencyCache{}),
+	}
+
+	selection, _, err := svc.SelectAccountWithScheduler(
+		ctx, &groupID, "", "duplicate-codex", model, nil, OpenAIUpstreamTransportAny, false,
+	)
+	require.Error(t, err)
+	require.Nil(t, selection)
 }
 
 func TestOpenAIGatewayService_SelectAccountWithScheduler_SessionStickyBusyKeepsSticky(t *testing.T) {

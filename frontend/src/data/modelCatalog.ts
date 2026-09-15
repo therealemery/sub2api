@@ -103,6 +103,13 @@ export function calculateOwnApiPricing(
   return result
 }
 
+export function ownApiSaleMultiplierForCostRatio(costRatio: number | null): 0.7 | 0.8 | null {
+  if (costRatio == null || !Number.isFinite(costRatio) || costRatio < 0) return null
+  if (costRatio <= 0.6) return 0.7
+  if (costRatio <= 0.8) return 0.8
+  return null
+}
+
 export function activeOfficialTier(
   pricing: ModelPricingSource,
   tierId?: string | null,
@@ -220,7 +227,7 @@ const fallbackFamily: FamilyMetadata = {
 }
 
 export const verifiedCatalogSeeds: CuratedSeed[] = verifiedModelSeedData
-  .filter((raw) => raw.discountPercent >= 20 && !isRestrictedThirdPartyModel(raw.modelId))
+  .filter(isVerifiedCatalogSeed)
   .map(seedFromRawData)
 
 export function buildModelCatalog(config?: ModelDisplayConfig | null): ModelCatalogEntry[] {
@@ -386,7 +393,8 @@ function family(
 function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
   const metadata = families.find((item) => item.family === raw.family)
   if (!metadata) throw new Error(`Missing model family metadata: ${raw.family}`)
-  const ownApiMultiplier: ModelPricingSource['multiplier'] = raw.customerMultiplier ?? (raw.discountPercent >= 40 ? 0.7 : 0.8)
+  const reviewedPackyMultiplier = ownApiSaleMultiplierForCostRatio(1 - raw.discountPercent / 100)
+  const ownApiMultiplier: ModelPricingSource['multiplier'] = raw.customerMultiplier ?? reviewedPackyMultiplier ?? 0.8
   const checkedAt = raw.checkedAt ?? '2026-09-07'
   const pricingStatus: ModelPricingStatus = raw.pricingStatus === 'free'
     ? 'free'
@@ -426,6 +434,16 @@ function seedFromRawData(raw: RawVerifiedModelSeed): CuratedSeed {
     isAlias: raw.isAlias ?? false,
     aliasNoteKey: raw.aliasNoteKey ?? null,
   }
+}
+
+function isVerifiedCatalogSeed(raw: RawVerifiedModelSeed): boolean {
+  if (isRestrictedThirdPartyModel(raw.modelId)) return false
+  if (raw.modality === 'Video') return raw.discountPercent >= 20 && raw.videoPricing != null && raw.videoPricing.length > 0
+  const hasExactManufacturerPrice = raw.pricingStatus === 'paid'
+    && raw.official.input != null
+    && raw.official.output != null
+    && raw.sourceUrl.startsWith('https://')
+  return hasExactManufacturerPrice && ownApiSaleMultiplierForCostRatio(1 - raw.discountPercent / 100) != null
 }
 
 function entryFromSeed(item: CuratedSeed, featured: FeaturedModelConfig[]): ModelCatalogEntry {

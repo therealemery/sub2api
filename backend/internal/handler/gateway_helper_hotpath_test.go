@@ -9,10 +9,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Wei-Shaw/sub2api/internal/pkg/openai"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 )
+
+func TestAppendModelIfMissingKeepsRestrictiveEmptyListDistinctFromFallback(t *testing.T) {
+	models := appendModelIfMissing([]string{}, miniMaxH3Model)
+	require.Equal(t, []string{miniMaxH3Model}, models)
+	for _, fallback := range openai.DefaultModels {
+		require.NotEqual(t, fallback.ID, models[0])
+	}
+}
 
 type helperConcurrencyCacheStub struct {
 	mu sync.Mutex

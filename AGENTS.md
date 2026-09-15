@@ -104,6 +104,50 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-15 — Conditional text pricing implementation locally complete
+
+- Completed the approved DeepSeek weekday peak rule and immutable final-successful-attempt
+  timestamp: customer charge and Packy account cost use the same `1x`/`2x` condition factor,
+  while the negotiated multiplier remains independently resolved by customer/model,
+  customer/group, group, then `1.0`.
+- Usage rows, user/admin history, and admin export now retain/display the pricing timestamp,
+  condition multiplier, and provider-neutral rule ID. Public model settings expose only a
+  sanitized schedule projection.
+- Migration 143 records the corrected 70/80-percent customer pricing, GPT-6 strict `>272K`
+  tier, exact Codex/DeepSeek cost cards normalized at 6.7 CNY/USD, and exact Packy account
+  scopes without creating accounts or changing credentials. Integration coverage verifies
+  idempotence, unchanged API keys/base URLs, duplicate-account failure closing, and GPT-6
+  selection at 271,999/272,000/272,001 tokens.
+- Exact-account checks now apply before normal, advanced-scheduler, session-sticky, and
+  previous-response-sticky selection. Wrong/unmanaged/duplicate Packy accounts, missing channel
+  prices, and DeepSeek Pro all fail closed; an explicitly empty restrictive model list cannot
+  fall back to built-in OpenAI defaults.
+- The reviewed text snapshot covers all 49 text seeds. It publishes 39 text models plus three
+  video models (42 total); exact-unverified, cost-above-80-percent, and Claude Code-only entries
+  stay excluded. DeepSeek Flash's reviewed Packy cost band is 50 percent and its base customer
+  price remains manufacturer list x 70 percent.
+- Final local verification: frontend 115 test files / 699 tests, Vue type checks, full ESLint,
+  production build, backend target packages, and `go vet ./...` passed. The complete backend
+  matrix still reproduces the pre-existing local Go/Ent `ent/schema: package "context" without
+  types` failure; Docker is unavailable here, so integration tests exit cleanly without running
+  containers. Focused sticky/GPT-6 boundary tests, privacy/credential scans, `git diff --check`,
+  and local browser QA at 1440x900 and 390x844 passed.
+- Nothing from this checkpoint is pushed or deployed. Production remains
+  `ownapi:4ef4a83716b5`; no paid request has been made. Before deployment, take the read-only
+  production preflight/backup and confirm exactly one schedulable managed `Packy / Codex` and
+  one `Packy / DeepSeek Sale` account.
+
+### 2026-09-14 — Exact Packy Codex cost evidence recovered
+
+- Packy's public read-only pricing projection was rechecked for the exact `codex` group. The group
+  ratio is `0.8` over Packy's ¥2 base and the four model rows expose their component ratios.
+- Exact CNY/MTok cards are Luna `0.8/4.8/0.08/1.0`, Sol `4/24/0.4/5`, Terra
+  `1.6/9.6/0.16/2`, and Astra `8/40/0.8/10` for input/output/cache-read/cache-write.
+  The first three use Packy's published above-272K input `2x` and output `1.5x` cost tier;
+  Astra has no Packy cost tier. OwnAPI normalizes these costs at 6.7 CNY/USD.
+- The exact evidence gate for migration 143 is therefore cleared without using a credential or
+  issuing a paid request. Migration/routing work remains local and is not pushed or deployed.
+
 ### 2026-09-14 — Sanitized conditional-pricing disclosure locally verified
 
 - The backend-owned model-display projection now publishes only the provider-neutral DeepSeek rule

@@ -48,6 +48,39 @@ func TestOpenAIGatewayService_SelectAccountByPreviousResponseID_Hit(t *testing.T
 	}
 }
 
+func TestOpenAIGatewayService_SelectAccountByPreviousResponseID_CodexFailsClosedWithDuplicateExactAccounts(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	groupID := int64(10111)
+	model := "gpt-5.6-luna"
+	newAccount := func(id int64) Account {
+		return Account{
+			ID: id, Name: "Packy / Codex", Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
+			Status: StatusActive, Schedulable: true, Concurrency: 1,
+			Extra: map[string]any{
+				"upstream_provider":                             UpstreamProviderPackyAPI,
+				"openai_apikey_responses_websockets_v2_enabled": true,
+			},
+			Credentials: map[string]any{"model_mapping": map[string]any{model: model}},
+		}
+	}
+	accounts := []Account{newAccount(52001), newAccount(52002)}
+	cache := &stubGatewayCache{}
+	store := NewOpenAIWSStateStore(cache)
+	svc := &OpenAIGatewayService{
+		accountRepo:        stubOpenAIAccountRepo{accounts: accounts},
+		cache:              cache,
+		cfg:                newOpenAIWSV2TestConfig(),
+		concurrencyService: NewConcurrencyService(stubConcurrencyCache{}),
+		openaiWSStateStore: store,
+	}
+	require.NoError(t, store.BindResponseAccount(ctx, groupID, "resp_duplicate_codex", 52001, time.Hour))
+
+	selection, err := svc.SelectAccountByPreviousResponseID(ctx, &groupID, "resp_duplicate_codex", model, nil, false)
+	require.Error(t, err)
+	require.Nil(t, selection)
+}
+
 func TestOpenAIGatewayService_SelectAccountByPreviousResponseID_RateLimitedMiss(t *testing.T) {
 	ctx := context.Background()
 	groupID := int64(23)

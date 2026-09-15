@@ -154,6 +154,23 @@ prices. A Packy discount label or a price inferred by doubling the 50% cost card
 the manufacturer USD source. Once verified, the same 70% sale policy applies without changing the
 conditional-rule design.
 
+The Packy public pricing projection was rechecked on 2026-09-14 for the exact `codex` group. Its
+group ratio is `0.8` over Packy's ¥2 model-ratio base, and the model rows publish the independent
+output, cache-read, cache-write, and long-context ratios. The resulting reviewed CNY/MTok cards
+used by OwnAPI account-cost reporting are:
+
+| Exact `codex` model | Input | Output | Cache read | Cache write |
+| --- | ---: | ---: | ---: | ---: |
+| `gpt-5.6-luna` | 0.80 | 4.80 | 0.08 | 1.00 |
+| `gpt-5.6-sol` | 4.00 | 24.00 | 0.40 | 5.00 |
+| `gpt-5.6-terra` | 1.60 | 9.60 | 0.16 | 2.00 |
+| `gpt-6-astra` | 8.00 | 40.00 | 0.80 | 10.00 |
+
+The three GPT-5.6 rows use Packy's published above-272K input `2x` and output `1.5x` cost tier.
+Packy publishes no cost tier for GPT-6 Astra, so its exact flat `codex` card remains the upstream
+cost at both customer context tiers. All values are divided by 6.7 when OwnAPI persists USD account
+cost. No credential or signed-in account identifier is part of this evidence.
+
 ## Reusable Request-Condition Pricing Rules
 
 Request conditions are represented as version-controlled structured rules, not cron jobs that

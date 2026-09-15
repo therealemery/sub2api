@@ -3965,6 +3965,9 @@ func (s *OpenAIGatewayService) SelectAccountByPreviousResponseID(
 	if responseID == "" {
 		return nil, nil
 	}
+	if err := s.validateManagedPackyAccountCardinality(ctx, groupID, requestedModel); err != nil {
+		return nil, err
+	}
 	store := s.getOpenAIWSStateStore()
 	if store == nil {
 		return nil, nil

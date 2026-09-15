@@ -482,6 +482,28 @@ func (s *ChannelService) GetChannelModelPricing(ctx context.Context, groupID int
 	return &cp
 }
 
+// FilterModelsByGroupPricing applies the channel's exact allow-list semantics
+// to an already discovered model list. Groups without an active restrictive
+// channel preserve the legacy account-mapping list.
+func (s *ChannelService) FilterModelsByGroupPricing(ctx context.Context, groupID int64, models []string) []string {
+	lk, err := s.lookupGroupChannel(ctx, groupID)
+	if err != nil {
+		slog.Warn("failed to load channel cache for available-model filtering", "group_id", groupID, "error", err)
+		return nil
+	}
+	if lk == nil || !lk.channel.RestrictModels {
+		return cloneStringSlice(models)
+	}
+
+	filtered := make([]string, 0, len(models))
+	for _, model := range models {
+		if lookupPricingAcrossPlatforms(lk.cache, groupID, lk.platform, strings.ToLower(strings.TrimSpace(model))) != nil {
+			filtered = append(filtered, model)
+		}
+	}
+	return filtered
+}
+
 // ResolveChannelMapping 解析渠道级模型映射（热路径 O(1)）
 // 返回映射结果，包含映射后的模型名、渠道 ID、计费模型来源。
 func (s *ChannelService) ResolveChannelMapping(ctx context.Context, groupID int64, model string) ChannelMappingResult {
