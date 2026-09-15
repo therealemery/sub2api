@@ -22,7 +22,7 @@ func TestPackyTextPricingMigrationIsIdempotentAndFailClosed(t *testing.T) {
 	_, err := tx.ExecContext(ctx, `
 		INSERT INTO groups (name, platform, rate_multiplier, status)
 		VALUES ('OwnAPI', 'openai', 1.0, 'active')
-		ON CONFLICT (name) DO UPDATE SET
+		ON CONFLICT (name) WHERE deleted_at IS NULL DO UPDATE SET
 			platform = EXCLUDED.platform,
 			rate_multiplier = EXCLUDED.rate_multiplier,
 			status = EXCLUDED.status
@@ -181,7 +181,7 @@ func TestPackyTextPricingMigration143IsIdempotentAndFailClosed(t *testing.T) {
 	_, err := tx.ExecContext(ctx, `
 		INSERT INTO groups (name, platform, rate_multiplier, status)
 		VALUES ('OwnAPI', 'openai', 1.0, 'active')
-		ON CONFLICT (name) DO UPDATE SET platform = EXCLUDED.platform, status = EXCLUDED.status
+		ON CONFLICT (name) WHERE deleted_at IS NULL DO UPDATE SET platform = EXCLUDED.platform, status = EXCLUDED.status
 	`)
 	require.NoError(t, err)
 	_, err = tx.ExecContext(ctx, `
@@ -320,7 +320,7 @@ func TestPackyTextPricingMigration143RejectsAmbiguousCodexAccounts(t *testing.T)
 	_, err := tx.ExecContext(ctx, `
 		INSERT INTO groups (name, platform, rate_multiplier, status)
 		VALUES ('OwnAPI', 'openai', 1.0, 'active')
-		ON CONFLICT (name) DO UPDATE SET platform = EXCLUDED.platform, status = EXCLUDED.status
+		ON CONFLICT (name) WHERE deleted_at IS NULL DO UPDATE SET platform = EXCLUDED.platform, status = EXCLUDED.status
 	`)
 	require.NoError(t, err)
 	_, err = tx.ExecContext(ctx, `

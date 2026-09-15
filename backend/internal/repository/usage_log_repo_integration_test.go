@@ -49,7 +49,8 @@ func TestUsageLogRepositoryPricingAuditRoundTrip(t *testing.T) {
 	user := mustCreateUser(t, client, &service.User{Email: fmt.Sprintf("usage-pricing-audit-%d@example.com", time.Now().UnixNano())})
 	apiKey := mustCreateApiKey(t, client, &service.APIKey{UserID: user.ID, Key: "sk-usage-pricing-audit-" + uuid.NewString(), Name: "k"})
 	account := mustCreateAccount(t, client, &service.Account{Name: "acc-usage-pricing-audit-" + uuid.NewString()})
-	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 123, time.UTC)
+	// PostgreSQL timestamps preserve microseconds, not arbitrary nanoseconds.
+	effectiveAt := time.Date(2026, 9, 14, 1, 0, 0, 123000, time.UTC)
 	ruleID := "deepseek-weekday-peak-2026-09-13"
 	log := &service.UsageLog{
 		UserID: user.ID, APIKeyID: apiKey.ID, AccountID: account.ID,
