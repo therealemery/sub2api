@@ -109,6 +109,31 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-15 — Production reference-image/video paid verification
+
+- The user explicitly authorized minimum-cost paid verification for `wan3.0-video`,
+  `wan3.0-video-prime`, and `MiniMax-H3`. No text-model or unrelated video request was made.
+- A single 480P, two-second request containing both one public HTTPS reference image and one public
+  HTTPS reference video completed for each Wan model. Usage 3322 (`wan3.0-video`) charged
+  `$0.0660096000`, recorded `$0.0492537314` account cost, and downloaded a 1,859,624-byte MP4.
+  Usage 3323 (`wan3.0-video-prime`) charged `$0.1017600000`, recorded `$0.0873134328` account cost,
+  and downloaded a 1,625,989-byte MP4.
+- MiniMax H3 accepted and completed one lowest-cost 768p, five-second customer request containing a
+  public HTTPS reference image. Usage 3324 charged `$0.2798507465` and downloaded a 1,255,566-byte
+  MP4. The three successful customer tasks charged exactly `$0.4476203465`; the test user's balance
+  moved from `$53.75789827` to `$53.31027792`.
+- MiniMax H3 did not accept a public HTTPS reference-video request: DC-API returned an immediate
+  provider-owned `service_unavailable`. A combined HTTPS image+video request likewise failed before
+  billing. Separate multipart PNG and MP4 uploads through OwnAPI returned upstream 400 before task
+  creation. All these failed OwnAPI requests produced no usage row and no customer deduction.
+- A provider-direct, sanitized diagnostic confirmed the H3 split: HTTPS image queued, while HTTPS
+  video immediately returned `service_unavailable`. The accepted provider-direct image diagnostic
+  bypassed OwnAPI usage/customer billing and may have consumed upstream credit; its private task ID
+  and credentials were neither printed nor retained. Do not repeat it.
+- Current verified capability: both Wan models support reference image+video together through the
+  customer API; H3 supports public HTTPS reference images, but H3 reference video and local-upload
+  reference media are not production-ready. No product code was changed during this verification.
+
 ### 2026-09-15 — Conditional text pricing deployed and verified
 
 - Functional commit `b5625850` plus PostgreSQL integration-fixture corrections `bcc4c5e5` and

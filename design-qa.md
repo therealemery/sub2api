@@ -23,6 +23,22 @@
 
 final result: passed
 
+## Production Video Reference-Media QA — 2026-09-15
+
+- Explicitly authorized lowest-cost paid tests used one reference image and one reference video on
+  both Wan models at 480P / two seconds. Both tasks completed and their customer content endpoints
+  returned valid MP4 files (1,859,624 and 1,625,989 bytes).
+- MiniMax H3 completed at 768p / five seconds with one public HTTPS reference image and returned a
+  valid 1,255,566-byte MP4. The H3 public HTTPS reference-video request returned provider
+  `service_unavailable`; combined image+video behaved the same. Local multipart PNG and MP4 inputs
+  reached DC-API but returned upstream 400 before task creation.
+- Successful customer usage IDs 3322–3324 charged `$0.4476203465` in total. Balance movement matched
+  exactly. Failed H3 customer attempts created no usage row and deducted no balance.
+- One sanitized provider-direct image diagnostic was accepted outside OwnAPI billing and may have
+  used provider credit; it was not repeated and no private ID or credential was retained.
+
+final result: Wan 3 and Wan 3 Prime passed image+video; H3 passed HTTPS image only and failed video/uploads
+
 ## Conditional Text Pricing Production QA — 2026-09-15
 
 ### Deployment and data evidence
