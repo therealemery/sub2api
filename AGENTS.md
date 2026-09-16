@@ -110,6 +110,33 @@ This repository is being customized into the OwnAPI product. The active objectiv
 
 ## Work in Progress
 
+### 2026-09-16 — H3 reference-video fail-closed repair locally verified
+
+- Production minimum-cost verification is complete: Wan 3 and Wan 3 Prime both succeeded with
+  reference image plus reference video; MiniMax H3 succeeded with a public HTTPS reference image
+  and with a local PNG multipart upload, but failed with both a public reference-video URL and a
+  local MP4 multipart upload.
+- The successful local H3 PNG request created Usage `3325`, charged `$0.2798507465`, returned a
+  valid 1,055,082-byte MP4, and left the balance at `$53.03042717`. The failed H3 MP4 request created
+  no usage row and deducted no balance. The two authorized H3 creates have been used; do not submit
+  another paid task without fresh approval.
+- Read-only investigation confirmed DC-API's current frontend explicitly accepts
+  `reference_videos` as `{url}[]` or `String[]`. DC-API fetched the staged, standards-compliant
+  2-second H.264 MP4 completely and still returned a terminal failure. MiniMax's official H3 V2 API
+  supports reference video through its different `content`/`role=reference_video` protocol, so the
+  remaining fault is in DC-API's legacy H3 adapter rather than OwnAPI's upload, callback URL, media
+  validation, or JSON shape. Guessing a second accepted JSON shape is not a valid repair.
+- With user approval, OwnAPI now fails closed for MiniMax H3 `reference_videos`: JSON, data URI, and
+  multipart attempts return a customer-safe 400 before media staging, account selection, upstream
+  task creation, usage creation, or billing. The H3 playground hides the reference-video URL/file
+  controls and explains that reference images remain supported. Model examples and public Docs no
+  longer advertise H3 reference video and clearly disclose the temporary limitation.
+- Wan 3 and Wan 3 Prime reference-video behavior, routing, prices, and examples remain unchanged.
+  H3 text, reference-image, reference-audio-with-image, and first/last-frame paths remain unchanged.
+- Local verification passed: backend handler/service/routes packages; all 115 frontend test files /
+  699 tests; Vue type checking; focused ESLint; production frontend build; Go formatting; and
+  `git diff --check`. Deployment is pending at this checkpoint and no additional paid task was run.
+
 ### 2026-09-15 — MiniMax H3 reference-media follow-up fix locally verified
 
 - Corrected the failed-test diagnosis without changing `/v1/videos` or the DC-API JSON URL-object

@@ -51,7 +51,7 @@
               <div><span class="video-step">01</span><h3>{{ t('publicDocs.videoCreateTitle') }}</h3><p>{{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoCreateDescriptionH3' : 'publicDocs.videoCreateDescriptionWan') }}</p><h4 v-if="selectedVideoModel === 'MiniMax-H3'">{{ t('publicDocs.videoUrlExampleTitle') }}</h4><pre><code>{{ videoCreateExample }}</code></pre><template v-if="selectedVideoModel === 'MiniMax-H3'"><h4>{{ t('publicDocs.videoUploadExampleTitle') }}</h4><pre><code>{{ h3UploadExample }}</code></pre></template></div>
               <div><span class="video-step">02</span><h3>{{ t('publicDocs.videoRetrieveTitle') }}</h3><p>{{ t('publicDocs.videoRetrieveDescription') }}</p><pre><code>{{ h3RetrieveExample }}</code></pre></div>
               <div><span class="video-step">03</span><h3>{{ t('publicDocs.videoDownloadTitle') }}</h3><p>{{ t('publicDocs.videoDownloadDescription') }}</p><pre><code>{{ h3DownloadExample }}</code></pre></div>
-              <div><span class="video-step">API</span><h3>{{ t('publicDocs.videoInputsTitle') }}</h3><p>{{ t('publicDocs.videoInputsDescription') }}</p><ul><li><code>reference_images</code> / <code>input_reference</code> — {{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoImagesHint' : 'publicDocs.wanImagesHint') }}</li><li><code>reference_videos</code> — {{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoVideosHint' : 'publicDocs.wanVideosHint') }}</li><li><code>reference_audios</code> — {{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoAudiosHint' : 'publicDocs.wanAudiosHint') }}</li><li><code>first_frame_image</code> / <code>last_frame_image</code> — {{ t('publicDocs.videoFramesHint') }}</li><li v-if="selectedVideoModel === 'MiniMax-H3'">{{ t('publicDocs.videoTotalInputsHint') }}</li><li v-if="selectedVideoModel !== 'MiniMax-H3'"><code>ratio</code>, <code>audio</code>, <code>seed</code>, <code>prompt_extend</code>, <code>watermark</code> — {{ t('publicDocs.wanControlsHint') }}</li><li>{{ t('publicDocs.videoExclusivityHint') }}</li></ul></div>
+              <div><span class="video-step">API</span><h3>{{ t('publicDocs.videoInputsTitle') }}</h3><p>{{ t('publicDocs.videoInputsDescription') }}</p><ul><li><code>reference_images</code> / <code>input_reference</code> — {{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoImagesHint' : 'publicDocs.wanImagesHint') }}</li><li v-if="selectedVideoModel !== 'MiniMax-H3'"><code>reference_videos</code> — {{ t('publicDocs.wanVideosHint') }}</li><li v-else>{{ t('publicDocs.h3VideoUnavailableHint') }}</li><li><code>reference_audios</code> — {{ t(selectedVideoModel === 'MiniMax-H3' ? 'publicDocs.videoAudiosHint' : 'publicDocs.wanAudiosHint') }}</li><li><code>first_frame_image</code> / <code>last_frame_image</code> — {{ t('publicDocs.videoFramesHint') }}</li><li v-if="selectedVideoModel === 'MiniMax-H3'">{{ t('publicDocs.videoTotalInputsHint') }}</li><li v-if="selectedVideoModel !== 'MiniMax-H3'"><code>ratio</code>, <code>audio</code>, <code>seed</code>, <code>prompt_extend</code>, <code>watermark</code> — {{ t('publicDocs.wanControlsHint') }}</li><li>{{ t('publicDocs.videoExclusivityHint') }}</li></ul></div>
             </div>
             <div class="video-docs-flow"><code>POST /v1/videos</code><span>→</span><code>GET /v1/videos/{task_id}</code><span>→</span><code>GET /v1/videos/{task_id}/content</code></div>
           </section>
@@ -124,7 +124,6 @@ const h3CreateExample = `curl "${baseUrl}/videos" \\
     "duration": 5,
     "resolution": "768p",
     "reference_images": ["<HTTPS_REFERENCE_IMAGE_URL>"],
-    "reference_videos": ["<HTTPS_REFERENCE_VIDEO_URL>"],
     "reference_audios": ["<HTTPS_REFERENCE_AUDIO_URL>"]
   }'`
 const h3UploadExample = `curl "${baseUrl}/videos" \\
@@ -134,7 +133,6 @@ const h3UploadExample = `curl "${baseUrl}/videos" \\
   -F "duration=5" \\
   -F "resolution=768p" \\
   -F "input_reference=@reference.png;type=image/png" \\
-  -F "reference_videos=@reference.mp4;type=video/mp4" \\
   -F "reference_audios=@reference.mp3;type=audio/mpeg"`
 const videoCreateExample = computed(() => selectedVideoModel.value === 'MiniMax-H3' ? h3CreateExample : `curl "${baseUrl}/videos" \\
   -H "Authorization: Bearer $OWNAPI_API_KEY" \\

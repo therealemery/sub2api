@@ -48,20 +48,15 @@ func TestBuildH3UpstreamRequestKeepsTextOnlyJSON(t *testing.T) {
 
 func TestBuildH3UpstreamRequestEncodesReferenceMediaAsDCAPIJSON(t *testing.T) {
 	pngURI := "data:image/png;base64," + base64.StdEncoding.EncodeToString(tinyPNG)
-	mp4 := tinyMP4WithDuration(2)
-	mp4URI := "data:video/mp4;base64," + base64.StdEncoding.EncodeToString(mp4)
 	mp3URI := "data:audio/mpeg;base64," + base64.StdEncoding.EncodeToString([]byte("ID3audio"))
 	body, contentType, err := buildH3UpstreamRequest(map[string]any{
 		"prompt":           "Follow the references",
 		"reference_images": []any{pngURI},
-		"reference_videos": []any{mp4URI},
 		"reference_audios": []any{mp3URI},
 	}, 5, "2k", func(field string, value h3MediaValue) (string, error) {
 		switch field {
 		case "input_reference":
 			return "https://www.ownapi.dev/v1/video-inputs/image_token", nil
-		case "reference_videos":
-			return "https://www.ownapi.dev/v1/video-inputs/video_token", nil
 		default:
 			return "https://www.ownapi.dev/v1/video-inputs/audio_token", nil
 		}
@@ -71,8 +66,21 @@ func TestBuildH3UpstreamRequestEncodesReferenceMediaAsDCAPIJSON(t *testing.T) {
 	var got map[string]any
 	require.NoError(t, json.Unmarshal(body, &got))
 	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/image_token"}}, got["reference_images"])
-	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/video_token"}}, got["reference_videos"])
+	require.NotContains(t, got, "reference_videos")
 	require.Equal(t, []any{map[string]any{"url": "https://www.ownapi.dev/v1/video-inputs/audio_token"}}, got["reference_audios"])
+}
+
+func TestBuildH3UpstreamRequestRejectsReferenceVideoBeforeUpstreamPreparation(t *testing.T) {
+	buildMediaURLCalled := false
+	_, _, err := buildH3UpstreamRequest(map[string]any{
+		"prompt":           "Follow the reference motion",
+		"reference_videos": []any{"https://example.com/reference.mp4"},
+	}, 5, "768p", func(field string, value h3MediaValue) (string, error) {
+		buildMediaURLCalled = true
+		return "https://www.ownapi.dev/v1/video-inputs/video_token", nil
+	})
+	require.ErrorContains(t, err, "temporarily unavailable")
+	require.False(t, buildMediaURLCalled)
 }
 
 func TestBuildH3UpstreamRequestStagesUploadedImageWithPublicURL(t *testing.T) {

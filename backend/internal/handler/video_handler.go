@@ -271,6 +271,9 @@ func (h *GatewayHandler) VideosCreate(c *gin.Context) {
 }
 
 func videoMediaErrorMessage(err error) string {
+	if err != nil && strings.Contains(err.Error(), "MiniMax H3 reference video is temporarily unavailable") {
+		return "MiniMax H3 reference video is temporarily unavailable"
+	}
 	if err != nil && strings.Contains(err.Error(), "reference videos must be from 2 through 15 seconds") {
 		return "Reference videos must be from 2 through 15 seconds"
 	}

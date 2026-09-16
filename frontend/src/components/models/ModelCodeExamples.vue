@@ -56,17 +56,17 @@ const videoResolution = computed(() => isWan.value ? '480P' : '768p')
 const videoFilename = computed(() => `${props.modelId.toLowerCase().replace(/[^a-z0-9.-]+/g, '-')}.mp4`)
 const pythonMediaFields = computed(() => isWan.value
   ? `        "ratio": "adaptive",\n        "audio": True,\n        "seed": -1,\n        "prompt_extend": True,\n        "watermark": False,\n        # Optional reference inputs (replace with real HTTPS URLs or data URIs):\n        # "reference_images": ["<REFERENCE_IMAGE_URL>"],\n        # "reference_videos": ["<REFERENCE_VIDEO_URL>"],\n        # "reference_audios": ["<REFERENCE_AUDIO_URL>"],`
-  : `        # Optional direct HTTPS inputs (audio requires an image):\n        # "reference_images": ["<HTTPS_REFERENCE_IMAGE_URL>"],\n        # "reference_videos": ["<HTTPS_REFERENCE_VIDEO_URL>"],\n        # "reference_audios": ["<HTTPS_REFERENCE_AUDIO_URL>"],`)
+  : `        # Optional direct HTTPS inputs (audio requires an image):\n        # "reference_images": ["<HTTPS_REFERENCE_IMAGE_URL>"],\n        # "reference_audios": ["<HTTPS_REFERENCE_AUDIO_URL>"],`)
 const javascriptMediaFields = computed(() => isWan.value
   ? `    ratio: "adaptive", audio: true, seed: -1,\n    prompt_extend: true, watermark: false,\n    // Optional reference inputs (replace with real HTTPS URLs or data URIs):\n    // reference_images: ["<REFERENCE_IMAGE_URL>"],\n    // reference_videos: ["<REFERENCE_VIDEO_URL>"],\n    // reference_audios: ["<REFERENCE_AUDIO_URL>"]`
-  : `    // Optional direct HTTPS inputs (audio requires an image):\n    // reference_images: ["<HTTPS_REFERENCE_IMAGE_URL>"],\n    // reference_videos: ["<HTTPS_REFERENCE_VIDEO_URL>"],\n    // reference_audios: ["<HTTPS_REFERENCE_AUDIO_URL>"]`)
+  : `    // Optional direct HTTPS inputs (audio requires an image):\n    // reference_images: ["<HTTPS_REFERENCE_IMAGE_URL>"],\n    // reference_audios: ["<HTTPS_REFERENCE_AUDIO_URL>"]`)
 const curlMediaFields = computed(() => isWan.value
   ? `    "ratio": "adaptive",\n    "audio": true,\n    "seed": -1,\n    "prompt_extend": true,\n    "watermark": false`
-  : `    "reference_images": ["<HTTPS_REFERENCE_IMAGE_URL>"],\n    "reference_videos": ["<HTTPS_REFERENCE_VIDEO_URL>"],\n    "reference_audios": ["<HTTPS_REFERENCE_AUDIO_URL>"]`)
+  : `    "reference_images": ["<HTTPS_REFERENCE_IMAGE_URL>"],\n    "reference_audios": ["<HTTPS_REFERENCE_AUDIO_URL>"]`)
 const videoPrompt = computed(() => isWan.value
   ? 'A paper boat crosses a moonlit lake. Cinematic, smooth camera movement.'
-  : 'Follow the reference motion and preserve the subject. No text.')
-const h3CurlExample = computed(() => `# 1. Create with local reference files. Audio requires an image.\ncurl "${baseUrl.value}/videos" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n+  -F "model=${props.modelId}" \\\n+  -F "prompt=${videoPrompt.value}" \\\n+  -F "duration=5" \\\n+  -F "resolution=${videoResolution.value}" \\\n+  -F "input_reference=@reference.png;type=image/png" \\\n+  -F "reference_videos=@reference.mp4;type=video/mp4" \\\n+  -F "reference_audios=@reference.mp3;type=audio/mpeg"\n\n# 2. Replace <task_id> with the id from the create response.\ncurl "${baseUrl.value}/videos/<task_id>" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY"\n\n# 3. Download the generated MP4 after status becomes completed.\ncurl "${baseUrl.value}/videos/<task_id>/content" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n+  -o ${videoFilename.value}`)
+  : 'Animate the reference image and follow the reference audio. No text.')
+const h3CurlExample = computed(() => `# 1. Create with local reference files. Audio requires an image.\ncurl "${baseUrl.value}/videos" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n+  -F "model=${props.modelId}" \\\n+  -F "prompt=${videoPrompt.value}" \\\n+  -F "duration=5" \\\n+  -F "resolution=${videoResolution.value}" \\\n+  -F "input_reference=@reference.png;type=image/png" \\\n+  -F "reference_audios=@reference.mp3;type=audio/mpeg"\n\n# MiniMax H3 reference-video input is temporarily unavailable.\n\n# 2. Replace <task_id> with the id from the create response.\ncurl "${baseUrl.value}/videos/<task_id>" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY"\n\n# 3. Download the generated MP4 after status becomes completed.\ncurl "${baseUrl.value}/videos/<task_id>/content" \\\n+  -H "Authorization: Bearer $OWNAPI_API_KEY" \\\n+  -o ${videoFilename.value}`)
 
 const tabs = [
   { id: 'python', labelKey: 'publicModels.code.python' },

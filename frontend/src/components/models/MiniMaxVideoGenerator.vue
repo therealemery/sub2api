@@ -44,14 +44,15 @@
         <label><span>{{ t('publicModels.videoGenerator.firstFrameFile') }}</span><input type="file" :accept="isWan ? 'image/png,image/jpeg' : 'image/png'" @change="selectFirstFrameFile" /></label>
         <label><span>{{ t('publicModels.videoGenerator.lastFrameFile') }}</span><input type="file" :accept="isWan ? 'image/png,image/jpeg' : 'image/png'" @change="selectLastFrameFile" /></label>
       </div>
-      <label>
+      <label v-if="isWan">
         <span>{{ t('publicModels.videoGenerator.referenceVideoUrl') }}</span>
         <input v-model.trim="referenceVideoURL" type="url" placeholder="https://…/reference.mp4" />
       </label>
-      <label>
+      <label v-if="isWan">
         <span>{{ t('publicModels.videoGenerator.referenceVideoFile') }}</span>
         <input type="file" accept="video/mp4,video/*" @change="selectReferenceVideoFile" />
       </label>
+      <p v-else class="input-notice">{{ t('publicModels.videoGenerator.h3ReferenceVideoUnavailable') }}</p>
       <label>
         <span>{{ t('publicModels.videoGenerator.referenceAudioUrl') }}</span>
         <input v-model.trim="referenceAudioURL" type="url" placeholder="https://…/reference.mp3" />
@@ -283,5 +284,5 @@ onBeforeUnmount(() => { window.clearTimeout(pollTimer); releaseVideoObjectURL() 
 </script>
 
 <style scoped>
-.video-generator{margin-top:32px;border:1px solid #dedede;border-radius:18px;background:#fff;padding:28px}.generator-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}.generator-heading span{color:#777;font-size:11px}.generator-heading h2{margin:6px 0 0;font-size:25px;letter-spacing:-.04em}.generator-heading>strong{font-size:22px}.video-generator form{display:grid;gap:16px}.video-generator label{display:grid;gap:7px;color:#555;font-size:12px}.video-generator input,.video-generator textarea,.video-generator select{width:100%;box-sizing:border-box;border:1px solid #d8d8d8;border-radius:9px;background:#fafafa;padding:11px 12px;color:#171717;font:inherit}.video-generator textarea{min-height:130px;resize:vertical}.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.check-options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.check-options label{display:flex;align-items:center;gap:8px}.check-options input{width:auto}.video-generator form>button{min-height:44px;border:0;border-radius:9px;background:#171717;color:#fff;font:inherit;font-weight:650;cursor:pointer}.video-generator form>button:disabled{opacity:.55}.generator-error{margin:16px 0 0;color:#b42318;font-size:12px}.task-result{display:grid;gap:12px;margin-top:22px;border-top:1px solid #e5e5e5;padding-top:20px}.task-result>div{display:flex;justify-content:space-between}.task-result video{width:100%;border-radius:10px;background:#111}.task-result a{width:fit-content;color:#171717;font-size:12px;font-weight:650}@media(max-width:620px){.video-generator{padding:20px}.generator-heading{align-items:flex-start;flex-direction:column}.options-grid,.check-options{grid-template-columns:1fr}}
+.video-generator{margin-top:32px;border:1px solid #dedede;border-radius:18px;background:#fff;padding:28px}.generator-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}.generator-heading span{color:#777;font-size:11px}.generator-heading h2{margin:6px 0 0;font-size:25px;letter-spacing:-.04em}.generator-heading>strong{font-size:22px}.video-generator form{display:grid;gap:16px}.video-generator label{display:grid;gap:7px;color:#555;font-size:12px}.video-generator input,.video-generator textarea,.video-generator select{width:100%;box-sizing:border-box;border:1px solid #d8d8d8;border-radius:9px;background:#fafafa;padding:11px 12px;color:#171717;font:inherit}.video-generator textarea{min-height:130px;resize:vertical}.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.check-options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.check-options label{display:flex;align-items:center;gap:8px}.check-options input{width:auto}.video-generator form>button{min-height:44px;border:0;border-radius:9px;background:#171717;color:#fff;font:inherit;font-weight:650;cursor:pointer}.video-generator form>button:disabled{opacity:.55}.input-notice{margin:0;border:1px solid #dedede;border-radius:9px;background:#fafafa;padding:11px 12px;color:#666;font-size:12px}.generator-error{margin:16px 0 0;color:#b42318;font-size:12px}.task-result{display:grid;gap:12px;margin-top:22px;border-top:1px solid #e5e5e5;padding-top:20px}.task-result>div{display:flex;justify-content:space-between}.task-result video{width:100%;border-radius:10px;background:#111}.task-result a{width:fit-content;color:#171717;font-size:12px;font-weight:650}@media(max-width:620px){.video-generator{padding:20px}.generator-heading{align-items:flex-start;flex-direction:column}.options-grid,.check-options{grid-template-columns:1fr}}
 </style>

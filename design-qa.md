@@ -1,3 +1,35 @@
+# Video reference-media QA — 2026-09-16
+
+## Production evidence
+
+- Wan 3 and Wan 3 Prime both completed with reference image plus reference video.
+- MiniMax H3 completed with a public HTTPS reference image and with a local PNG multipart upload.
+  The local PNG task is Usage `3325`; it charged `$0.2798507465` and returned a valid
+  1,055,082-byte MP4.
+- MiniMax H3 failed with both a public reference-video URL and a local MP4 multipart upload. The
+  local file was a valid 2.000-second H.264 MP4 at 854×480 and 30 fps. DC-API fetched the entire
+  staged OwnAPI URL with HTTP 200, then returned terminal failure. No usage row or balance deduction
+  was created for that failed request.
+
+## Diagnosis and product correction
+
+- DC-API's current frontend declares `reference_videos` compatible with both `{url}[]` and
+  `String[]`; changing between those shapes is not an evidence-based fix.
+- MiniMax's official H3 V2 API supports reference video, but DC-API's legacy `/v1/videos` adapter
+  does not currently translate or execute that path successfully.
+- OwnAPI now rejects H3 reference-video inputs before staging or contacting the upstream, returns a
+  clear 400 response, hides the H3 reference-video controls, and removes the unsupported field from
+  examples. Wan reference-video inputs remain available.
+
+## Verification
+
+- Backend handler, service, and routes packages passed.
+- Frontend: 115 test files / 699 tests, Vue type checking, focused ESLint, and the production build
+  passed. Only the repository's existing Browserslist, mixed-import, and chunk-size warnings remain.
+- No paid request was submitted while verifying the fail-closed correction.
+
+final result: verified supported paths and safely disabled the failing H3 reference-video path
+
 # Conditional Text Pricing QA — 2026-09-15
 
 ## Local browser evidence

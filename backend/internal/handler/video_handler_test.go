@@ -68,6 +68,8 @@ func TestVideoUsageEndpointDoesNotRevealPrivateAdapterPath(t *testing.T) {
 }
 
 func TestVideoMediaErrorMessageOnlyExposesSafeDurationGuidance(t *testing.T) {
+	require.Equal(t, "MiniMax H3 reference video is temporarily unavailable",
+		videoMediaErrorMessage(fmt.Errorf("MiniMax H3 reference video is temporarily unavailable")))
 	require.Equal(t, "Reference videos must be from 2 through 15 seconds",
 		videoMediaErrorMessage(fmt.Errorf("reference videos must be from 2 through 15 seconds")))
 	require.Equal(t, "Reference media could not be processed",

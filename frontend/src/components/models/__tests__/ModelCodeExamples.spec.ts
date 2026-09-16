@@ -7,7 +7,7 @@ vi.mock('vue-i18n', () => ({
 }))
 
 describe('ModelCodeExamples', () => {
-  it('documents the private OwnAPI H3 lifecycle and multipart uploads', async () => {
+  it('documents the private OwnAPI H3 lifecycle without advertising reference video', async () => {
     const wrapper = mount(ModelCodeExamples, {
       props: { modelId: 'MiniMax-H3', modality: 'Video' },
     })
@@ -16,8 +16,9 @@ describe('ModelCodeExamples', () => {
     await wrapper.findAll('[role="tab"]')[2]?.trigger('click')
     const curl = wrapper.get('code').text()
     expect(curl).toContain('-F "input_reference=@reference.png;type=image/png"')
-    expect(curl).toContain('-F "reference_videos=@reference.mp4;type=video/mp4"')
     expect(curl).toContain('-F "reference_audios=@reference.mp3;type=audio/mpeg"')
+    expect(curl).toContain('reference-video input is temporarily unavailable')
+    expect(curl).not.toContain('reference_videos=')
     expect(curl).toContain('/videos/<task_id>/content')
     expect(curl).not.toContain('dc-api')
   })

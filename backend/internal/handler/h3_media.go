@@ -218,6 +218,9 @@ func validateH3Media(request map[string]any) error {
 	audios := h3MediaValues(request["reference_audios"])
 	first := append(h3MediaValues(request["first_frame"]), h3MediaValues(request["first_frame_image"])...)
 	last := append(h3MediaValues(request["last_frame"]), h3MediaValues(request["last_frame_image"])...)
+	if len(videos) > 0 {
+		return fmt.Errorf("MiniMax H3 reference video is temporarily unavailable")
+	}
 	if len(images) > 9 {
 		return fmt.Errorf("at most 9 reference images are allowed")
 	}

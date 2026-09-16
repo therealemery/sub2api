@@ -189,11 +189,12 @@ describe('public Models and Docs motion', () => {
     expect(disconnect).toHaveBeenCalledTimes(1)
   })
 
-  it('documents H3 URL and multipart reference-media requests without exposing the upstream', () => {
+  it('documents supported H3 reference media without exposing the upstream', () => {
     expect(docsSource).toContain('h3UploadExample')
     expect(docsSource).toContain('input_reference=@reference.png;type=image/png')
-    expect(docsSource).toContain('reference_videos=@reference.mp4;type=video/mp4')
     expect(docsSource).toContain('reference_audios=@reference.mp3;type=audio/mpeg')
+    expect(docsSource).toContain('publicDocs.h3VideoUnavailableHint')
+    expect(docsSource).not.toContain('reference_videos=@reference.mp4;type=video/mp4')
     expect(docsSource).toContain('GET /v1/videos/{task_id}/content')
     expect(docsSource).not.toContain('console.dc-api.com')
   })
