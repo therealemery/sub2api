@@ -26,6 +26,8 @@
 - Backend handler, service, and routes packages passed.
 - Frontend: 115 test files / 699 tests, Vue type checking, focused ESLint, and the production build
   passed. Only the repository's existing Browserslist, mixed-import, and chunk-size warnings remain.
+- CI run `35045539349` passed. Deploy run `35045875650` installed
+  `ownapi:d47d5d147c2c`; `/health` returned 200 and an invalid input token returned 404.
 - No paid request was submitted while verifying the fail-closed correction.
 
 final result: verified supported paths and safely disabled the failing H3 reference-video path

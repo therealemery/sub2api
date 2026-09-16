@@ -135,7 +135,10 @@ This repository is being customized into the OwnAPI product. The active objectiv
   H3 text, reference-image, reference-audio-with-image, and first/last-frame paths remain unchanged.
 - Local verification passed: backend handler/service/routes packages; all 115 frontend test files /
   699 tests; Vue type checking; focused ESLint; production frontend build; Go formatting; and
-  `git diff --check`. Deployment is pending at this checkpoint and no additional paid task was run.
+  `git diff --check`. Commit `d47d5d14` was pushed to the feature branch and `main`; CI run
+  `35045539349` passed unit, integration, lint, and frontend jobs. Deploy run `35045875650` completed
+  successfully as image `ownapi:d47d5d147c2c`; public health returned 200 and an invalid input token
+  returned 404. No additional paid task was run.
 
 ### 2026-09-15 — MiniMax H3 reference-media follow-up fix locally verified
 
